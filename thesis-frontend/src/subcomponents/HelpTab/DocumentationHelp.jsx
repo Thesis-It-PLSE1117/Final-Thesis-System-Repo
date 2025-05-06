@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ChevronRight, Home, FileText, Cpu, Code, BarChart2, HelpCircle, Link as LinkIcon, Zap } from "lucide-react";
+import { BookOpen, ChevronRight, FileText, Cpu, Code, BarChart2, HelpCircle, Link as LinkIcon, Zap, Server, Clock, Gauge, Activity, Battery, Layers } from "lucide-react";
 import { useState } from "react";
 
 const DocumentationHelp = () => {
@@ -16,51 +16,84 @@ const DocumentationHelp = () => {
     {
       title: "Introduction",
       icon: <FileText className="w-5 h-5" />,
-      content: "Overview of the cloud load balancing simulation project and its objectives."
+      content: "This documentation covers our cloud load balancing simulation system comparing Enhanced ACO (Ant Colony Optimization) and Enhanced PSO (Particle Swarm Optimization) algorithms for efficient task scheduling in cloud environments."
     },
     {
-      title: "Dataset",
+      title: "Dataset & Workloads",
       icon: <BookOpen className="w-5 h-5" />,
-      content: "Details about the dataset used for simulations and workload generation."
+      content: "The system uses customizable cloudlet workloads in CSV format, containing task specifications including length, file size, output size, and arrival time. Sample datasets are provided for quick testing."
     },
     {
-      title: "Preprocessing Steps",
-      icon: <Cpu className="w-5 h-5" />,
-      content: "How we prepare and normalize the data before running simulations."
+      title: "System Requirements",
+      icon: <Server className="w-5 h-5" />,
+      content: "Minimum requirements include modern browsers (Chrome/Firefox/Edge) with JavaScript enabled. For optimal performance, we recommend systems with 8GB+ RAM when running complex simulations."
     },
     {
       title: "Algorithms",
       icon: <Code className="w-5 h-5" />,
       subsections: [
         {
-          title: "Round Robin (RR)",
-          content: "Traditional load balancing algorithm that distributes requests equally."
+          title: "Enhanced ACO (EACO)",
+          content: "Our modified Ant Colony Optimization algorithm featuring adaptive pheromone evaporation rates and heuristic-based load information for dynamic cloud environments."
         },
         {
           title: "Enhanced PSO (EPSO)",
-          content: "Our improved Particle Swarm Optimization algorithm for load balancing."
+          content: "Improved Particle Swarm Optimization with nonlinear inertia weight reduction and adaptive velocity clamping for faster convergence in load balancing scenarios."
         }
       ]
     },
     {
-      title: "System Architecture",
+      title: "Performance Metrics",
       icon: <BarChart2 className="w-5 h-5" />,
-      content: "Technical overview of the simulation system's components and design."
-    },
-    {
-      title: "Frontend Guide",
-      icon: <HelpCircle className="w-5 h-5" />,
       subsections: [
-        { title: "Overview", content: "General frontend structure and capabilities" },
-        { title: "UI Walkthrough", content: "How to navigate the interface" },
-        { title: "Features", content: "Key features and their functions" },
-        { title: "Interaction Diagrams", content: "Visual representations of user flows" }
+        {
+          title: "Response Time",
+          content: "Time taken from task submission to completion (measured in milliseconds)"
+        },
+        {
+          title: "Resource Utilization",
+          content: "Percentage of available CPU, memory, and bandwidth being used effectively (higher is better)"
+        },
+        {
+          title: "Energy Efficiency",
+          content: "Power consumption relative to computational output (watts per task, lower is better)"
+        },
+        {
+          title: "Load Imbalance",
+          content: "Measure of uneven distribution across VMs (0-1 scale, lower values indicate better balance)"
+        },
+        {
+          title: "Makespan",
+          content: "Total time to complete all tasks in the workload (measured in milliseconds)"
+        }
       ]
     },
     {
-      title: "Results & Analysis",
-      icon: <LinkIcon className="w-5 h-5" />,
-      content: "Findings from our simulations and comparative analysis of algorithms."
+      title: "Simulation Guide",
+      icon: <HelpCircle className="w-5 h-5" />,
+      subsections: [
+        { 
+          title: "Configuration", 
+          content: "Set up data center specifications including hosts, VMs, and their capabilities" 
+        },
+        { 
+          title: "Workload Upload", 
+          content: "Import custom datasets or use provided samples" 
+        },
+        { 
+          title: "Algorithm Selection", 
+          content: "Choose between EACO, EPSO or compare both" 
+        },
+        { 
+          title: "Result Analysis", 
+          content: "Interpret the performance metrics and visualizations" 
+        }
+      ]
+    },
+    {
+      title: "Technical Details",
+      icon: <Cpu className="w-5 h-5" />,
+      content: "The system architecture includes a React.js frontend with visualization components and a simulation engine implementing the load balancing algorithms. All computations run client-side for privacy."
     }
   ];
 
@@ -81,7 +114,7 @@ const DocumentationHelp = () => {
           <Zap className="text-[#319694] animate-pulse" />
         </div>
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-          Project Documentation
+          Simulation Documentation
         </h2>
       </motion.div>
 
@@ -172,26 +205,52 @@ const DocumentationHelp = () => {
         className="mt-12 bg-[#319694]/10 rounded-xl p-6 border border-[#319694]/20"
       >
         <h3 className="font-semibold text-[#319694] mb-3 flex items-center gap-2">
-          <Home className="w-5 h-5" /> Getting Started
+          <Clock className="w-5 h-5" /> Key Performance Indicators
         </h3>
         <p className="text-gray-600 mb-4">
-          New to the project? Begin with our installation guide and tutorial walkthroughs.
+          These metrics are used to evaluate and compare algorithm performance:
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {['Installation', 'Simulation Guide', 'Custom Workloads'].map((item, idx) => (
-            <motion.button
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[
+            { 
+              title: "Response Time", 
+              icon: <Clock className="text-[#319694]" />,
+              desc: "Task completion latency (ms)" 
+            },
+            { 
+              title: "Resource Utilization", 
+              icon: <Activity className="text-[#319694]" />,
+              desc: "Effective resource usage (%)" 
+            },
+            { 
+              title: "Energy Efficiency", 
+              icon: <Battery className="text-[#319694]" />,
+              desc: "Power per computation (W)" 
+            },
+            { 
+              title: "Load Imbalance", 
+              icon: <Gauge className="text-[#319694]" />,
+              desc: "VM workload distribution (0-1)" 
+            },
+            { 
+              title: "Makespan", 
+              icon: <Layers className="text-[#319694]" />,
+              desc: "Total workload time (ms)" 
+            }
+          ].map((item, idx) => (
+            <motion.div
               key={idx}
               whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-white rounded-lg p-4 shadow-xs border border-[#319694]/10 text-left"
+              className="bg-white rounded-lg p-4 shadow-xs border border-[#319694]/10"
             >
-              <h4 className="font-medium text-[#319694]">{item}</h4>
-              <p className="text-sm text-gray-500 mt-1">
-                {idx === 0 && "How to set up the simulation environment"}
-                {idx === 1 && "Running your first load balancing simulation"}
-                {idx === 2 && "Using custom datasets and workload patterns"}
+              <div className="flex items-center gap-3 mb-2">
+                {item.icon}
+                <h4 className="font-medium text-[#319694]">{item.title}</h4>
+              </div>
+              <p className="text-sm text-gray-500">
+                {item.desc}
               </p>
-            </motion.button>
+            </motion.div>
           ))}
         </div>
       </motion.div>

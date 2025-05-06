@@ -109,8 +109,8 @@ const HomePage = () => {
       title: "Resources",
       links: [
         { text: "Documentation", href: "#", icon: <BookText size={16} />, onClick: () => openModal('documentation') },
-        { text: "Research Paper", href: "#", icon: <FileText size={16} /> },
-        { text: "GitHub Repository", href: "#", icon: <GitCompare size={16} /> }
+        { text: "Research Paper", href: "https://docs.google.com/document/d/1NYjfhNk7LM67LDS1SdULkZ0WgZGMHuDq/edit?fbclid=IwZXh0bgNhZW0CMTEAAR7ulWdWXKfO8zESkvZ8M0iVmr80DYh5V9x8uNWXZBtTUkpMYF-Xbou2F0jx0w_aem_A7Q6gt6Js_R74zj6Yo7J_A", icon: <FileText size={16} /> },
+        { text: "GitHub Repository", href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git", icon: <GitCompare size={16} /> }
       ]
     },
     {
