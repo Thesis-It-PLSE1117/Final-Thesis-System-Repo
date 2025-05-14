@@ -50,7 +50,7 @@ const MetricCard = ({ title, description, rrValue, epsoValue, unit, betterWhen, 
           <div className={`p-4 rounded-lg border ${
             !isBetter ? "bg-blue-50 border-blue-200 ring-2 ring-blue-100" : "bg-blue-50 border-blue-100"
           }`}>
-            <div className="text-sm font-medium mb-1 text-blue-600">Round Robin</div>
+            <div className="text-sm font-medium mb-1 text-blue-600">EACO</div>
             <div className="text-2xl font-bold text-blue-800">
               {rrValue.toFixed(2)}{unit}
             </div>
@@ -90,7 +90,7 @@ const MetricCard = ({ title, description, rrValue, epsoValue, unit, betterWhen, 
               <div className={`text-xs font-semibold ${
                 isBetter ? "text-green-600" : "text-red-600"
               }`}>
-                EPSO is {improvementText} than Round Robin
+                EPSO is {improvementText} than EACO
               </div>
             </div>
           </div>

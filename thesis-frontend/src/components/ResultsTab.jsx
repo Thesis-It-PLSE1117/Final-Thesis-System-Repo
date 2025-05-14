@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiRefreshCw,
   FiArrowLeft,
   FiSearch
 } from 'react-icons/fi';
-import rrResults from '../../public/results/apirun_rr.json';
-import epsoResults from '../../public/results/apirun_epso.json';
 import MetricCard from '../subcomponents/ResultsTab/MetricCard';
 import SchedulingLogTable from '../subcomponents/ResultsTab/SchedulingLogTable';
 import PerformanceCharts from '../subcomponents/ResultsTab/Charts';
 import { normalizeData, getSummaryData, keyMetrics } from '../subcomponents/ResultsTab/utils';
 
-const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
+const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults }) => {
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,18 +23,37 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
 
   useEffect(() => {
     try {
-      const rrData = normalizeData(rrResults);
-      const epsoData = normalizeData(epsoResults);
+      console.group('📊 Results Tab Data Processing');
+      console.log('📥 Raw EACO results from props:', rrResults);
+      console.log('📥 Raw EPSO results from props:', epsoResults);
+      
+      if (!rrResults || !epsoResults) {
+        console.warn('⚠️ Missing results data from props');
+        setError('No simulation results available. Please run a simulation first.');
+        setLoading(false);
+        console.groupEnd();
+        return;
+      }
+      
+      // Normalize the data
+      const normalizedRR = normalizeData(rrResults);
+      const normalizedEPSO = normalizeData(epsoResults);
+      
+      console.log('🔄 Normalized EACO data:', normalizedRR);
+      console.log('🔄 Normalized EPSO data:', normalizedEPSO);
 
-      setResultsRR(rrData);
-      setResultsEPSO(epsoData);
+      setResultsRR(normalizedRR);
+      setResultsEPSO(normalizedEPSO);
       setLoading(false);
+      
+      console.groupEnd();
     } catch (err) {
-      setError(`Failed to load results: ${err.message}`);
-      console.error('Error loading results:', err);
+      console.error('❌ Error processing results:', err);
+      setError('Failed to process simulation results. Please try again.');
       setLoading(false);
+      console.groupEnd();
     }
-  }, []);
+  }, [rrResults, epsoResults]);
 
   const handleBackToAnimation = () => {
     setIsExiting(true);
@@ -212,7 +230,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Round Robin Logs
+                EACO Logs
               </button>
               <button
                 onClick={() => setActiveLogTab('epso')}

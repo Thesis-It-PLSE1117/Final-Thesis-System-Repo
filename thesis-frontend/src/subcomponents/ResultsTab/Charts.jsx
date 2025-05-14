@@ -64,7 +64,7 @@ const PerformanceCharts = ({ rrSummary, epsoSummary, activeChart, setActiveChart
     labels: ['Resource Utilization', 'Response Time', 'Energy Efficiency'],
     datasets: [
       {
-        label: 'Round Robin',
+        label: 'EACO',
         data: [
           rrSummary.cpuUtilization,
           rrSummary.avgResponseTime,

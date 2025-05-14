@@ -2,82 +2,140 @@ import { useEffect, useRef, useState } from 'react';
 import VMCard from '../subcomponents/AnimationTab/VMCard';
 import MetricsPanel from '../subcomponents/AnimationTab/MetricsPanel';
 import Controls from '../subcomponents/AnimationTab/Controls';
-import { assignTasksWithEPSO, assignTasksWithRoundRobin } from '../subcomponents/AnimationTab/EPSORRAlgorithm';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, onViewResults }) => {
+const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, onViewResults, rrResults, epsoResults }) => {
   const [activeAlgorithm, setActiveAlgorithm] = useState('EPSO');
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeVMs, setActiveVMs] = useState({ EPSO: [], RR: [] });
-  const [taskCounts, setTaskCounts] = useState({ EPSO: {}, RR: {} });
-  const [cpuLoads, setCpuLoads] = useState({ EPSO: {}, RR: {} });
+  const [activeVMs, setActiveVMs] = useState({ EPSO: [], EACO: [] });
+  const [taskCounts, setTaskCounts] = useState({ EPSO: {}, EACO: {} });
+  const [cpuLoads, setCpuLoads] = useState({ EPSO: {}, EACO: {} });
   const [totalTasks, setTotalTasks] = useState(0);
   const animationRef = useRef(null);
-  const tasksRef = useRef([]);
-  const vmAssignmentsRef = useRef({ EPSO: {}, RR: {} });
-  const [executionTime, setExecutionTime] = useState({ EPSO: 0, RR: 0 });
-  const lastUpdateTimeRef = useRef(0);
   const [metrics, setMetrics] = useState({
     EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
-    RR: { imbalance: 0, makespan: 0, utilization: 0 }
+    EACO: { imbalance: 0, makespan: 0, utilization: 0 }
   });
   const [showResultsButton, setShowResultsButton] = useState(true);
-  const [highlightedVM, setHighlightedVM] = useState({ EPSO: null, RR: null });
+  const [highlightedVM, setHighlightedVM] = useState({ EPSO: null, EACO: null });
 
+  // Load backend results
+  useEffect(() => {
+    if (epsoResults && rrResults) {
+      console.group('Backend Response Data');
+      console.log('🚀 EPSO Results Received:', epsoResults);
+      console.log('🚀 EACO Results Received:', rrResults);
+      console.groupEnd();
+
+      console.group('Resource Utilization Comparison');
+      console.log('Simulation Results (Backend):');
+      console.log('EPSO:', {
+        imbalance: epsoResults.summary.imbalanceDegree,
+        makespan: epsoResults.summary.makespan,
+        utilization: epsoResults.summary.resourceUtilization * 100
+      });
+      console.log('EACO:', {
+        imbalance: rrResults.summary.imbalanceDegree,
+        makespan: rrResults.summary.makespan,
+        utilization: rrResults.summary.resourceUtilization * 100
+      });
+      
+      console.log('\nAnimation Initial State:');
+      console.log('EPSO VMs:', epsoResults.vmUtilization.map(vm => ({
+        id: vm.vmId,
+        load: vm.cpuUtilization,
+        tasks: vm.numAPECloudlets
+      })));
+      console.log('EACO VMs:', rrResults.vmUtilization.map(vm => ({
+        id: vm.vmId,
+        load: vm.cpuUtilization,
+        tasks: vm.numAPECloudlets
+      })));
+      console.groupEnd();
+
+      // Set metrics from backend data
+      setMetrics({
+        EPSO: {
+          imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
+          makespan: epsoResults.summary.makespan.toFixed(2),
+          utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+        },
+        EACO: {
+          imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
+          makespan: rrResults.summary.makespan.toFixed(2),
+          utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+        }
+      });
+
+      // Prepare VM utilization data
+      const epsoLoads = {};
+      const eacoLoads = {};
+      const epsoCounts = {};
+      const eacoCounts = {};
+      const epsoActive = [];
+      const eacoActive = [];
+
+      // Process EPSO VM utilization
+      epsoResults.vmUtilization.forEach(vm => {
+        const vmId = vm.vmId;
+        epsoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
+        epsoCounts[vmId] = vm.numAPECloudlets || 0;
+        if (vm.cpuUtilization > 0) epsoActive.push(vmId);
+      });
+
+      // Process EACO VM utilization
+      rrResults.vmUtilization.forEach(vm => {
+        const vmId = vm.vmId;
+        eacoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
+        eacoCounts[vmId] = vm.numAPECloudlets || 0;
+        if (vm.cpuUtilization > 0) eacoActive.push(vmId);
+      });
+
+      // Set component state
+      setCpuLoads({ EPSO: epsoLoads, EACO: eacoLoads });
+      setTaskCounts({ EPSO: epsoCounts, EACO: eacoCounts });
+      setActiveVMs({ EPSO: epsoActive, EACO: eacoActive });
+
+      // Find VMs with highest load for highlighting
+      let maxEpsoLoad = 0;
+      let maxEpsoVmId = null;
+      let maxEacoLoad = 0;
+      let maxEacoVmId = null;
+
+      epsoResults.vmUtilization.forEach(vm => {
+        if (vm.cpuUtilization > maxEpsoLoad) {
+          maxEpsoLoad = vm.cpuUtilization;
+          maxEpsoVmId = vm.vmId;
+        }
+      });
+
+      rrResults.vmUtilization.forEach(vm => {
+        if (vm.cpuUtilization > maxEacoLoad) {
+          maxEacoLoad = vm.cpuUtilization;
+          maxEacoVmId = vm.vmId;
+        }
+      });
+
+      setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
+
+      // Set total tasks from backend data
+      setTotalTasks(epsoResults.summary.totalCloudlets || 100);
+    }
+  }, [epsoResults, rrResults, dataCenterConfig.numVMs]);
+
+  // Handle workload file for task count
   useEffect(() => {
     if (workloadFile) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target.result;
         const lines = text.split('\n').filter(line => line.trim() !== '');
-        const headers = lines[0].split(',');
-        const data = lines.slice(1).map(line => {
-          const values = line.split(',');
-          return headers.reduce((obj, header, i) => {
-            obj[header.trim()] = values[i] ? values[i].trim() : '';
-            return obj;
-          }, {});
-        }).filter(task => task.job_id && task.task_index);
-
-        tasksRef.current = data;
-        setTotalTasks(data.length);
-
-        const counts = { EPSO: {}, RR: {} };
-        const loads = { EPSO: {}, RR: {} };
-        for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-          counts.EPSO[i] = 0;
-          loads.EPSO[i] = 0;
-          counts.RR[i] = 0;
-          loads.RR[i] = 0;
-        }
-        setTaskCounts(counts);
-        setCpuLoads(loads);
+        setTotalTasks(lines.length - 1); // Exclude header
       };
       reader.readAsText(workloadFile);
     }
-  }, [workloadFile, dataCenterConfig.numVMs]);
-
-  const calculateMetrics = (loads) => {
-    const vmCount = dataCenterConfig.numVMs;
-    if (vmCount === 0) return { imbalance: 0, makespan: 0, utilization: 0 };
-
-    const loadValues = Object.values(loads);
-    const maxLoad = Math.max(...loadValues);
-    const avgLoad = loadValues.reduce((sum, load) => sum + load, 0) / vmCount;
-
-    const squaredDiffs = loadValues.map(load => Math.pow(load - avgLoad, 2));
-    const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / vmCount;
-    const stdDev = Math.sqrt(variance);
-
-    const utilization = (avgLoad / maxLoad) * 100;
-
-    return {
-      imbalance: stdDev.toFixed(2),
-      makespan: maxLoad.toFixed(2),
-      utilization: utilization.toFixed(2)
-    };
-  };
+  }, [workloadFile]);
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -86,160 +144,208 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
     } else {
       setIsPlaying(true);
       const startTime = Date.now();
-      const duration = 10000;
-      lastUpdateTimeRef.current = 0;
+      const duration = 10000; // 10 seconds for animation
 
-      const resetCounts = { EPSO: {}, RR: {} };
-      const resetLoads = { EPSO: {}, RR: {} };
-      for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-        resetCounts.EPSO[i] = 0;
-        resetLoads.EPSO[i] = 0;
-        resetCounts.RR[i] = 0;
-        resetLoads.RR[i] = 0;
-      }
+      if (epsoResults && rrResults) {
+        // Reset state
+        const resetCounts = { EPSO: {}, EACO: {} };
+        const resetLoads = { EPSO: {}, EACO: {} };
+        const initialVMs = { EPSO: [], EACO: [] };
+        for (let i = 0; i < dataCenterConfig.numVMs; i++) {
+          resetCounts.EPSO[i] = 0;
+          resetLoads.EPSO[i] = 0;
+          resetCounts.EACO[i] = 0;
+          resetLoads.EACO[i] = 0;
+        }
+        setTaskCounts(resetCounts);
+        setCpuLoads(resetLoads);
+        setActiveVMs({ EPSO: [], EACO: [] });
+        setProgress(0);
+        setHighlightedVM({ EPSO: null, EACO: null });
 
-      setTaskCounts(resetCounts);
-      setCpuLoads(resetLoads);
-      setActiveVMs({ EPSO: [], RR: [] });
-      setExecutionTime({ EPSO: 0, RR: 0 });
-      setMetrics({
-        EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
-        RR: { imbalance: 0, makespan: 0, utilization: 0 }
-      });
-      setShowResultsButton(false);
-      setHighlightedVM({ EPSO: null, RR: null });
+        // Get final state from backend
+        const finalEpsoLoads = {};
+        const finalEacoLoads = {};
+        const finalEpsoCounts = {};
+        const finalEacoCounts = {};
+        const finalEpsoActive = [];
+        const finalEacoActive = [];
 
-      const animate = (timestamp) => {
-        const elapsed = Date.now() - startTime;
-        const newProgress = Math.min(100, (elapsed / duration) * 100);
-        setProgress(newProgress);
+        epsoResults.vmUtilization.forEach(vm => {
+          const vmId = vm.vmId;
+          finalEpsoLoads[vmId] = vm.cpuUtilization / 100 || 0;
+          finalEpsoCounts[vmId] = vm.numAPECloudlets || 0;
+          if (vm.cpuUtilization > 0) finalEpsoActive.push(vmId);
+        });
 
-        if (timestamp - lastUpdateTimeRef.current >= 16 || lastUpdateTimeRef.current === 0) {
-          lastUpdateTimeRef.current = timestamp;
+        rrResults.vmUtilization.forEach(vm => {
+          const vmId = vm.vmId;
+          finalEacoLoads[vmId] = vm.cpuUtilization / 100 || 0;
+          finalEacoCounts[vmId] = vm.numAPECloudlets || 0;
+          if (vm.cpuUtilization > 0) finalEacoActive.push(vmId);
+        });
 
-          const tasksToShow = Math.floor(cloudletConfig.numCloudlets * newProgress / 100);
-          const counts = { EPSO: {}, RR: {} };
-          const loads = { EPSO: {}, RR: {} };
-          const active = { EPSO: [], RR: [] };
-          const newHighlighted = { EPSO: null, RR: null };
+        const animate = (timestamp) => {
+          const elapsed = Date.now() - startTime;
+          const newProgress = Math.min(100, (elapsed / duration) * 100);
+          setProgress(newProgress);
+
+          const currentEpsoLoads = {};
+          const currentEacoLoads = {};
+          const currentEpsoCounts = {};
+          const currentEacoCounts = {};
+          const currentEpsoActive = [];
+          const currentEacoActive = [];
+
+          // Interpolate based on progress
+          for (let i = 0; i < dataCenterConfig.numVMs; i++) {
+            const percentPerVM = 95 / Math.max(finalEpsoActive.length, finalEacoActive.length);
+            const revealThreshold = finalEpsoActive.indexOf(i) * percentPerVM;
+
+            // EPSO
+            if (finalEpsoActive.includes(i) && newProgress >= revealThreshold) {
+              currentEpsoActive.push(i);
+              const vmVisibleProgress = Math.min(100, (newProgress - revealThreshold) * (100 / percentPerVM)) / 100;
+              currentEpsoLoads[i] = finalEpsoLoads[i] * vmVisibleProgress;
+              currentEpsoCounts[i] = Math.round(finalEpsoCounts[i] * vmVisibleProgress);
+            } else {
+              currentEpsoLoads[i] = 0;
+              currentEpsoCounts[i] = 0;
+            }
+
+            // EACO
+            if (finalEacoActive.includes(i) && newProgress >= revealThreshold) {
+              currentEacoActive.push(i);
+              const vmVisibleProgress = Math.min(100, (newProgress - revealThreshold) * (100 / percentPerVM)) / 100;
+              currentEacoLoads[i] = finalEacoLoads[i] * vmVisibleProgress;
+              currentEacoCounts[i] = Math.round(finalEacoCounts[i] * vmVisibleProgress);
+            } else {
+              currentEacoLoads[i] = 0;
+              currentEacoCounts[i] = 0;
+            }
+          }
+
+          // Log current state during animation
+          if (newProgress % 10 === 0) { // Log every 10% progress
+            console.group(`Animation Progress: ${newProgress}%`);
+            console.log('Current State:');
+            console.log('EPSO:', {
+              activeVMs: currentEpsoActive.length,
+              avgLoad: Object.values(currentEpsoLoads).reduce((sum, load) => sum + load, 0) / dataCenterConfig.numVMs,
+              totalTasks: Object.values(currentEpsoCounts).reduce((sum, count) => sum + count, 0)
+            });
+            console.log('EACO:', {
+              activeVMs: currentEacoActive.length,
+              avgLoad: Object.values(currentEacoLoads).reduce((sum, load) => sum + load, 0) / dataCenterConfig.numVMs,
+              totalTasks: Object.values(currentEacoCounts).reduce((sum, count) => sum + count, 0)
+            });
+            console.groupEnd();
+          }
+
+          // Highlight VMs with highest load
+          let maxEpsoLoad = 0;
+          let maxEpsoVmId = null;
+          let maxEacoLoad = 0;
+          let maxEacoVmId = null;
 
           for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-            counts.EPSO[i] = 0;
-            loads.EPSO[i] = 0;
-            counts.RR[i] = 0;
-            loads.RR[i] = 0;
-          }
-
-          const tasksSlice = tasksRef.current.slice(0, tasksToShow);
-
-          const startEPSTime = performance.now();
-          const epsonAssignments = assignTasksWithEPSO(
-            tasksSlice, 
-            dataCenterConfig.numVMs, 
-            dataCenterConfig.vmPes * dataCenterConfig.vmMips
-          );
-          const endEPSTime = performance.now();
-
-          const startRRTime = performance.now();
-          const rrAssignments = assignTasksWithRoundRobin(
-            tasksSlice, 
-            dataCenterConfig.numVMs
-          );
-          const endRRTime = performance.now();
-
-          setExecutionTime({
-            EPSO: endEPSTime - startEPSTime,
-            RR: endRRTime - startRRTime
-          });
-
-          let maxEPVOLoad = 0;
-          let maxRRLoad = 0;
-
-          for (const vmId in epsonAssignments) {
-            if (epsonAssignments[vmId].length > 0) {
-              const id = parseInt(vmId);
-              active.EPSO.push(id);
-              counts.EPSO[id] = epsonAssignments[vmId].length;
-              loads.EPSO[id] = epsonAssignments[vmId].reduce(
-                (sum, task) => sum + (parseFloat(task.cpu_request) || 0), 0);
-              
-              if (loads.EPSO[id] > maxEPVOLoad) {
-                maxEPVOLoad = loads.EPSO[id];
-                newHighlighted.EPSO = id;
-              }
+            if (currentEpsoLoads[i] > maxEpsoLoad) {
+              maxEpsoLoad = currentEpsoLoads[i];
+              maxEpsoVmId = i;
+            }
+            if (currentEacoLoads[i] > maxEacoLoad) {
+              maxEacoLoad = currentEacoLoads[i];
+              maxEacoVmId = i;
             }
           }
 
-          for (const vmId in rrAssignments) {
-            if (rrAssignments[vmId].length > 0) {
-              const id = parseInt(vmId);
-              active.RR.push(id);
-              counts.RR[id] = rrAssignments[vmId].length;
-              loads.RR[id] = rrAssignments[vmId].reduce(
-                (sum, task) => sum + (parseFloat(task.cpu_request) || 0), 0);
-              
-              if (loads.RR[id] > maxRRLoad) {
-                maxRRLoad = loads.RR[id];
-                newHighlighted.RR = id;
-              }
-            }
-          }
-
-          setActiveVMs(active);
-          setTaskCounts(counts);
-          setCpuLoads(loads);
-          setHighlightedVM(newHighlighted);
-          vmAssignmentsRef.current = { EPSO: epsonAssignments, RR: rrAssignments };
+          setActiveVMs({ EPSO: currentEpsoActive, EACO: currentEacoActive });
+          setTaskCounts({ EPSO: currentEpsoCounts, EACO: currentEacoCounts });
+          setCpuLoads({ EPSO: currentEpsoLoads, EACO: currentEacoLoads });
+          setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
 
           setMetrics({
-            EPSO: calculateMetrics(loads.EPSO),
-            RR: calculateMetrics(loads.RR)
+            EPSO: newProgress >= 99 ? {
+              imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
+              makespan: epsoResults.summary.makespan.toFixed(2),
+              utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+            } : {
+              imbalance: (epsoResults.summary.imbalanceDegree * (newProgress / 100)).toFixed(2),
+              makespan: (epsoResults.summary.makespan * (newProgress / 100)).toFixed(2),
+              utilization: (epsoResults.summary.resourceUtilization * 100 * (newProgress / 100)).toFixed(2)
+            },
+            EACO: newProgress >= 99 ? {
+              imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
+              makespan: rrResults.summary.makespan.toFixed(2),
+              utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+            } : {
+              imbalance: (rrResults.summary.imbalanceDegree * (newProgress / 100)).toFixed(2),
+              makespan: (rrResults.summary.makespan * (newProgress / 100)).toFixed(2),
+              utilization: (rrResults.summary.resourceUtilization * 100 * (newProgress / 100)).toFixed(2) // Fixed: Use rrResults
+            }
           });
-        }
 
-        if (newProgress < 100) {
-          animationRef.current = requestAnimationFrame(animate);
-        } else {
-          setIsPlaying(false);
-          setShowResultsButton(true);
-        }
-      };
+          if (newProgress < 100) {
+            animationRef.current = requestAnimationFrame(animate);
+          } else {
+            setIsPlaying(false);
+            setShowResultsButton(true);
+            setActiveVMs({ EPSO: finalEpsoActive, EACO: finalEacoActive });
+            setTaskCounts({ EPSO: finalEpsoCounts, EACO: finalEacoCounts });
+            setCpuLoads({ EPSO: finalEpsoLoads, EACO: finalEacoLoads });
+            setMetrics({
+              EPSO: {
+                imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
+                makespan: epsoResults.summary.makespan.toFixed(2),
+                utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+              },
+              EACO: {
+                imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
+                makespan: rrResults.summary.makespan.toFixed(2),
+                utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+              }
+            });
+          }
+        };
 
-      animationRef.current = requestAnimationFrame(animate);
+        animationRef.current = requestAnimationFrame(animate);
+      }
     }
   };
 
   const handleReset = () => {
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
     setIsPlaying(false);
     setProgress(0);
-    setActiveVMs({ EPSO: [], RR: [] });
-    const counts = { EPSO: {}, RR: {} };
-    const loads = { EPSO: {}, RR: {} };
+
+    const resetCounts = { EPSO: {}, EACO: {} };
+    const resetLoads = { EPSO: {}, EACO: {} };
+    const initialVMs = { EPSO: [], EACO: [] };
     for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-      counts.EPSO[i] = 0;
-      loads.EPSO[i] = 0;
-      counts.RR[i] = 0;
-      loads.RR[i] = 0;
+      resetCounts.EPSO[i] = 0;
+      resetLoads.EPSO[i] = 0;
+      resetCounts.EACO[i] = 0;
+      resetLoads.EACO[i] = 0;
     }
-    setTaskCounts(counts);
-    setCpuLoads(loads);
-    setExecutionTime({ EPSO: 0, RR: 0 });
+
+    setTaskCounts(resetCounts);
+    setCpuLoads(resetLoads);
+    setActiveVMs(initialVMs);
+    setHighlightedVM({ EPSO: null, EACO: null });
     setMetrics({
       EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
-      RR: { imbalance: 0, makespan: 0, utilization: 0 }
+      EACO: { imbalance: 0, makespan: 0, utilization: 0 }
     });
     setShowResultsButton(false);
-    setHighlightedVM({ EPSO: null, RR: null });
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
   };
 
   const getVmStatus = (vmId, algorithm) => {
     const cpuLoad = cpuLoads[algorithm][vmId] || 0;
-    const vmPes = dataCenterConfig.vmPes || 1;
-    const cpuPercentage = Math.min(100, (cpuLoad / vmPes) * 100);
+    const cpuPercentage = Math.min(100, cpuLoad * 100); // Convert to percentage
 
     if (cpuPercentage > 90) return 'Overloaded';
     if (cpuPercentage > 70) return 'High Load';
+    if (cpuPercentage > 30) return 'Medium Load';
     if (cpuPercentage > 0) return 'Normal';
     return 'Idle';
   };
@@ -248,6 +354,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
     switch (status) {
       case 'Overloaded': return 'bg-red-100 text-red-800 border-red-300';
       case 'High Load': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'Medium Load': return 'bg-orange-100 text-orange-800 border-orange-300';
       case 'Normal': return 'bg-green-100 text-green-800 border-green-300';
       default: return 'bg-gray-100 text-gray-800 border-gray-300';
     }
@@ -273,16 +380,16 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className={`px-6 py-3 font-medium text-sm rounded-t-lg transition-all ${activeAlgorithm === 'RR' 
+        className={`px-6 py-3 font-medium text-sm rounded-t-lg transition-all ${activeAlgorithm === 'EACO' 
           ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50' 
           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-        onClick={() => setActiveAlgorithm('RR')}
+        onClick={() => setActiveAlgorithm('EACO')}
       >
         <div className="flex items-center">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0 Blaine4 4m-4-4l4-4" />
           </svg>
-          Round Robin
+          Enhanced ACO
         </div>
       </motion.button>
       <motion.button
@@ -313,13 +420,9 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
             opacity: 1, 
             y: 0,
             scale: highlightedVM[algorithm] === i ? 1.03 : 1,
-            boxShadow: highlightedVM[algorithm] === i ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none'
+            boxShadow: highlightedVM[algorithm] === i ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none'
           }}
-          transition={{ 
-            duration: 0.3, 
-            delay: i * 0.05,
-            scale: { type: 'spring', stiffness: 300, damping: 20 }
-          }}
+          transition={{ duration: 0.3, delay: i * 0.05 }}
           whileHover={{ scale: 1.02 }}
         >
           <VMCard
@@ -346,14 +449,6 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
         className="flex items-center justify-between mb-4"
       >
         <h4 className="text-xl font-bold text-gray-800">Algorithm Comparison</h4>
-        <div className="flex items-center space-x-2">
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            EPSO: {executionTime.EPSO.toFixed(2)}ms
-          </span>
-          <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-            RR: {executionTime.RR.toFixed(2)}ms
-          </span>
-        </div>
       </motion.div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div 
@@ -361,7 +456,6 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          whileHover={{ boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05)' }}
         >
           <div className="flex items-center justify-between mb-4">
             <h5 className="font-bold text-lg text-blue-600 flex items-center">
@@ -385,23 +479,22 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          whileHover={{ boxShadow: '0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -2px rgba(124, 58, 237, 0.05)' }}
         >
           <div className="flex items-center justify-between mb-4">
             <h5 className="font-bold text-lg text-purple-600 flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0 Blaine4 4m-4-4l4-4" />
               </svg>
-              Round Robin
+              Enhanced ACO
             </h5>
             <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full">
-              {activeVMs.RR.length} Active VMs
+              {activeVMs.EACO.length} Active VMs
             </span>
           </div>
           <div className="h-[400px] overflow-y-auto smooth-scroll pr-2">
-            {renderVMCards('RR')}
+            {renderVMCards('EACO')}
           </div>
-          <MetricsPanel metrics={metrics.RR} color="purple" />
+          <MetricsPanel metrics={metrics.EACO} color="purple" />
         </motion.div>
       </div>
     </div>

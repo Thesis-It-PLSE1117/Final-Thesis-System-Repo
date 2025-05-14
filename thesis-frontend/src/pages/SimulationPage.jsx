@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Info, Settings, BarChart2, Play } from 'lucide-react';
 import DataCenterTab from '../components/DataCenterTab';
@@ -17,7 +18,7 @@ const SimulationPage = ({ onBack }) => {
 
   // Data center configuration
   const [dataCenterConfig, setDataCenterConfig] = useState({
-    numHosts: 1,
+    numHosts: 10,
     numPesPerHost: 2,
     peMips: 2000,
     ramPerHost: 2048,
@@ -29,7 +30,8 @@ const SimulationPage = ({ onBack }) => {
     vmRam: 1024,
     vmBw: 1000,
     vmSize: 10000,
-    optimizationAlgorithm: "RoundRobin",
+    vmScheduler: "TimeShared",
+    optimizationAlgorithm: "EPSO",
   });
 
   // Workload configuration
@@ -110,8 +112,14 @@ const SimulationPage = ({ onBack }) => {
   };
 
   const handleFileUpload = (e) => {
+    // If clearing (no files), reset state and return early
+    if (!e.target.files || e.target.files.length === 0) {
+      setWorkloadFile(null);
+      setCsvRowCount(0);
+      return;
+    }
     const file = e.target.files[0];
-    if (file && file.type === 'text/csv') {
+    if (file && (file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv'))) {
       setSelectedPreset('');
       setWorkloadFile(file);
 
@@ -156,26 +164,374 @@ const SimulationPage = ({ onBack }) => {
       .catch(() => alert('Failed to load preset workload'));
   };
 
-  const handleRunSimulation = () => {
+  const calculateEacoEnergyConsumption = (vmUtilization, makespan) => {
+    // Constants for energy calculation (based on typical server power consumption)
+    const IDLE_POWER = 100; // Watts
+    const MAX_POWER = 250;  // Watts
+    const TIME_UNIT = 3600; // Convert to hours
+
+    // Calculate total energy consumption
+    let totalEnergy = 0;
+    
+    vmUtilization.forEach(vm => {
+      // Calculate power consumption based on CPU utilization
+      const utilization = vm.cpuUtilization / 100;
+      const power = IDLE_POWER + (MAX_POWER - IDLE_POWER) * utilization;
+      
+      // Calculate energy in Watt-hours
+      const timeInHours = makespan / TIME_UNIT;
+      const vmEnergy = power * timeInHours;
+      
+      totalEnergy += vmEnergy;
+    });
+
+    return totalEnergy;
+  };
+
+  const runAlgorithm = async (algorithm, configData) => {
+    const algorithmConfig = {
+      ...configData,
+      optimizationAlgorithm: algorithm
+    };
+    
+    const isEpso = algorithm === "EPSO";
+    const isEaco = algorithm === "EACO";
+    
+    if (isEpso) {
+      console.group("🚀 EPSO ALGORITHM REQUEST");
+      console.log("📊 Configuration:", JSON.stringify(algorithmConfig, null, 2));
+      console.log("📁 Using workload file:", workloadFile ? workloadFile.name : "No file (using random workload)");
+    } else if (isEaco) {
+      console.group("🚀 EACO ALGORITHM REQUEST");
+      console.log("📊 Configuration:", JSON.stringify(algorithmConfig, null, 2));
+      console.log("📁 Using workload file:", workloadFile ? workloadFile.name : "No file (using random workload)");
+    } else {
+      console.log(`Running ${algorithm} algorithm with config:`, algorithmConfig);
+    }
+    
+    try {
+      if (workloadFile) {
+        // Send with file - use the run-with-file endpoint as defined in the backend
+        if (isEpso || isEaco) console.log("📤 Sending CSV file to backend via FormData");
+        else console.log(`Using file upload mode with ${workloadFile.name}`);
+        
+        const formData = new FormData();
+        formData.append('file', workloadFile);
+        Object.entries(algorithmConfig).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
+        
+        if (isEpso || isEaco) {
+          console.log("📬 Form data entries:");
+          for (let [key, value] of formData.entries()) {
+            if (key === 'file') {
+              console.log(`  - ${key}: ${value.name} (${value.size} bytes)`);
+            } else {
+              console.log(`  - ${key}: ${value}`);
+            }
+          }
+          console.log("🌐 Endpoint: http://localhost:8080/api/run-with-file");
+        } else {
+          console.log("Sending form data:", [...formData.entries()]);
+        }
+        
+        const startTime = Date.now();
+        const response = await fetch('http://localhost:8080/api/run-with-file', {
+          method: 'POST',
+          body: formData
+        });
+        const requestTime = Date.now() - startTime;
+        
+        if (isEpso || isEaco) {
+          console.log(`⏱️ Request completed in ${requestTime}ms`);
+          console.log(`🛎️ Response status: ${response.status} ${response.statusText}`);
+        } else {
+          console.log(`Response status: ${response.status}`);
+        }
+        
+        if (!response.ok) {
+          let errorText = await response.text();
+          console.error("Error response:", errorText);
+          if (isEpso || isEaco) console.groupEnd();
+          throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
+        }
+        
+        let responseData = await response.json();
+        
+        // Calculate energy consumption for EACO
+        if (isEaco) {
+          const energyConsumption = calculateEacoEnergyConsumption(
+            responseData.vmUtilization,
+            responseData.summary.makespan
+          );
+          
+          // Add energy consumption to the response
+          responseData = {
+            ...responseData,
+            energyConsumption: {
+              totalEnergyWh: energyConsumption
+            }
+          };
+          
+          console.log("⚡ Calculated EACO energy consumption:", energyConsumption, "Wh");
+        }
+        
+        if (isEpso || isEaco) {
+          console.log("✅ Received successful response from server");
+          console.log("📊 Response summary:", {
+            totalTasks: responseData.summary?.totalTasks || 'N/A',
+            finishedTasks: responseData.summary?.finishedTasks || 'N/A',
+            makespan: responseData.summary?.makespan || 'N/A',
+            schedulingLogEntries: responseData.schedulingLog?.length || 0,
+            vmUtilization: responseData.vmUtilization?.length || 0,
+            energyConsumption: responseData.energyConsumption?.totalEnergyWh || 'N/A'
+          });
+          
+          console.groupEnd();
+        }
+        
+        return responseData;
+      } else {
+        // Send without file
+        if (isEpso || isEaco) console.log("📤 Sending JSON request (no file)");
+        else console.log(`Using default workload (no file)`);
+        
+        if (isEpso || isEaco) {
+          console.log("📬 JSON payload:", JSON.stringify(algorithmConfig, null, 2));
+          console.log("🌐 Endpoint: http://localhost:8080/api/run");
+        }
+        
+        const startTime = Date.now();
+        const response = await fetch('http://localhost:8080/api/run', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(algorithmConfig)
+        });
+        const requestTime = Date.now() - startTime;
+        
+        if (isEpso || isEaco) {
+          console.log(`⏱️ Request completed in ${requestTime}ms`);
+          console.log(`🛎️ Response status: ${response.status} ${response.statusText}`);
+        } else {
+          console.log(`Response status: ${response.status}`);
+        }
+        
+        if (!response.ok) {
+          let errorText = await response.text();
+          console.error("Error response:", errorText);
+          if (isEpso || isEaco) console.groupEnd();
+          throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
+        }
+        
+        let responseData = await response.json();
+        
+        // Calculate energy consumption for EACO
+        if (isEaco) {
+          const energyConsumption = calculateEacoEnergyConsumption(
+            responseData.vmUtilization,
+            responseData.summary.makespan
+          );
+          
+          // Add energy consumption to the response
+          responseData = {
+            ...responseData,
+            energyConsumption: {
+              totalEnergyWh: energyConsumption
+            }
+          };
+          
+          console.log("⚡ Calculated EACO energy consumption:", energyConsumption, "Wh");
+        }
+        
+        if (isEpso || isEaco) {
+          console.log("✅ Received successful response from server");
+          console.log("📊 Response summary:", {
+            totalTasks: responseData.summary?.totalTasks || 'N/A',
+            finishedTasks: responseData.summary?.finishedTasks || 'N/A',
+            makespan: responseData.summary?.makespan || 'N/A',
+            schedulingLogEntries: responseData.schedulingLog?.length || 0,
+            vmUtilization: responseData.vmUtilization?.length || 0,
+            energyConsumption: responseData.energyConsumption?.totalEnergyWh || 'N/A'
+          });
+          
+          console.groupEnd();
+        }
+        
+        return responseData;
+      }
+    } catch (error) {
+      console.error(`Error running ${algorithm}:`, error);
+      if (isEpso || isEaco) console.groupEnd();
+      throw error;
+    }
+  };
+
+  const handleRunSimulation = async () => {
     setSimulationState('loading');
     setProgress(0);
     
-    // Simulate progress updates
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev + (10 + Math.random() * 15);
-        if (newProgress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setSimulationState('animation');
-          }, 500);
-          return 100;
-        }
-        return newProgress;
-      });
-    }, 300);
-
-    return () => clearInterval(interval);
+    // Create the configuration data to match backend @RequestParam exactly
+    const configData = {
+      // Required parameters from the backend code
+      numHosts: dataCenterConfig.numHosts,
+      numVMs: dataCenterConfig.numVMs,
+      numPesPerHost: dataCenterConfig.numPesPerHost,
+      peMips: dataCenterConfig.peMips,
+      
+      // Other parameters that might be needed
+      ramPerHost: dataCenterConfig.ramPerHost,
+      bwPerHost: dataCenterConfig.bwPerHost,
+      storagePerHost: dataCenterConfig.storagePerHost,
+      vmMips: dataCenterConfig.vmMips,
+      vmPes: dataCenterConfig.vmPes,
+      vmRam: dataCenterConfig.vmRam,
+      vmBw: dataCenterConfig.vmBw,
+      vmSize: dataCenterConfig.vmSize,
+      numCloudlets: cloudletConfig.numCloudlets,
+      vmScheduler: dataCenterConfig.vmScheduler,
+      
+      // Set the workload type explicitly
+      workloadType: workloadFile ? 'CSV' : 'Random',
+      useDefaultWorkload: !workloadFile
+    };
+    
+    console.group('🔄 Starting Simulation');
+    console.log('📊 Sending configuration to backend:', configData);
+    console.log('📁 Workload file:', workloadFile ? workloadFile.name : 'No file (using random workload)');
+    
+    try {
+      let progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) return prev;
+          return prev + (5 + Math.random() * 10);
+        });
+      }, 300);
+      
+      // Run both algorithms
+      try {
+        // First run EACO algorithm
+        console.group('🏆 Running EACO algorithm...');
+        console.time('EACO execution time');
+        const eacoResponse = await runAlgorithm("EACO", configData);
+        console.timeEnd('EACO execution time');
+        console.log('✅ EACO algorithm completed successfully');
+        console.groupEnd();
+        
+        // Update progress
+        setProgress(70);
+        
+        // Then run EPSO
+        console.group('🏆 Running EPSO algorithm...');
+        console.time('EPSO execution time');
+        const epsoResponse = await runAlgorithm("EPSO", configData);
+        console.timeEnd('EPSO execution time');
+        console.log('✅ EPSO algorithm completed successfully');
+        console.groupEnd();
+        
+        // Combine results for the simulation
+        const combinedResults = {
+          eaco: eacoResponse,
+          epso: epsoResponse
+        };
+        
+        // Log the detailed results
+        console.group('📈 Algorithm Comparison');
+        
+        // Log EACO metrics
+        console.log('🧮 EACO Metrics:');
+        console.table({
+          makespan: eacoResponse.summary.makespan.toFixed(2),
+          imbalanceDegree: eacoResponse.summary.imbalanceDegree.toFixed(4),
+          resourceUtilization: (eacoResponse.summary.resourceUtilization * 100).toFixed(2) + '%',
+          averageResponseTime: eacoResponse.summary.averageResponseTime.toFixed(2)
+        });
+        
+        // Log EPSO metrics
+        console.log('🧮 EPSO Metrics:');
+        console.table({
+          makespan: epsoResponse.summary.makespan.toFixed(2),
+          imbalanceDegree: epsoResponse.summary.imbalanceDegree.toFixed(4),
+          resourceUtilization: (epsoResponse.summary.resourceUtilization * 100).toFixed(2) + '%',
+          averageResponseTime: epsoResponse.summary.averageResponseTime.toFixed(2)
+        });
+        
+        // Log energy consumption for both algorithms
+        console.log('⚡ Energy Consumption (Wh):');
+        console.table([
+          {
+            Algorithm: 'EACO',
+            TotalEnergyWh: eacoResponse.energyConsumption?.totalEnergyWh ?? eacoResponse.energyConsumption ?? 'N/A'
+          },
+          {
+            Algorithm: 'EPSO',
+            TotalEnergyWh: epsoResponse.energyConsumption?.totalEnergyWh ?? epsoResponse.energyConsumption ?? 'N/A'
+          }
+        ]);
+        
+        // Log VM utilization details
+        console.group('📊 VM Utilization Details');
+        console.log('EPSO VM Utilization:');
+        console.table(epsoResponse.vmUtilization.map(vm => ({
+          VM_ID: vm.vmId,
+          CPU_Load: vm.cpuUtilization.toFixed(2),
+          Tasks: vm.numAPECloudlets,
+          Status: vm.cpuUtilization > 0 ? 'Active' : 'Idle'
+        })));
+        
+        console.log('EACO VM Utilization:');
+        console.table(eacoResponse.vmUtilization.map(vm => ({
+          VM_ID: vm.vmId,
+          CPU_Load: vm.cpuUtilization.toFixed(2),
+          Tasks: vm.numAPECloudlets,
+          Status: vm.cpuUtilization > 0 ? 'Active' : 'Idle'
+        })));
+        console.groupEnd();
+        
+        // Log performance improvement comparison
+        const makespanImprovement = ((eacoResponse.summary.makespan - epsoResponse.summary.makespan) / eacoResponse.summary.makespan * 100);
+        const imbalanceImprovement = ((eacoResponse.summary.imbalanceDegree - epsoResponse.summary.imbalanceDegree) / eacoResponse.summary.imbalanceDegree * 100);
+        
+        console.log('🔄 Performance Comparison (EPSO vs EACO):');
+        console.table({
+          'Makespan Change': makespanImprovement > 0 ? 
+            `${makespanImprovement.toFixed(2)}% better with EPSO` : 
+            `${Math.abs(makespanImprovement).toFixed(2)}% better with EACO`,
+          'Imbalance Change': imbalanceImprovement > 0 ? 
+            `${imbalanceImprovement.toFixed(2)}% better with EPSO` : 
+            `${Math.abs(imbalanceImprovement).toFixed(2)}% better with EACO`
+        });
+        
+        console.groupEnd(); // End Algorithm Comparison
+        
+        // Store the combined results
+        setSimulationResults(combinedResults);
+        
+        // Clear the interval and finish loading
+        clearInterval(progressInterval);
+        setProgress(100);
+        
+        // Short delay before moving to animation view
+        setTimeout(() => {
+          console.log('👍 Both algorithms completed successfully. Moving to animation view.');
+          console.groupEnd(); // End Starting Simulation
+          setSimulationState('animation');
+        }, 500);
+      } catch (algorithmError) {
+        console.error('❌ Error running algorithms:', algorithmError);
+        console.groupEnd(); // End nested group
+        console.groupEnd(); // End Starting Simulation
+        clearInterval(progressInterval);
+        alert(`Failed to run algorithms: ${algorithmError.message}`);
+        setSimulationState('config');
+      }
+    } catch (err) {
+      console.error('❌ Simulation run error:', err);
+      console.groupEnd(); // End Starting Simulation
+      alert(`Failed to run simulation: ${err.message}`);
+      setSimulationState('config');
+    }
   };
 
   // Render functions
@@ -242,7 +598,6 @@ const SimulationPage = ({ onBack }) => {
             <button
               className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
               onClick={handleRunSimulation}
-              disabled={!workloadFile}
             >
               <Play size={18} />
               Run Simulation
@@ -288,6 +643,8 @@ const SimulationPage = ({ onBack }) => {
                   : cloudletConfig.numCloudlets
               }}
               workloadFile={workloadFile}
+              rrResults={simulationResults?.eaco}
+              epsoResults={simulationResults?.epso}
               onBack={() => setSimulationState('config')}
               onViewResults={() => setSimulationState('results')}
             />
@@ -304,6 +661,8 @@ const SimulationPage = ({ onBack }) => {
           >
             <ResultsTab 
               results={simulationResults}
+              rrResults={simulationResults?.eaco}
+              epsoResults={simulationResults?.epso}
               onBackToAnimation={() => setSimulationState('animation')}
               onNewSimulation={() => setSimulationState('config')}
             />

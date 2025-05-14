@@ -33,7 +33,7 @@ const DocumentationHelp = () => {
       icon: <Code className="w-5 h-5" />,
       subsections: [
         {
-          title: "Round Robin (RR)",
+          title: "Enhanced Ant Colony Optimization (EACO)",
           content: "Traditional load balancing algorithm that distributes requests equally."
         },
         {
