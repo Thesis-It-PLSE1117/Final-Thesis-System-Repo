@@ -45,7 +45,7 @@ const MetricBar = ({ value, max = 100, color }) => {
 };
 
 const AlgorithmMetricCard = ({ algorithm, metrics, delay }) => {
-  const isEACO = algorithm === "EACO";
+  const isEACO = algorithm === "ACO";
   const accentColor = isEACO ? "from-[#319694]" : "from-[#4fd1c5]";
   const barColor = isEACO ? "bg-[#319694]" : "bg-[#4fd1c5]";
   
@@ -265,12 +265,12 @@ const HeroSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.8 }}
         >
           <AlgorithmMetricCard 
-            algorithm="EACO" 
+            algorithm="ACO" 
             metrics={eacoMetrics} 
             delay={0} 
           />
           <AlgorithmMetricCard 
-            algorithm="EPSO" 
+            algorithm="PSO" 
             metrics={epsoMetrics} 
             delay={0.2} 
           />

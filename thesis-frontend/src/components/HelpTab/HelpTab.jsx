@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { HelpCircle, BookOpen } from "lucide-react";
-import DataCenterHelp from "../subcomponents/HelpTab/DataCenterHelp";
-import WorkloadHelp from "../subcomponents/HelpTab/WorkloadHelp";
-import DocumentationHelp from "../subcomponents/HelpTab/DocumentationHelp";
+import DataCenterHelp from "./DataCenterHelp";
+import WorkloadHelp from "./WorkloadHelp";
+import DocumentationHelp from "./DocumentationHelp";
 
 // Animation variants
 const containerVariants = {

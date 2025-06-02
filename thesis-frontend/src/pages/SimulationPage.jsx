@@ -2,12 +2,12 @@ import { useState } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Info, Settings, BarChart2, Play } from 'lucide-react';
-import DataCenterTab from '../components/DataCenterTab';
+import DataCenterTab from '../components/DatacenterTab/DataCenterTab';
 import WorkloadTab from '../components/WorkloadTab';
-import AnimationTab from '../components/AnimationTab';
-import ResultsTab from '../components/ResultsTab';
-import HelpTab from '../components/HelpTab';
-import CloudLoadingModal from '../components/CloudLoadingModal';
+import AnimationTab from '../components/AnimationTab/AnimationTab';
+import ResultsTab from '../components/ResultsTab/ResultsTab';
+import HelpTab from '../components/HelpTab/HelpTab';
+import CloudLoadingModal from '../components/modals/CloudLoadingModal';
 
 const SimulationPage = ({ onBack }) => {
   // Configuration states

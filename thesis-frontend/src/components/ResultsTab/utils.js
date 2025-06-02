@@ -1,4 +1,4 @@
-import { FiActivity, FiClock, FiZap } from 'react-icons/fi';
+import { FiActivity, FiClock, FiZap, FiServer, FiLayers } from 'react-icons/fi';
 
 export const normalizeData = (data) => {
   if (!data) return null;
@@ -49,7 +49,8 @@ export const getSummaryData = (results) => {
     makespan: 0,
     avgResponseTime: 0,
     cpuUtilization: 0,
-    energyConsumption: 0
+    energyConsumption: 0,
+    loadImbalance: 0
   };
 
   console.group('📊 Generating Summary Data');
@@ -57,7 +58,7 @@ export const getSummaryData = (results) => {
 
   const cloudlets = results.cloudlets || [];
   const vmUtilization = results.vmUtilization || [];
-  
+    
   const avgResponseTime = cloudlets.length > 0
     ? (cloudlets.reduce((sum, c) => sum + (c.responseTime || 0), 0) / cloudlets.length)
     : 0;
@@ -75,6 +76,7 @@ export const getSummaryData = (results) => {
     avgResponseTime: results.summary?.averageResponseTime || avgResponseTime,
     cpuUtilization: cpuUtilization,
     energyConsumption: results.energyConsumption?.totalEnergyWh || 0
+
   };
   
   console.log('📤 Generated summary:', summary);
@@ -103,6 +105,20 @@ export const keyMetrics = [
     description: "Total energy consumed",
     icon: FiZap,
     unit: "Wh",
+    betterWhen: "lower"
+  },
+  {
+    title: "Load Imbalance",
+    description: "Standard deviation of VM utilization",
+    icon: FiServer,
+    unit: "%",
+    betterWhen: "lower"
+  },
+  {
+    title: "Makespan",
+    description: "Total time to complete all tasks",
+    icon: FiLayers,
+    unit: "s",
     betterWhen: "lower"
   }
 ];

@@ -9,11 +9,19 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
     });
   };
 
-  const handleLinkClick = (link) => {
+  const handleLinkClick = (e, link) => {
+    e.preventDefault(); // Prevent default behavior
+    
     if (link.onClick) {
       link.onClick();
     }
-    // Default behavior for href links
+    if (link.href && !link.onClick) { // Only handle href if there's no onClick
+      if (link.href.startsWith('http') || link.href.startsWith('mailto')) {
+        window.open(link.href, link.href.startsWith('mailto') ? '_self' : '_blank');
+      } else {
+        window.location.href = link.href;
+      }
+    }
   };
 
   return (
@@ -51,9 +59,9 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
                 <li key={j}>
                   <motion.button
                     className="text-white/80 hover:text-white transition-colors flex items-center gap-1 w-full text-left"
-                    onClick={() => handleLinkClick(link)}
-                    whileHover={{ x: 5 }}
-                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => handleLinkClick(e, link)}
+                    whileHover={{ x: link.href || link.onClick ? 5 : 0 }}
+                    whileTap={{ scale: link.href || link.onClick ? 0.95 : 1 }}
                   >
                     {link.icon && <span className="mr-1">{link.icon}</span>}
                     {link.text}
@@ -72,7 +80,7 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
         transition={{ delay: 0.5 }}
       >
         <p className="text-white/70 text-sm">
-          &copy; {new Date().getFullYear()} CloudSim Load Balancer. All rights reserved.
+          &copy; {new Date().getFullYear()} Cloud Load Balancer. All rights reserved.
         </p>
         
         <div className="flex gap-4 mt-4 md:mt-0">
