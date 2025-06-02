@@ -164,30 +164,6 @@ const SimulationPage = ({ onBack }) => {
       .catch(() => alert('Failed to load preset workload'));
   };
 
-  const calculateEacoEnergyConsumption = (vmUtilization, makespan) => {
-    // Constants for energy calculation (based on typical server power consumption)
-    const IDLE_POWER = 100; // Watts
-    const MAX_POWER = 250;  // Watts
-    const TIME_UNIT = 3600; // Convert to hours
-
-    // Calculate total energy consumption
-    let totalEnergy = 0;
-    
-    vmUtilization.forEach(vm => {
-      // Calculate power consumption based on CPU utilization
-      const utilization = vm.cpuUtilization / 100;
-      const power = IDLE_POWER + (MAX_POWER - IDLE_POWER) * utilization;
-      
-      // Calculate energy in Watt-hours
-      const timeInHours = makespan / TIME_UNIT;
-      const vmEnergy = power * timeInHours;
-      
-      totalEnergy += vmEnergy;
-    });
-
-    return totalEnergy;
-  };
-
   const runAlgorithm = async (algorithm, configData) => {
     const algorithmConfig = {
       ...configData,
@@ -258,24 +234,6 @@ const SimulationPage = ({ onBack }) => {
         
         let responseData = await response.json();
         
-        // Calculate energy consumption for EACO
-        if (isEaco) {
-          const energyConsumption = calculateEacoEnergyConsumption(
-            responseData.vmUtilization,
-            responseData.summary.makespan
-          );
-          
-          // Add energy consumption to the response
-          responseData = {
-            ...responseData,
-            energyConsumption: {
-              totalEnergyWh: energyConsumption
-            }
-          };
-          
-          console.log("⚡ Calculated EACO energy consumption:", energyConsumption, "Wh");
-        }
-        
         if (isEpso || isEaco) {
           console.log("✅ Received successful response from server");
           console.log("📊 Response summary:", {
@@ -326,24 +284,6 @@ const SimulationPage = ({ onBack }) => {
         }
         
         let responseData = await response.json();
-        
-        // Calculate energy consumption for EACO
-        if (isEaco) {
-          const energyConsumption = calculateEacoEnergyConsumption(
-            responseData.vmUtilization,
-            responseData.summary.makespan
-          );
-          
-          // Add energy consumption to the response
-          responseData = {
-            ...responseData,
-            energyConsumption: {
-              totalEnergyWh: energyConsumption
-            }
-          };
-          
-          console.log("⚡ Calculated EACO energy consumption:", energyConsumption, "Wh");
-        }
         
         if (isEpso || isEaco) {
           console.log("✅ Received successful response from server");
