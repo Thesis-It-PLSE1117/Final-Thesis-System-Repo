@@ -1,5 +1,5 @@
 import './App.css'
-import HomePage from './pages/HomePage'
+import HomePage from './pages/HomePage/HomePage'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 

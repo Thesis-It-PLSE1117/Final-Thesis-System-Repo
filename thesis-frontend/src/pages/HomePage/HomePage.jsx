@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Settings, Upload, Cpu, LineChart, BookText, GitCompare, FileText, Mail } from 'lucide-react'; 
-import AboutUsModal from '../components/modals/AboutUsModal';
-import DocumentationModal from '../components/modals/DocumentationModal';
-import AlgorithmModal from '../components/modals/AlgorithmModal';
-import ComparisonModal from '../components/modals/ComparisonModal';
-import SimulationPage from './SimulationPage';
-import AnimatedBackground from '../subcomponents/HomePage/AnimatedBackground';
-import Header from '../subcomponents/HomePage/Header';
-import HeroSection from '../subcomponents/HomePage/HeroSection';
-import DemoSection from '../subcomponents/HomePage/DemoSection';
-import WalkthroughSection from '../subcomponents/HomePage/WalkthroughSection';
-import CtaSection from '../subcomponents/HomePage/CtaSection';
-import Footer from '../subcomponents/HomePage/Footer';
+import AboutUsModal from '../../components/modals/AboutUsModal';
+import DocumentationModal from '../../components/modals/DocumentationModal';
+import AlgorithmModal from '../../components/modals/AlgorithmModal';
+import ComparisonModal from '../../components/modals/ComparisonModal';
+import SimulationPage from '../SimulationPage';
+import AnimatedBackground from './AnimatedBackground';
+import Header from './Header';
+import HeroSection from './HeroSection';
+import DemoSection from './DemoSection';
+import WalkthroughSection from './WalkthroughSection';
+import CtaSection from './CtaSection';
+import Footer from './Footer';
 
 const HomePage = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);

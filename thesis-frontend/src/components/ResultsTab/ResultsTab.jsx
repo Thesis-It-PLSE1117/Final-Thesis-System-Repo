@@ -5,12 +5,12 @@ import {
   FiArrowLeft,
   FiSearch
 } from 'react-icons/fi';
-import eacoResults from '../../public/results/apirun_eaco.json';
-import epsoResults from '../../public/results/apirun_epso.json';
-import MetricCard from '../subcomponents/ResultsTab/MetricCard';
-import SchedulingLogTable from '../subcomponents/ResultsTab/SchedulingLogTable';
-import PerformanceCharts from '../subcomponents/ResultsTab/Charts';
-import { normalizeData, getSummaryData, keyMetrics } from '../subcomponents/ResultsTab/utils';
+import eacoResults from '../../../public/results/apirun_eaco.json';
+import epsoResults from '../../../public/results/apirun_epso.json';
+import MetricCard from './MetricCard';
+import SchedulingLogTable from './SchedulingLogTable';
+import PerformanceCharts from './Charts';
+import { normalizeData, getSummaryData, keyMetrics } from './utils';
 
 const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
   const [resultsEACO, setResultsEACO] = useState(null);

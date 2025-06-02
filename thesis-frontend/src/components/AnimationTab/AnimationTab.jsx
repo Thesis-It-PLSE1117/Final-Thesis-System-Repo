@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MetricsPanel from '../subcomponents/AnimationTab/MetricsPanel';
-import Controls from '../subcomponents/AnimationTab/Controls';
-import AlgorithmTabs from '../subcomponents/AnimationTab/AlgorithmTabs';
-import AlgorithmView from '../subcomponents/AnimationTab/AlgorithmView';
-import { assignTasksWithEPSO, assignTasksWithEACO } from '../subcomponents/AnimationTab/TaskAssignmentAlgorithms';
+import MetricsPanel from './MetricsPanel';
+import Controls from './Controls';
+import AlgorithmTabs from './AlgorithmTabs';
+import AlgorithmView from './AlgorithmView';
+import { assignTasksWithEPSO, assignTasksWithEACO } from './TaskAssignmentAlgorithms';
 
 const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, onViewResults }) => {
   const [activeAlgorithm, setActiveAlgorithm] = useState('EPSO');

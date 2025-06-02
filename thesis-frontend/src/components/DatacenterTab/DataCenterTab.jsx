@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
-  Cpu, MemoryStick, Database, Network, HardDrive, Server, 
-  ChevronDown, ChevronUp, Gauge, HardDriveDownload, 
+  Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, HardDriveDownload, 
   HardDriveUpload, Disc 
 } from 'lucide-react';
-import ConfigSection from '../subcomponents/DataCenterTab/ConfigSection';
-import InputField from '../subcomponents/DataCenterTab/InputField';
-import VMCard from '../subcomponents/DataCenterTab/VMCard';
-import HostCard from '../subcomponents/DataCenterTab/HostCard';
+import ConfigSection from './ConfigSection';
+import InputField from './InputField';
+import VMCard from './VMCard';
+import HostCard from './HostCard';
 
 const DataCenterTab = ({ config, onChange }) => {
   const [vmCards, setVmCards] = useState([]);
