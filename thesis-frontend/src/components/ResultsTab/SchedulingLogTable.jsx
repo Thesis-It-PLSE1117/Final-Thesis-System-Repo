@@ -4,7 +4,7 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
   if (!logs || logs.length === 0) {
     return (
       <div className="text-gray-500 p-4 text-center">
-        No scheduling log available for {algorithm === 'rr' ? 'Round Robin' : 'EPSO'}
+        No scheduling log available for {algorithm === 'rr' ? 'EACO' : 'EPSO'}
       </div>
     );
   }

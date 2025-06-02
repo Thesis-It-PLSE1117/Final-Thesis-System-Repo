@@ -1,51 +1,59 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiRefreshCw,
   FiArrowLeft,
   FiSearch
 } from 'react-icons/fi';
-import eacoResults from '../../../public/results/apirun_eaco.json';
-import epsoResults from '../../../public/results/apirun_epso.json';
-import MetricCard from './MetricCard';
-import SchedulingLogTable from './SchedulingLogTable';
-import PerformanceCharts from './Charts';
-import { normalizeData, getSummaryData, keyMetrics } from './utils';
+import MetricCard from '../subcomponents/ResultsTab/MetricCard';
+import SchedulingLogTable from '../subcomponents/ResultsTab/SchedulingLogTable';
+import PerformanceCharts from '../subcomponents/ResultsTab/Charts';
+import { normalizeData, getSummaryData, keyMetrics } from '../subcomponents/ResultsTab/utils';
 
-const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
-  const [resultsEACO, setResultsEACO] = useState(null);
+const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults }) => {
+  const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeLogTab, setActiveLogTab] = useState('eaco');
+  const [activeLogTab, setActiveLogTab] = useState('rr');
   const [activeChart, setActiveChart] = useState('bar');
   const [isExiting, setIsExiting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     try {
-      // Add mock load imbalance and makespan data
-      const eacoData = normalizeData({
-        ...eacoResults,
-        loadImbalance: 18.2, // Mock load imbalance for EACO
-        makespan: 105.8 // Mock makespan for EACO
-      });
+      console.group('📊 Results Tab Data Processing');
+      console.log('📥 Raw EACO results from props:', rrResults);
+      console.log('📥 Raw EPSO results from props:', epsoResults);
       
-      const epsoData = normalizeData({
-        ...epsoResults,
-        loadImbalance: 12.7, // Mock load imbalance for EPSO
-        makespan: 95.2 // Mock makespan for EPSO
-      });
+      if (!rrResults || !epsoResults) {
+        console.warn('⚠️ Missing results data from props');
+        setError('No simulation results available. Please run a simulation first.');
+        setLoading(false);
+        console.groupEnd();
+        return;
+      }
+      
+      // Normalize the data
+      const normalizedRR = normalizeData(rrResults);
+      const normalizedEPSO = normalizeData(epsoResults);
+      
+      console.log('🔄 Normalized EACO data:', normalizedRR);
+      console.log('🔄 Normalized EPSO data:', normalizedEPSO);
 
-      setResultsEACO(eacoData);
-      setResultsEPSO(epsoData);
+      setResultsRR(normalizedRR);
+      setResultsEPSO(normalizedEPSO);
       setLoading(false);
+      
+      console.groupEnd();
     } catch (err) {
-      setError(`Failed to load results: ${err.message}`);
-      console.error('Error loading results:', err);
+      console.error('❌ Error processing results:', err);
+      setError('Failed to process simulation results. Please try again.');
       setLoading(false);
+      console.groupEnd();
     }
-  }, []);
+  }, [rrResults, epsoResults]);
 
   const handleBackToAnimation = () => {
     setIsExiting(true);
@@ -65,7 +73,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
     );
   };
 
-  const eacoSummary = getSummaryData(resultsEACO);
+  const rrSummary = getSummaryData(resultsRR);
   const epsoSummary = getSummaryData(resultsEPSO);
 
   if (loading) return (
@@ -90,7 +98,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
     </div>
   );
   
-  if (!resultsEACO && !resultsEPSO) return (
+  if (!resultsRR && !resultsEPSO) return (
     <div className="p-6 text-center max-w-2xl mx-auto mt-8">
       <p className="text-gray-600 mb-4 text-lg">No results available for comparison</p>
       <button
@@ -110,7 +118,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
       className="flex-grow p-6 overflow-y-auto bg-gradient-to-b from-gray-50 to-white"
     >
       <motion.div 
-        className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+        className="bg-white p-8 rounded-xl shadow-md border border-gray-100"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
@@ -144,7 +152,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
         
         {/* Key Metrics Cards */}
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
           initial="hidden"
           animate="visible"
           variants={{
@@ -169,16 +177,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
               <MetricCard 
                 title={metric.title}
                 description={metric.description}
-                eacoValue={eacoSummary[metric.title.toLowerCase().replace(/\s+/g, '')] || 
-                          eacoSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
-                          metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 
-                          metric.title.toLowerCase().includes('energy') ? 'energyConsumption' :
-                          metric.title.toLowerCase().includes('imbalance') ? 'loadImbalance' : 'makespan']}
-                epsoValue={epsoSummary[metric.title.toLowerCase().replace(/\s+/g, '')] || 
-                          epsoSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
-                          metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 
-                          metric.title.toLowerCase().includes('energy') ? 'energyConsumption' :
-                          metric.title.toLowerCase().includes('imbalance') ? 'loadImbalance' : 'makespan']}
+                rrValue={rrSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
+                                metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 'energyConsumption']}
+                epsoValue={epsoSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
+                                metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 'energyConsumption']}
                 unit={metric.unit}
                 betterWhen={metric.betterWhen}
                 icon={metric.icon}
@@ -188,12 +190,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
         </motion.div>
         
         {/* Visualization Section */}
-        <PerformanceCharts 
-          eacoSummary={eacoSummary} 
-          epsoSummary={epsoSummary}
-          activeChart={activeChart}
-          setActiveChart={setActiveChart}
-        />
+        <div className="mb-10">
+          <PerformanceCharts 
+            rrSummary={rrSummary} 
+            epsoSummary={epsoSummary}
+            activeChart={activeChart}
+            setActiveChart={setActiveChart}
+          />
+        </div>
 
         {/* Scheduling Logs Section */}
         <div className="mb-8">
@@ -208,7 +212,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
               <input
                 type="text"
                 placeholder="Search logs..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent text-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -219,14 +223,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
           <div className="border-b border-gray-200 mb-4">
             <nav className="-mb-px flex space-x-8">
               <button
-                onClick={() => setActiveLogTab('eaco')}
+                onClick={() => setActiveLogTab('rr')}
                 className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLogTab === 'eaco'
+                  activeLogTab === 'rr'
                     ? 'border-[#319694] text-[#319694]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Enhanced ACO Logs
+                EACO Logs
               </button>
               <button
                 onClick={() => setActiveLogTab('epso')}
@@ -251,10 +255,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation }) => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {activeLogTab === 'eaco' ? (
+                {activeLogTab === 'rr' ? (
                   <SchedulingLogTable 
-                    logs={filteredLogs(resultsEACO?.schedulingLog)} 
-                    algorithm="eaco" 
+                    logs={filteredLogs(resultsRR?.schedulingLog)} 
+                    algorithm="rr" 
                   />
                 ) : (
                   <SchedulingLogTable 
