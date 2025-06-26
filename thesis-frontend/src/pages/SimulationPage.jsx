@@ -18,7 +18,7 @@ const SimulationPage = ({ onBack }) => {
 
   // Data center configuration
   const [dataCenterConfig, setDataCenterConfig] = useState({
-    numHosts: 10,
+    numHosts: 1,
     numPesPerHost: 2,
     peMips: 2000,
     ramPerHost: 2048,
