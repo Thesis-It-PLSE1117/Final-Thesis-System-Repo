@@ -1,8 +1,7 @@
 import { Cpu, MemoryStick, Database, Network, HardDrive } from 'lucide-react';
 
 const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, getStatusColor }) => {
-  const vmPes = dataCenterConfig.vmPes || 1;
-  const cpuPercentage = Math.min(100, (cpuLoad / vmPes) * 100);
+  const cpuPercentage = Math.min(100, (cpuLoad * 100));
   const vmCapacity = dataCenterConfig.vmPes * dataCenterConfig.vmMips;
 
   return (
@@ -13,7 +12,9 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
             ? 'bg-red-50 border-red-200' 
             : status === 'High Load'
               ? 'bg-yellow-50 border-yellow-200'
-              : 'bg-green-50 border-green-200'
+              : status === 'Medium Load'
+                ? 'bg-orange-50 border-orange-200'
+                : 'bg-green-50 border-green-200'
           : 'bg-gray-50 border-gray-200'
       }`}
       style={{
@@ -33,13 +34,14 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
       <div className="mb-2">
         <div className="flex justify-between text-xs text-gray-600 mb-1">
           <span>CPU Load</span>
-          <span>{cpuPercentage.toFixed(1)}% ({cpuLoad.toFixed(1)}/{vmCapacity})</span>
+          <span>{cpuPercentage.toFixed(1)}% ({(cpuLoad * vmCapacity).toFixed(1)}/{vmCapacity})</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className={`h-2 rounded-full ${
               cpuPercentage > 90 ? 'bg-red-500' :
-              cpuPercentage > 70 ? 'bg-yellow-500' : 'bg-green-500'
+              cpuPercentage > 70 ? 'bg-yellow-500' : 
+              cpuPercentage > 40 ? 'bg-orange-500' : 'bg-green-500'
             }`} 
             style={{ width: `${cpuPercentage}%` }}
           ></div>
