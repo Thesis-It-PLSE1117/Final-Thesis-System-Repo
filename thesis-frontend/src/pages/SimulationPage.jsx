@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Info, Settings, BarChart2, Play } from 'lucide-react';
 import DataCenterTab from '../components/DatacenterTab/DataCenterTab';
-import WorkloadTab from '../components/WorkloadTab';
+import WorkloadTab from '../components/WorkloadTab/WorkloadTab';
 import AnimationTab from '../components/AnimationTab/AnimationTab';
 import ResultsTab from '../components/ResultsTab/ResultsTab';
 import HelpTab from '../components/HelpTab/HelpTab';
