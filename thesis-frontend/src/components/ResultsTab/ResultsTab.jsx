@@ -6,10 +6,10 @@ import {
   FiArrowLeft,
   FiSearch
 } from 'react-icons/fi';
-import MetricCard from '../subcomponents/ResultsTab/MetricCard';
-import SchedulingLogTable from '../subcomponents/ResultsTab/SchedulingLogTable';
-import PerformanceCharts from '../subcomponents/ResultsTab/Charts';
-import { normalizeData, getSummaryData, keyMetrics } from '../subcomponents/ResultsTab/utils';
+import MetricCard from './MetricCard';
+import SchedulingLogTable from './SchedulingLogTable';
+import PerformanceCharts from './Charts';
+import { normalizeData, getSummaryData, keyMetrics } from './utils';
 
 const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults }) => {
   const [resultsRR, setResultsRR] = useState(null);

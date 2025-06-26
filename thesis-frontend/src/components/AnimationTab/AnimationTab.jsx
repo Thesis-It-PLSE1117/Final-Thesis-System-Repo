@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import VMCard from '../subcomponents/AnimationTab/VMCard';
-import MetricsPanel from '../subcomponents/AnimationTab/MetricsPanel';
-import Controls from '../subcomponents/AnimationTab/Controls';
+import VMCard from './VMCard';
+import MetricsPanel from './MetricsPanel';
+import Controls from './Controls';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, onViewResults, rrResults, epsoResults }) => {
