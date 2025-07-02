@@ -167,7 +167,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   <h4 className="font-semibold text-[#319694]">University of Cabuyao</h4>
                 </div>
                 <p className="text-sm text-gray-700 text-center">
-                  <span className="font-medium">Thesis Title:</span> Comparison of EACO and Enhanced PSO Algorithms for Cloud Load Balancing Evaluating Response Time, Resource Utilization, and Energy Efficiency
+                  <span className="font-medium">Thesis Title:</span> Enhanced ACO and PSO for Cloud Load Balancing: A Comparative Study
                 </p>
               </motion.div>
 
