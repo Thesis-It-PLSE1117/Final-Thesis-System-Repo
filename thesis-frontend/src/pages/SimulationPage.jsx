@@ -1,5 +1,4 @@
-import { useState } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Info, Settings, BarChart2, Play } from 'lucide-react';
 import DataCenterTab from '../components/DatacenterTab/DataCenterTab';
@@ -7,6 +6,7 @@ import WorkloadTab from '../components/WorkloadTab/WorkloadTab';
 import AnimationTab from '../components/AnimationTab/AnimationTab';
 import ResultsTab from '../components/ResultsTab/ResultsTab';
 import HelpTab from '../components/HelpTab/HelpTab';
+import HistoryTab from '../components/HistoryTab/HistoryTab';
 import CloudLoadingModal from '../components/modals/CloudLoadingModal';
 
 const SimulationPage = ({ onBack }) => {
@@ -18,13 +18,13 @@ const SimulationPage = ({ onBack }) => {
 
   // Data center configuration
   const [dataCenterConfig, setDataCenterConfig] = useState({
-    numHosts: 1,
+    numHosts: 10,
     numPesPerHost: 2,
     peMips: 2000,
     ramPerHost: 2048,
     bwPerHost: 10000,
     storagePerHost: 100000,
-    numVMs: 10,
+    numVMs: 50,
     vmMips: 1000,
     vmPes: 2,
     vmRam: 1024,
@@ -45,7 +45,7 @@ const SimulationPage = ({ onBack }) => {
   const [direction, setDirection] = useState(1);
 
   // Tab order for animation direction
-  const tabOrder = ['dataCenter', 'workload', 'help'];
+  const tabOrder = ['dataCenter', 'workload', 'history', 'help'];
 
   // Animation variants
   const tabContentVariants = {
@@ -112,7 +112,6 @@ const SimulationPage = ({ onBack }) => {
   };
 
   const handleFileUpload = (e) => {
-    // If clearing (no files), reset state and return early
     if (!e.target.files || e.target.files.length === 0) {
       setWorkloadFile(null);
       setCsvRowCount(0);
@@ -164,102 +163,62 @@ const SimulationPage = ({ onBack }) => {
       .catch(() => alert('Failed to load preset workload'));
   };
 
+  const saveToHistory = (results) => {
+    const timestamp = new Date().toISOString();
+    const id = Date.now();
+    
+    const historyEntries = [
+      {
+        id: `${id}-eaco`,
+        timestamp,
+        algorithm: 'EACO',
+        config: dataCenterConfig,
+        summary: results.eaco.summary,
+        energyConsumption: results.eaco.energyConsumption,
+        vmUtilization: results.eaco.vmUtilization
+      },
+      {
+        id: `${id}-epso`,
+        timestamp,
+        algorithm: 'EPSO',
+        config: dataCenterConfig,
+        summary: results.epso.summary,
+        energyConsumption: results.epso.energyConsumption,
+        vmUtilization: results.epso.vmUtilization
+      }
+    ];
+
+    const existingHistory = JSON.parse(localStorage.getItem('simulationHistory') || '[]');
+    const updatedHistory = [...historyEntries, ...existingHistory].slice(0, 50);
+    localStorage.setItem('simulationHistory', JSON.stringify(updatedHistory));
+  };
+
   const runAlgorithm = async (algorithm, configData) => {
     const algorithmConfig = {
       ...configData,
       optimizationAlgorithm: algorithm
     };
     
-    const isEpso = algorithm === "EPSO";
-    const isEaco = algorithm === "EACO";
-    
-    if (isEpso) {
-      console.group("🚀 EPSO ALGORITHM REQUEST");
-      console.log("📊 Configuration:", JSON.stringify(algorithmConfig, null, 2));
-      console.log("📁 Using workload file:", workloadFile ? workloadFile.name : "No file (using random workload)");
-    } else if (isEaco) {
-      console.group("🚀 EACO ALGORITHM REQUEST");
-      console.log("📊 Configuration:", JSON.stringify(algorithmConfig, null, 2));
-      console.log("📁 Using workload file:", workloadFile ? workloadFile.name : "No file (using random workload)");
-    } else {
-      console.log(`Running ${algorithm} algorithm with config:`, algorithmConfig);
-    }
-    
     try {
       if (workloadFile) {
-        // Send with file - use the run-with-file endpoint as defined in the backend
-        if (isEpso || isEaco) console.log("📤 Sending CSV file to backend via FormData");
-        else console.log(`Using file upload mode with ${workloadFile.name}`);
-        
         const formData = new FormData();
         formData.append('file', workloadFile);
         Object.entries(algorithmConfig).forEach(([key, value]) => {
           formData.append(key, value);
         });
         
-        if (isEpso || isEaco) {
-          console.log("📬 Form data entries:");
-          for (let [key, value] of formData.entries()) {
-            if (key === 'file') {
-              console.log(`  - ${key}: ${value.name} (${value.size} bytes)`);
-            } else {
-              console.log(`  - ${key}: ${value}`);
-            }
-          }
-          console.log("🌐 Endpoint: http://localhost:8080/api/run-with-file");
-        } else {
-          console.log("Sending form data:", [...formData.entries()]);
-        }
-        
-        const startTime = Date.now();
         const response = await fetch('http://localhost:8080/api/run-with-file', {
           method: 'POST',
           body: formData
         });
-        const requestTime = Date.now() - startTime;
-        
-        if (isEpso || isEaco) {
-          console.log(`⏱️ Request completed in ${requestTime}ms`);
-          console.log(`🛎️ Response status: ${response.status} ${response.statusText}`);
-        } else {
-          console.log(`Response status: ${response.status}`);
-        }
         
         if (!response.ok) {
           let errorText = await response.text();
-          console.error("Error response:", errorText);
-          if (isEpso || isEaco) console.groupEnd();
           throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
         }
         
-        let responseData = await response.json();
-        
-        if (isEpso || isEaco) {
-          console.log("✅ Received successful response from server");
-          console.log("📊 Response summary:", {
-            totalTasks: responseData.summary?.totalTasks || 'N/A',
-            finishedTasks: responseData.summary?.finishedTasks || 'N/A',
-            makespan: responseData.summary?.makespan || 'N/A',
-            schedulingLogEntries: responseData.schedulingLog?.length || 0,
-            vmUtilization: responseData.vmUtilization?.length || 0,
-            energyConsumption: responseData.energyConsumption?.totalEnergyWh || 'N/A'
-          });
-          
-          console.groupEnd();
-        }
-        
-        return responseData;
+        return await response.json();
       } else {
-        // Send without file
-        if (isEpso || isEaco) console.log("📤 Sending JSON request (no file)");
-        else console.log(`Using default workload (no file)`);
-        
-        if (isEpso || isEaco) {
-          console.log("📬 JSON payload:", JSON.stringify(algorithmConfig, null, 2));
-          console.log("🌐 Endpoint: http://localhost:8080/api/run");
-        }
-        
-        const startTime = Date.now();
         const response = await fetch('http://localhost:8080/api/run', {
           method: 'POST',
           headers: {
@@ -267,43 +226,16 @@ const SimulationPage = ({ onBack }) => {
           },
           body: JSON.stringify(algorithmConfig)
         });
-        const requestTime = Date.now() - startTime;
-        
-        if (isEpso || isEaco) {
-          console.log(`⏱️ Request completed in ${requestTime}ms`);
-          console.log(`🛎️ Response status: ${response.status} ${response.statusText}`);
-        } else {
-          console.log(`Response status: ${response.status}`);
-        }
         
         if (!response.ok) {
           let errorText = await response.text();
-          console.error("Error response:", errorText);
-          if (isEpso || isEaco) console.groupEnd();
           throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
         }
         
-        let responseData = await response.json();
-        
-        if (isEpso || isEaco) {
-          console.log("✅ Received successful response from server");
-          console.log("📊 Response summary:", {
-            totalTasks: responseData.summary?.totalTasks || 'N/A',
-            finishedTasks: responseData.summary?.finishedTasks || 'N/A',
-            makespan: responseData.summary?.makespan || 'N/A',
-            schedulingLogEntries: responseData.schedulingLog?.length || 0,
-            vmUtilization: responseData.vmUtilization?.length || 0,
-            energyConsumption: responseData.energyConsumption?.totalEnergyWh || 'N/A'
-          });
-          
-          console.groupEnd();
-        }
-        
-        return responseData;
+        return await response.json();
       }
     } catch (error) {
       console.error(`Error running ${algorithm}:`, error);
-      if (isEpso || isEaco) console.groupEnd();
       throw error;
     }
   };
@@ -312,15 +244,11 @@ const SimulationPage = ({ onBack }) => {
     setSimulationState('loading');
     setProgress(0);
     
-    // Create the configuration data to match backend @RequestParam exactly
     const configData = {
-      // Required parameters from the backend code
       numHosts: dataCenterConfig.numHosts,
       numVMs: dataCenterConfig.numVMs,
       numPesPerHost: dataCenterConfig.numPesPerHost,
       peMips: dataCenterConfig.peMips,
-      
-      // Other parameters that might be needed
       ramPerHost: dataCenterConfig.ramPerHost,
       bwPerHost: dataCenterConfig.bwPerHost,
       storagePerHost: dataCenterConfig.storagePerHost,
@@ -331,15 +259,9 @@ const SimulationPage = ({ onBack }) => {
       vmSize: dataCenterConfig.vmSize,
       numCloudlets: cloudletConfig.numCloudlets,
       vmScheduler: dataCenterConfig.vmScheduler,
-      
-      // Set the workload type explicitly
       workloadType: workloadFile ? 'CSV' : 'Random',
       useDefaultWorkload: !workloadFile
     };
-    
-    console.group('🔄 Starting Simulation');
-    console.log('📊 Sending configuration to backend:', configData);
-    console.log('📁 Workload file:', workloadFile ? workloadFile.name : 'No file (using random workload)');
     
     try {
       let progressInterval = setInterval(() => {
@@ -349,126 +271,33 @@ const SimulationPage = ({ onBack }) => {
         });
       }, 300);
       
-      // Run both algorithms
       try {
-        // First run EACO algorithm
-        console.group('🏆 Running EACO algorithm...');
-        console.time('EACO execution time');
         const eacoResponse = await runAlgorithm("EACO", configData);
-        console.timeEnd('EACO execution time');
-        console.log('✅ EACO algorithm completed successfully');
-        console.groupEnd();
-        
-        // Update progress
         setProgress(70);
-        
-        // Then run EPSO
-        console.group('🏆 Running EPSO algorithm...');
-        console.time('EPSO execution time');
         const epsoResponse = await runAlgorithm("EPSO", configData);
-        console.timeEnd('EPSO execution time');
-        console.log('✅ EPSO algorithm completed successfully');
-        console.groupEnd();
         
-        // Combine results for the simulation
         const combinedResults = {
           eaco: eacoResponse,
           epso: epsoResponse
         };
         
-        // Log the detailed results
-        console.group('📈 Algorithm Comparison');
-        
-        // Log EACO metrics
-        console.log('🧮 EACO Metrics:');
-        console.table({
-          makespan: eacoResponse.summary.makespan.toFixed(2),
-          imbalanceDegree: eacoResponse.summary.imbalanceDegree.toFixed(4),
-          resourceUtilization: (eacoResponse.summary.resourceUtilization * 100).toFixed(2) + '%',
-          averageResponseTime: eacoResponse.summary.averageResponseTime.toFixed(2)
-        });
-        
-        // Log EPSO metrics
-        console.log('🧮 EPSO Metrics:');
-        console.table({
-          makespan: epsoResponse.summary.makespan.toFixed(2),
-          imbalanceDegree: epsoResponse.summary.imbalanceDegree.toFixed(4),
-          resourceUtilization: (epsoResponse.summary.resourceUtilization * 100).toFixed(2) + '%',
-          averageResponseTime: epsoResponse.summary.averageResponseTime.toFixed(2)
-        });
-        
-        // Log energy consumption for both algorithms
-        console.log('⚡ Energy Consumption (Wh):');
-        console.table([
-          {
-            Algorithm: 'EACO',
-            TotalEnergyWh: eacoResponse.energyConsumption?.totalEnergyWh ?? eacoResponse.energyConsumption ?? 'N/A'
-          },
-          {
-            Algorithm: 'EPSO',
-            TotalEnergyWh: epsoResponse.energyConsumption?.totalEnergyWh ?? epsoResponse.energyConsumption ?? 'N/A'
-          }
-        ]);
-        
-        // Log VM utilization details
-        console.group('📊 VM Utilization Details');
-        console.log('EPSO VM Utilization:');
-        console.table(epsoResponse.vmUtilization.map(vm => ({
-          VM_ID: vm.vmId,
-          CPU_Load: vm.cpuUtilization.toFixed(2),
-          Tasks: vm.numAPECloudlets,
-          Status: vm.cpuUtilization > 0 ? 'Active' : 'Idle'
-        })));
-        
-        console.log('EACO VM Utilization:');
-        console.table(eacoResponse.vmUtilization.map(vm => ({
-          VM_ID: vm.vmId,
-          CPU_Load: vm.cpuUtilization.toFixed(2),
-          Tasks: vm.numAPECloudlets,
-          Status: vm.cpuUtilization > 0 ? 'Active' : 'Idle'
-        })));
-        console.groupEnd();
-        
-        // Log performance improvement comparison
-        const makespanImprovement = ((eacoResponse.summary.makespan - epsoResponse.summary.makespan) / eacoResponse.summary.makespan * 100);
-        const imbalanceImprovement = ((eacoResponse.summary.imbalanceDegree - epsoResponse.summary.imbalanceDegree) / eacoResponse.summary.imbalanceDegree * 100);
-        
-        console.log('🔄 Performance Comparison (EPSO vs EACO):');
-        console.table({
-          'Makespan Change': makespanImprovement > 0 ? 
-            `${makespanImprovement.toFixed(2)}% better with EPSO` : 
-            `${Math.abs(makespanImprovement).toFixed(2)}% better with EACO`,
-          'Imbalance Change': imbalanceImprovement > 0 ? 
-            `${imbalanceImprovement.toFixed(2)}% better with EPSO` : 
-            `${Math.abs(imbalanceImprovement).toFixed(2)}% better with EACO`
-        });
-        
-        console.groupEnd(); // End Algorithm Comparison
-        
-        // Store the combined results
         setSimulationResults(combinedResults);
+        saveToHistory(combinedResults);
         
-        // Clear the interval and finish loading
         clearInterval(progressInterval);
         setProgress(100);
         
-        // Short delay before moving to animation view
         setTimeout(() => {
-          console.log('👍 Both algorithms completed successfully. Moving to animation view.');
-          console.groupEnd(); // End Starting Simulation
           setSimulationState('animation');
         }, 500);
       } catch (algorithmError) {
-        console.error('❌ Error running algorithms:', algorithmError);
-        console.groupEnd(); // End nested group
-        console.groupEnd(); // End Starting Simulation
+        console.error('Error running algorithms:', algorithmError);
         clearInterval(progressInterval);
         alert(`Failed to run algorithms: ${algorithmError.message}`);
         setSimulationState('config');
       }
     } catch (err) {
-      console.error('❌ Simulation run error:', err);
-      console.groupEnd(); // End Starting Simulation
+      console.error('Simulation run error:', err);
       alert(`Failed to run simulation: ${err.message}`);
       setSimulationState('config');
     }
@@ -491,6 +320,13 @@ const SimulationPage = ({ onBack }) => {
         >
           <Play size={18} />
           Workload
+        </button>
+        <button
+          className={`py-4 px-6 font-medium flex items-center gap-2 ${activeTab === 'history' ? 'text-[#319694] border-b-2 border-[#319694]' : 'text-gray-500'}`}
+          onClick={() => handleTabChange('history')}
+        >
+          <BarChart2 size={18} />
+          History
         </button>
         <button
           className={`py-4 px-6 font-medium flex items-center gap-2 ${activeTab === 'help' ? 'text-[#319694] border-b-2 border-[#319694]' : 'text-gray-500'}`}
@@ -527,13 +363,24 @@ const SimulationPage = ({ onBack }) => {
                 onPresetSelect={handlePresetSelect}
                 selectedPreset={selectedPreset}
               />
+            ) : activeTab === 'history' ? (
+              <HistoryTab 
+                onBack={() => setActiveTab('dataCenter')}
+                onViewResults={(result) => {
+                  setSimulationResults({
+                    eaco: result.algorithm === 'EACO' ? result : null,
+                    epso: result.algorithm === 'EPSO' ? result : null
+                  });
+                  setSimulationState('results');
+                }}
+              />
             ) : (
               <HelpTab />
             )}
           </motion.div>
         </AnimatePresence>
 
-        {activeTab !== 'help' && (
+        {activeTab !== 'help' && activeTab !== 'history' && (
           <div className="mt-8 flex justify-center">
             <button
               className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
@@ -617,7 +464,7 @@ const SimulationPage = ({ onBack }) => {
   const getHeaderTitle = () => {
     switch (simulationState) {
       case 'config':
-        return 'Simulation Configuration';
+        return activeTab === 'history' ? 'Results History' : 'Simulation Configuration';
       case 'loading':
         return 'Running Simulation';
       case 'animation':
@@ -632,7 +479,9 @@ const SimulationPage = ({ onBack }) => {
   const getHeaderSubtitle = () => {
     switch (simulationState) {
       case 'config':
-        return 'Set up your data center and workload parameters';
+        return activeTab === 'history' 
+          ? 'View past simulation results and configurations' 
+          : 'Set up your data center and workload parameters';
       case 'loading':
         return 'Processing your cloud workload';
       case 'animation':
@@ -647,7 +496,9 @@ const SimulationPage = ({ onBack }) => {
   const getHeaderIcon = () => {
     switch (simulationState) {
       case 'config':
-        return <Settings size={24} className="text-white" />;
+        return activeTab === 'history' 
+          ? <BarChart2 size={24} className="text-white" />
+          : <Settings size={24} className="text-white" />;
       case 'loading':
         return <Play size={24} className="text-white animate-pulse" />;
       case 'animation':
