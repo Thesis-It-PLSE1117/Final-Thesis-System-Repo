@@ -3,29 +3,36 @@ import { BarChart2, Clock, Cpu, Zap, Activity } from 'lucide-react';
 const HistoryDetails = ({ result, onViewResults }) => {
   if (!result) return null;
 
+  // Safely access properties with defaults
+  const summary = result.summary || {};
+  const config = result.config || {};
+  
   const metrics = [
     {
       icon: <Clock size={20} className="text-[#319694]" />,
       title: "Makespan",
-      value: result.summary.makespan.toFixed(2),
+      value: (summary.makespan || 0).toFixed(2),
       unit: "ms"
     },
     {
       icon: <Cpu size={20} className="text-[#319694]" />,
       title: "Resource Utilization",
-      value: (result.summary.resourceUtilization * 100).toFixed(2),
+      value: (summary.resourceUtilization || summary.utilization || 0).toFixed(2),
       unit: "%"
     },
     {
       icon: <Zap size={20} className="text-[#319694]" />,
       title: "Energy Consumption",
-      value: result.energyConsumption.totalEnergyWh.toFixed(2),
+      value: (typeof result.energyConsumption === 'number' 
+        ? result.energyConsumption 
+        : result.energyConsumption?.totalEnergyWh || 0
+      ).toFixed(2),
       unit: "Wh"
     },
     {
       icon: <Activity size={20} className="text-[#319694]" />,
-      title: "Imbalance Degree",
-      value: result.summary.imbalanceDegree.toFixed(4),
+      title: "Load Balance",
+      value: (summary.loadBalance || summary.imbalanceDegree || summary.imbalance || 0).toFixed(4),
       unit: ""
     }
   ];
@@ -55,27 +62,27 @@ const HistoryDetails = ({ result, onViewResults }) => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-gray-500">Hosts</p>
-            <p>{result.config.numHosts}</p>
+            <p>{config.numHosts || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-500">VMs</p>
-            <p>{result.config.numVMs}</p>
+            <p>{config.numVMs || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-500">Cloudlets</p>
-            <p>{result.config.numCloudlets}</p>
+            <p>{config.numCloudlets || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-500">Algorithm</p>
-            <p>{result.config.optimizationAlgorithm}</p>
+            <p>{result.algorithm || config.optimizationAlgorithm || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-500">VM Scheduler</p>
-            <p>{result.config.vmScheduler}</p>
+            <p>{config.vmScheduler || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-500">Workload</p>
-            <p>{result.config.workloadType}</p>
+            <p>{config.workloadType || 'N/A'}</p>
           </div>
         </div>
       </div>

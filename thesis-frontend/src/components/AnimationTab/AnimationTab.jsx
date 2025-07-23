@@ -23,6 +23,10 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
   // Load backend results
   useEffect(() => {
     if (epsoResults && rrResults) {
+      // Handle new API response structure
+      const epsoData = epsoResults.rawResults || epsoResults;
+      const rrData = rrResults.rawResults || rrResults;
+      
       console.group('Backend Response Data');
       console.log('🚀 EPSO Results Received:', epsoResults);
       console.log('🚀 EACO Results Received:', rrResults);
@@ -31,40 +35,40 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       console.group('Resource Utilization Comparison');
       console.log('Simulation Results (Backend):');
       console.log('EPSO:', {
-        imbalance: epsoResults.summary.imbalanceDegree,
-        makespan: epsoResults.summary.makespan,
-        utilization: epsoResults.summary.resourceUtilization * 100
+        imbalance: epsoData.summary?.imbalanceDegree || epsoData.summary?.loadBalance,
+        makespan: epsoData.summary?.makespan,
+        utilization: epsoData.summary?.resourceUtilization
       });
       console.log('EACO:', {
-        imbalance: rrResults.summary.imbalanceDegree,
-        makespan: rrResults.summary.makespan,
-        utilization: rrResults.summary.resourceUtilization * 100
+        imbalance: rrData.summary?.imbalanceDegree || rrData.summary?.loadBalance,
+        makespan: rrData.summary?.makespan,
+        utilization: rrData.summary?.resourceUtilization
       });
       
       console.log('\nAnimation Initial State:');
-      console.log('EPSO VMs:', epsoResults.vmUtilization.map(vm => ({
+      console.log('EPSO VMs:', epsoData.vmUtilization?.map(vm => ({
         id: vm.vmId,
         load: vm.cpuUtilization,
         tasks: vm.numAPECloudlets
-      })));
-      console.log('EACO VMs:', rrResults.vmUtilization.map(vm => ({
+      })) || []);
+      console.log('EACO VMs:', rrData.vmUtilization?.map(vm => ({
         id: vm.vmId,
         load: vm.cpuUtilization,
         tasks: vm.numAPECloudlets
-      })));
+      })) || []);
       console.groupEnd();
 
       // Set metrics from backend data
       setMetrics({
         EPSO: {
-          imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
-          makespan: epsoResults.summary.makespan.toFixed(2),
-          utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+          imbalance: (epsoData.summary?.imbalanceDegree || epsoData.summary?.loadBalance || 0).toFixed(2),
+          makespan: (epsoData.summary?.makespan || 0).toFixed(2),
+          utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
         },
         EACO: {
-          imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
-          makespan: rrResults.summary.makespan.toFixed(2),
-          utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+          imbalance: (rrData.summary?.imbalanceDegree || rrData.summary?.loadBalance || 0).toFixed(2),
+          makespan: (rrData.summary?.makespan || 0).toFixed(2),
+          utilization: (rrData.summary?.resourceUtilization || 0).toFixed(2)
         }
       });
 
@@ -77,20 +81,24 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       const eacoActive = [];
 
       // Process EPSO VM utilization
-      epsoResults.vmUtilization.forEach(vm => {
-        const vmId = vm.vmId;
-        epsoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
-        epsoCounts[vmId] = vm.numAPECloudlets || 0;
-        if (vm.cpuUtilization > 0) epsoActive.push(vmId);
-      });
+      if (epsoData.vmUtilization) {
+        epsoData.vmUtilization.forEach(vm => {
+          const vmId = vm.vmId;
+          epsoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
+          epsoCounts[vmId] = vm.numAPECloudlets || 0;
+          if (vm.cpuUtilization > 0) epsoActive.push(vmId);
+        });
+      }
 
       // Process EACO VM utilization
-      rrResults.vmUtilization.forEach(vm => {
-        const vmId = vm.vmId;
-        eacoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
-        eacoCounts[vmId] = vm.numAPECloudlets || 0;
-        if (vm.cpuUtilization > 0) eacoActive.push(vmId);
-      });
+      if (rrData.vmUtilization) {
+        rrData.vmUtilization.forEach(vm => {
+          const vmId = vm.vmId;
+          eacoLoads[vmId] = (vm.cpuUtilization / 100) || 0; // Scale to 0-1 range
+          eacoCounts[vmId] = vm.numAPECloudlets || 0;
+          if (vm.cpuUtilization > 0) eacoActive.push(vmId);
+        });
+      }
 
       // Set component state
       setCpuLoads({ EPSO: epsoLoads, EACO: eacoLoads });
@@ -103,24 +111,28 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       let maxEacoLoad = 0;
       let maxEacoVmId = null;
 
-      epsoResults.vmUtilization.forEach(vm => {
-        if (vm.cpuUtilization > maxEpsoLoad) {
-          maxEpsoLoad = vm.cpuUtilization;
-          maxEpsoVmId = vm.vmId;
-        }
-      });
+      if (epsoData.vmUtilization) {
+        epsoData.vmUtilization.forEach(vm => {
+          if (vm.cpuUtilization > maxEpsoLoad) {
+            maxEpsoLoad = vm.cpuUtilization;
+            maxEpsoVmId = vm.vmId;
+          }
+        });
+      }
 
-      rrResults.vmUtilization.forEach(vm => {
-        if (vm.cpuUtilization > maxEacoLoad) {
-          maxEacoLoad = vm.cpuUtilization;
-          maxEacoVmId = vm.vmId;
-        }
-      });
+      if (rrData.vmUtilization) {
+        rrData.vmUtilization.forEach(vm => {
+          if (vm.cpuUtilization > maxEacoLoad) {
+            maxEacoLoad = vm.cpuUtilization;
+            maxEacoVmId = vm.vmId;
+          }
+        });
+      }
 
       setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
 
       // Set total tasks from backend data
-      setTotalTasks(epsoResults.summary.totalCloudlets || 100);
+      setTotalTasks(epsoData.summary?.totalCloudlets || 100);
     }
   }, [epsoResults, rrResults, dataCenterConfig.numVMs]);
 
@@ -143,10 +155,14 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       setIsPlaying(false);
     } else {
       setIsPlaying(true);
-      const startTime = Date.now();
+      const startTime = performance.now();
       const duration = 10000; // 10 seconds for animation
 
       if (epsoResults && rrResults) {
+        // Handle new API response structure
+        const epsoData = epsoResults.rawResults || epsoResults;
+        const rrData = rrResults.rawResults || rrResults;
+        
         // Reset state
         const resetCounts = { EPSO: {}, EACO: {} };
         const resetLoads = { EPSO: {}, EACO: {} };
@@ -171,23 +187,39 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
         const finalEpsoActive = [];
         const finalEacoActive = [];
 
-        epsoResults.vmUtilization.forEach(vm => {
-          const vmId = vm.vmId;
-          finalEpsoLoads[vmId] = vm.cpuUtilization / 100 || 0;
-          finalEpsoCounts[vmId] = vm.numAPECloudlets || 0;
-          if (vm.cpuUtilization > 0) finalEpsoActive.push(vmId);
-        });
+        if (epsoData.vmUtilization) {
+          epsoData.vmUtilization.forEach(vm => {
+            const vmId = vm.vmId;
+            finalEpsoLoads[vmId] = vm.cpuUtilization / 100 || 0;
+            finalEpsoCounts[vmId] = vm.numAPECloudlets || 0;
+            if (vm.cpuUtilization > 0) finalEpsoActive.push(vmId);
+          });
+        }
 
-        rrResults.vmUtilization.forEach(vm => {
-          const vmId = vm.vmId;
-          finalEacoLoads[vmId] = vm.cpuUtilization / 100 || 0;
-          finalEacoCounts[vmId] = vm.numAPECloudlets || 0;
-          if (vm.cpuUtilization > 0) finalEacoActive.push(vmId);
-        });
+        if (rrData.vmUtilization) {
+          rrData.vmUtilization.forEach(vm => {
+            const vmId = vm.vmId;
+            finalEacoLoads[vmId] = vm.cpuUtilization / 100 || 0;
+            finalEacoCounts[vmId] = vm.numAPECloudlets || 0;
+            if (vm.cpuUtilization > 0) finalEacoActive.push(vmId);
+          });
+        }
 
+        // Use RAF timestamp for more accurate timing
+        let lastUpdateTime = 0;
+        const updateInterval = 1000 / 30; // Cap updates to 30fps for better performance
+        
         const animate = (timestamp) => {
-          const elapsed = Date.now() - startTime;
+          const elapsed = timestamp - startTime;
           const newProgress = Math.min(100, (elapsed / duration) * 100);
+          
+          // Only update state at controlled intervals
+          if (timestamp - lastUpdateTime < updateInterval && newProgress < 100) {
+            animationRef.current = requestAnimationFrame(animate);
+            return;
+          }
+          lastUpdateTime = timestamp;
+          
           setProgress(newProgress);
 
           const currentEpsoLoads = {};
@@ -225,22 +257,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
             }
           }
 
-          // Log current state during animation
-          if (newProgress % 10 === 0) { // Log every 10% progress
-            console.group(`Animation Progress: ${newProgress}%`);
-            console.log('Current State:');
-            console.log('EPSO:', {
-              activeVMs: currentEpsoActive.length,
-              avgLoad: Object.values(currentEpsoLoads).reduce((sum, load) => sum + load, 0) / dataCenterConfig.numVMs,
-              totalTasks: Object.values(currentEpsoCounts).reduce((sum, count) => sum + count, 0)
-            });
-            console.log('EACO:', {
-              activeVMs: currentEacoActive.length,
-              avgLoad: Object.values(currentEacoLoads).reduce((sum, load) => sum + load, 0) / dataCenterConfig.numVMs,
-              totalTasks: Object.values(currentEacoCounts).reduce((sum, count) => sum + count, 0)
-            });
-            console.groupEnd();
-          }
+          // Remove console logging during animation for better performance
 
           // Highlight VMs with highest load
           let maxEpsoLoad = 0;
@@ -266,22 +283,22 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
 
           setMetrics({
             EPSO: newProgress >= 99 ? {
-              imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
-              makespan: epsoResults.summary.makespan.toFixed(2),
-              utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+              imbalance: (epsoData.summary?.imbalanceDegree || epsoData.summary?.loadBalance || 0).toFixed(2),
+              makespan: (epsoData.summary?.makespan || 0).toFixed(2),
+              utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
             } : {
-              imbalance: (epsoResults.summary.imbalanceDegree * (newProgress / 100)).toFixed(2),
-              makespan: (epsoResults.summary.makespan * (newProgress / 100)).toFixed(2),
-              utilization: (epsoResults.summary.resourceUtilization * 100 * (newProgress / 100)).toFixed(2)
+              imbalance: ((epsoData.summary?.imbalanceDegree || epsoData.summary?.loadBalance || 0) * (newProgress / 100)).toFixed(2),
+              makespan: ((epsoData.summary?.makespan || 0) * (newProgress / 100)).toFixed(2),
+              utilization: ((epsoData.summary?.resourceUtilization || 0) * (newProgress / 100)).toFixed(2)
             },
             EACO: newProgress >= 99 ? {
-              imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
-              makespan: rrResults.summary.makespan.toFixed(2),
-              utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+              imbalance: (rrData.summary?.imbalanceDegree || rrData.summary?.loadBalance || 0).toFixed(2),
+              makespan: (rrData.summary?.makespan || 0).toFixed(2),
+              utilization: (rrData.summary?.resourceUtilization || 0).toFixed(2)
             } : {
-              imbalance: (rrResults.summary.imbalanceDegree * (newProgress / 100)).toFixed(2),
-              makespan: (rrResults.summary.makespan * (newProgress / 100)).toFixed(2),
-              utilization: (rrResults.summary.resourceUtilization * 100 * (newProgress / 100)).toFixed(2) // Fixed: Use rrResults
+              imbalance: ((rrData.summary?.imbalanceDegree || rrData.summary?.loadBalance || 0) * (newProgress / 100)).toFixed(2),
+              makespan: ((rrData.summary?.makespan || 0) * (newProgress / 100)).toFixed(2),
+              utilization: ((rrData.summary?.resourceUtilization || 0) * (newProgress / 100)).toFixed(2)
             }
           });
 
@@ -295,14 +312,14 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
             setCpuLoads({ EPSO: finalEpsoLoads, EACO: finalEacoLoads });
             setMetrics({
               EPSO: {
-                imbalance: epsoResults.summary.imbalanceDegree.toFixed(2),
-                makespan: epsoResults.summary.makespan.toFixed(2),
-                utilization: (epsoResults.summary.resourceUtilization * 100).toFixed(2)
+                imbalance: (epsoData.summary?.imbalanceDegree || epsoData.summary?.loadBalance || 0).toFixed(2),
+                makespan: (epsoData.summary?.makespan || 0).toFixed(2),
+                utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
               },
               EACO: {
-                imbalance: rrResults.summary.imbalanceDegree.toFixed(2),
-                makespan: rrResults.summary.makespan.toFixed(2),
-                utilization: (rrResults.summary.resourceUtilization * 100).toFixed(2)
+                imbalance: (rrData.summary?.imbalanceDegree || rrData.summary?.loadBalance || 0).toFixed(2),
+                makespan: (rrData.summary?.makespan || 0).toFixed(2),
+                utilization: (rrData.summary?.resourceUtilization || 0).toFixed(2)
               }
             });
           }
@@ -387,7 +404,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       >
         <div className="flex items-center">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0 Blaine4 4m-4-4l4-4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
           Enhanced ACO
         </div>
@@ -483,7 +500,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
           <div className="flex items-center justify-between mb-4">
             <h5 className="font-bold text-lg text-purple-600 flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0 Blaine4 4m-4-4l4-4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
               </svg>
               Enhanced ACO
             </h5>
