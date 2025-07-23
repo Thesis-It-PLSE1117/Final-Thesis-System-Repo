@@ -33,6 +33,9 @@ const SimulationPage = ({ onBack }) => {
     vmScheduler: "TimeShared",
     optimizationAlgorithm: "EPSO",
   });
+  
+  // Additional configuration for MATLAB plots
+  const [enableMatlabPlots, setEnableMatlabPlots] = useState(false);
 
   // Workload configuration
   const [cloudletConfig, setCloudletConfig] = useState({
@@ -163,28 +166,44 @@ const SimulationPage = ({ onBack }) => {
       .catch(() => alert('Failed to load preset workload'));
   };
 
+  // Base URL for backend API
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+
   const saveToHistory = (results) => {
     const timestamp = new Date().toISOString();
     const id = Date.now();
+    
+    // Create full config object including cloudlet config
+    const fullConfig = {
+      ...dataCenterConfig,
+      numCloudlets: cloudletConfig.numCloudlets,
+      workloadType: workloadFile ? 'CSV' : 'Random'
+    };
     
     const historyEntries = [
       {
         id: `${id}-eaco`,
         timestamp,
         algorithm: 'EACO',
-        config: dataCenterConfig,
-        summary: results.eaco.summary,
-        energyConsumption: results.eaco.energyConsumption,
-        vmUtilization: results.eaco.vmUtilization
+        config: fullConfig,
+        summary: results.eaco.rawResults?.summary || results.eaco.summary,
+        energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
+        vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
+        schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
+        plotData: results.eaco.plotData,
+        simulationId: results.eaco.simulationId
       },
       {
         id: `${id}-epso`,
         timestamp,
         algorithm: 'EPSO',
-        config: dataCenterConfig,
-        summary: results.epso.summary,
-        energyConsumption: results.epso.energyConsumption,
-        vmUtilization: results.epso.vmUtilization
+        config: fullConfig,
+        summary: results.epso.rawResults?.summary || results.epso.summary,
+        energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
+        vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
+        schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
+        plotData: results.epso.plotData,
+        simulationId: results.epso.simulationId
       }
     ];
 
@@ -193,21 +212,49 @@ const SimulationPage = ({ onBack }) => {
     localStorage.setItem('simulationHistory', JSON.stringify(updatedHistory));
   };
 
-  const runAlgorithm = async (algorithm, configData) => {
+  const runAlgorithm = async (algorithm, configData, withPlots = false) => {
     const algorithmConfig = {
       ...configData,
       optimizationAlgorithm: algorithm
     };
     
     try {
-      if (workloadFile) {
+      // Use MATLAB plots endpoint if requested
+      if (withPlots && !workloadFile) {
+        const response = await fetch(`${API_BASE}/api/simulate/with-plots`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(algorithmConfig)
+        });
+        
+        if (!response.ok) {
+          // Handle MATLAB warming up
+          if (response.status === 202) {
+            const data = await response.json();
+            if (data.status === 'WARMING_UP') {
+              console.log('MATLAB engine is warming up, retrying in 5 seconds...');
+              await new Promise(resolve => setTimeout(resolve, 5000));
+              // Retry the request
+              return runAlgorithm(algorithm, configData, withPlots);
+            }
+          }
+          let errorText = await response.text();
+          throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        // Return the entire result including rawResults and plotData
+        return result;
+      } else if (workloadFile) {
         const formData = new FormData();
         formData.append('file', workloadFile);
         Object.entries(algorithmConfig).forEach(([key, value]) => {
           formData.append(key, value);
         });
         
-        const response = await fetch('http://localhost:8080/api/run-with-file', {
+        const response = await fetch(`${API_BASE}/api/run-with-file`, {
           method: 'POST',
           body: formData
         });
@@ -219,7 +266,7 @@ const SimulationPage = ({ onBack }) => {
         
         return await response.json();
       } else {
-        const response = await fetch('http://localhost:8080/api/run', {
+        const response = await fetch(`${API_BASE}/api/run`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -272,9 +319,9 @@ const SimulationPage = ({ onBack }) => {
       }, 300);
       
       try {
-        const eacoResponse = await runAlgorithm("EACO", configData);
+        const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots);
         setProgress(70);
-        const epsoResponse = await runAlgorithm("EPSO", configData);
+        const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots);
         
         const combinedResults = {
           eaco: eacoResponse,
@@ -351,7 +398,9 @@ const SimulationPage = ({ onBack }) => {
             {activeTab === 'dataCenter' ? (
               <DataCenterTab 
                 config={dataCenterConfig} 
-                onChange={handleDataCenterChange} 
+                onChange={handleDataCenterChange}
+                enableMatlabPlots={enableMatlabPlots}
+                onMatlabToggle={setEnableMatlabPlots}
               />
             ) : activeTab === 'workload' ? (
               <WorkloadTab
@@ -362,16 +411,33 @@ const SimulationPage = ({ onBack }) => {
                 csvRowCount={csvRowCount}
                 onPresetSelect={handlePresetSelect}
                 selectedPreset={selectedPreset}
+                onSyntheticWorkloadSubmit={(config) => {
+                  console.log('Synthetic workload config:', config);
+                  // Handle synthetic workload submission
+                }}
               />
             ) : activeTab === 'history' ? (
               <HistoryTab 
                 onBack={() => setActiveTab('dataCenter')}
                 onViewResults={(result) => {
-                  setSimulationResults({
-                    eaco: result.algorithm === 'EACO' ? result : null,
-                    epso: result.algorithm === 'EPSO' ? result : null
-                  });
-                  setSimulationState('results');
+                  // Find the corresponding paired result from the same simulation run
+                  const savedHistory = JSON.parse(localStorage.getItem('simulationHistory') || '[]');
+                  const baseId = result.id.split('-')[0];
+                  
+                  // Find both EACO and EPSO results from the same run
+                  const eacoResult = savedHistory.find(r => r.id === `${baseId}-eaco`);
+                  const epsoResult = savedHistory.find(r => r.id === `${baseId}-epso`);
+                  
+                  if (eacoResult && epsoResult) {
+                    setSimulationResults({
+                      eaco: eacoResult,
+                      epso: epsoResult
+                    });
+                    setSimulationState('results');
+                  } else {
+                    // Fallback for single result (old format)
+                    alert('Unable to load complete results. This may be an old history entry.');
+                  }
                 }}
               />
             ) : (
@@ -450,6 +516,10 @@ const SimulationPage = ({ onBack }) => {
               results={simulationResults}
               rrResults={simulationResults?.eaco}
               epsoResults={simulationResults?.epso}
+              plotData={{
+                eaco: simulationResults?.eaco?.plotData,
+                epso: simulationResults?.epso?.plotData
+              }}
               onBackToAnimation={() => setSimulationState('animation')}
               onNewSimulation={() => setSimulationState('config')}
             />

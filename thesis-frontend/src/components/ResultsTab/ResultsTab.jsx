@@ -4,14 +4,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiRefreshCw,
   FiArrowLeft,
-  FiSearch
+  FiSearch,
+  FiDownload,
+  FiPrinter
 } from 'react-icons/fi';
 import MetricCard from './MetricCard';
 import SchedulingLogTable from './SchedulingLogTable';
 import PerformanceCharts from './Charts';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 
-const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults }) => {
+const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults, plotData }) => {
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,62 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
         String(value).toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
+  };
+
+  const getPlotTitle = (filename, index) => {
+    if (!filename) return `Plot ${index + 1}`;
+    
+    const fname = filename.toLowerCase();
+    
+    if (fname.includes('metrics')) return 'Performance Metrics Overview';
+    if (fname.includes('detailed')) return 'Detailed Performance Analysis';
+    if (fname.includes('vm_utilization')) return 'VM Resource Utilization';
+    if (fname.includes('energy')) return 'Energy Consumption Analysis';
+    if (fname.includes('comparison')) return 'Algorithm Comparison';
+    if (fname.includes('radar')) return 'Multi-Metric Radar Analysis';
+    if (fname.includes('timeline')) return 'Task Scheduling Timeline';
+    
+    return `Analysis Plot ${index + 1}`;
+  };
+
+  const handleDownloadImage = async (imageUrl, filename, algo) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${algo}_${filename}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    }
+  };
+
+  const handlePrintImage = (imageUrl, title) => {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+            img { max-width: 100%; height: auto; }
+            @media print {
+              body { margin: 0; }
+              img { max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const rrSummary = getSummaryData(resultsRR);
@@ -177,10 +235,8 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
               <MetricCard 
                 title={metric.title}
                 description={metric.description}
-                rrValue={rrSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
-                                metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 'energyConsumption']}
-                epsoValue={epsoSummary[metric.title.toLowerCase().includes('utilization') ? 'cpuUtilization' : 
-                                metric.title.toLowerCase().includes('response') ? 'avgResponseTime' : 'energyConsumption']}
+                rrValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
+                epsoValue={epsoSummary ? epsoSummary[metric.valueKey] || 0 : 0}
                 unit={metric.unit}
                 betterWhen={metric.betterWhen}
                 icon={metric.icon}
@@ -198,6 +254,180 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
             setActiveChart={setActiveChart}
           />
         </div>
+
+        {/* MATLAB Plots Section */}
+        {plotData && Object.keys(plotData).length > 0 && (
+          <div className="mb-10">
+            <h4 className="font-semibold text-gray-700 text-lg mb-6 flex items-center gap-2">
+              <svg className="w-5 h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              MATLAB Analysis Plots Comparison
+            </h4>
+            
+            {/* Group plots by type for side-by-side comparison */}
+            {(() => {
+              const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+              const eacoData = plotData.eaco;
+              const epsoData = plotData.epso;
+              
+              if (!eacoData?.plotPaths || !epsoData?.plotPaths) return null;
+              
+              // Create pairs of plots for comparison
+              const plotTypes = ['metrics', 'detailed', 'vm_utilization', 'energy', 'timeline', 'radar'];
+              
+              return (
+                <div className="space-y-8">
+                  {plotTypes.map((type) => {
+                    // Find matching plots for each type
+                    const eacoPlot = eacoData.plotPaths.find(path => path.toLowerCase().includes(type));
+                    const epsoPlot = epsoData.plotPaths.find(path => path.toLowerCase().includes(type));
+                    
+                    if (!eacoPlot || !epsoPlot) return null;
+                    
+                    // Process EACO plot path
+                    let eacoNormalizedPath = eacoPlot.replace(/\\/g, '/');
+                    if (eacoNormalizedPath.startsWith('plots/')) {
+                      eacoNormalizedPath = eacoNormalizedPath.substring(6);
+                    }
+                    const eacoUrl = `${API_BASE}/api/plots/${eacoNormalizedPath}`;
+                    
+                    // Process EPSO plot path
+                    let epsoNormalizedPath = epsoPlot.replace(/\\/g, '/');
+                    if (epsoNormalizedPath.startsWith('plots/')) {
+                      epsoNormalizedPath = epsoNormalizedPath.substring(6);
+                    }
+                    const epsoUrl = `${API_BASE}/api/plots/${epsoNormalizedPath}`;
+                    
+                    const plotTitle = getPlotTitle(type, 0);
+                    
+                    return (
+                      <motion.div
+                        key={type}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: plotTypes.indexOf(type) * 0.1 }}
+                        className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-200"
+                      >
+                        {/* Plot type header */}
+                        <h5 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                          {plotTitle}
+                        </h5>
+                        
+                        {/* Side-by-side comparison grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {/* EACO Plot */}
+                          <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 group">
+                            <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200 shadow-sm">
+                              EACO Algorithm
+                            </div>
+                            <div className="relative">
+                              <img 
+                                src={eacoUrl} 
+                                alt={`EACO ${plotTitle}`}
+                                className="w-full h-auto object-contain max-h-96"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                              <div 
+                                style={{ display: 'none' }}
+                                className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-500"
+                              >
+                                <div className="text-center">
+                                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  <p className="text-sm">Plot loading...</p>
+                                </div>
+                              </div>
+                              {/* Action buttons overlay */}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div className="flex gap-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleDownloadImage(eacoUrl, `eaco_${type}.png`, 'eaco')}
+                                    className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
+                                    title="Download image"
+                                  >
+                                    <FiDownload className="w-4 h-4" />
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handlePrintImage(eacoUrl, `EACO - ${plotTitle}`)}
+                                    className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
+                                    title="Print image"
+                                  >
+                                    <FiPrinter className="w-4 h-4" />
+                                  </motion.button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* EPSO Plot */}
+                          <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 group">
+                            <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200 shadow-sm">
+                              EPSO Algorithm
+                            </div>
+                            <div className="relative">
+                              <img 
+                                src={epsoUrl} 
+                                alt={`EPSO ${plotTitle}`}
+                                className="w-full h-auto object-contain max-h-96"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                              <div 
+                                style={{ display: 'none' }}
+                                className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-500"
+                              >
+                                <div className="text-center">
+                                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  <p className="text-sm">Plot loading...</p>
+                                </div>
+                              </div>
+                              {/* Action buttons overlay */}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div className="flex gap-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleDownloadImage(epsoUrl, `epso_${type}.png`, 'epso')}
+                                    className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
+                                    title="Download image"
+                                  >
+                                    <FiDownload className="w-4 h-4" />
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handlePrintImage(epsoUrl, `EPSO - ${plotTitle}`)}
+                                    className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
+                                    title="Print image"
+                                  >
+                                    <FiPrinter className="w-4 h-4" />
+                                  </motion.button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
+        )}
 
         {/* Scheduling Logs Section */}
         <div className="mb-8">
