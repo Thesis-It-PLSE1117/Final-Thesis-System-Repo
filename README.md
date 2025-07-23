@@ -78,6 +78,12 @@ npm run dev
 - No console errors in browser
 - Successful API connection test
 
+This frontend works with our Java-based backend simulation engine:
+
+Backend Repository: https://github.com/kierre-yes/research_sim.git
+
+Make sure to clone and run the backend server before using this frontend application.
+Please read the README.md file in the root directory for further documentation.
 ## Support
 
 For issues and feature requests, please create an issue in the repository.
