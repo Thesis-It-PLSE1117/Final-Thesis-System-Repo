@@ -85,6 +85,9 @@ const WorkloadTab = ({
               onFileUpload={onFileUpload}
               workloadFile={workloadFile}
               csvRowCount={csvRowCount}
+              onPresetSelect={onPresetSelect}
+              selectedPreset={selectedPreset}
+              presetOptions={presetOptions}
             />
           </div>
         ) : (

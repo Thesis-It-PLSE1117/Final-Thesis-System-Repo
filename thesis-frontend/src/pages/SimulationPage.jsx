@@ -320,14 +320,17 @@ const SimulationPage = ({ onBack }) => {
       
       try {
         const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots);
+        console.log('📊 EACO Response from backend:', eacoResponse);
         setProgress(70);
         const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots);
+        console.log('📊 EPSO Response from backend:', epsoResponse);
         
         const combinedResults = {
           eaco: eacoResponse,
           epso: epsoResponse
         };
         
+        console.log('📊 Combined Results to be saved:', combinedResults);
         setSimulationResults(combinedResults);
         saveToHistory(combinedResults);
         
@@ -496,10 +499,14 @@ const SimulationPage = ({ onBack }) => {
                   : cloudletConfig.numCloudlets
               }}
               workloadFile={workloadFile}
-              rrResults={simulationResults?.eaco}
+              eacoResults={simulationResults?.eaco}
               epsoResults={simulationResults?.epso}
               onBack={() => setSimulationState('config')}
-              onViewResults={() => setSimulationState('results')}
+              onViewResults={() => {
+                console.log('📋 Transitioning to Results Tab');
+                console.log('📋 Current simulationResults:', simulationResults);
+                setSimulationState('results');
+              }}
             />
           </motion.div>
         );
@@ -514,7 +521,7 @@ const SimulationPage = ({ onBack }) => {
           >
             <ResultsTab 
               results={simulationResults}
-              rrResults={simulationResults?.eaco}
+              eacoResults={simulationResults?.eaco}
               epsoResults={simulationResults?.epso}
               plotData={{
                 eaco: simulationResults?.eaco?.plotData,

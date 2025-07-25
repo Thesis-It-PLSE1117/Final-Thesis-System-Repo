@@ -51,7 +51,7 @@ const HomePage = () => {
       title: "1. Configure Your Data Center",
       content: [
         "Specify host and VM configurations including processing capabilities, memory, bandwidth, and storage.",
-        "Choose the load balancing algorithm to evaluate (Enhanced ACO, Enhanced PSO, or compare both)."
+        "Choose the load balancing algorithm to evaluate (EACO, EPSO, or compare both)."
       ],
       list: [
         "Number of Hosts",
@@ -116,15 +116,15 @@ const HomePage = () => {
     {
       title: "Algorithms",
       links: [
-        { text: "Enhanced ACO", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('aco') },
-        { text: "Enhanced PSO", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('pso') },
+        { text: "EACO Algorithm", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('aco') },
+        { text: "EPSO Algorithm", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('pso') },
         { text: "Comparison", href: "#", icon: <GitCompare size={16} />, onClick: () => openModal('comparison') }
       ]
     },
     {
       title: "Contact",
       links: [
-        { text: "csa7-2025@gmail.com", href: "gmail.com", icon: <Mail size={16} /> },
+        { text: "csa7-2025@gmail.com", href: "mailto:csa7-2025@gmail.com", icon: <Mail size={16} /> },
       ]
     }
   ];
