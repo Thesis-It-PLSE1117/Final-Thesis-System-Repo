@@ -118,18 +118,18 @@ const HeroSection = ({ onStartSimulation }) => {
   
   const eacoMetrics = [
     { icon: <Cpu />, value: "72-82%", label: "Resource Utilization" },
-    { icon: <Clock />, value: "85-135ms", label: "Response Time" },
+    { icon: <Clock />, value: "85-135", label: "Response Time (secs)" },
     { icon: <Zap />, value: "78-88%", label: "Energy Efficiency" },
     { icon: <Scale />, value: "0.15-0.25", label: "Load Imbalance Factor" },
-    { icon: <Layers />, value: "220-280ms", label: "Makespan" }
+    { icon: <Layers />, value: "220-280", label: "Makespan (secs)" }
   ];
 
   const epsoMetrics = [
     { icon: <Cpu />, value: "80-90%", label: "Resource Utilization" },
-    { icon: <Clock />, value: "75-125ms", label: "Response Time" },
+    { icon: <Clock />, value: "75-125", label: "Response Time (secs)" },
     { icon: <Zap />, value: "85-93%", label: "Energy Efficiency" },
     { icon: <Scale />, value: "0.10-0.20", label: "Load Imbalance Factor" },
-    { icon: <Layers />, value: "200-260ms", label: "Makespan" }
+    { icon: <Layers />, value: "200-260", label: "Makespan (secs)" }
   ];
 
   useEffect(() => {

@@ -13,12 +13,12 @@ import SchedulingLogTable from './SchedulingLogTable';
 import PerformanceCharts from './Charts';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 
-const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults, plotData }) => {
+const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResults, plotData }) => {
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeLogTab, setActiveLogTab] = useState('rr');
+  const [activeLogTab, setActiveLogTab] = useState('eaco');
   const [activeChart, setActiveChart] = useState('bar');
   const [isExiting, setIsExiting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,10 +26,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
   useEffect(() => {
     try {
       console.group('📊 Results Tab Data Processing');
-      console.log('📥 Raw EACO results from props:', rrResults);
+      console.log('📥 Raw EACO results from props:', eacoResults);
       console.log('📥 Raw EPSO results from props:', epsoResults);
       
-      if (!rrResults || !epsoResults) {
+      if (!eacoResults || !epsoResults) {
         console.warn('⚠️ Missing results data from props');
         setError('No simulation results available. Please run a simulation first.');
         setLoading(false);
@@ -38,7 +38,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
       }
       
       // Normalize the data
-      const normalizedRR = normalizeData(rrResults);
+      const normalizedRR = normalizeData(eacoResults);
       const normalizedEPSO = normalizeData(epsoResults);
       
       console.log('🔄 Normalized EACO data:', normalizedRR);
@@ -55,7 +55,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
       setLoading(false);
       console.groupEnd();
     }
-  }, [rrResults, epsoResults]);
+  }, [eacoResults, epsoResults]);
 
   const handleBackToAnimation = () => {
     setIsExiting(true);
@@ -235,7 +235,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
               <MetricCard 
                 title={metric.title}
                 description={metric.description}
-                rrValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
+                eacoValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
                 epsoValue={epsoSummary ? epsoSummary[metric.valueKey] || 0 : 0}
                 unit={metric.unit}
                 betterWhen={metric.betterWhen}
@@ -453,9 +453,9 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
           <div className="border-b border-gray-200 mb-4">
             <nav className="-mb-px flex space-x-8">
               <button
-                onClick={() => setActiveLogTab('rr')}
+                onClick={() => setActiveLogTab('eaco')}
                 className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLogTab === 'rr'
+                  activeLogTab === 'eaco'
                     ? 'border-[#319694] text-[#319694]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
@@ -485,10 +485,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, rrResults, epsoResults
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {activeLogTab === 'rr' ? (
+                {activeLogTab === 'eaco' ? (
                   <SchedulingLogTable 
                     logs={filteredLogs(resultsRR?.schedulingLog)} 
-                    algorithm="rr" 
+                    algorithm="eaco" 
                   />
                 ) : (
                   <SchedulingLogTable 

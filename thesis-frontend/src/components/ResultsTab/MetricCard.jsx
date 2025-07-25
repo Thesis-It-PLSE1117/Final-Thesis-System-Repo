@@ -1,18 +1,18 @@
 import { motion } from 'framer-motion';
 import { FiActivity, FiClock, FiZap, FiServer, FiCheckCircle } from 'react-icons/fi';
 
-const MetricCard = ({ title, description, rrValue, epsoValue, unit, betterWhen, icon: Icon }) => {
+const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen, icon: Icon }) => {
   // Ensure values are numbers
-  const rrNum = parseFloat(rrValue) || 0;
+  const eacoNum = parseFloat(eacoValue) || 0;
   const epsoNum = parseFloat(epsoValue) || 0;
   
-  const difference = epsoNum - rrNum;
-  const percentDiff = rrNum !== 0 ? (difference / rrNum) * 100 : 0;
+  const difference = epsoNum - eacoNum;
+  const percentDiff = eacoNum !== 0 ? (difference / eacoNum) * 100 : 0;
   const absPercentDiff = Math.abs(percentDiff);
   
   const isBetter = betterWhen === "higher" 
-    ? epsoNum > rrNum 
-    : epsoNum < rrNum;
+    ? epsoNum > eacoNum 
+    : epsoNum < eacoNum;
   
   const comparisonResult = isBetter ? "better" : "worse";
   const improvementText = `${absPercentDiff.toFixed(1)}% ${comparisonResult}`;
@@ -56,7 +56,7 @@ const MetricCard = ({ title, description, rrValue, epsoValue, unit, betterWhen, 
           }`}>
             <div className="text-sm font-medium mb-1 text-blue-600">EACO</div>
             <div className="text-2xl font-bold text-blue-800">
-              {rrNum.toFixed(2)}{unit}
+              {eacoNum.toFixed(2)}{unit}
             </div>
           </div>
           

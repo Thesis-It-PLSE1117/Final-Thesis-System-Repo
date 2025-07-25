@@ -34,10 +34,13 @@ export const normalizeData = (results) => {
     // Normalize summary metrics
     summary: {
       ...data.summary,
-      // Convert imbalance degree to percentage (if < 1, it's a decimal)
-      imbalanceDegree: (data.summary.loadBalance || data.summary.imbalanceDegree || 0) < 1 
-        ? (data.summary.loadBalance || data.summary.imbalanceDegree || 0) * 100
-        : (data.summary.loadBalance || data.summary.imbalanceDegree || 0),
+      // Backend returns loadBalance (0 = perfect balance, 1 = worst imbalance)
+      // Convert to load balance percentage (100% = perfect balance)
+      loadBalancePercentage: data.summary.loadBalance !== undefined 
+        ? ((1 - data.summary.loadBalance) * 100).toFixed(2)
+        : 0,
+      // Keep the raw loadBalance value for calculations
+      loadBalance: data.summary.loadBalance || 0,
       // Resource utilization is already in percentage from backend
       resourceUtilization: data.summary.resourceUtilization,
       // Ensure responseTime field exists
@@ -51,12 +54,16 @@ export const normalizeData = (results) => {
 };
 
 export const getSummaryData = (results) => {
-  if (!results) return null;
+  if (!results || !results.summary) return null;
 
   return {
-    makespan: results.summary.makespan.toFixed(2),
-    imbalance: (results.summary.loadBalance || results.summary.imbalanceDegree || 0).toFixed(2),
-    utilization: results.summary.resourceUtilization.toFixed(2),
+    makespan: (results.summary.makespan || 0).toFixed(2),
+    // Use the load balance percentage (100% = perfect balance)
+    imbalance: results.summary.loadBalancePercentage || 
+               (results.summary.loadBalance !== undefined 
+                 ? ((1 - results.summary.loadBalance) * 100).toFixed(2)
+                 : '0'),
+    utilization: (results.summary.resourceUtilization || 0).toFixed(2),
     avgResponseTime: (results.summary.responseTime || results.summary.averageResponseTime || 0).toFixed(2),
     energyConsumption: (results.summary.energyConsumption || 0).toFixed(2)
   };
