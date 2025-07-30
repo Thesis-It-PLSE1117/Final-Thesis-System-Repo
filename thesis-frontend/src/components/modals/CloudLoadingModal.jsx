@@ -1,7 +1,65 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Cloud, HardDrive, Cpu, Network, Database, Server } from 'lucide-react';
+import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity } from 'lucide-react';
 
 const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
+  const [elapsedTime, setElapsedTime] = React.useState(0);
+  const [currentPhase, setCurrentPhase] = React.useState('initializing');
+  
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedTime(prev => prev + 1);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+
+  React.useEffect(() => {
+    if (progress < 10) setCurrentPhase('initializing');
+    else if (progress < 30) setCurrentPhase('scheduling');
+    else if (progress < 60) setCurrentPhase('simulating');
+    else if (progress < 90) setCurrentPhase('analyzing');
+    else setCurrentPhase('finalizing');
+  }, [progress]);
+  
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+
+  const estimateRemainingTime = () => {
+    if (progress === 0 || elapsedTime === 0) return 'Calculating...';
+    const estimatedTotal = (elapsedTime / progress) * 100;
+    const remaining = Math.max(0, estimatedTotal - elapsedTime);
+    return `~${formatTime(Math.round(remaining))} remaining`;
+  };
+  
+  const tips = [
+    "EPSO enhances traditional PSO by using adaptive inertia weights that decrease from 0.9 to 0.4 during optimization.",
+    "EACO improves upon standard ACO by incorporating dynamic pheromone evaporation rates based on solution quality.",
+    "Your multi-objective fitness function balances makespan (25%), cost (25%), energy (25%), and load balance (25%).",
+    "The load balance metric uses standard deviation of VM utilization - lower values indicate better distribution.",
+    "EPSO's cognitive (c1=2.0) and social (c2=2.0) factors guide particles toward personal and global best solutions.",
+    "EACO uses alpha=1.0 for pheromone influence and beta=2.0 for heuristic information in probability calculations.",
+    "Both algorithms run for 50 iterations with population sizes optimized for convergence speed vs solution quality.",
+    "Energy consumption is calculated using VM power models: 120W at peak + 60% at idle state.",
+    "The simulation uses CloudSim 7.0's enhanced architecture for more accurate cloud environment modeling.",
+    "MATLAB integration provides 3D surface plots, convergence graphs, and comparative performance visualizations."
+  ];
+  
+  const [currentTipIndex, setCurrentTipIndex] = React.useState(0);
+  
+  React.useEffect(() => {
+    const tipInterval = setInterval(() => {
+      setCurrentTipIndex(prev => (prev + 1) % tips.length);
+    }, 10000); // 10 secs
+    
+    return () => clearInterval(tipInterval);
+  }, []);
   // Cloud animation variants
   const cloudVariants = {
     animate: {
@@ -99,10 +157,43 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
           </svg>
         </div>
 
-        {/* Progress bar */}
+        {/* Enhanced Progress Information */}
         <div className="mb-4">
+          {/* Phase indicator */}
+          <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-medium text-blue-800">
+                {currentPhase === 'initializing' && '🚀 Initializing Cloud Environment'}
+                {currentPhase === 'scheduling' && '📋 Scheduling Tasks with EPSO Algorithm'}
+                {currentPhase === 'simulating' && '⚡ Running Cloud Simulation'}
+                {currentPhase === 'analyzing' && '📊 Generating MATLAB Visualizations'}
+                {currentPhase === 'finalizing' && '✨ Finalizing Results'}
+              </span>
+              <Activity className="text-blue-600 animate-pulse" size={16} />
+            </div>
+            <p className="text-xs text-blue-600">
+              {currentPhase === 'initializing' && 'Setting up virtual machines and hosts...'}
+              {currentPhase === 'scheduling' && 'Optimizing task distribution across VMs...'}
+              {currentPhase === 'simulating' && 'Processing cloudlets and calculating metrics...'}
+              {currentPhase === 'analyzing' && 'Creating performance plots (this may take a while)...'}
+              {currentPhase === 'finalizing' && 'Preparing results for display...'}
+            </p>
+          </div>
+          
+          {/* Time information */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock size={14} />
+              <span>Elapsed: {formatTime(elapsedTime)}</span>
+            </div>
+            <span className="text-sm text-gray-600">
+              {estimateRemainingTime()}
+            </span>
+          </div>
+          
+          {/* Progress bar */}
           <div className="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Initializing cloud resources...</span>
+            <span>Overall Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -115,6 +206,22 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
           </div>
         </div>
 
+        <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-amber-800 font-medium text-sm">💡 Did You Know?</span>
+          </div>
+          <motion.p 
+            key={currentTipIndex}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.5 }}
+            className="text-xs text-amber-700 leading-relaxed"
+          >
+            {tips[currentTipIndex]}
+          </motion.p>
+        </div>
+        
         {/* Resource allocation info */}
         <div className="grid grid-cols-3 gap-2 text-sm">
           <div className="bg-blue-50 p-2 rounded-lg flex items-center gap-2">
