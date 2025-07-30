@@ -313,10 +313,14 @@ const SimulationPage = ({ onBack }) => {
     try {
       let progressInterval = setInterval(() => {
         setProgress(prev => {
+          if (prev < 10) return prev + 2; // Initial setup
+          if (prev < 30) return prev + 1.5; // Scheduling phase
+          if (prev < 60) return prev + 0.8; // Simulation phase (slower)
+          if (prev < 90) return prev + 0.5; // MATLAB analysis (slowest)
           if (prev >= 95) return prev;
-          return prev + (5 + Math.random() * 10);
+          return prev + 0.3; // Final phase
         });
-      }, 300);
+      }, 500);
       
       try {
         const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots);
