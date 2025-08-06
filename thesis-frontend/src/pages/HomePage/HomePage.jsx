@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Settings, Upload, Cpu, LineChart, BookText, GitCompare, FileText, Mail } from 'lucide-react'; 
-import AboutUsModal from '../../components/modals/AboutUsModal';
-import DocumentationModal from '../../components/modals/DocumentationModal';
-import AlgorithmModal from '../../components/modals/AlgorithmModal';
-import ComparisonModal from '../../components/modals/ComparisonModal';
-import SimulationPage from '../SimulationPage';
+import { lazy, Suspense } from 'react';
+const AboutUsModal = lazy(() => import('../../components/modals/AboutUsModal'));
+const DocumentationModal = lazy(() => import('../../components/modals/DocumentationModal'));
+const AlgorithmModal = lazy(() => import('../../components/modals/AlgorithmModal'));
+const ComparisonModal = lazy(() => import('../../components/modals/ComparisonModal'));
+const SimulationPage = lazy(() => import('../SimulationPage'));
 import AnimatedBackground from './AnimatedBackground';
 import Header from './Header';
 import HeroSection from './HeroSection';
@@ -34,7 +35,15 @@ const HomePage = () => {
   }, [isPlaying, controls]);
 
   if (showSimulation) {
-    return <SimulationPage onBack={() => setShowSimulation(false)} />;
+    return (
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
+        </div>
+      }>
+        <SimulationPage onBack={() => setShowSimulation(false)} />
+      </Suspense>
+    );
   }
 
   const openModal = (modalName) => {
@@ -157,12 +166,15 @@ const HomePage = () => {
         onOpenAboutUs={() => setIsAboutModalOpen(true)} 
       />
 
-      <AboutUsModal 
-        isOpen={isAboutModalOpen} 
-        onClose={() => setIsAboutModalOpen(false)} 
-      />
+      <Suspense fallback={null}>
+        <AboutUsModal 
+          isOpen={isAboutModalOpen} 
+          onClose={() => setIsAboutModalOpen(false)} 
+        />
+      </Suspense>
       
-      <DocumentationModal 
+      <Suspense fallback={null}>
+        <DocumentationModal
         isOpen={activeModal === 'documentation'} 
         onClose={closeModal}
         content={{
@@ -198,8 +210,10 @@ const HomePage = () => {
           ]
         }}
       />
+      </Suspense>
       
-      <AlgorithmModal 
+      <Suspense fallback={null}>
+        <AlgorithmModal
         isOpen={activeModal === 'aco'} 
         onClose={closeModal}
         algorithm={{
@@ -292,6 +306,7 @@ const HomePage = () => {
           ]
         }}
       />
+      </Suspense>
     </motion.div>
   );
 };

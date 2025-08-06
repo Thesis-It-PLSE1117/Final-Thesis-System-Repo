@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity } from 'lucide-react';
+import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity, Info, Repeat } from 'lucide-react';
 
-const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
+const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iterations = 1 }) => {
   const [elapsedTime, setElapsedTime] = React.useState(0);
   const [currentPhase, setCurrentPhase] = React.useState('initializing');
   
@@ -159,27 +159,6 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
 
         {/* Enhanced Progress Information */}
         <div className="mb-4">
-          {/* Phase indicator */}
-          <div className="mb-3 p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium text-blue-800">
-                {currentPhase === 'initializing' && '🚀 Initializing Cloud Environment'}
-                {currentPhase === 'scheduling' && '📋 Scheduling Tasks with EPSO Algorithm'}
-                {currentPhase === 'simulating' && '⚡ Running Cloud Simulation'}
-                {currentPhase === 'analyzing' && '📊 Generating MATLAB Visualizations'}
-                {currentPhase === 'finalizing' && '✨ Finalizing Results'}
-              </span>
-              <Activity className="text-blue-600 animate-pulse" size={16} />
-            </div>
-            <p className="text-xs text-blue-600">
-              {currentPhase === 'initializing' && 'Setting up virtual machines and hosts...'}
-              {currentPhase === 'scheduling' && 'Optimizing task distribution across VMs...'}
-              {currentPhase === 'simulating' && 'Processing cloudlets and calculating metrics...'}
-              {currentPhase === 'analyzing' && 'Creating performance plots (this may take a while)...'}
-              {currentPhase === 'finalizing' && 'Preparing results for display...'}
-            </p>
-          </div>
-          
           {/* Time information */}
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -208,7 +187,10 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
 
         <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-amber-800 font-medium text-sm">💡 Did You Know?</span>
+            <div className="p-1.5 bg-amber-100 rounded">
+              <Info className="text-amber-800" size={16} />
+            </div>
+            <span className="text-amber-800 font-medium text-sm">Did You Know?</span>
           </div>
           <motion.p 
             key={currentTipIndex}
@@ -221,6 +203,21 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress }) => {
             {tips[currentTipIndex]}
           </motion.p>
         </div>
+        
+        {/*running multiple */}
+        {iterations > 1 && (
+          <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-purple-100 rounded">
+                <Repeat className="text-purple-800" size={16} />
+              </div>
+              <span className="text-purple-800 font-medium text-sm">Running Multiple Iterations</span>
+            </div>
+            <p className="text-xs text-purple-700 mt-1">
+              Executing {iterations} simulation runs in parallel (up to 4 at a time)
+            </p>
+          </div>
+        )}
         
         {/* Resource allocation info */}
         <div className="grid grid-cols-3 gap-2 text-sm">

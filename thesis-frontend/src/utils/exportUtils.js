@@ -87,7 +87,6 @@ export const flattenObject = (obj, prefix = '') => {
 //history of data
 export const exportSimulationHistory = (history, format = 'json') => {
   if (!history || history.length === 0) {
-    console.warn('No history data to export');
     return;
   }
 

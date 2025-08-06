@@ -37,12 +37,12 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
           }
         }
       }}
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden"
     >
       <div className="p-5">
         <div className="flex items-start mb-3">
-          <div className="p-3 rounded-full bg-blue-50 text-blue-600 mr-4">
-            <Icon size={20} />
+          <div className="p-2 bg-[#319694]/10 rounded-lg mr-4">
+            <Icon size={24} className="text-[#319694]" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-800">{title}</h3>

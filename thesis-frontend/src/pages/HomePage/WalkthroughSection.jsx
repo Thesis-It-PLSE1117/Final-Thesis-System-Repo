@@ -90,7 +90,7 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           viewport={{ once: false }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 bg-[#e0f7f6] text-[#319694] px-4 py-2 rounded-full mb-4 text-sm font-medium shadow-inner"
+            className="inline-flex items-center gap-2 bg-[#e0f7f6] text-[#1a5654] px-4 py-2 rounded-full mb-4 text-sm font-medium shadow-inner"
             initial={{ scale: 0.8 }}
             whileInView={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.1 }}

@@ -1,13 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Info, Settings, BarChart2, Play } from 'lucide-react';
-import DataCenterTab from '../components/DatacenterTab/DataCenterTab';
-import WorkloadTab from '../components/WorkloadTab/WorkloadTab';
-import AnimationTab from '../components/AnimationTab/AnimationTab';
-import ResultsTab from '../components/ResultsTab/ResultsTab';
-import HelpTab from '../components/HelpTab/HelpTab';
-import HistoryTab from '../components/HistoryTab/HistoryTab';
+import { Home, Info, Settings, BarChart2, Play, Repeat, Undo, Redo, Save, HelpCircle } from 'lucide-react';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { showNotification } from '../components/common/ErrorNotification';
+import { useAutoSave } from '../hooks/useAutoSave';
+import UndoRedoManager from '../utils/undoRedoManager';
+import ConfirmationDialog from '../components/common/ConfirmationDialog';
+import ProgressSteps from '../components/common/ProgressSteps';
+
+// Lazy load tabs
+const DataCenterTab = lazy(() => import('../components/DatacenterTab/DataCenterTab'));
+const WorkloadTab = lazy(() => import('../components/WorkloadTab/WorkloadTab'));
+const IterationTab = lazy(() => import('../components/IterationTab/IterationTab'));
+const AnimationTab = lazy(() => import('../components/AnimationTab/AnimationTab'));
+const ResultsTab = lazy(() => import('../components/ResultsTab/ResultsTab'));
+const HelpTab = lazy(() => import('../components/HelpTab/HelpTab'));
+const HistoryTab = lazy(() => import('../components/HistoryTab/HistoryTab'));
+
 import CloudLoadingModal from '../components/modals/CloudLoadingModal';
+import { validateSimulationConfig, sanitizeNumericInput, validateCSVFile } from '../utils/validation';
+import { safeJsonParse } from '../utils/security';
+import { getHistory, saveToHistory, clearHistory } from '../utils/storageManager';
 
 const SimulationPage = ({ onBack }) => {
   // Configuration states
@@ -15,6 +28,18 @@ const SimulationPage = ({ onBack }) => {
   const [simulationState, setSimulationState] = useState('config');
   const [selectedPreset, setSelectedPreset] = useState('');
   const [progress, setProgress] = useState(0);
+  
+  // Undo/Redo management
+  const undoRedoManager = useRef(new UndoRedoManager());
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  
+  // Confirmation dialogs
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, action: null });
+  
+  // Progress tracking for workflow
+  const [workflowStep, setWorkflowStep] = useState(0);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
   // Data center configuration
   const [dataCenterConfig, setDataCenterConfig] = useState({
@@ -41,16 +66,89 @@ const SimulationPage = ({ onBack }) => {
   const [cloudletConfig, setCloudletConfig] = useState({
     numCloudlets: 100,
   });
+  
+  // Iteration configuration
+  const [iterationConfig, setIterationConfig] = useState({
+    iterations: 1,
+  });
 
   const [workloadFile, setWorkloadFile] = useState(null);
   const [csvRowCount, setCsvRowCount] = useState(0);
   const [simulationResults, setSimulationResults] = useState(null);
   const [direction, setDirection] = useState(1);
+  
+  // Auto-save configuration
+  const configData = {
+    dataCenterConfig,
+    cloudletConfig,
+    iterationConfig,
+    enableMatlabPlots,
+    selectedPreset
+  };
+  
+  const { isSaving, lastSaved, loadAutoSave, clearAutoSave } = useAutoSave(
+    configData,
+    'simulation-config',
+    3000 // 3 second delay
+  );
+  
+  // Initialize undo/redo manager
+  useEffect(() => {
+    const unsubscribe = undoRedoManager.current.subscribe((state) => {
+      setCanUndo(state.canUndo);
+      setCanRedo(state.canRedo);
+    });
+    undoRedoManager.current.push(configData);
+    
+    return unsubscribe;
+  }, []);
+  
+  useEffect(() => {
+    if (undoRedoManager.current) {
+      undoRedoManager.current.push(configData);
+    }
+  }, [dataCenterConfig, cloudletConfig, iterationConfig, enableMatlabPlots]);
 
-  // Tab order for animation direction
-  const tabOrder = ['dataCenter', 'workload', 'history', 'help'];
+  useEffect(() => {
+    const saved = loadAutoSave();
+    if (saved && saved.data) {
+      setConfirmDialog({
+        isOpen: true,
+        action: 'loadAutoSave',
+        title: 'Restore Auto-saved Configuration',
+        message: `Would you like to restore your configuration from ${new Date(saved.timestamp).toLocaleString()}?`,
+        type: 'info',
+        onConfirm: () => {
+          setDataCenterConfig(saved.data.dataCenterConfig);
+          setCloudletConfig(saved.data.cloudletConfig);
+          setIterationConfig(saved.data.iterationConfig);
+          setEnableMatlabPlots(saved.data.enableMatlabPlots);
+          setSelectedPreset(saved.data.selectedPreset || '');
+          showNotification('Configuration restored successfully', 'success');
+        }
+      });
+    }
+  }, []);
+  
+  // Workflow steps
+  const workflowSteps = [
+    { id: 'datacenter', label: 'Data Center', sublabel: 'Configure infrastructure' },
+    { id: 'workload', label: 'Workload', sublabel: 'Set up tasks' },
+    { id: 'iterations', label: 'Iterations', sublabel: 'Configure runs' },
+    { id: 'run', label: 'Run', sublabel: 'Execute simulation' }
+  ];
+  
+  useEffect(() => {
+    const stepMap = {
+      'dataCenter': 0,
+      'workload': 1,
+      'iterations': 2
+    };
+    setWorkflowStep(stepMap[activeTab] || 0);
+  }, [activeTab]);
 
-  // Animation variants
+  const tabOrder = ['dataCenter', 'workload', 'iterations', 'history', 'help'];
+
   const tabContentVariants = {
     enter: (direction) => ({
       x: direction > 0 ? 50 : -50,
@@ -96,10 +194,24 @@ const SimulationPage = ({ onBack }) => {
 
   const handleDataCenterChange = (e) => {
     const { name, value } = e.target;
-    setDataCenterConfig(prev => ({
-      ...prev,
-      [name]: name === 'optimizationAlgorithm' ? value : Number(value)
-    }));
+    
+    const errors = validateSimulationConfig({ ...dataCenterConfig, [name]: value });
+    if (Object.keys(errors).length > 0) {
+      showNotification(Object.values(errors)[0], 'warning');
+      return;
+    }
+    
+    if (name === 'optimizationAlgorithm' || name === 'vmScheduler') {
+      setDataCenterConfig(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    } else {
+      setDataCenterConfig(prev => ({
+        ...prev,
+        [name]: Number(value)
+      }));
+    }
   };
 
   const handleCloudletChange = (e) => {
@@ -139,7 +251,7 @@ const SimulationPage = ({ onBack }) => {
       };
       reader.readAsText(file);
     } else {
-      alert('Please upload a valid CSV file');
+      showNotification('Please upload a valid CSV file', 'warning');
     }
   };
 
@@ -163,8 +275,72 @@ const SimulationPage = ({ onBack }) => {
           numCloudlets: Math.min(prev.numCloudlets, rowCount)
         }));
       })
-      .catch(() => alert('Failed to load preset workload'));
+      .catch(() => showNotification('Failed to load preset workload', 'error'));
   };
+
+  const handleUndo = () => {
+    const previousState = undoRedoManager.current.undo();
+    if (previousState) {
+      setDataCenterConfig(previousState.dataCenterConfig);
+      setCloudletConfig(previousState.cloudletConfig);
+      setIterationConfig(previousState.iterationConfig);
+      setEnableMatlabPlots(previousState.enableMatlabPlots);
+      showNotification('Changes undone', 'info', 2000);
+    }
+  };
+  
+  const handleRedo = () => {
+    const nextState = undoRedoManager.current.redo();
+    if (nextState) {
+      setDataCenterConfig(nextState.dataCenterConfig);
+      setCloudletConfig(nextState.cloudletConfig);
+      setIterationConfig(nextState.iterationConfig);
+      setEnableMatlabPlots(nextState.enableMatlabPlots);
+      showNotification('Changes redone', 'info', 2000);
+    }
+  };
+  
+  useKeyboardShortcuts(
+    {
+      'num1': () => handleTabChange('dataCenter'),
+      'num2': () => handleTabChange('workload'),
+      'num3': () => handleTabChange('iterations'),
+      'num4': () => handleTabChange('history'),
+      'num5': () => handleTabChange('help'),
+      'alt+left': () => {
+        const currentIndex = tabOrder.indexOf(activeTab);
+        const prevIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
+        handleTabChange(tabOrder[prevIndex]);
+      },
+      'alt+right': () => {
+        const currentIndex = tabOrder.indexOf(activeTab);
+        const nextIndex = (currentIndex + 1) % tabOrder.length;
+        handleTabChange(tabOrder[nextIndex]);
+      },
+      'ctrl+enter': () => {
+        if (simulationState === 'config' && activeTab !== 'help' && activeTab !== 'history') {
+          handleRunSimulation();
+        }
+      },
+      'ctrl+z': handleUndo,
+      'ctrl+y': handleRedo,
+      'ctrl+s': (e) => {
+        e.preventDefault();
+        showNotification('Configuration saved', 'success', 2000);
+      },
+      '?': () => setShowKeyboardHelp(true),
+      'escape': () => {
+        if (showKeyboardHelp) {
+          setShowKeyboardHelp(false);
+        } else if (confirmDialog.isOpen) {
+          setConfirmDialog({ isOpen: false, action: null });
+        } else if (simulationState !== 'config') {
+          setSimulationState('config');
+        }
+      }
+    },
+    [activeTab, simulationState, showKeyboardHelp, confirmDialog.isOpen]
+  );
 
   // Base URL for backend API
   const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
@@ -219,8 +395,11 @@ const SimulationPage = ({ onBack }) => {
     };
     
     try {
-      // Use MATLAB plots endpoint if requested
-      if (withPlots && !workloadFile) {
+      // need to use the iterations 
+      const useIterations = configData.iterations > 1;
+      
+      // if matlabs requested
+      if (withPlots && !workloadFile && !useIterations) {
         const response = await fetch(`${API_BASE}/api/simulate/with-plots`, {
           method: 'POST',
           headers: {
@@ -234,7 +413,6 @@ const SimulationPage = ({ onBack }) => {
           if (response.status === 202) {
             const data = await response.json();
             if (data.status === 'WARMING_UP') {
-              console.log('MATLAB engine is warming up, retrying in 5 seconds...');
               await new Promise(resolve => setTimeout(resolve, 5000));
               // Retry the request
               return runAlgorithm(algorithm, configData, withPlots);
@@ -254,7 +432,9 @@ const SimulationPage = ({ onBack }) => {
           formData.append(key, value);
         });
         
-        const response = await fetch(`${API_BASE}/api/run-with-file`, {
+        // endpoints (iterations)
+        const endpoint = useIterations ? '/api/run-iterations-with-file' : '/api/run-with-file';
+        const response = await fetch(`${API_BASE}${endpoint}`, {
           method: 'POST',
           body: formData
         });
@@ -264,9 +444,20 @@ const SimulationPage = ({ onBack }) => {
           throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        // wrapper
+        if (useIterations && result.totalIterations) {
+          return {
+            rawResults: result,
+            summary: result.averageMetrics,
+            isIterationResult: true
+          };
+        }
+        return result;
       } else {
-        const response = await fetch(`${API_BASE}/api/run`, {
+        // if > 1 
+        const endpoint = useIterations ? '/api/run-iterations' : '/api/run';
+        const response = await fetch(`${API_BASE}${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -279,17 +470,58 @@ const SimulationPage = ({ onBack }) => {
           throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+            //wrapper
+        if (useIterations && result.totalIterations) {
+          return {
+            rawResults: result,
+            summary: result.averageMetrics,
+            isIterationResult: true
+          };
+        }
+        return result;
       }
     } catch (error) {
-      console.error(`Error running ${algorithm}:`, error);
       throw error;
     }
   };
 
   const handleRunSimulation = async () => {
+    // Validate configuration before running
+    const errors = validateSimulationConfig({
+      ...dataCenterConfig,
+      ...cloudletConfig,
+      ...iterationConfig
+    });
+    
+    if (Object.keys(errors).length > 0) {
+      showNotification(`Please fix configuration errors: ${Object.values(errors).join(', ')}`, 'error');
+      return;
+    }
+    
+    // Show confirmation dialog for large simulations
+    const totalOperations = dataCenterConfig.numVMs * cloudletConfig.numCloudlets * iterationConfig.iterations;
+    if (totalOperations > 100000) {
+      setConfirmDialog({
+        isOpen: true,
+        action: 'runSimulation',
+        title: 'Large Simulation Warning',
+        message: `This simulation will process ${totalOperations.toLocaleString()} operations. This may take several minutes. Do you want to continue?`,
+        type: 'warning',
+        onConfirm: () => {
+          executeSimulation();
+        }
+      });
+      return;
+    }
+    
+    executeSimulation();
+  };
+  
+  const executeSimulation = async () => {
     setSimulationState('loading');
     setProgress(0);
+    setWorkflowStep(3); // Move to 'Run' step
     
     const configData = {
       numHosts: dataCenterConfig.numHosts,
@@ -307,34 +539,34 @@ const SimulationPage = ({ onBack }) => {
       numCloudlets: cloudletConfig.numCloudlets,
       vmScheduler: dataCenterConfig.vmScheduler,
       workloadType: workloadFile ? 'CSV' : 'Random',
-      useDefaultWorkload: !workloadFile
+      useDefaultWorkload: !workloadFile,
+      iterations: iterationConfig.iterations || 1
     };
     
     try {
+      // Adjust progress speed based on iterations
+      const progressMultiplier = iterationConfig.iterations > 1 ? 0.6 : 1.0;
+      
       let progressInterval = setInterval(() => {
         setProgress(prev => {
-          if (prev < 10) return prev + 2; // Initial setup
-          if (prev < 30) return prev + 1.5; // Scheduling phase
-          if (prev < 60) return prev + 0.8; // Simulation phase (slower)
-          if (prev < 90) return prev + 0.5; // MATLAB analysis (slowest)
+          if (prev < 10) return prev + (2 * progressMultiplier); // Initial setup
+          if (prev < 30) return prev + (1.5 * progressMultiplier); // Scheduling phase
+          if (prev < 60) return prev + (0.8 * progressMultiplier); // Simulation phase (slower)
+          if (prev < 90) return prev + (0.5 * progressMultiplier); // Analysis phase (slowest)
           if (prev >= 95) return prev;
-          return prev + 0.3; // Final phase
+          return prev + (0.3 * progressMultiplier); // Final phase
         });
       }, 500);
       
       try {
         const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots);
-        console.log('📊 EACO Response from backend:', eacoResponse);
         setProgress(70);
         const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots);
-        console.log('📊 EPSO Response from backend:', epsoResponse);
         
         const combinedResults = {
           eaco: eacoResponse,
           epso: epsoResponse
         };
-        
-        console.log('📊 Combined Results to be saved:', combinedResults);
         setSimulationResults(combinedResults);
         saveToHistory(combinedResults);
         
@@ -345,14 +577,12 @@ const SimulationPage = ({ onBack }) => {
           setSimulationState('animation');
         }, 500);
       } catch (algorithmError) {
-        console.error('Error running algorithms:', algorithmError);
         clearInterval(progressInterval);
-        alert(`Failed to run algorithms: ${algorithmError.message}`);
+        showNotification(`Failed to run algorithms: ${algorithmError.message}`, 'error');
         setSimulationState('config');
       }
     } catch (err) {
-      console.error('Simulation run error:', err);
-      alert(`Failed to run simulation: ${err.message}`);
+      showNotification(`Failed to run simulation: ${err.message}`, 'error');
       setSimulationState('config');
     }
   };
@@ -374,6 +604,13 @@ const SimulationPage = ({ onBack }) => {
         >
           <Play size={18} />
           Workload
+        </button>
+        <button
+          className={`py-4 px-6 font-medium flex items-center gap-2 ${activeTab === 'iterations' ? 'text-[#319694] border-b-2 border-[#319694]' : 'text-gray-500'}`}
+          onClick={() => handleTabChange('iterations')}
+        >
+          <Repeat size={18} />
+          Iterations
         </button>
         <button
           className={`py-4 px-6 font-medium flex items-center gap-2 ${activeTab === 'history' ? 'text-[#319694] border-b-2 border-[#319694]' : 'text-gray-500'}`}
@@ -402,54 +639,60 @@ const SimulationPage = ({ onBack }) => {
             exit="exit"
             className="w-full"
           >
-            {activeTab === 'dataCenter' ? (
-              <DataCenterTab 
-                config={dataCenterConfig} 
-                onChange={handleDataCenterChange}
-                enableMatlabPlots={enableMatlabPlots}
-                onMatlabToggle={setEnableMatlabPlots}
-              />
-            ) : activeTab === 'workload' ? (
-              <WorkloadTab
-                config={cloudletConfig}
-                onChange={handleCloudletChange}
-                onFileUpload={handleFileUpload}
-                workloadFile={workloadFile}
-                csvRowCount={csvRowCount}
-                onPresetSelect={handlePresetSelect}
-                selectedPreset={selectedPreset}
-                onSyntheticWorkloadSubmit={(config) => {
-                  console.log('Synthetic workload config:', config);
-                  // Handle synthetic workload submission
-                }}
-              />
-            ) : activeTab === 'history' ? (
-              <HistoryTab 
-                onBack={() => setActiveTab('dataCenter')}
-                onViewResults={(result) => {
-                  // Find the corresponding paired result from the same simulation run
-                  const savedHistory = JSON.parse(localStorage.getItem('simulationHistory') || '[]');
-                  const baseId = result.id.split('-')[0];
-                  
-                  // Find both EACO and EPSO results from the same run
-                  const eacoResult = savedHistory.find(r => r.id === `${baseId}-eaco`);
-                  const epsoResult = savedHistory.find(r => r.id === `${baseId}-epso`);
-                  
-                  if (eacoResult && epsoResult) {
-                    setSimulationResults({
-                      eaco: eacoResult,
-                      epso: epsoResult
-                    });
-                    setSimulationState('results');
-                  } else {
-                    // Fallback for single result (old format)
-                    alert('Unable to load complete results. This may be an old history entry.');
-                  }
-                }}
-              />
-            ) : (
-              <HelpTab />
-            )}
+            <Suspense fallback={<div>Loading...</div>}>
+              {activeTab === 'dataCenter' ? (
+                <DataCenterTab 
+                  config={dataCenterConfig} 
+                  onChange={handleDataCenterChange}
+                  enableMatlabPlots={enableMatlabPlots}
+                  onMatlabToggle={setEnableMatlabPlots}
+                />
+              ) : activeTab === 'workload' ? (
+                <WorkloadTab
+                  config={cloudletConfig}
+                  onChange={handleCloudletChange}
+                  onFileUpload={handleFileUpload}
+                  workloadFile={workloadFile}
+                  csvRowCount={csvRowCount}
+                  onPresetSelect={handlePresetSelect}
+                  selectedPreset={selectedPreset}
+                  onSyntheticWorkloadSubmit={(config) => {
+                    // Handle synthetic workload submission
+                  }}
+                />
+              ) : activeTab === 'iterations' ? (
+                <IterationTab 
+                  config={iterationConfig}
+                  onChange={setIterationConfig}
+                />
+              ) : activeTab === 'history' ? (
+                <HistoryTab 
+                  onBack={() => setActiveTab('dataCenter')}
+                  onViewResults={(result) => {
+                    // Find the corresponding paired result from the same simulation run
+                    const savedHistory = JSON.parse(localStorage.getItem('simulationHistory') || '[]');
+                    const baseId = result.id.split('-')[0];
+                    
+                    // Find both EACO and EPSO results from the same run
+                    const eacoResult = savedHistory.find(r => r.id === `${baseId}-eaco`);
+                    const epsoResult = savedHistory.find(r => r.id === `${baseId}-epso`);
+                    
+                    if (eacoResult && epsoResult) {
+                      setSimulationResults({
+                        eaco: eacoResult,
+                        epso: epsoResult
+                      });
+                      setSimulationState('results');
+                    } else {
+                      // Fallback for single result (old format)
+                      showNotification('Unable to load complete results. This may be an old history entry.', 'info');
+                    }
+                  }}
+                />
+              ) : (
+                <HelpTab />
+              )}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
 
@@ -482,6 +725,7 @@ const SimulationPage = ({ onBack }) => {
               numHosts={dataCenterConfig.numHosts}
               numVMs={dataCenterConfig.numVMs}
               progress={progress}
+              iterations={iterationConfig.iterations}
             />
           </>
         );
@@ -494,24 +738,28 @@ const SimulationPage = ({ onBack }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <AnimationTab 
-              dataCenterConfig={dataCenterConfig}
-              cloudletConfig={{
-                ...cloudletConfig,
-                numCloudlets: csvRowCount > 0 
-                  ? Math.min(cloudletConfig.numCloudlets, csvRowCount)
-                  : cloudletConfig.numCloudlets
-              }}
-              workloadFile={workloadFile}
-              eacoResults={simulationResults?.eaco}
-              epsoResults={simulationResults?.epso}
-              onBack={() => setSimulationState('config')}
-              onViewResults={() => {
-                console.log('📋 Transitioning to Results Tab');
-                console.log('📋 Current simulationResults:', simulationResults);
-                setSimulationState('results');
-              }}
-            />
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
+              </div>
+            }>
+              <AnimationTab 
+                dataCenterConfig={dataCenterConfig}
+                cloudletConfig={{
+                  ...cloudletConfig,
+                  numCloudlets: csvRowCount > 0 
+                    ? Math.min(cloudletConfig.numCloudlets, csvRowCount)
+                    : cloudletConfig.numCloudlets
+                }}
+                workloadFile={workloadFile}
+                eacoResults={simulationResults?.eaco}
+                epsoResults={simulationResults?.epso}
+                onBack={() => setSimulationState('config')}
+                onViewResults={() => {
+                  setSimulationState('results');
+                }}
+              />
+            </Suspense>
           </motion.div>
         );
 
@@ -523,17 +771,23 @@ const SimulationPage = ({ onBack }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <ResultsTab 
-              results={simulationResults}
-              eacoResults={simulationResults?.eaco}
-              epsoResults={simulationResults?.epso}
-              plotData={{
-                eaco: simulationResults?.eaco?.plotData,
-                epso: simulationResults?.epso?.plotData
-              }}
-              onBackToAnimation={() => setSimulationState('animation')}
-              onNewSimulation={() => setSimulationState('config')}
-            />
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
+              </div>
+            }>
+              <ResultsTab 
+                results={simulationResults}
+                eacoResults={simulationResults?.eaco}
+                epsoResults={simulationResults?.epso}
+                plotData={{
+                  eaco: simulationResults?.eaco?.plotData,
+                  epso: simulationResults?.epso?.plotData
+                }}
+                onBackToAnimation={() => setSimulationState('animation')}
+                onNewSimulation={() => setSimulationState('config')}
+              />
+            </Suspense>
           </motion.div>
         );
 
