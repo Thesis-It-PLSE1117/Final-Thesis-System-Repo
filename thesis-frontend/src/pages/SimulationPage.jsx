@@ -190,6 +190,8 @@ const SimulationPage = ({ onBack }) => {
     const newIndex = tabOrder.indexOf(newTab);
     setDirection(newIndex > currentIndex ? 1 : -1);
     setActiveTab(newTab);
+    // Force a re-render by updating a dummy state
+    setSimulationState(prev => prev); // This ensures header updates
   };
 
   const handleDataCenterChange = (e) => {
@@ -799,49 +801,54 @@ const SimulationPage = ({ onBack }) => {
   const getHeaderTitle = () => {
     switch (simulationState) {
       case 'config':
-        return activeTab === 'history' ? 'Results History' : 'Simulation Configuration';
-      case 'loading':
-        return 'Running Simulation';
-      case 'animation':
-        return 'Distribution Visualization';
-      case 'results':
-        return 'Result Analysis';
-      default:
-        return 'Cloud Simulation';
+        switch (activeTab) {
+          case 'dataCenter': return 'Data Center Configuration';
+          case 'workload': return 'Workload Configuration';
+          case 'iterations': return 'Iteration Settings';
+          case 'history': return 'Results History';
+          case 'help': return 'Help & Documentation';
+          default: return 'Simulation Configuration';
+        }
+      case 'loading': return 'Running Simulation';
+      case 'animation': return 'Distribution Visualization';
+      case 'results': return 'Result Analysis';
+      default: return 'Cloud Simulation';
     }
   };
 
   const getHeaderSubtitle = () => {
     switch (simulationState) {
       case 'config':
-        return activeTab === 'history' 
-          ? 'View past simulation results and configurations' 
-          : 'Set up your data center and workload parameters';
-      case 'loading':
-        return 'Processing your cloud workload';
-      case 'animation':
-        return 'Visualizing the task scheduling process';
-      case 'results':
-        return 'Analyze the performance metrics';
-      default:
-        return '';
+        switch (activeTab) {
+          case 'dataCenter': return 'Configure your data center infrastructure';
+          case 'workload': return 'Set up your cloud workload parameters';
+          case 'iterations': return 'Configure simulation iterations';
+          case 'history': return 'View past simulation results';
+          case 'help': return 'Documentation and keyboard shortcuts';
+          default: return 'Set up your simulation parameters';
+        }
+      case 'loading': return 'Processing your cloud workload';
+      case 'animation': return 'Visualizing the task scheduling process';
+      case 'results': return 'Analyze the performance metrics';
+      default: return '';
     }
   };
 
   const getHeaderIcon = () => {
     switch (simulationState) {
       case 'config':
-        return activeTab === 'history' 
-          ? <BarChart2 size={24} className="text-white" />
-          : <Settings size={24} className="text-white" />;
-      case 'loading':
-        return <Play size={24} className="text-white animate-pulse" />;
-      case 'animation':
-        return <Play size={24} className="text-white" />;
-      case 'results':
-        return <BarChart2 size={24} className="text-white" />;
-      default:
-        return <Home size={24} className="text-white" />;
+        switch (activeTab) {
+          case 'dataCenter': return <Settings size={24} className="text-white" />;
+          case 'workload': return <Play size={24} className="text-white" />;
+          case 'iterations': return <Repeat size={24} className="text-white" />;
+          case 'history': return <BarChart2 size={24} className="text-white" />;
+          case 'help': return <HelpCircle size={24} className="text-white" />;
+          default: return <Settings size={24} className="text-white" />;
+        }
+      case 'loading': return <Play size={24} className="text-white animate-pulse" />;
+      case 'animation': return <Play size={24} className="text-white" />;
+      case 'results': return <BarChart2 size={24} className="text-white" />;
+      default: return <Home size={24} className="text-white" />;
     }
   };
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronUp, HelpCircle } from 'lucide-react';
 import Papa from 'papaparse';
 
 const WorkloadUploadCard = ({
@@ -11,7 +11,8 @@ const WorkloadUploadCard = ({
   csvRowCount,
   onPresetSelect,
   selectedPreset,
-  presetOptions
+  presetOptions,
+  onClearWorkload
 }) => {
   const [csvPreview, setCsvPreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -24,7 +25,7 @@ const WorkloadUploadCard = ({
         setIsLoadingPreview(true);
         Papa.parse(workloadFile, {
           header: true,
-          preview: 5,
+          preview: 10,
           complete: (results) => {
             setCsvPreview({
               headers: results.meta.fields,
@@ -44,7 +45,7 @@ const WorkloadUploadCard = ({
           const text = await response.text();
           Papa.parse(text, {
             header: true,
-            preview: 5,
+            preview: 10,
             complete: (results) => {
               setCsvPreview({
                 headers: results.meta.fields,
@@ -94,11 +95,6 @@ const WorkloadUploadCard = ({
     }
   };
 
-  const handleClearWorkload = () => {
-    onFileUpload({ target: { files: [] } });
-    onPresetSelect('');
-  };
-
   const togglePreview = () => {
     setShowPreview(!showPreview);
   };
@@ -109,6 +105,8 @@ const WorkloadUploadCard = ({
     return preset?.label || selectedPreset;
   };
 
+  const hasWorkload = workloadFile || selectedPreset;
+
   return (
     <motion.div 
       className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-md border border-[#319694]/10"
@@ -116,47 +114,62 @@ const WorkloadUploadCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Upload area */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-[#319694]/10 rounded-lg">
-          <Cloud className="text-[#319694]" size={20} />
-        </div>
-        <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-          Upload Your Own CSV
-        </h3>
-      </div>
-
-      <div className="flex items-center justify-center w-full">
-        <motion.label 
-          className={`flex flex-col items-center justify-center w-full h-40 border-2 ${
-            isDragging ? 'border-[#319694] bg-[#f0fdfa]' : 'border-[#319694]/30'
-          } border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f0fdfa] transition-all`}
-          whileTap={{ scale: 0.98 }}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <motion.div animate={{ y: isDragging ? [-3, 3, -3] : 0 }}>
-              <Upload className="text-[#319694] mb-3" size={28} />
-            </motion.div>
-            <p className="mb-2 text-sm text-gray-600">
-              <span className="font-semibold text-[#319694]">Click to upload</span> or drag and drop
-            </p>
-            <p className="text-xs text-gray-500">CSV files only</p>
+      {/* Upload area - only shown when no file is selected */}
+      {!hasWorkload && (
+        <>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-[#319694]/10 rounded-lg">
+              <Cloud className="text-[#319694]" size={20} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
+                Upload Your Own CSV
+              </h3>
+              <div className="flex items-center gap-1 mt-1">
+                <p className="text-sm text-gray-500">It should contain the workload and its traffic model</p>
+                <div className="group relative">
+                  <HelpCircle className="text-gray-400 hover:text-[#319694] cursor-pointer" size={16} />
+                  <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    Check the Help tab for detailed preprocessing steps and file format requirements
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <input
-            type="file"
-            className="hidden"
-            accept=".csv"
-            onChange={handleFileInputChange}
-          />
-        </motion.label>
-      </div>
 
-      {/* File info and preview */}
-      {(workloadFile || selectedPreset) && (
-        <div className="mt-6 space-y-3">
+          <div className="flex items-center justify-center w-full">
+            <motion.label 
+              className={`flex flex-col items-center justify-center w-full h-40 border-2 ${
+                isDragging ? 'border-[#319694] bg-[#f0fdfa]' : 'border-[#319694]/30'
+              } border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f0fdfa] transition-all`}
+              whileTap={{ scale: 0.98 }}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <motion.div animate={{ y: isDragging ? [-3, 3, -3] : 0 }}>
+                  <Upload className="text-[#319694] mb-3" size={28} />
+                </motion.div>
+                <p className="mb-2 text-sm text-gray-600">
+                  <span className="font-semibold text-[#319694]">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">CSV files only</p>
+              </div>
+              <input
+                type="file"
+                className="hidden"
+                accept=".csv"
+                onChange={handleFileInputChange}
+              />
+            </motion.label>
+          </div>
+        </>
+      )}
+
+      {/* File info and preview - only shown when file is selected */}
+      {hasWorkload && (
+        <div className="space-y-3">
           <motion.div 
             className="p-4 bg-[#f0fdfa] rounded-lg border border-[#319694]/20 flex items-center"
             initial={{ opacity: 0 }}
@@ -206,7 +219,7 @@ const WorkloadUploadCard = ({
               )}
               <motion.button 
                 className="p-1 text-gray-400 hover:text-[#319694] rounded-full"
-                onClick={handleClearWorkload}
+                onClick={onClearWorkload}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -215,46 +228,56 @@ const WorkloadUploadCard = ({
             </div>
           </motion.div>
 
-          {/* Preview section */}
-          {showPreview && csvPreview && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-white rounded-lg border border-[#319694]/20 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-[#f0fdfa] text-[#319694]">
-                      <tr>
-                        {csvPreview.headers.map((header, i) => (
-                          <th key={i} className="px-3 py-2 text-left font-medium">
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#319694]/10">
-                      {csvPreview.rows.map((row, i) => (
-                        <tr key={i}>
-                          {csvPreview.headers.map((header, j) => (
-                            <td key={j} className="px-3 py-2 text-gray-700 whitespace-nowrap">
-                              {row[header] || '-'}
-                            </td>
+          {/* Preview section with smooth animations */}
+          <AnimatePresence>
+            {showPreview && csvPreview && (
+              <motion.div
+                key="preview"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ 
+                  opacity: 1, 
+                  height: 'auto',
+                  transition: { duration: 0.3, ease: "easeInOut" }
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  height: 0,
+                  transition: { duration: 0.2, ease: "easeIn" }
+                }}
+                className="overflow-hidden"
+              >
+                <div className="bg-white rounded-lg border border-[#319694]/20 overflow-hidden">
+                  <div className="overflow-x-auto max-h-96">
+                    <table className="w-full text-sm">
+                      <thead className="bg-[#f0fdfa] text-[#319694] sticky top-0">
+                        <tr>
+                          {csvPreview.headers.map((header, i) => (
+                            <th key={i} className="px-3 py-2 text-left font-medium">
+                              {header}
+                            </th>
                           ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-[#319694]/10">
+                        {csvPreview.rows.map((row, i) => (
+                          <tr key={i}>
+                            {csvPreview.headers.map((header, j) => (
+                              <td key={j} className="px-3 py-2 text-gray-700 whitespace-nowrap">
+                                {row[header] || '-'}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="px-3 py-1.5 text-xs text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10 sticky bottom-0">
+                    Showing {csvPreview.rows.length} of {csvRowCount} rows • {csvPreview.type === 'preset' ? 'Preset workload' : 'Uploaded file'}
+                  </div>
                 </div>
-                <div className="px-3 py-1.5 text-xs text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10">
-                  Previewing {csvPreview.rows.length} rows • {csvPreview.type === 'preset' ? 'Preset workload' : 'Uploaded file'}
-                </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </motion.div>

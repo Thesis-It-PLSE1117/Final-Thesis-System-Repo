@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
   Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, HardDriveDownload, 
-  HardDriveUpload, Disc 
+  HardDriveUpload, Disc, Play 
 } from 'lucide-react';
 import ConfigSection from './ConfigSection';
 import InputField from './InputField';
@@ -10,15 +10,15 @@ import VMCard from './VMCard';
 import HostCard from './HostCard';
 import MatlabToggle from './MatlabToggle';
 
-const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle }) => {
+const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle, onRunSimulation }) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);
   const [expandedHost, setExpandedHost] = useState(null);
   const [expandedSection, setExpandedSection] = useState({
     hostConfig: true,
-    vmConfig: true,
-    distribution: true,
-    preview: true
+    vmConfig: false,
+    distribution: false,
+    preview: false
   });
 
   const toggleSection = (section) => {
@@ -228,14 +228,6 @@ const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle }) 
         </div>
       </ConfigSection>
 
-      {/* MATLAB Visualization Toggle */}
-      <div className="mt-6">
-        <MatlabToggle 
-          enabled={enableMatlabPlots} 
-          onChange={onMatlabToggle}
-        />
-      </div>
-
       {/* Host-VM Distribution */}
       <ConfigSection 
         title="Host-VM Distribution" 
@@ -263,6 +255,14 @@ const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle }) 
           </div>
         </div>
       </ConfigSection>
+
+      {/* MATLAB Visualization Toggle */}
+      <div className="mt-6 mb-6">
+        <MatlabToggle 
+          enabled={enableMatlabPlots} 
+          onChange={onMatlabToggle}
+        />
+      </div>
     </div>
   );
 };

@@ -21,6 +21,13 @@ const WorkloadConfigCard = ({
   selectedPreset,
   presetOptions = [] // Default to empty array if not provided
 }) => {
+  const hasWorkload = csvRowCount > 0 || (selectedPreset && selectedPreset !== '');
+  const inputClasses = `w-full px-4 py-2 border rounded-lg focus:outline-none transition-all ${
+    hasWorkload 
+      ? 'border-[#319694]/20 focus:ring-2 focus:ring-[#319694]/30 focus:border-[#319694]/50'
+      : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+  }`;
+
   return (
     <motion.div 
       className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-md border border-[#319694]/10 mb-8"
@@ -53,11 +60,12 @@ const WorkloadConfigCard = ({
             name="numCloudlets"
             value={config.numCloudlets}
             onChange={onChange}
-            className="w-full px-4 py-2 border border-[#319694]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#319694]/30 focus:border-[#319694]/50 transition-all"
+            className={inputClasses}
             min="1"
             max={csvRowCount > 0 ? csvRowCount : undefined}
+            disabled={!hasWorkload}
           />
-          {csvRowCount > 0 && (
+          {csvRowCount > 0 ? (
             <motion.p 
               className="text-xs text-gray-500 mt-2 flex items-center gap-2"
               initial={{ opacity: 0 }}
@@ -66,6 +74,15 @@ const WorkloadConfigCard = ({
             >
               <Database size={14} className="text-[#319694]" />
               Max cloudlets (tasks) based on workload: {csvRowCount}
+            </motion.p>
+          ) : !hasWorkload && (
+            <motion.p 
+              className="text-xs text-gray-400 mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Please select or upload a workload first
             </motion.p>
           )}
         </motion.div>

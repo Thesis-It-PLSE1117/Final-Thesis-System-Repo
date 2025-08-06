@@ -60,39 +60,6 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
     
     return () => clearInterval(tipInterval);
   }, []);
-  // Cloud animation variants
-  const cloudVariants = {
-    animate: {
-      y: [0, -5, 0],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  // Data packet animation variants
-  const packetVariants = {
-    animate: (i) => ({
-      y: [0, 40],
-      opacity: [1, 0],
-      transition: {
-        delay: i * 0.3,
-        duration: 1.5,
-        repeat: Infinity,
-        ease: "easeIn"
-      }
-    })
-  };
-
-  // Cloud services with Lucide icons
-  const cloudServices = [
-    { name: "Compute", icon: <Cpu size={16} />, color: "#4CAF50" },
-    { name: "Storage", icon: <HardDrive size={16} />, color: "#2196F3" },
-    { name: "Network", icon: <Network size={16} />, color: "#9C27B0" },
-    { name: "Database", icon: <Database size={16} />, color: "#FF9800" }
-  ];
 
   return (
     <motion.div
@@ -119,42 +86,21 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
       >
         {/* Cloud header */}
         <div className="flex items-center justify-center mb-4">
-          <motion.div
-            variants={cloudVariants}
-            animate="animate"
-            className="w-16 h-10 mr-3 flex items-center justify-center"
-          >
+          <div className="w-16 h-10 mr-3 flex items-center justify-center">
             <Cloud size={32} className="text-blue-500" />
-          </motion.div>
+          </div>
           <h3 id="cloud-loading-title" className="text-xl font-bold text-gray-800">
             Cloud Simulation Progress
           </h3>
         </div>
 
-        {/* Cloud packets animation */}
-        <div className="relative h-24 mb-6 overflow-hidden">
-          <svg viewBox="0 0 100 60" className="w-full h-full">
-            {[...Array(8)].map((_, i) => {
-              const service = cloudServices[i % cloudServices.length];
-              return (
-                <motion.g
-                  key={i}
-                  custom={i}
-                  variants={packetVariants}
-                  animate="animate"
-                  transform={`translate(${10 + (i * 10)}, 0)`}
-                >
-                  <rect 
-                    x="0" y="0" 
-                    width="8" height="8" 
-                    rx="1" 
-                    fill={service.color}
-                    opacity="0.9"
-                  />
-                </motion.g>
-              );
-            })}
-          </svg>
+        {/* Loading GIF animation */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/loading/cloud_loading.gif" 
+            alt="Cloud simulation in progress"
+            className="h-36 w-auto"
+          />
         </div>
 
         {/* Enhanced Progress Information */}

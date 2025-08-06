@@ -50,13 +50,6 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       className="p-6"
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <button
-          onClick={onBack}
-          className="bg-[#319694] text-white px-4 py-2 rounded-lg hover:bg-[#267b79] transition-colors"
-        >
-          Back
-        </button>
-        
         {history.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <button
