@@ -892,6 +892,18 @@ const SimulationPage = ({ onBack }) => {
       </header>
 
       {renderContent()}
+      
+      {/* since iterations is 30 times only i guess */}
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, action: null })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        type={confirmDialog.type}
+        confirmText="Continue"
+        cancelText="Cancel"
+      />
     </motion.div>
   );
 };

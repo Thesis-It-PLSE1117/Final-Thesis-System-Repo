@@ -18,11 +18,11 @@ const ConfirmationDialog = ({
       case 'danger':
         return <AlertTriangle className="w-6 h-6 text-red-500" />;
       case 'info':
-        return <Info className="w-6 h-6 text-blue-500" />;
+        return <Info className="w-6 h-6 text-[#319694]" />;
       case 'success':
-        return <CheckCircle className="w-6 h-6 text-green-500" />;
+        return <CheckCircle className="w-6 h-6 text-[#319694]" />;
       default:
-        return <AlertTriangle className="w-6 h-6 text-amber-500" />;
+        return <AlertTriangle className="w-6 h-6 text-[#319694]" />;
     }
   };
 
@@ -31,11 +31,11 @@ const ConfirmationDialog = ({
       case 'danger':
         return 'bg-red-600 hover:bg-red-700';
       case 'info':
-        return 'bg-blue-600 hover:bg-blue-700';
+        return 'bg-[#319694] hover:bg-[#267b79]';
       case 'success':
-        return 'bg-green-600 hover:bg-green-700';
+        return 'bg-[#319694] hover:bg-[#267b79]';
       default:
-        return 'bg-amber-600 hover:bg-amber-700';
+        return 'bg-[#319694] hover:bg-[#267b79]';
     }
   };
 
@@ -48,7 +48,7 @@ const ConfirmationDialog = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-[#267b79]/20 backdrop-blur-sm z-50"
             onClick={onClose}
           />
           
@@ -58,18 +58,20 @@ const ConfirmationDialog = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", duration: 0.3 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg mx-4"
           >
-            <div className="bg-white rounded-lg shadow-xl">
+            <div className="bg-white rounded-xl shadow-xl border border-[#319694]/10">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-6 border-b border-[#319694]/10">
                 <div className="flex items-center gap-3">
-                  {getIcon()}
-                  <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                  <div className="p-2 bg-[#319694]/10 rounded-lg">
+                    {getIcon()}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-[#319694] transition-colors p-1 rounded-lg hover:bg-[#319694]/10"
                   aria-label="Close dialog"
                 >
                   <X size={20} />
@@ -77,30 +79,34 @@ const ConfirmationDialog = ({
               </div>
               
               {/* Content */}
-              <div className="p-4">
-                <p className="text-gray-600">{message}</p>
+              <div className="p-6">
+                <p className="text-gray-700 leading-relaxed">{message}</p>
                 {children && <div className="mt-4">{children}</div>}
               </div>
               
               {/* Actions */}
-              <div className="flex justify-end gap-3 p-4 border-t bg-gray-50">
+              <div className="flex justify-end gap-3 p-6 border-t border-[#319694]/10 bg-gradient-to-r from-gray-50 to-[#e0f7f6]">
                 {showCancel && (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={onClose}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-[#319694]/30 transition-all focus:outline-none focus:ring-2 focus:ring-[#319694]/20 shadow-sm"
                   >
                     {cancelText}
-                  </button>
+                  </motion.button>
                 )}
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     onConfirm();
                     onClose();
                   }}
-                  className={`px-4 py-2 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${getButtonColor()}`}
+                  className={`px-6 py-2 text-white rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#319694]/30 shadow-md ${getButtonColor()}`}
                 >
                   {confirmText}
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.div>
