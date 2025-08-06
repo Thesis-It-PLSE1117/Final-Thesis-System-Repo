@@ -34,7 +34,7 @@ const CtaSection = ({ onStartSimulation }) => {
         >
           <motion.button
             onClick={onStartSimulation}
-            className="bg-white text-[#319694] px-8 py-4 rounded-2xl text-lg font-semibold shadow-lg hover:bg-gray-100 transition-all flex items-center gap-2 mx-auto"
+            className="bg-white text-[#1a5654] px-8 py-4 rounded-2xl text-lg font-semibold shadow-lg hover:bg-gray-100 transition-all flex items-center gap-2 mx-auto"
             whileHover={{ 
               scale: 1.05,
               boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)"

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiRefreshCw,
@@ -11,6 +10,8 @@ import {
 import MetricCard from './MetricCard';
 import SchedulingLogTable from './SchedulingLogTable';
 import PerformanceCharts from './Charts';
+import IterationBadge from './IterationBadge';
+import StatisticsDisplay from './StatisticsDisplay';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 
 const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResults, plotData }) => {
@@ -25,35 +26,35 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
 
   useEffect(() => {
     try {
-      console.group('📊 Results Tab Data Processing');
-      console.log('📥 Raw EACO results from props:', eacoResults);
-      console.log('📥 Raw EPSO results from props:', epsoResults);
+      console.log('ResultsTab received eacoResults:', eacoResults);
+      console.log('ResultsTab received epsoResults:', epsoResults);
       
       if (!eacoResults || !epsoResults) {
-        console.warn('⚠️ Missing results data from props');
         setError('No simulation results available. Please run a simulation first.');
         setLoading(false);
-        console.groupEnd();
         return;
       }
       
-      // Normalize the data
+
       const normalizedRR = normalizeData(eacoResults);
       const normalizedEPSO = normalizeData(epsoResults);
       
-      console.log('🔄 Normalized EACO data:', normalizedRR);
-      console.log('🔄 Normalized EPSO data:', normalizedEPSO);
+      console.log('Normalized EACO:', normalizedRR);
+      console.log('Normalized EPSO:', normalizedEPSO);
+      
+      if (!normalizedRR || !normalizedEPSO) {
+        setError('Failed to normalize simulation results. Data may be incomplete.');
+        setLoading(false);
+        return;
+      }
 
       setResultsRR(normalizedRR);
       setResultsEPSO(normalizedEPSO);
       setLoading(false);
-      
-      console.groupEnd();
     } catch (err) {
-      console.error('❌ Error processing results:', err);
-      setError('Failed to process simulation results. Please try again.');
+      console.error('Error processing results:', err);
+      setError(`Failed to process simulation results: ${err.message}`);
       setLoading(false);
-      console.groupEnd();
     }
   }, [eacoResults, epsoResults]);
 
@@ -104,7 +105,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Failed to download image:', error);
     }
   };
 
@@ -208,6 +208,21 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           </div>
         </div>
         
+        {/* Iteration Badge */}
+        {eacoResults?.rawResults?.totalIterations > 1 && (
+          <IterationBadge iterationData={eacoResults.rawResults} />
+        )}
+        
+        {/* Statistics Display */}
+        {eacoResults?.rawResults ? (
+          <StatisticsDisplay
+            average={eacoResults.rawResults.averageMetrics}
+            min={eacoResults.rawResults.minMetrics}
+            max={eacoResults.rawResults.maxMetrics}
+            stdDev={eacoResults.rawResults.stdDevMetrics}
+          />
+        ) : null}
+
         {/* Key Metrics Cards */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"

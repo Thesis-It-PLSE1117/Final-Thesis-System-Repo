@@ -125,10 +125,13 @@ const PerformanceCharts = ({ rrSummary, epsoSummary, activeChart, setActiveChart
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-3">
-        <h4 className="font-semibold text-gray-700 text-lg">Performance Overview</h4>
+        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <FiBarChart2 className="text-[#319694]" size={20} />
+          Performance Overview
+        </h4>
         <ChartSwitcher activeChart={activeChart} setActiveChart={setActiveChart} />
       </div>
-      <div className="bg-gray-50 p-4 rounded-lg" style={{ height: '400px' }}>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200" style={{ height: '400px' }}>
         {activeChart === 'bar' ? (
           <Bar 
             data={chartData} 

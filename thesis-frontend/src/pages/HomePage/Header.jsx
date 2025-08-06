@@ -34,7 +34,7 @@ const Header = ({ onStartSimulation }) => {
       <div className="flex items-center gap-6">
         <motion.button
           onClick={() => document.getElementById('walkthrough').scrollIntoView({ behavior: 'smooth' })}
-          className="hidden md:flex items-center gap-2 text-white/90 hover:text-white transition-colors"
+          className="hidden md:flex items-center gap-2 text-white hover:text-white transition-colors font-medium"
           whileHover={{ scale: 1.05 }}
         >
           <Settings className="w-5 h-5" />
@@ -43,7 +43,7 @@ const Header = ({ onStartSimulation }) => {
         
         <motion.button
           onClick={onStartSimulation}
-          className="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full text-white hover:bg-white/20 transition-all border border-white/20"
+          className="hidden md:flex items-center gap-3 bg-white px-6 py-3 rounded-full text-[#1a5654] hover:bg-gray-100 transition-all border border-white/30 font-semibold shadow-lg"
           whileHover={{ 
             scale: 1.05,
             boxShadow: "0 5px 15px -3px rgba(255, 255, 255, 0.2)"

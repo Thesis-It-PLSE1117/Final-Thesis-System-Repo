@@ -19,6 +19,9 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
   });
   const [showResultsButton, setShowResultsButton] = useState(true);
   const [highlightedVM, setHighlightedVM] = useState({ EPSO: null, EACO: null });
+  
+  // Check if results are from iterations (not suitable for animation)
+  const isIterationResult = (epsoResults && epsoResults.iterationData) || (eacoResults && eacoResults.iterationData);
 
   // Load backend results
   useEffect(() => {
@@ -26,37 +29,6 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       // Handle new API response structure
       const epsoData = epsoResults.rawResults || epsoResults;
       const eacoData = eacoResults.rawResults || eacoResults;
-      
-      console.group('Backend Response Data');
-      console.log('🚀 EPSO Results Received:', epsoResults);
-      console.log('🚀 EACO Results Received:', eacoResults);
-      console.groupEnd();
-
-      console.group('Resource Utilization Comparison');
-      console.log('Simulation Results (Backend):');
-      console.log('EPSO:', {
-        loadBalance: epsoData.summary?.loadBalance,
-        makespan: epsoData.summary?.makespan,
-        utilization: epsoData.summary?.resourceUtilization
-      });
-      console.log('EACO:', {
-        loadBalance: eacoData.summary?.loadBalance,
-        makespan: eacoData.summary?.makespan,
-        utilization: eacoData.summary?.resourceUtilization
-      });
-      
-      console.log('\nAnimation Initial State:');
-      console.log('EPSO VMs:', epsoData.vmUtilization?.map(vm => ({
-        id: vm.vmId,
-        load: vm.cpuUtilization,
-        tasks: vm.numAPECloudlets
-      })) || []);
-      console.log('EACO VMs:', eacoData.vmUtilization?.map(vm => ({
-        id: vm.vmId,
-        load: vm.cpuUtilization,
-        tasks: vm.numAPECloudlets
-      })) || []);
-      console.groupEnd();
 
       // Set metrics from backend data
       // Use loadBalance directly as degree of imbalance (0=perfect, 1=worst)
@@ -530,6 +502,75 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
     </div>
   );
 
+  // Render iteration notice message
+  const renderIterationNotice = () => (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center justify-center h-[400px] text-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-dashed border-blue-200"
+    >
+      <motion.div
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white p-6 rounded-full shadow-lg mb-6"
+      >
+        <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </motion.div>
+      
+      <motion.h4 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-xl font-bold text-gray-800 mb-3"
+      >
+        Animation Not Available
+      </motion.h4>
+      
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="text-gray-600 mb-4 max-w-md"
+      >
+        Animation view is only available for single simulation runs. The current results are from multiple iterations and show aggregated data.
+      </motion.p>
+      
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="flex flex-col sm:flex-row gap-3"
+      >
+        <motion.button
+          onClick={onViewResults}
+          className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-6 py-3 rounded-lg hover:shadow-md transition-all flex items-center justify-center"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          View Detailed Results
+        </motion.button>
+        
+        <motion.button
+          onClick={onBack}
+          className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Configuration
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  );
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -551,71 +592,88 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
                 <svg className="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                Showing assignment of {cloudletConfig.numCloudlets} tasks to {dataCenterConfig.numVMs} VMs
+                {isIterationResult ? 
+                  `Results from multiple iterations (${epsoResults?.iterationData?.totalIterations || eacoResults?.iterationData?.totalIterations || 'N/A'} runs)` :
+                  `Showing assignment of ${cloudletConfig.numCloudlets} tasks to ${dataCenterConfig.numVMs} VMs`
+                }
               </div>
-              <div className="flex items-center mt-1 text-xs text-gray-500">
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                VM Configuration: {dataCenterConfig.vmPes} PEs @ {dataCenterConfig.vmMips} MIPS each
-              </div>
+              {!isIterationResult && (
+                <div className="flex items-center mt-1 text-xs text-gray-500">
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  VM Configuration: {dataCenterConfig.vmPes} PEs @ {dataCenterConfig.vmMips} MIPS each
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-              {totalTasks} Total Tasks
-            </div>
+            {isIterationResult ? (
+              <div className="px-3 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                Iteration Results
+              </div>
+            ) : (
+              <div className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                {totalTasks} Total Tasks
+              </div>
+            )}
           </div>
         </div>
 
-        {renderAlgorithmTabs()}
-        
-        {activeAlgorithm === 'comparison' ? (
-          renderComparisonView()
+        {isIterationResult ? (
+          renderIterationNotice()
         ) : (
           <>
-            <div className="h-[500px] overflow-y-auto smooth-scroll mb-6 pr-2">
-              {renderVMCards(activeAlgorithm)}
-            </div>
-            <MetricsPanel 
-              metrics={metrics[activeAlgorithm]} 
-              color={activeAlgorithm === 'EPSO' ? 'blue' : 'purple'} 
+            {renderAlgorithmTabs()}
+            
+            {activeAlgorithm === 'comparison' ? (
+              renderComparisonView()
+            ) : (
+              <>
+                <div className="h-[500px] overflow-y-auto smooth-scroll mb-6 pr-2">
+                  {renderVMCards(activeAlgorithm)}
+                </div>
+                <MetricsPanel 
+                  metrics={metrics[activeAlgorithm]} 
+                  color={activeAlgorithm === 'EPSO' ? 'blue' : 'purple'} 
+                />
+              </>
+            )}
+
+            <Controls
+              isPlaying={isPlaying}
+              handlePlayPause={handlePlayPause}
+              handleReset={handleReset}
+              progress={progress}
+              total={totalTasks}
+              cloudlets={cloudletConfig.numCloudlets}
             />
+
+            <AnimatePresence>
+              {showResultsButton && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-6 flex justify-end"
+                >
+                  <motion.button
+                    onClick={onViewResults}
+                    className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-6 py-3 rounded-lg hover:shadow-md transition-all flex items-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    View Detailed Results
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </>
         )}
-
-        <Controls
-          isPlaying={isPlaying}
-          handlePlayPause={handlePlayPause}
-          handleReset={handleReset}
-          progress={progress}
-          total={totalTasks}
-          cloudlets={cloudletConfig.numCloudlets}
-        />
-
-        <AnimatePresence>
-          {showResultsButton && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="mt-6 flex justify-end"
-            >
-              <motion.button
-                onClick={onViewResults}
-                className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-6 py-3 rounded-lg hover:shadow-md transition-all flex items-center"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                View Detailed Results
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
     </motion.div>
   );

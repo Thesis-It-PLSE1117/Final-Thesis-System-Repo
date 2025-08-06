@@ -3,6 +3,8 @@ import { Play, Pause, Server, Cpu, Zap, Clock, Gauge, RefreshCw } from 'lucide-r
 import { useState, useEffect } from 'react';
 
 const DemoSection = ({ isPlaying, setIsPlaying }) => {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
   const [demoData, setDemoData] = useState({
     metrics: {
       EPSO: {
@@ -83,7 +85,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
             </span>
           </h3>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            Interactive comparison between <span className="font-semibold text-[#319694]">Enhanced ACO</span> and <span className="font-semibold text-[#4fd1c5]">EPSO</span> algorithms
+            Interactive comparison between <span className="font-semibold text-[#1a5654]">Enhanced ACO</span> and <span className="font-semibold text-[#2c8b84]">EPSO</span> algorithms
           </p>
           <p className="text-sm text-gray-500 mt-2">* Displaying mock simulation results for demonstration purposes</p>
         </motion.div>
@@ -91,7 +93,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
         <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-[#319694]/10">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <div>
-              <h4 className="text-lg font-semibold text-[#319694]">Server Load Distribution</h4>
+              <h4 className="text-lg font-semibold text-[#1a5654]">Server Load Distribution</h4>
               <p className="text-sm text-gray-600 mt-1">
                 {isPlaying ? "Live simulation running (mock data)" : "Simulation paused"}
               </p>
@@ -115,7 +117,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
               </motion.button>
               <motion.button 
                 onClick={() => setIsPlaying(false)}
-                className="flex items-center gap-2 text-[#319694] bg-white hover:bg-gray-50 px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition-all border border-[#319694]/20"
+                className="flex items-center gap-2 text-[#1a5654] bg-white hover:bg-gray-50 px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition-all border border-[#319694]/20"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

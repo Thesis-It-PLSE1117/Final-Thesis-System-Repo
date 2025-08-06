@@ -145,11 +145,12 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                       whileHover={{ rotate: 5, scale: 1.1 }}
                       className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#319694]/10 flex items-center justify-center overflow-hidden"
                     >
-                      <img 
+                      img 
+                        loading="lazy"
                         src={member.image} 
                         alt={member.name}
                         className="w-full h-full object-cover"
-                      />
+                      /
                     </motion.div>
                     <h3 className="font-bold text-gray-800 text-lg">{member.name}</h3>
                     <p className="text-sm text-[#319694] font-medium mb-2">{member.role}</p>

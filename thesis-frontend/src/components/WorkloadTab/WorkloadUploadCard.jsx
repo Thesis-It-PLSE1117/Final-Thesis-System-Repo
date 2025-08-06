@@ -34,7 +34,6 @@ const WorkloadUploadCard = ({
             setIsLoadingPreview(false);
           },
           error: (error) => {
-            console.error('Error parsing CSV:', error);
             setIsLoadingPreview(false);
           }
         });
@@ -55,12 +54,10 @@ const WorkloadUploadCard = ({
               setIsLoadingPreview(false);
             },
             error: (error) => {
-              console.error('Error parsing preset CSV:', error);
               setIsLoadingPreview(false);
             }
           });
         } catch (error) {
-          console.error('Error loading preset:', error);
           setIsLoadingPreview(false);
         }
       } else {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { getMatlabStatus } from '../../services/testService';
 
 const MatlabToggle = ({ enabled, onChange }) => {
   const [matlabStatus, setMatlabStatus] = useState(null);
@@ -18,10 +17,12 @@ const MatlabToggle = ({ enabled, onChange }) => {
   const checkMatlabStatus = async () => {
     try {
       setLoading(true);
-      const response = await getMatlabStatus();
-      setMatlabStatus(response.data);
+      // Check MATLAB status via API
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+      const response = await fetch(`${API_BASE}/api/matlab/status`);
+      const data = await response.json();
+      setMatlabStatus(data);
     } catch (error) {
-      console.error('Failed to check MATLAB status:', error);
       setMatlabStatus({ matlabAvailable: false, engineReady: false });
     } finally {
       setLoading(false);

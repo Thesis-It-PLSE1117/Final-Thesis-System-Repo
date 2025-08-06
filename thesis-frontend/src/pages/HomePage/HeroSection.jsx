@@ -71,9 +71,9 @@ const AlgorithmMetricCard = ({ algorithm, metrics, delay }) => {
           )}
         </div>
         <div>
-          <h3 className={`text-xl font-bold ${isEACO ? 'text-[#319694]' : 'text-[#4fd1c5]'}`}>
+          <h2 className={`text-xl font-bold ${isEACO ? 'text-[#1a5654]' : 'text-[#2c8b84]'}`}>
             {algorithm} Algorithm
-          </h3>
+          </h2>
           <p className="text-sm text-gray-500">Cloud Load Balancing</p>
         </div>
       </div>
@@ -246,7 +246,7 @@ const HeroSection = ({ onStartSimulation }) => {
           
           <motion.button
             onClick={() => document.getElementById('walkthrough').scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center justify-center gap-3 bg-white text-[#319694] px-8 py-4 rounded-xl text-lg font-medium shadow-lg hover:shadow-xl transition-all border border-[#319694]/20"
+            className="flex items-center justify-center gap-3 bg-white text-[#267b79] px-8 py-4 rounded-xl text-lg font-medium shadow-lg hover:shadow-xl transition-all border-2 border-[#267b79]/30"
             whileHover={{ 
               scale: 1.05,
               boxShadow: "0 10px 25px -5px rgba(49, 150, 148, 0.2)"

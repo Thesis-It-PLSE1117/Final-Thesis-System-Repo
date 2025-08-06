@@ -16,7 +16,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       try {
         setHistory(JSON.parse(savedHistory));
       } catch (e) {
-        console.error('Failed to parse history', e);
+        // Failed to parse history
       }
     }
   }, []);
