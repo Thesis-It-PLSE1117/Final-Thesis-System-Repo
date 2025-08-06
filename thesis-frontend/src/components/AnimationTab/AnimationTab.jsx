@@ -144,7 +144,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
         // Reset state
         const resetCounts = { EPSO: {}, EACO: {} };
         const resetLoads = { EPSO: {}, EACO: {} };
-        const initialVMs = { EPSO: [], EACO: [] };
+        // initialVMs variable removed as it was unused
         for (let i = 0; i < dataCenterConfig.numVMs; i++) {
           resetCounts.EPSO[i] = 0;
           resetLoads.EPSO[i] = 0;
