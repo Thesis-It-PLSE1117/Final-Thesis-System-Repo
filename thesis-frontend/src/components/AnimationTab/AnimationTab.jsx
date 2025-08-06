@@ -20,8 +20,9 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
   const [showResultsButton, setShowResultsButton] = useState(true);
   const [highlightedVM, setHighlightedVM] = useState({ EPSO: null, EACO: null });
   
-  // Check if results are from iterations (not suitable for animation)
-  const isIterationResult = (epsoResults && epsoResults.iterationData) || (eacoResults && eacoResults.iterationData);
+
+  const isIterationResult = (epsoResults && epsoResults.isIterationResult) || (eacoResults && eacoResults.isIterationResult) ||
+    (epsoResults?.rawResults?.totalIterations > 1) || (eacoResults?.rawResults?.totalIterations > 1);
 
   // Load backend results
   useEffect(() => {
@@ -593,7 +594,7 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 {isIterationResult ? 
-                  `Results from multiple iterations (${epsoResults?.iterationData?.totalIterations || eacoResults?.iterationData?.totalIterations || 'N/A'} runs)` :
+                  `Results from multiple iterations (${epsoResults?.rawResults?.totalIterations || eacoResults?.rawResults?.totalIterations || 'N/A'} runs)` :
                   `Showing assignment of ${cloudletConfig.numCloudlets} tasks to ${dataCenterConfig.numVMs} VMs`
                 }
               </div>
