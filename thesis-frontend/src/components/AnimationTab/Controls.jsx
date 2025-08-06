@@ -1,4 +1,4 @@
-const Controls = ({ isPlaying, handlePlayPause, handleReset, progress, total, cloudlets }) => (
+const Controls = ({ isPlaying, handlePlayPause, handleReset, progress, cloudlets }) => (
     <div className="mt-4 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
       <button 
         className={`px-6 py-2 rounded-lg flex items-center ${
