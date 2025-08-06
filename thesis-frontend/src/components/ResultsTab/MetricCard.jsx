@@ -10,15 +10,21 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
   const percentDiff = eacoNum !== 0 ? (difference / eacoNum) * 100 : 0;
   const absPercentDiff = Math.abs(percentDiff);
   
-  const isBetter = betterWhen === "higher" 
+  // fix it due to misleading data
+  const isEqual = Math.abs(difference) < 0.0001; // Use small epsilon for floating point comparison
+  
+  const isBetter = isEqual ? false : (betterWhen === "higher" 
     ? epsoNum > eacoNum 
-    : epsoNum < eacoNum;
+    : epsoNum < eacoNum);
   
-  const comparisonResult = isBetter ? "better" : "worse";
-  const improvementText = `${absPercentDiff.toFixed(1)}% ${comparisonResult}`;
+  const comparisonResult = isEqual ? "equal to" : (isBetter ? "better" : "worse");
+  const improvementText = isEqual 
+    ? "identical performance" 
+    : `${absPercentDiff.toFixed(1)}% ${comparisonResult}`;
   
-  // Verbal interpretation based on performance difference
+  // add new interpret
   const getInterpretation = () => {
+    if (isEqual) return "Identical performance";
     if (absPercentDiff < 5) return "Nearly identical performance";
     if (absPercentDiff < 15) return isBetter ? "Moderate improvement" : "Slight disadvantage";
     if (absPercentDiff < 30) return isBetter ? "Significant improvement" : "Noticeable drawback";
@@ -72,13 +78,20 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
         
         {/* Enhanced comparison section */}
         <div className={`mt-3 p-3 rounded-lg ${
-          isBetter ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
+          isEqual ? "bg-gray-50 border border-gray-200" : 
+          (isBetter ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200")
         }`}>
           <div className="flex items-center">
             <div className={`mr-3 p-2 rounded-full ${
-              isBetter ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+              isEqual ? "bg-gray-100 text-gray-600" :
+              (isBetter ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600")
             }`}>
-              {isBetter ? (
+              {isEqual ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+              ) : isBetter ? (
                 <FiCheckCircle size={18} />
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -92,9 +105,10 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                 {getInterpretation()}
               </div>
               <div className={`text-xs font-semibold ${
-                isBetter ? "text-green-600" : "text-red-600"
+                isEqual ? "text-gray-600" :
+                (isBetter ? "text-green-600" : "text-red-600")
               }`}>
-                EPSO is {improvementText} than EACO
+                {isEqual ? "EPSO and EACO have identical performance" : `EPSO is ${improvementText} than EACO`}
               </div>
             </div>
           </div>
@@ -104,7 +118,8 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
           <span>Performance difference:</span>
           <span className={`font-medium ${
-            isBetter ? "text-green-600" : "text-red-600"
+            isEqual ? "text-gray-600" :
+            (isBetter ? "text-green-600" : "text-red-600")
           }`}>
             {difference > 0 ? '+' : ''}{difference.toFixed(2)}{unit}
           </span>

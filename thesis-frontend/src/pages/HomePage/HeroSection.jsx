@@ -265,12 +265,12 @@ const HeroSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.8 }}
         >
           <AlgorithmMetricCard 
-            algorithm="ACO" 
+            algorithm="EACO" 
             metrics={eacoMetrics} 
             delay={0} 
           />
           <AlgorithmMetricCard 
-            algorithm="PSO" 
+            algorithm="EPSO" 
             metrics={epsoMetrics} 
             delay={0.2} 
           />
