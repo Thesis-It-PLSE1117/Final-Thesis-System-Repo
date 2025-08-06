@@ -8,9 +8,8 @@ import ConfigSection from './ConfigSection';
 import InputField from './InputField';
 import VMCard from './VMCard';
 import HostCard from './HostCard';
-import MatlabToggle from './MatlabToggle';
 
-const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle, onRunSimulation }) => {
+const DataCenterTab = ({ config, onChange}) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);
   const [expandedHost, setExpandedHost] = useState(null);
@@ -255,14 +254,6 @@ const DataCenterTab = ({ config, onChange, enableMatlabPlots, onMatlabToggle, on
           </div>
         </div>
       </ConfigSection>
-
-      {/* MATLAB Visualization Toggle */}
-      <div className="mt-6 mb-6">
-        <MatlabToggle 
-          enabled={enableMatlabPlots} 
-          onChange={onMatlabToggle}
-        />
-      </div>
     </div>
   );
 };

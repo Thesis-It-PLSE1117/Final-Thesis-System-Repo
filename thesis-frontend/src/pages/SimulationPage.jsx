@@ -646,8 +646,6 @@ const SimulationPage = ({ onBack }) => {
                 <DataCenterTab 
                   config={dataCenterConfig} 
                   onChange={handleDataCenterChange}
-                  enableMatlabPlots={enableMatlabPlots}
-                  onMatlabToggle={setEnableMatlabPlots}
                 />
               ) : activeTab === 'workload' ? (
                 <WorkloadTab
@@ -658,9 +656,8 @@ const SimulationPage = ({ onBack }) => {
                   csvRowCount={csvRowCount}
                   onPresetSelect={handlePresetSelect}
                   selectedPreset={selectedPreset}
-                  onSyntheticWorkloadSubmit={(config) => {
-                    // Handle synthetic workload submission
-                  }}
+                  enableMatlabPlots={enableMatlabPlots}
+                  onMatlabToggle={setEnableMatlabPlots}
                 />
               ) : activeTab === 'iterations' ? (
                 <IterationTab 
@@ -698,7 +695,7 @@ const SimulationPage = ({ onBack }) => {
           </motion.div>
         </AnimatePresence>
 
-        {activeTab !== 'help' && activeTab !== 'history' && (
+        {activeTab !== 'help' && activeTab !== 'history' && activeTab !== 'iterations' && activeTab !== 'dataCenter' && (
           <div className="mt-8 flex justify-center">
             <button
               className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 flex items-center gap-2"

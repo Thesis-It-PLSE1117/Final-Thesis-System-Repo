@@ -4,6 +4,7 @@ import { Upload } from 'lucide-react';
 import WorkloadConfigCard from './WorkloadConfigCard';
 import WorkloadUploadCard from './WorkloadUploadCard';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import MatlabToggle from './MatlabToggle';
 
 const WorkloadTab = ({
   config,
@@ -12,7 +13,9 @@ const WorkloadTab = ({
   workloadFile,
   csvRowCount,
   onPresetSelect,
-  selectedPreset
+  selectedPreset,
+  enableMatlabPlots,
+  onMatlabToggle
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -85,6 +88,14 @@ const WorkloadTab = ({
           />
         </div>
       </motion.div>
+
+      {/* MATLAB Visualization Toggle */}
+      <div className="mt-6 mb-6">
+        <MatlabToggle 
+          enabled={enableMatlabPlots} 
+          onChange={onMatlabToggle}
+        />
+      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
