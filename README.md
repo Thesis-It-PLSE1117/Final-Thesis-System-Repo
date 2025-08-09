@@ -1,113 +1,116 @@
-# Load Balancing Simulator
+<a href="#">
+  <img width="1024" alt="Cloud Load Balancer Simulator preview" src="https://github.com/user-attachments/assets/f719a4d1-2d0b-4080-8203-032f951600d9" />
+</a>
 
-A modern web application for simulating and comparing load balancing algorithms in cloud computing environments. This simulator focuses on comparing the Round Robin (RR) and Enhanced Particle Swarm Optimization (EPSO) algorithms for task scheduling in cloud datacenters.
+<p align="center">
+  <a href="#about">About</a>
+  ·
+  <a href="#installation">Installation</a>
+  ·
+  <a href="#tech-stack">Tech Stack</a>
+  ·
+  <a href="#scripts">Scripts</a>
+  ·
+  <a href="#configuration">Configuration</a>
+  ·
+  <a href="#backend">Backend</a>
+</p>
+
+<h1></h1>
 
 ## About
 
-The Load Balancing Simulator provides an interactive environment to:
-- Simulate task scheduling using RR and EPSO algorithms
-- Visualize resource allocation in real-time
-- Compare performance metrics between algorithms
-- Analyze scheduling logs and results
-- Upload custom workload datasets
-- Configure simulation parameters
+A modern web interface for the Cloud Load Balancer Simulator, built with React + Vite. It lets you configure data centers and workloads, run EPSO/EACO simulations via the backend, and visualize results with interactive charts and animations.
 
-## Features
-
-- 🔄 Real-time animation of task scheduling
-- 📊 Detailed performance metrics and comparisons
-- 📈 Interactive charts and visualizations
-- 📁 Custom workload file upload support
-- ⚙️ Configurable simulation parameters
-- 📝 Comprehensive scheduling logs
-- 💾 Results export functionality
-
-## Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn package manager
-- Java 17 or higher (for backend)
-- Modern web browser
+Key features:
+- Interactive Simulation Configuration (data centers, VMs, workloads)
+- Real-time Animation of task distribution and VM utilization
+- Algorithm Comparison for EACO and EPSO
+- MATLAB-driven visualizations when backend is MATLAB-enabled
+- Results Analysis with comprehensive metrics and charts
+- History Management to save and review runs
 
 ## Installation
 
-1. Clone the repository:
+Clone and install:
 ```bash
-git clone https://github.com/yourusername/thesis-system.git
-```
-
-2. Frontend setup:
-```bash
-cd thesis-frontend
+git clone https://github.com/kierre-yes/research_sim.git
+cd Final-Thesis-System-Repo/thesis-frontend
 npm install
 ```
 
-3. Backend setup:
-```bash
-cd ../thesis-backend
-mvn install
+Create a .env file:
+```env
+VITE_API_BASE_URL=http://localhost:8081
 ```
 
-4. Start the backend server:
+Start development server:
 ```bash
-mvn spring-boot:run
-```
-
-5. In a new terminal, start the frontend:
-```bash
-cd ../thesis-frontend
 npm run dev
 ```
 
-6. Access the application at `http://localhost:5173`
+Build for production:
+```bash
+npm run build
+```
+
+Preview the production build:
+```bash
+npm run preview
+```
+
+## Tech Stack
+
+- React 19 + Vite 7
+- Tailwind CSS 4
+- Chart.js via react-chartjs-2
+- Framer Motion animations
+- Lucide React / react-icons
+- PapaParse for CSV
+data
+
+## Scripts
+
+- `npm run dev` – start dev server
+- `npm run build` – production build
+- `npm run preview` – preview dist/
+- `npm run lint` – run ESLint
+- `npm run build:production` – production mode build
+- `npm run build:analyze` – bundle visualizer (outputs dist/stats.html)
 
 ## Configuration
 
-1. Frontend:
-   - Copy `.env.example` to `.env`
-   - Update API endpoint if needed
+Set environment variables in `.env`:
+- `VITE_API_BASE_URL` – backend API (default http://localhost:8081)
 
-2. Backend:
-   - Configure `application.properties`
-   - Set up database connection if required
+Vite config highlights (vite.config.js):
+- Tailwind integration
+- Gzip + Brotli compression during build
+- Vendor chunk splitting for faster loads
+- Optional bundle analyzer (ANALYZE=true)
 
-## Verification
+## Backend
 
-- Backend server should be running on port 8080
-- Frontend dev server on port 5173
-- No console errors in browser
-- Successful API connection test
+This UI talks to the Spring Boot backend:
+- Repository: https://github.com/kierre-yes/research_sim.git
+- Ensure the backend is running on the URL in `VITE_API_BASE_URL` before starting the UI.
 
-This frontend works with our Java-based backend simulation engine:
+## Project Structure
 
-Backend Repository: https://github.com/kierre-yes/research_sim.git
+```
+src/
+├── components/
+│   ├── AnimationTab/
+│   ├── DatacenterTab/
+│   ├── ResultsTab/
+│   ├── WorkloadTab/
+│   └── HistoryTab/
+├── pages/
+├── assets/
+├── services/
+└── utils/
+```
 
-Make sure to clone and run the backend server before using this frontend application.
-Please read the README.md file in the root directory for further documentation.
-## Support
+---
 
-For issues and feature requests, please create an issue in the repository.
-
-## License
-
-MIT License
-
-Copyright (c) 2024 Load Balancing Simulator
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This project is part of academic research on cloud computing load balancing strategies.
