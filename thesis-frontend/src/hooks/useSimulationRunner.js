@@ -22,7 +22,9 @@ export const useSimulationRunner = () => {
       // i check iterations as a valid for using the right endpoint
       const useIterations = configData.iterations > 1;
       
+      console.log('DEBUG runAlgorithm:', { algorithm, withPlots, workloadFile: !!workloadFile, useIterations, iterations: configData.iterations });
       if (withPlots && !workloadFile && !useIterations) {
+        console.log('SHOULD USE PLOTS API!');
         // use async plot generation for better ux
         if (useAsync) {
           return await apiClient.runWithPlotsAsync(algorithm, configData);
@@ -293,15 +295,33 @@ export const useSimulationRunner = () => {
         return true;
       } catch (algorithmError) {
         clearInterval(progressInterval);
-        showNotification(`Failed to run algorithms: ${algorithmError.message}`, 'error');
+        // Check if the error is due to cancellation
+        if (algorithmError.name === 'CancelledError' || algorithmError.message === 'Request cancelled') {
+          showNotification('Simulation cancelled', 'info');
+        } else {
+          showNotification(`Failed to run algorithms: ${algorithmError.message}`, 'error');
+        }
         setSimulationState('config');
         return false;
       }
     } catch (err) {
-      showNotification(`Failed to run simulation: ${err.message}`, 'error');
+      // Check if the error is due to cancellation
+      if (err.name === 'CancelledError' || err.message === 'Request cancelled') {
+        showNotification('Simulation cancelled', 'info');
+      } else {
+        showNotification(`Failed to run simulation: ${err.message}`, 'error');
+      }
       setSimulationState('config');
       return false;
     }
+  };
+
+  // cancel the simulation
+  const cancelSimulation = () => {
+    // Simple cancel - just reset states
+    setProgress(0);
+    setSimulationState('config');
+    showNotification('Simulation cancelled by user', 'info');
   };
 
   return {
@@ -312,6 +332,7 @@ export const useSimulationRunner = () => {
     simulationState,
     setSimulationState,
     runSimulation,
+    cancelSimulation,
     plotStatus,
     plotTrackingIds
   };

@@ -70,10 +70,29 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
   try {
     const existingHistory = getHistory();
     const updatedHistory = [...historyEntries, ...existingHistory].slice(0, MAX_HISTORY_ENTRIES);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+    
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+    } catch (quotaError) {
+      // Handle quota exceeded error
+      if (quotaError.name === 'QuotaExceededError' || quotaError.message.includes('quota')) {
+        console.log('Storage quota exceeded, reducing history size...');
+        // Keep only 10 most recent entries
+        const reducedHistory = [...historyEntries, ...existingHistory].slice(0, 10);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(reducedHistory));
+      } else {
+        throw quotaError;
+      }
+    }
+    
     return true;
   } catch (error) {
     console.error('Failed to save to history:', error);
+    // Try to clear history if all else fails
+    if (error.name === 'QuotaExceededError') {
+      clearHistory();
+      console.log('Cleared history due to quota issues');
+    }
     return false;
   }
 };

@@ -1,7 +1,6 @@
 import { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Undo, Redo } from 'lucide-react';
-import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { ArrowLeft, Play, Undo, Redo } from 'lucide-react';
 import { showNotification } from '../components/common/ErrorNotification';
 import { useAutoSave } from '../hooks/useAutoSave';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
@@ -38,12 +37,14 @@ const SimulationPage = ({ onBack }) => {
     setProgress,
     simulationState,
     setSimulationState,
-    runSimulation
+    runSimulation,
+    cancelSimulation
   } = useSimulationRunner();
   
   // ui states
   const [activeTab, setActiveTab] = useState('dataCenter');
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
   const fileInputRef = useRef(null);
   
   // undo/redo functionality
@@ -115,35 +116,39 @@ const SimulationPage = ({ onBack }) => {
   }, [activeTab, simulationState]);
   
   const executeSimulation = async () => {
-    // i validate before running since you know for the sake of preventing errors
-    const totalOperations = config.dataCenterConfig.numVMs * config.cloudletConfig.numCloudlets * config.iterationConfig.iterations;
-    if (totalOperations > 100000) {
-      setConfirmDialog({
-        isOpen: true,
-        title: 'Large Simulation Warning',
-        message: `This simulation will process ${totalOperations.toLocaleString()} operations. This may take several minutes. Do you want to continue?`,
-        onConfirm: async () => {
-          setConfirmDialog({ isOpen: false });
-          // i delegate to the hook since you know for the sake of keeping this simple
-          await runSimulation({
-            dataCenterConfig: config.dataCenterConfig,
-            cloudletConfig: config.cloudletConfig,
-            iterationConfig: config.iterationConfig,
-            enableMatlabPlots: config.enableMatlabPlots,
-            workloadFile: config.workloadFile
-          });
-        },
+    try {
+      // i validate before running since you know for the sake of preventing errors
+      const totalOperations = config.dataCenterConfig.numVMs * config.cloudletConfig.numCloudlets * config.iterationConfig.iterations;
+      if (totalOperations > 100000) {
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Large Simulation Warning',
+          message: `This simulation will process ${totalOperations.toLocaleString()} operations. This may take several minutes. Do you want to continue?`,
+          onConfirm: async () => {
+            setConfirmDialog({ isOpen: false });
+            // i delegate to the hook since you know for the sake of keeping this simple
+            await runSimulation({
+              dataCenterConfig: config.dataCenterConfig,
+              cloudletConfig: config.cloudletConfig,
+              iterationConfig: config.iterationConfig,
+              enableMatlabPlots: config.enableMatlabPlots,
+              workloadFile: config.workloadFile
+            });
+          }
+        });
+        return;
+      }
+      
+      await runSimulation({
+        dataCenterConfig: config.dataCenterConfig,
+        cloudletConfig: config.cloudletConfig,
+        iterationConfig: config.iterationConfig,
+        enableMatlabPlots: config.enableMatlabPlots,
+        workloadFile: config.workloadFile
       });
-      return;
+    } catch (error) {
+      showNotification(`Failed to start simulation: ${error.message}`, 'error');
     }
-    
-    await runSimulation({
-      dataCenterConfig: config.dataCenterConfig,
-      cloudletConfig: config.cloudletConfig,
-      iterationConfig: config.iterationConfig,
-      enableMatlabPlots: config.enableMatlabPlots,
-      workloadFile: config.workloadFile
-    });
   };
   
   const tabOrder = ['dataCenter', 'workload', 'iterations', 'history', 'help'];
@@ -155,48 +160,7 @@ const SimulationPage = ({ onBack }) => {
     setActiveTab(newTab);
   };
   
-  // keyboard shortcuts
-  useKeyboardShortcuts(
-    {
-      'num1': () => handleTabChange('dataCenter'),
-      'num2': () => handleTabChange('workload'),
-      'num3': () => handleTabChange('iterations'),
-      'num4': () => handleTabChange('history'),
-      'num5': () => handleTabChange('help'),
-      'alt+left': () => {
-        const currentIndex = tabOrder.indexOf(activeTab);
-        const prevIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
-        handleTabChange(tabOrder[prevIndex]);
-      },
-      'alt+right': () => {
-        const currentIndex = tabOrder.indexOf(activeTab);
-        const nextIndex = (currentIndex + 1) % tabOrder.length;
-        handleTabChange(tabOrder[nextIndex]);
-      },
-      'ctrl+enter': () => {
-        if (simulationState === 'config' && activeTab !== 'help' && activeTab !== 'history') {
-          executeSimulation();
-        }
-      },
-      'ctrl+z': handleUndo,
-      'ctrl+y': handleRedo,
-      'ctrl+s': (e) => {
-        e.preventDefault();
-        showNotification('Configuration saved', 'success', 2000);
-      },
-      '?': () => setShowKeyboardHelp(true),
-      'escape': () => {
-        if (showKeyboardHelp) {
-          setShowKeyboardHelp(false);
-        } else if (confirmDialog.isOpen) {
-          setConfirmDialog({ isOpen: false });
-        } else if (simulationState !== 'config') {
-          setSimulationState('config');
-        }
-      }
-    },
-    [activeTab, simulationState, showKeyboardHelp, confirmDialog.isOpen]
-  );
+  // Keyboard shortcuts removed - not essential for functionality
   
   // animation variants
   const tabContentVariants = {
@@ -305,12 +269,21 @@ const SimulationPage = ({ onBack }) => {
         {activeTab === 'workload' && (
           <div className="mt-8 flex justify-center">
             <button
-              className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+              className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               onClick={executeSimulation}
-              disabled={!config.cloudletConfig.numCloudlets}
+              disabled={!config.cloudletConfig.numCloudlets || isSimulating || simulationState === 'loading'}
             >
-              <Play size={18} />
-              Run Simulation
+              {isSimulating || simulationState === 'loading' ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Play size={18} />
+                  Run Simulation
+                </>
+              )}
             </button>
           </div>
         )}
