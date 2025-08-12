@@ -26,11 +26,23 @@ const HistoryTab = ({ onBack, onViewResults }) => {
   };
 
   const handleDownloadCSV = () => {
-    exportSimulationHistory(history, 'csv');
+    // Export only the selected result, or the first one if none selected
+    const dataToExport = selectedResult ? [selectedResult] : (history.length > 0 ? [history[0]] : []);
+    if (dataToExport.length === 0) {
+      alert('No simulation data to export');
+      return;
+    }
+    exportSimulationHistory(dataToExport, 'csv');
   };
 
   const handleDownloadJSON = () => {
-    exportSimulationHistory(history, 'json');
+    // Export only the selected result, or the first one if none selected
+    const dataToExport = selectedResult ? [selectedResult] : (history.length > 0 ? [history[0]] : []);
+    if (dataToExport.length === 0) {
+      alert('No simulation data to export');
+      return;
+    }
+    exportSimulationHistory(dataToExport, 'json');
   };
 
   const handleClearHistory = () => {

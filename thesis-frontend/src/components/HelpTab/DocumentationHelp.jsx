@@ -19,14 +19,14 @@ const DocumentationHelp = () => {
       content: "Overview of the cloud load balancing simulation project and its objectives."
     },
     {
-      title: "Dataset",
+      title: "Dataset & Provenance",
       icon: <BookOpen className="w-5 h-5" />,
-      content: "Details about the dataset used for simulations and workload generation."
+      content: "We use subsets of the Google Cluster Traces. Timestamps (arrival_ts) are provided in microseconds and normalized to seconds (t := (arrival_ts - min(arrival_ts)) / 1e6). file_size and output_size values are interpreted as normalized fractions (0–1) and scaled to bytes."
     },
     {
-      title: "Preprocessing Steps",
+      title: "Preprocessing & Submission Modes",
       icon: <Cpu className="w-5 h-5" />,
-      content: "How we prepare and normalize the data before running simulations."
+      content: "Two CSV schemas are supported: (1) Normalized: length, pes, file_size, output_size; (2) Google: arrival_ts, cpu_request, memory_request, file_size, output_size, pes_number, [time_window]. The system supports batch submission (default; all tasks at t=0) and optional staged submission that respects arrival_ts."
     },
     {
       title: "Algorithms",
@@ -34,18 +34,18 @@ const DocumentationHelp = () => {
       subsections: [
         {
           title: "Enhanced Ant Colony Optimization (EACO)",
-          content: "Traditional load balancing algorithm that distributes requests equally."
+          content: "Adaptive ACO for task-to-VM scheduling with: (a) diversity-driven pheromone evaporation within [ρ_min, ρ_max]; (b) heuristic information combining execution time and resource fit; (c) load-aware reinforcement (inversely proportional to VM load); (d) pheromone capping and early-stopping based on convergence variance. Multi-objective fitness over makespan, energy, utilization, and load balance (weighted)."
         },
         {
           title: "Enhanced PSO (EPSO)",
-          content: "Our improved Particle Swarm Optimization algorithm for load balancing."
+          content: "PSO with nonlinear inertia weight decay, adaptive velocity clamping (v_max initial→final), optional early-stopping, and multi-objective fitness combining makespan, energy, utilization, and degree of imbalance (weighted)."
         }
       ]
     },
     {
       title: "System Architecture",
       icon: <BarChart2 className="w-5 h-5" />,
-      content: "Technical overview of the simulation system's components and design."
+      content: "Spring Boot backend + CloudSim core. EnhancedSimulationManager orchestrates datacenter/VM build, workload loading, algorithmic scheduling via a custom broker, and metrics computation. React frontend manages configuration, runs, iterations, comparisons, and visualization."
     },
     {
       title: "Frontend Guide",
@@ -53,14 +53,22 @@ const DocumentationHelp = () => {
       subsections: [
         { title: "Overview", content: "General frontend structure and capabilities" },
         { title: "UI Walkthrough", content: "How to navigate the interface" },
-        { title: "Features", content: "Key features and their functions" },
+        { title: "Features", content: "Configuration tabs, results visualization, t-test panel, history and export." },
         { title: "Interaction Diagrams", content: "Visual representations of user flows" }
       ]
     },
     {
       title: "Results & Analysis",
       icon: <LinkIcon className="w-5 h-5" />,
-      content: "Findings from our simulations and comparative analysis of algorithms."
+      content: "We report per-iteration metrics and summary statistics. Comparative analysis uses paired t-tests (per metric) with effect sizes and confidence intervals."
+    },
+    {
+      title: "Methodology Notes",
+      icon: <BookOpen className="w-5 h-5" />,
+      subsections: [
+        { title: "Surveys", content: "End-user and IT-expert questionnaires are administered via Google Forms (Likert scale). Aggregated findings are reported in the manuscript; this app does not store survey responses." },
+        { title: "Data Provenance", content: "Google Cluster subset; arrival_ts provided in μs and normalized to seconds for simulation. When arrival_ts is present and enabled, the system stages submissions by time; otherwise, tasks run in a batch at t=0." }
+      ]
     }
   ];
 

@@ -34,9 +34,18 @@ export const useSimulationConfig = () => {
   });
   
   // iteration configuration
-  const [iterationConfig, setIterationConfig] = useState({
+  const [iterationConfig, setIterationConfigState] = useState({
     iterations: 1,
   });
+  
+  // wrapper for setIterationConfig to handle MATLAB toggle
+  const setIterationConfig = (newConfig) => {
+    setIterationConfigState(newConfig);
+    // automatically disable MATLAB plots if iterations > 1
+    if (newConfig.iterations > 1 && enableMatlabPlots) {
+      setEnableMatlabPlots(false);
+    }
+  };
 
   const [workloadFile, setWorkloadFile] = useState(null);
   const [csvRowCount, setCsvRowCount] = useState(0);

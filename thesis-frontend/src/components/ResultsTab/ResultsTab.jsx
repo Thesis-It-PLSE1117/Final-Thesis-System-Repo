@@ -12,9 +12,12 @@ import SchedulingLogTable from './SchedulingLogTable';
 import PerformanceCharts from './Charts';
 import IterationBadge from './IterationBadge';
 import StatisticsDisplay from './StatisticsDisplay';
+import PairedTTestDisplay from './PairedTTestDisplay';
+import MetadataDisplay from './MetadataDisplay';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
+import ImageModal from '../modals/ImageModal';
 
-const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResults, plotData }) => {
+const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResults, plotData, plotsGenerating }) => {
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,12 +26,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   const [activeChart, setActiveChart] = useState('bar');
   const [isExiting, setIsExiting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [modalImage, setModalImage] = useState({ isOpen: false, src: '', alt: '' });
 
   useEffect(() => {
     try {
-      console.log('ResultsTab received eacoResults:', eacoResults);
-      console.log('ResultsTab received epsoResults:', epsoResults);
-      
       if (!eacoResults || !epsoResults) {
         setError('No simulation results available. Please run a simulation first.');
         setLoading(false);
@@ -38,9 +39,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
 
       const normalizedRR = normalizeData(eacoResults);
       const normalizedEPSO = normalizeData(epsoResults);
-      
-      console.log('Normalized EACO:', normalizedRR);
-      console.log('Normalized EPSO:', normalizedEPSO);
       
       if (!normalizedRR || !normalizedEPSO) {
         setError('Failed to normalize simulation results. Data may be incomplete.');
@@ -213,14 +211,50 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           <IterationBadge iterationData={eacoResults.rawResults} />
         )}
         
+        {/* Display for both algorithms */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+          {eacoResults && (
+            <MetadataDisplay 
+              metadata={{
+                runId: eacoResults.runId,
+                seed: eacoResults.seed,
+                configSnapshot: eacoResults.configSnapshot,
+                datasetId: eacoResults.datasetId
+              }}
+              algorithm="EACO"
+            />
+          )}
+          {epsoResults && (
+            <MetadataDisplay 
+              metadata={{
+                runId: epsoResults.runId,
+                seed: epsoResults.seed,
+                configSnapshot: epsoResults.configSnapshot,
+                datasetId: epsoResults.datasetId
+              }}
+              algorithm="EPSO"
+            />
+          )}
+        </div>
+        
         {/* Statistics Display */}
         {eacoResults?.rawResults ? (
-          <StatisticsDisplay
-            average={eacoResults.rawResults.averageMetrics}
-            min={eacoResults.rawResults.minMetrics}
-            max={eacoResults.rawResults.maxMetrics}
-            stdDev={eacoResults.rawResults.stdDevMetrics}
-          />
+          <>
+            <StatisticsDisplay
+              average={eacoResults.rawResults.averageMetrics}
+              min={eacoResults.rawResults.minMetrics}
+              max={eacoResults.rawResults.maxMetrics}
+              stdDev={eacoResults.rawResults.stdDevMetrics}
+            />
+            
+            {/* Paired T-Test Display - Only show if we have t-test results */}
+            {(eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+              <PairedTTestDisplay 
+                tTestResults={eacoResults?.tTestResults || epsoResults?.tTestResults}
+                isLoading={false}
+              />
+            )}
+          </>
         ) : null}
 
         {/* Key Metrics Cards */}
@@ -269,6 +303,23 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             setActiveChart={setActiveChart}
           />
         </div>
+
+        {/* Plots Status Banner */}
+        {plotsGenerating && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4"
+          >
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+              <div>
+                <p className="text-blue-800 font-medium">MATLAB plots are being generated...</p>
+                <p className="text-blue-600 text-sm mt-1">This may take a few moments. The plots will appear automatically when ready.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* MATLAB Plots Section */}
         {plotData && Object.keys(plotData).length > 0 && (
@@ -336,11 +387,11 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                             <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200 shadow-sm">
                               EACO Algorithm
                             </div>
-                            <div className="relative">
+                            <div className="relative" onClick={() => setModalImage({ isOpen: true, src: eacoUrl, alt: `EACO ${plotTitle}` })}>
                               <img 
                                 src={eacoUrl} 
                                 alt={`EACO ${plotTitle}`}
-                                className="w-full h-auto object-contain max-h-96"
+                                className="w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => {
                                   e.target.style.display = 'none';
                                   e.target.nextSibling.style.display = 'flex';
@@ -363,7 +414,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => handleDownloadImage(eacoUrl, `eaco_${type}.png`, 'eaco')}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDownloadImage(eacoUrl, `eaco_${type}.png`, 'eaco');
+                                    }}
                                     className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
                                     title="Download image"
                                   >
@@ -372,7 +426,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => handlePrintImage(eacoUrl, `EACO - ${plotTitle}`)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handlePrintImage(eacoUrl, `EACO - ${plotTitle}`);
+                                    }}
                                     className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
                                     title="Print image"
                                   >
@@ -388,11 +445,11 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                             <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200 shadow-sm">
                               EPSO Algorithm
                             </div>
-                            <div className="relative">
+                            <div className="relative" onClick={() => setModalImage({ isOpen: true, src: epsoUrl, alt: `EPSO ${plotTitle}` })}>
                               <img 
                                 src={epsoUrl} 
                                 alt={`EPSO ${plotTitle}`}
-                                className="w-full h-auto object-contain max-h-96"
+                                className="w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => {
                                   e.target.style.display = 'none';
                                   e.target.nextSibling.style.display = 'flex';
@@ -415,7 +472,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => handleDownloadImage(epsoUrl, `epso_${type}.png`, 'epso')}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDownloadImage(epsoUrl, `epso_${type}.png`, 'epso');
+                                    }}
                                     className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
                                     title="Download image"
                                   >
@@ -424,7 +484,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => handlePrintImage(epsoUrl, `EPSO - ${plotTitle}`)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handlePrintImage(epsoUrl, `EPSO - ${plotTitle}`);
+                                    }}
                                     className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
                                     title="Print image"
                                   >
@@ -516,6 +579,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           </div>
         </div>
       </motion.div>
+
+      {/* Image Modal for full view */}
+      <ImageModal
+        isOpen={modalImage.isOpen}
+        onClose={() => setModalImage({ isOpen: false, src: '', alt: '' })}
+        imageSrc={modalImage.src}
+        imageAlt={modalImage.alt}
+      />
     </motion.div>
   );
 };

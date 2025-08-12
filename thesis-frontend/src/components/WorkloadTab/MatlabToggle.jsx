@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Loader2, CheckCircle, XCircle } from 'lucide-react';
 
-const MatlabToggle = ({ enabled, onChange }) => {
+const MatlabToggle = ({ enabled, onChange, disabled = false }) => {
   const [matlabStatus, setMatlabStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null); // Track if we encountered an error
 
   useEffect(() => {
-    // Only check status when MATLAB is enabled
-    if (enabled) {
+    // Only check status when MATLAB is enabled and not disabled
+    if (enabled && !disabled) {
       checkMatlabStatus();
     } else {
       // Only clear status if manually toggled off (not due to error)
@@ -16,7 +16,7 @@ const MatlabToggle = ({ enabled, onChange }) => {
         setMatlabStatus(null);
       }
     }
-  }, [enabled]);
+  }, [enabled, disabled]);
 
   const checkMatlabStatus = async () => {
     try {
@@ -24,7 +24,7 @@ const MatlabToggle = ({ enabled, onChange }) => {
       setError(null); // Clear previous error when checking again
       // Check MATLAB status via API
       const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
-      const response = await fetch(`${API_BASE}/api/matlab/status`);
+      const response = await fetch(`${API_BASE}/api/test/matlab/status`);
       
       if (!response.ok) {
         throw new Error('Failed to check MATLAB status');
@@ -48,11 +48,13 @@ const MatlabToggle = ({ enabled, onChange }) => {
   };
 
   const handleManualToggle = (checked) => {
-    onChange(checked);
-    // Only clear error if manually toggling off
-    if (!checked) {
-      setError(null);
-      setMatlabStatus(null);
+    if (!disabled) {
+      onChange(checked);
+      // Only clear error if manually toggling off
+      if (!checked) {
+        setError(null);
+        setMatlabStatus(null);
+      }
     }
   };
 
@@ -92,25 +94,28 @@ const MatlabToggle = ({ enabled, onChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+    <div className={`bg-white rounded-lg p-6 shadow-sm border ${disabled ? 'border-gray-100 opacity-60' : 'border-gray-200'}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Activity className="text-[#319694]" size={24} />
+          <Activity className={disabled ? "text-gray-400" : "text-[#319694]"} size={24} />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">MATLAB Visualization</h3>
+            <h3 className={`text-lg font-semibold ${disabled ? 'text-gray-600' : 'text-gray-900'}`}>MATLAB Visualization</h3>
             <p className="text-sm text-gray-600">
-              Enable advanced plots and charts using MATLAB engine
+              {disabled 
+                ? 'MATLAB plots are not available for multiple iterations' 
+                : 'Enable advanced plots and charts using MATLAB engine'}
             </p>
           </div>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
+        <label className={`relative inline-flex items-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
           <input
             type="checkbox"
-            checked={enabled}
+            checked={enabled && !disabled}
             onChange={(e) => handleManualToggle(e.target.checked)}
+            disabled={disabled}
             className="sr-only peer"
           />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#319694]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#319694]"></div>
+          <div className={`w-11 h-6 ${disabled ? 'bg-gray-100' : 'bg-gray-200'} peer-focus:outline-none ${!disabled && 'peer-focus:ring-4 peer-focus:ring-[#319694]/20'} rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${!disabled && 'peer-checked:bg-[#319694]'} peer-disabled:opacity-50`}></div>
         </label>
       </div>
       

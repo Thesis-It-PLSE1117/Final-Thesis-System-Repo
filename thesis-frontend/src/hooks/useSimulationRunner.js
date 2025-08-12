@@ -13,21 +13,29 @@ export const useSimulationRunner = () => {
   const [simulationResults, setSimulationResults] = useState(null);
   const [progress, setProgress] = useState(0);
   const [simulationState, setSimulationState] = useState('config');
+  const [plotTrackingIds, setPlotTrackingIds] = useState(null);
+  const [plotStatus, setPlotStatus] = useState(null); // 'pending', 'generating', 'completed', 'failed'
 
-  // run a single algorithm
-  const runAlgorithm = async (algorithm, configData, withPlots, workloadFile) => {
+  // run a single algorithm with async plot support
+  const runAlgorithm = async (algorithm, configData, withPlots, workloadFile, useAsync = false, retryCount = 0) => {
     try {
       // i check iterations as a valid for using the right endpoint
       const useIterations = configData.iterations > 1;
       
       if (withPlots && !workloadFile && !useIterations) {
+        // use async plot generation for better ux
+        if (useAsync) {
+          return await apiClient.runWithPlotsAsync(algorithm, configData);
+        }
+        // fallback to sync if needed
         try {
           return await apiClient.runWithPlots(algorithm, configData);
         } catch (error) {
-          if (error.message === 'MATLAB_WARMING_UP') {
+          if (error.message === 'MATLAB_WARMING_UP' && retryCount < 3) {
             // i wait here since you know for the sake of letting matlab warm up
+            // but limit retries to prevent infinite recursion
             await new Promise(resolve => setTimeout(resolve, 5000));
-            return runAlgorithm(algorithm, configData, withPlots, workloadFile);
+            return runAlgorithm(algorithm, configData, withPlots, workloadFile, useAsync, retryCount + 1);
           }
           throw error;
         }
@@ -47,6 +55,68 @@ export const useSimulationRunner = () => {
     } catch (error) {
       throw error;
     }
+  };
+  
+  // poll for plot status
+  const pollPlotStatus = async (trackingIds) => {
+    if (!trackingIds) return null;
+    
+    const checkStatus = async () => {
+      try {
+        const statuses = await Promise.all(
+          Object.entries(trackingIds).map(async ([algo, id]) => {
+            const status = await apiClient.getPlotStatus(id);
+            return { algo, ...status };
+          })
+        );
+        
+        // check if all plots are completed
+        const allCompleted = statuses.every(s => s.status === 'COMPLETED');
+        const anyFailed = statuses.some(s => s.status === 'FAILED');
+        
+        if (allCompleted) {
+          setPlotStatus('completed');
+          // fetch the actual plot data
+          const plotData = {};
+          for (const [algo, id] of Object.entries(trackingIds)) {
+            const results = await apiClient.getPlotResults(id);
+            if (results.ready && results.plotData) {
+              plotData[algo.toLowerCase()] = results.plotData;
+            }
+          }
+          return { completed: true, data: plotData };
+        } else if (anyFailed) {
+          setPlotStatus('failed');
+          return { failed: true };
+        } else {
+          setPlotStatus('generating');
+          return { pending: true };
+        }
+      } catch (error) {
+        console.error('Error polling plot status:', error);
+        return { failed: true };
+      }
+    };
+    
+    // poll every 2 seconds until complete, with max attempts
+    return new Promise((resolve) => {
+      let attempts = 0;
+      const maxAttempts = 60; // max 2 minutes of polling
+      
+      const interval = setInterval(async () => {
+        attempts++;
+        const result = await checkStatus();
+        
+        if (result.completed) {
+          clearInterval(interval);
+          resolve(result.data);
+        } else if (result.failed || attempts >= maxAttempts) {
+          clearInterval(interval);
+          resolve(null);
+        }
+        // continue polling if pending
+      }, 2000);
+    });
   };
 
   // validate and run simulation
@@ -148,16 +218,69 @@ export const useSimulationRunner = () => {
           setSimulationResults(combinedResults);
           historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
         } else {
-          const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots, workloadFile);
-          setProgress(70);
-          const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots, workloadFile);
+          // use async plot generation when matlab plots are enabled
+          const useAsyncPlots = enableMatlabPlots && !workloadFile && iterationConfig.iterations === 1;
           
-          const combinedResults = {
-            eaco: eacoResponse,
-            epso: epsoResponse
-          };
-          setSimulationResults(combinedResults);
-          historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          if (useAsyncPlots) {
+            // run both algorithms with async plot generation
+            setPlotStatus('pending');
+            
+            const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots, workloadFile, true);
+            const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots, workloadFile, true);
+            
+            // extract tracking ids if async was used
+            const trackingIds = {};
+            if (eacoResponse.plotTrackingId) {
+              trackingIds.eaco = eacoResponse.plotTrackingId;
+            }
+            if (epsoResponse.plotTrackingId) {
+              trackingIds.epso = epsoResponse.plotTrackingId;
+            }
+            
+            // store results immediately (without plots)
+            const combinedResults = {
+              eaco: {
+                rawResults: eacoResponse.simulationResults || eacoResponse,
+                summary: eacoResponse.simulationResults?.summary || eacoResponse.summary
+              },
+              epso: {
+                rawResults: epsoResponse.simulationResults || epsoResponse,
+                summary: epsoResponse.simulationResults?.summary || epsoResponse.summary
+              },
+              plotsGenerating: true
+            };
+            
+            setSimulationResults(combinedResults);
+            setPlotTrackingIds(trackingIds);
+            setProgress(70);
+            
+            // start polling for plot completion in background
+            pollPlotStatus(trackingIds).then(plotData => {
+              if (plotData) {
+                // merge plot data into results
+                setSimulationResults(prev => ({
+                  ...prev,
+                  eaco: { ...prev.eaco, plotData: plotData.eaco },
+                  epso: { ...prev.epso, plotData: plotData.epso },
+                  plotsGenerating: false
+                }));
+              }
+            });
+            
+            historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          } else {
+            // use synchronous plot generation
+            const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots, workloadFile, false);
+            setProgress(70);
+            const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots, workloadFile, false);
+            
+            const combinedResults = {
+              eaco: eacoResponse,
+              epso: epsoResponse
+            };
+            setSimulationResults(combinedResults);
+            historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          }
         }
         
         clearInterval(progressInterval);
@@ -188,6 +311,8 @@ export const useSimulationRunner = () => {
     setProgress,
     simulationState,
     setSimulationState,
-    runSimulation
+    runSimulation,
+    plotStatus,
+    plotTrackingIds
   };
 };
