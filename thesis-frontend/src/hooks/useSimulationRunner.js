@@ -208,12 +208,20 @@ export const useSimulationRunner = () => {
             eaco: {
               rawResults: comparisonResults.eacoResults,
               summary: comparisonResults.eacoResults?.averageMetrics,
-              tTestResults: tTestResultsNormalized
+              tTestResults: tTestResultsNormalized,
+              iterationsAdjusted: comparisonResults.iterationsAdjusted,
+              originalIterations: comparisonResults.originalIterations,
+              adjustmentMessage: comparisonResults.adjustmentMessage,
+              iterations: comparisonResults.iterations
             },
             epso: {
               rawResults: comparisonResults.epsoResults,
               summary: comparisonResults.epsoResults?.averageMetrics,
-              tTestResults: tTestResultsNormalized
+              tTestResults: tTestResultsNormalized,
+              iterationsAdjusted: comparisonResults.iterationsAdjusted,
+              originalIterations: comparisonResults.originalIterations,
+              adjustmentMessage: comparisonResults.adjustmentMessage,
+              iterations: comparisonResults.iterations
             }
           };
           
