@@ -7,8 +7,8 @@ import { Settings, Play, Repeat, BarChart2, Info } from 'lucide-react';
 const TabNav = ({ activeTab, onChange }) => {
   const tabs = [
     { id: 'dataCenter', label: 'Data Center', icon: Settings },
-    { id: 'workload', label: 'Workload', icon: Play },
     { id: 'iterations', label: 'Iterations', icon: Repeat },
+    { id: 'workload', label: 'Workload', icon: Play },
     { id: 'history', label: 'History', icon: BarChart2 },
     { id: 'help', label: 'Help', icon: Info }
   ];

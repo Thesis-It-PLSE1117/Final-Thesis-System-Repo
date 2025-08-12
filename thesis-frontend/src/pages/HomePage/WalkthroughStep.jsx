@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Circle, ChevronRight, ArrowRight } from 'lucide-react';
+import { Circle, ChevronRight, ArrowRight, BarChart2, Clock, Battery, Calendar, Scale } from 'lucide-react';
 
 const WalkthroughStep = ({ step, index }) => {
+
   return (
     <motion.div
       className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start relative"

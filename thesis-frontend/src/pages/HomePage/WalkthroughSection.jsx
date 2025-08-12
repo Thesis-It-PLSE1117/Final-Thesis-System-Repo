@@ -1,85 +1,63 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { 
+  Zap, 
+  Server, 
+  Cpu, 
+  BarChart2, 
+  ChevronDown, 
+  Sparkles, 
+  Clock, 
+  Battery, 
+  Calendar, 
+  Scale, 
+  Info 
+} from 'lucide-react';
 import WalkthroughStep from './WalkthroughStep';
-import { Zap, Server, Cpu, BarChart2, ChevronDown, Sparkles, Code, Cloud, Database, Network } from 'lucide-react';
 
 const WalkthroughSection = ({ walkthroughSteps }) => {
+  const [hoveredMetric, setHoveredMetric] = useState(null);
+
+  const metricDescriptions = {
+    'Resource Utilization': 'Measures how effectively your server resources (CPU, memory, storage) are being used across all hosts',
+    'Response Time': 'Average time taken to complete tasks from submission to final response',
+    'Energy Efficiency': 'Evaluates power consumption relative to computational work performed',
+    'Makespan': 'Total time taken to complete all tasks in the workload',
+    'Imbalance Degree': 'Quantifies how unevenly the workload is distributed across available hosts'
+  };
+
+  const metrics = [
+    { icon: <BarChart2 size={24} />, label: 'Resource Utilization' },
+    { icon: <Clock size={24} />, label: 'Response Time' },
+    { icon: <Battery size={24} />, label: 'Energy Efficiency' },
+    { icon: <Calendar size={24} />, label: 'Makespan' },
+    { icon: <Scale size={24} />, label: 'Imbalance Degree' }
+  ];
+
   return (
     <motion.section 
       id="walkthrough"
       className="px-6 py-30 bg-white/90 backdrop-blur-sm relative overflow-hidden"
-      initial={{ opacity: 1 }}
+      initial={{ opacity: 0.8 }}
       whileInView={{ opacity: 1 }}
-      onViewportLeave={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      viewport={{ once: false, margin: "-100px" }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
     >
-      {/* Floating decorative elements */}
-      <motion.div
-        className="absolute top-20 left-10 text-[#319694]/10 z-0"
-        animate={{
-          y: [0, -30, 0],
-          rotate: [0, 15, 0],
-          opacity: [0.8, 1, 0.8]
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      >
-        <Cloud size={140} />
-      </motion.div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+      {/* Floating decorative elements - simplified */}
+      <div className="absolute top-20 left-10 text-[#319694]/8 z-0">
+        <Server size={120} />
+      </div>
       
-      <motion.div
-        className="absolute bottom-32 right-16 text-[#4fd1c5]/10 z-0"
-        animate={{
-          y: [0, 30, 0],
-          rotate: [0, -15, 0],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2
-        }}
-      >
-        <Network size={160} />
-      </motion.div>
-
-      <motion.div
-        className="absolute top-1/3 right-20 text-[#267b79]/10 z-0"
-        animate={{
-          y: [0, -20, 0],
-          x: [0, 10, 0],
-          rotate: [0, 360, 0]
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1
-        }}
-      >
-        <Database size={100} />
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-1/4 left-24 text-[#4fd1c5]/10 z-0"
-        animate={{
-          y: [0, 15, 0],
-          x: [0, -10, 0],
-          rotate: [0, -360, 0]
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 3
-        }}
-      >
-        <Code size={90} />
-      </motion.div>
+      <div className="absolute bottom-32 right-16 text-[#4fd1c5]/8 z-0">
+        <Cpu size={140} />
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
@@ -91,19 +69,14 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
         >
           <motion.div
             className="inline-flex items-center gap-2 bg-[#e0f7f6] text-[#1a5654] px-4 py-2 rounded-full mb-4 text-sm font-medium shadow-inner"
-            initial={{ scale: 0.8 }}
+            initial={{ scale: 0.9 }}
             whileInView={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.1 }}
-            viewport={{ once: false }}
+            transition={{ duration: 0.3 }}
+            viewport={{ once: true }}
           >
-            <Zap className="w-4 h-4 animate-pulse" />
-            <span>Step-by-Step Guide</span>
-            <motion.span
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Sparkles className="w-4 h-4" />
-            </motion.span>
+            <Zap className="w-4 h-4" />
+            <span>Simulation Workflow</span>
+            <Sparkles className="w-4 h-4" />
           </motion.div>
           
           <motion.h3
@@ -114,7 +87,7 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
             viewport={{ once: false }}
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-              Simulation Walkthrough
+              Data Center Simulation
             </span>
           </motion.h3>
           
@@ -125,28 +98,13 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
             transition={{ delay: 0.4 }}
             viewport={{ once: false }}
           >
-            Learn how to explore and compare different load balancing algorithms
+            Configure your data center and analyze performance metrics across multiple iterations
           </motion.p>
         </motion.div>
 
         <div className="relative">
-          <motion.div
-            className="absolute left-8 top-0 h-full w-1 bg-gradient-to-b from-[#319694] to-[#4fd1c5]"
-            initial={{ scaleY: 0, originY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            transition={{ duration: 1.5, delay: 0.5 }}
-            viewport={{ once: false }}
-          >
-            <motion.div
-              className="absolute top-0 left-0 w-full h-8 bg-white blur-md"
-              animate={{ y: [0, '100%'] }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-          </motion.div>
+          <div className="absolute left-8 top-0 h-full w-1 bg-gradient-to-b from-[#319694] to-[#4fd1c5]">
+          </div>
           
           <div className="space-y-12 pl-12">
             {walkthroughSteps.map((step, idx) => (
@@ -155,71 +113,87 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           </div>
         </div>
 
+        {/* Metrics Section with fixed positioning and improved styling */}
         <motion.div
-          className="mt-20 p-8 bg-gradient-to-r from-[#e0f7f6] to-[#c4f1ef] rounded-xl shadow-lg border border-[#319694]/20 relative overflow-hidden group"
-          initial={{ y: 30 }}
-          whileInView={{ y: 0 }}
-          transition={{ delay: 0.8, type: 'spring' }}
-          viewport={{ once: false }}
-          whileHover={{ y: -5, scale: 1.02 }}
+          className="mt-20 p-8 bg-gradient-to-r from-[#e0f7f6] to-[#c4f1ef] rounded-2xl shadow-xl border-2 border-[#319694]/20 relative overflow-visible group"
+          initial={{ y: 20, opacity: 0.8 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
         >
-          <motion.div
-            className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"
-            animate={{ 
-              backgroundPosition: ['0% 0%', '100% 100%']
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: 'linear'
-            }}
-          />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 rounded-2xl" />
           
-          <motion.div
-            className="absolute -right-6 -top-6 text-[#319694]/10"
-            animate={{
-              rotate: [0, 360]
-            }}
-            transition={{
-              duration: 30,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            <BarChart2 size={120} />
-          </motion.div>
-          
-          <div className="relative z-10">
-            <motion.div
-              className="flex items-start gap-6"
-              initial={{ opacity: 0.8 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              viewport={{ once: false }}
-            >
-              <div className="bg-white p-4 rounded-xl shadow-sm mt-1 flex-shrink-0">
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, 0]
-                  }}
-                  transition={{ 
-                    duration: 4,
-                    repeat: Infinity,
-                    repeatType: 'reverse'
-                  }}
-                >
-                  <BarChart2 className="text-[#319694]" size={28} />
-                </motion.div>
-              </div>
-              <div>
-                <h4 className="text-2xl font-bold text-gray-800 mb-4">Understanding the Results</h4>
-                <p className="text-gray-700 text-lg">
-                  By following these steps, you can explore how different load balancing algorithms distribute workloads across multiple servers. 
-                  This simulation helps in evaluating system performance and optimizing resource allocation for efficient cloud management.
-                </p>
-              </div>
-            </motion.div>
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-20 mb-8">
+            {metrics.map((metric, index) => (
+              <motion.div
+                key={index}
+                className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl border border-[#319694]/10 flex flex-col items-center text-center relative group/metric overflow-visible transition-all duration-300 hover:-translate-y-2"
+                onMouseEnter={() => setHoveredMetric(metric.label)}
+                onMouseLeave={() => setHoveredMetric(null)}
+                style={{ zIndex: hoveredMetric === metric.label ? 100 : 20 }}
+              >
+                <div className="bg-gradient-to-br from-[#f0fdfa] to-[#e0f7f6] p-4 rounded-full mb-4 text-[#319694] relative shadow-inner transition-transform duration-300 group-hover/metric:scale-110">
+                  {metric.icon}
+                  <div className="absolute -top-1 -right-1">
+                    <Info 
+                      className="w-4 h-4 text-[#319694]/80" 
+                      strokeWidth={2.5}
+                    />
+                  </div>
+                </div>
+                
+                <span className="text-sm font-semibold text-gray-800 group-hover/metric:text-[#319694] transition-colors duration-300">
+                  {metric.label}
+                </span>
+                
+                {/* Simplified tooltip */}
+                {hoveredMetric === metric.label && (
+                  <div
+                    className="absolute bottom-full mb-4 left-1/2 transform -translate-x-1/2 w-72 bg-white/98 backdrop-blur-md p-4 rounded-xl shadow-2xl border-2 border-[#319694]/20 opacity-0 animate-fadeIn"
+                    style={{ zIndex: 1000, animation: 'fadeIn 0.2s ease-out forwards' }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#319694]/10 to-[#4fd1c5]/10 rounded-xl" />
+                    
+                    <div className="relative z-10">
+                      <h5 className="text-sm font-bold text-[#319694] mb-2 flex items-center gap-2">
+                        {metric.icon}
+                        {metric.label}
+                      </h5>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {metricDescriptions[metric.label]}
+                      </p>
+                    </div>
+                    
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2">
+                      <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/98" />
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-[#319694]/20" />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Description Section */}
+          <div className="relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-4 shadow-inner border border-[#319694]/20">
+              <BarChart2 className="w-5 h-5 text-[#319694]" />
+              <span className="text-sm font-semibold text-[#267b79]">Performance Analytics</span>
+            </div>
+            
+            <h4 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#319694] mb-4">
+              Understanding the Metrics
+            </h4>
+            <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">
+              The simulation provides comprehensive metrics to evaluate your data center configuration's performance across multiple iterations. 
+              <span className="font-semibold text-[#319694]"> Hover over each metric</span> to learn more about what it measures and how it impacts your system's efficiency.
+            </p>
+          </div>
+
+          {/* Simple decorative element */}
+          <div className="absolute top-4 right-4 text-[#319694]/20">
+            <Sparkles size={24} />
           </div>
         </motion.div>
 
@@ -227,23 +201,16 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           className="mt-16 text-center"
           initial={{ opacity: 0.8 }}
           whileInView={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          viewport={{ once: false }}
+          transition={{ duration: 0.4 }}
+          viewport={{ once: true }}
         >
-          <motion.button
+          <button
             onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-            className="text-[#319694] flex flex-col items-center gap-2 mx-auto group"
-            whileHover={{ y: 5 }}
+            className="text-[#319694] flex flex-col items-center gap-2 mx-auto group transition-all duration-300 hover:-translate-y-1"
           >
-            <span className="text-sm font-medium">Continue Exploring</span>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="group-hover:animate-none"
-            >
-              <ChevronDown size={24} className="group-hover:text-[#267b79] transition-colors" />
-            </motion.div>
-          </motion.button>
+            <span className="text-sm font-medium">Ready to Simulate?</span>
+            <ChevronDown size={24} className="group-hover:text-[#267b79] transition-colors duration-300" />
+          </button>
         </motion.div>
       </div>
     </motion.section>

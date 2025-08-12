@@ -57,58 +57,57 @@ const HomePage = () => {
   const walkthroughSteps = [
     {
       icon: <Settings className="w-8 h-8" />,
-      title: "1. Configure Your Data Center",
+      title: "Configure Data Center",
       content: [
-        "Specify host and VM configurations including processing capabilities, memory, bandwidth, and storage.",
-        "Choose the load balancing algorithm to evaluate (EACO, EPSO, or compare both)."
+        "Define your data center infrastructure specifications including hosts, VMs, and their capabilities.",
+        "Set up the initial configuration for your simulation environment."
       ],
       list: [
-        "Number of Hosts",
-        "MIPS, RAM, BW, Storage specs",
-        "Number of VMs & VM Specifications",
-        "Select algorithm type"
-      ]
-    },
-    {
-      icon: <Upload className="w-8 h-8" />,
-      title: "2. Upload Workload Data",
-      content: [
-        "Upload a CSV file representing your cloudlet workload or use a predefined dataset.",
-        "The simulation uses this file to dispatch tasks during runtime."
-      ],
-      list: [
-        "Ensure CSV format is correct",
-        "Check that the row count matches your configuration",
-        "Use preset files for quicker setup"
+        "Number of physical hosts and their specifications",
+        "Virtual machine configurations (CPU, RAM, Storage)",
+        "Network bandwidth allocation",
+        "Power consumption parameters"
       ]
     },
     {
       icon: <Cpu className="w-8 h-8" />,
-      title: "3. Run the Simulation",
+      title: "Set Iteration Parameters",
       content: [
-        "After configuration and upload, start the simulation.",
-        "Tasks will be distributed to VMs based on the selected algorithm.",
-        "Animations will help visualize task allocation across the virtual infrastructure."
+        "Configure the simulation runtime parameters to control the experiment duration and granularity.",
+        "Specify the number of iterations for consistent performance evaluation."
       ],
       list: [
-        "Click 'Run Simulation'",
-        "Observe real-time animations of task scheduling",
-        "Compare fairness and optimization"
+        "Number of simulation iterations",
+        "Workload intensity levels",
+      ]
+    },
+    {
+      icon: <Upload className="w-8 h-8" />,
+      title: "Define Workload",
+      content: [
+        "Upload your workload with its traffic model or select from predefined templates.",
+        "Configure task characteristics and arrival patterns."
+      ],
+      list: [
+        "Upload CSV with task specifications",
+        "Set task arrival distribution",
+        "Define computational requirements",
+        "Configure priority levels if needed"
       ]
     },
     {
       icon: <LineChart className="w-8 h-8" />,
-      title: "4. Analyze Simulation Results",
+      title: "View Results",
       content: [
-        "Once the simulation finishes, detailed metrics will be displayed.",
-        "Results provide insight into system efficiency, including:"
+        "Analyze comprehensive performance metrics across all iterations.",
+        "Compare results and identify optimization opportunities."
       ],
       list: [
-        "Total tasks and completion rate",
-        "Makespan and average wait time",
-        "Resource utilization percentage",
-        "Per-task execution details",
-        "Algorithm-specific performance metrics"
+        "Resource utilization across hosts",
+        "Average task response time",
+        "Energy efficiency metrics",
+        "Makespan (total completion time)",
+        "Degree of imbalance in load distribution"
       ]
     }
   ];
