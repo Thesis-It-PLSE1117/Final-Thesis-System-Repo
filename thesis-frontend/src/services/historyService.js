@@ -39,11 +39,15 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
       timestamp,
       algorithm: 'EACO',
       config: fullConfig,
+      // store full rawResults if present so results view can reconstruct exactly
+      rawResults: results.eaco.rawResults || null,
       summary: results.eaco.rawResults?.summary || results.eaco.summary,
       energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
       vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
       schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
       plotData: results.eaco.plotData,
+      // store t-test results for statistical analysis display
+      tTestResults: results.eaco.tTestResults || null,
       simulationId: results.eaco.simulationId
     },
     {
@@ -51,11 +55,14 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
       timestamp,
       algorithm: 'EPSO',
       config: fullConfig,
+      rawResults: results.epso.rawResults || null,
       summary: results.epso.rawResults?.summary || results.epso.summary,
       energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
       vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
       schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
       plotData: results.epso.plotData,
+      // store t-test results for statistical analysis display
+      tTestResults: results.epso.tTestResults || null,
       simulationId: results.epso.simulationId
     }
   ];

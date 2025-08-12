@@ -169,6 +169,66 @@ export const runWithPlots = async (algorithm, config) => {
 };
 
 /**
+ * simulation with async plots - returns immediately with tracking id
+ */
+export const runWithPlotsAsync = async (algorithm, config) => {
+  const algorithmConfig = {
+    ...config,
+    optimizationAlgorithm: algorithm
+  };
+  
+  const response = await fetch(`${API_BASE}/api/simulate/async`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(algorithmConfig)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
+  }
+  
+  return response.json();
+};
+
+/**
+ * check plot generation status
+ */
+export const getPlotStatus = async (trackingId) => {
+  const response = await fetch(`${API_BASE}/api/simulate/plot-status/${trackingId}`);
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to get plot status: ${errorText}`);
+  }
+  
+  return response.json();
+};
+
+/**
+ * get completed plot results
+ */
+export const getPlotResults = async (trackingId) => {
+  const response = await fetch(`${API_BASE}/api/simulate/plot-results/${trackingId}`);
+  
+  if (response.status === 202) {
+    // plots not ready yet
+    const data = await response.json();
+    return { ready: false, ...data };
+  }
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to get plot results: ${errorText}`);
+  }
+  
+  const data = await response.json();
+  return { ready: true, ...data };
+};
+
+/**
  * normal run of statistics
  */
 export const compare = async (config) => {

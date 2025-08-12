@@ -183,9 +183,15 @@ export const normalizeTTestResults = (raw) => {
       test?.improvementPercent
     );
 
+    // Fallback: compute t-statistic if missing and values available
+    let computedT = tStatistic;
+    if (!Number.isFinite(computedT) && Number.isFinite(meanDifference) && Number.isFinite(standardError) && standardError !== 0) {
+      computedT = meanDifference / standardError;
+    }
+
     metricTests[metric] = {
       pValue,
-      tStatistic,
+      tStatistic: computedT,
       degreesOfFreedom,
       meanDifference,
       standardError,

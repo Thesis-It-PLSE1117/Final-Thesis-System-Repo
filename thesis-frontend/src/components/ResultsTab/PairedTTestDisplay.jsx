@@ -19,6 +19,26 @@ import {
 } from 'lucide-react';
 
 const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
+  // Debug: inspect incoming t-test results
+  try {
+    if (tTestResults && tTestResults.metricTests) {
+      const sample = Object.entries(tTestResults.metricTests)[0];
+      if (sample) {
+        const [name, test] = sample;
+        // eslint-disable-next-line no-console
+        console.debug('[TTEST DEBUG] Sample metric:', name, {
+          tStatistic: test?.tStatistic,
+          pValue: test?.pValue,
+          df: test?.degreesOfFreedom,
+          types: {
+            tStatistic: typeof test?.tStatistic,
+            pValue: typeof test?.pValue,
+            df: typeof test?.degreesOfFreedom,
+          },
+        });
+      }
+    }
+  } catch {}
   const [expandedMetric, setExpandedMetric] = useState(null);
   const [showMethodology, setShowMethodology] = useState(false);
 
@@ -43,17 +63,17 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
   const getMetricMeta = (metricName) => {
     switch (metricName) {
       case 'makespan':
-        return { Icon: Clock, label: 'Total Completion Time (Makespan)' };
+        return { Icon: Clock, label: 'Total Completion Time (Makespan)', unit: 'seconds', betterWhen: 'lower' };
       case 'energyConsumption':
-        return { Icon: Zap, label: 'Energy Used' };
+        return { Icon: Zap, label: 'Energy Consumption', unit: 'Wh', betterWhen: 'lower' };
       case 'resourceUtilization':
-        return { Icon: Gauge, label: 'Resource Utilization' };
+        return { Icon: Gauge, label: 'Resource Utilization', unit: '%', betterWhen: 'higher' };
       case 'responseTime':
-        return { Icon: Timer, label: 'Average Response Time' };
+        return { Icon: Timer, label: 'Average Response Time', unit: 'seconds', betterWhen: 'lower' };
       case 'loadBalance':
-        return { Icon: Scale, label: 'Load Balance' };
+        return { Icon: Scale, label: 'Degree of Imbalance (DI)', unit: 'ratio', betterWhen: 'lower' };
       default:
-        return { Icon: BarChart3, label: metricName };
+        return { Icon: BarChart3, label: metricName, unit: '', betterWhen: 'lower' };
     }
   };
 
@@ -109,13 +129,13 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
           >
             <h4 className="font-semibold text-blue-900 mb-2">Statistical Methodology</h4>
             <p className="text-sm text-blue-800 mb-2">
-              As per Chandrashekar et al. methodology, we use paired t-tests to compare
-              EPSO and EACO algorithms under identical workload conditions.
+              We use two-tailed paired t-tests on per-iteration paired differences under 
+              identical workload conditions to compare EPSO and EACO algorithms.
             </p>
             <div className="bg-white rounded p-3 font-mono text-xs">
               <p>Formula: t = d̄ / (Sd/√n)</p>
               <p className="text-gray-600 mt-1">
-                where d̄ = mean difference, Sd = std deviation, n = {sampleSize}
+                where d̄ = mean difference (EACO - EPSO), Sd = std deviation, n = {sampleSize}
               </p>
             </div>
             <p className="text-sm text-blue-800 mt-2">
@@ -178,6 +198,11 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
                   <div>
                     <h5 className="font-semibold text-gray-800" title={getMetricMeta(metricName).label} aria-label={getMetricMeta(metricName).label}>
                       {getMetricMeta(metricName).label}
+                      {getMetricMeta(metricName).betterWhen && (
+                        <span className="text-xs text-gray-500 ml-2">
+                          ({getMetricMeta(metricName).betterWhen} is better)
+                        </span>
+                      )}
                     </h5>
                     <div className="flex items-center gap-2 mt-1">
                       {test.significant ? (
@@ -227,8 +252,9 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
                   <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Mean Difference</p>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800" title="EACO - EPSO">
                         {typeof test?.meanDifference === 'number' ? test.meanDifference.toFixed(4) : '—'}
+                        <span className="text-xs text-gray-500 ml-1">{getMetricMeta(metricName).unit}</span>
                       </p>
                     </div>
                     <div>
@@ -308,7 +334,7 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
           </div>
           <div className="ml-auto flex items-center gap-1">
             <AlertCircle size={14} className="text-gray-400" />
-            <span>Based on {sampleSize} paired observations</span>
+            <span>Based on {sampleSize} paired observations (differences: EACO - EPSO)</span>
           </div>
         </div>
       </div>

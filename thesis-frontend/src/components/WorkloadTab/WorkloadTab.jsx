@@ -15,7 +15,8 @@ const WorkloadTab = ({
   onPresetSelect,
   selectedPreset,
   enableMatlabPlots,
-  onMatlabToggle
+  onMatlabToggle,
+  iterations
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -94,6 +95,7 @@ const WorkloadTab = ({
         <MatlabToggle 
           enabled={enableMatlabPlots} 
           onChange={onMatlabToggle}
+          disabled={iterations > 1}
         />
       </div>
 

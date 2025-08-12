@@ -19,11 +19,10 @@ export const normalizeData = (results) => {
   if (results.rawResults && results.rawResults.totalIterations) {
 
     const bestResult = results.rawResults.bestResult || 
-                      (results.rawResults.individualResults && results.rawResults.individualResults[0]);
+                      (results.rawResults.individualResults && results.rawResults.individualResults[0]) || {};
     
-    if (!bestResult || !bestResult.vmUtilization) {
-      console.warn('No valid bestResult found in iteration data');
-      return null;
+    if (!bestResult.vmUtilization) {
+      console.warn('No valid bestResult.vmUtilization found in iteration data; using safe defaults');
     }
     
     console.log('Processing iteration result, bestResult:', bestResult);
@@ -31,27 +30,22 @@ export const normalizeData = (results) => {
 
     const normalized = {
       ...bestResult,
-      vmUtilization: bestResult.vmUtilization.map(vm => ({
-        ...vm,
-
-        cpuUtilization: vm.cpuUtilization / 100,
-
-        numAPECloudlets: Number(vm.numAPECloudlets) || 0
-      })),
+      vmUtilization: Array.isArray(bestResult.vmUtilization)
+        ? bestResult.vmUtilization.map(vm => ({
+            ...vm,
+            cpuUtilization: (Number(vm.cpuUtilization) || 0) / 100,
+            numAPECloudlets: Number(vm.numAPECloudlets) || 0
+          }))
+        : [],
       
-
       summary: {
-        ...results.rawResults.averageMetrics,
-     
-        loadBalancePercentage: results.rawResults.averageMetrics.loadBalance !== undefined 
+        ...(results.rawResults.averageMetrics || {}),
+        loadBalancePercentage: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance !== undefined)
           ? ((1 - results.rawResults.averageMetrics.loadBalance) * 100).toFixed(2)
           : 0,
-
-        loadBalance: results.rawResults.averageMetrics.loadBalance || 0,
-
-        resourceUtilization: results.rawResults.averageMetrics.resourceUtilization,
-
-        responseTime: results.rawResults.averageMetrics.responseTime || 0
+        loadBalance: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance) || 0,
+        resourceUtilization: results.rawResults.averageMetrics ? results.rawResults.averageMetrics.resourceUtilization : 0,
+        responseTime: results.rawResults.averageMetrics ? (results.rawResults.averageMetrics.responseTime || 0) : 0
       },
 
       plotData: results.plotData,
@@ -63,32 +57,35 @@ export const normalizeData = (results) => {
     return normalized;
   }
   
-  const data = results.rawResults || results;
+  const data = results.rawResults || results || {};
   
   if (!data.vmUtilization) {
-    console.warn('No vmUtilization found in single run data');
-    return null;
+    console.warn('No vmUtilization found in single run data; using safe defaults');
   }
 
   console.log('Processing single run result');
 
   const normalized = {
     ...data,
-    vmUtilization: data.vmUtilization.map(vm => ({
-      ...vm,
-      cpuUtilization: vm.cpuUtilization / 100,
-      numAPECloudlets: Number(vm.numAPECloudlets) || 0
-    })),
+    vmUtilization: Array.isArray(data.vmUtilization)
+      ? data.vmUtilization.map(vm => ({
+          ...vm,
+          cpuUtilization: (Number(vm.cpuUtilization) || 0) / 100,
+          numAPECloudlets: Number(vm.numAPECloudlets) || 0
+        }))
+      : [],
     
-    summary: {
-      ...data.summary,
-      loadBalancePercentage: data.summary.loadBalance !== undefined 
-        ? ((1 - data.summary.loadBalance) * 100).toFixed(2)
-        : 0,
-      loadBalance: data.summary.loadBalance || 0,
-      resourceUtilization: data.summary.resourceUtilization,
-      responseTime: data.summary.responseTime || data.summary.averageResponseTime || 0
-    },
+    summary: (() => {
+      const s = data.summary || {};
+      const loadBalance = s.loadBalance !== undefined ? s.loadBalance : 0;
+      return {
+        ...s,
+        loadBalancePercentage: ((1 - loadBalance) * 100).toFixed(2),
+        loadBalance,
+        resourceUtilization: s.resourceUtilization !== undefined ? s.resourceUtilization : 0,
+        responseTime: s.responseTime || s.averageResponseTime || 0
+      };
+    })(),
     plotData: results.plotData || data.plotData
   };
   
@@ -122,8 +119,8 @@ export const keyMetrics = [
     icon: Clock
   },
   {
-    title: "Load Balance",
-    description: "Measure of load balance across VMs",
+    title: "Balance",
+    description: "Load distribution balance across VMs (100% - DI)",
     unit: "%",
     betterWhen: "higher",
     valueKey: "imbalance",
