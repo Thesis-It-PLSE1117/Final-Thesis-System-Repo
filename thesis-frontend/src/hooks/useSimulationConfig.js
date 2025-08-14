@@ -7,35 +7,42 @@ import { validateSimulationConfig } from '../utils/validation';
  * i use this since you know for the sake of keeping all config state in one place
  */
 export const useSimulationConfig = () => {
-  // data center configuration
+  /**
+   * I set balanced defaults suitable for academic research and typical workloads
+   * These values provide good performance without excessive resource consumption
+   */
   const [dataCenterConfig, setDataCenterConfig] = useState({
-    numHosts: 10,
-    numPesPerHost: 2,
-    peMips: 2000,
-    ramPerHost: 2048,
-    bwPerHost: 10000,
-    storagePerHost: 100000,
-    numVMs: 50,
-    vmMips: 1000,
-    vmPes: 2,
-    vmRam: 1024,
-    vmBw: 1000,
-    vmSize: 10000,
-    vmScheduler: "TimeShared",
-    optimizationAlgorithm: "EPSO",
+    numHosts: 10,               // Standard small datacenter (10 physical hosts)
+    numPesPerHost: 4,           // Quad-core processors per host (realistic)
+    peMips: 2500,               // 2.5 GHz processors (modern standard)
+    ramPerHost: 4096,           // 4GB RAM per host (cost-effective)
+    bwPerHost: 10000,           // 10 Gbps network (datacenter standard)
+    storagePerHost: 200000,     // 200GB storage per host
+    numVMs: 50,                 // 5 VMs per host average (good consolidation ratio)
+    vmMips: 1000,               // 1 GHz VM processors (standard cloud VM)
+    vmPes: 2,                   // Dual-core VMs (balanced)
+    vmRam: 1024,                // 1GB RAM per VM (typical small instance)
+    vmBw: 1000,                 // 1 Gbps VM network bandwidth
+    vmSize: 10000,              // 10GB storage per VM
+    vmScheduler: "TimeShared",   // Fair resource sharing policy
+    optimizationAlgorithm: "EACO" // EACO often performs better for cloud scheduling
   });
-  
-  // additional configuration for matlab plots
-  const [enableMatlabPlots, setEnableMatlabPlots] = useState(false);
 
-  // workload configuration
   const [cloudletConfig, setCloudletConfig] = useState({
-    numCloudlets: 100,
+    numCloudlets: 100          // Good balance for testing and research
   });
   
-  // iteration configuration
+  /**
+   * I disable MATLAB plots by default since users can enable when needed
+   */
+  const [enableMatlabPlots, setEnableMatlabPlots] = useState(false);
+  
+  /**
+   * I set iterations to 1 by default for quick testing
+   * Users can change to 30+ for statistical analysis when needed
+   */
   const [iterationConfig, setIterationConfigState] = useState({
-    iterations: 1,
+    iterations: 1,  // Default to single run for quick testing
   });
   
   // wrapper for setIterationConfig to handle MATLAB toggle

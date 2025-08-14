@@ -6,7 +6,7 @@
 export const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
 
 /**
- * default config
+ *
  */
 export const run = async (algorithm, config) => {
   const algorithmConfig = {
@@ -14,7 +14,8 @@ export const run = async (algorithm, config) => {
     optimizationAlgorithm: algorithm
   };
   
-  const response = await fetch(`${API_BASE}/api/run`, {
+  // Use /api/simulate/raw to get analysis with the results
+  const response = await fetch(`${API_BASE}/api/simulate/raw`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -56,7 +57,19 @@ export const runWithFile = async (algorithm, config, file) => {
     throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
   }
   
-  return response.json();
+  const result = await response.json();
+  
+  // Check if the response contains plot data (ProcessedResults structure)
+  if (result.plotData) {
+    // This is a ProcessedResults with MATLAB plots
+    return {
+      rawResults: result.rawResults || result,
+      summary: result.rawResults?.summary || result.summary,
+      plotData: result.plotData
+    };
+  }
+  
+  return result;
 };
 
 /**

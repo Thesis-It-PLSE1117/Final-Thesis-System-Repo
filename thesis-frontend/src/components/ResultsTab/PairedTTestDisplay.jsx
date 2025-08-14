@@ -15,7 +15,8 @@ import {
   Zap,
   Gauge,
   Timer,
-  Scale
+  Scale,
+  Activity
 } from 'lucide-react';
 
 const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
@@ -41,6 +42,7 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
   } catch {}
   const [expandedMetric, setExpandedMetric] = useState(null);
   const [showMethodology, setShowMethodology] = useState(false);
+  const [showInterpretation, setShowInterpretation] = useState(true);
 
   if (isLoading) {
     return (
@@ -59,7 +61,7 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
 
   const { metricTests, overallWinner, significantDifferences, sampleSize, alpha } = tTestResults;
 
-  // HCI-friendly metadata: consistent icons and descriptive labels
+  // metadata: consistent icons and descriptive labels
   const getMetricMeta = (metricName) => {
     switch (metricName) {
       case 'makespan':
@@ -312,6 +314,86 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
           </motion.div>
         ))}
       </div>
+
+      {/* for stats */}
+      {tTestResults?.interpretation && (
+        <div className="mt-6">
+          <button
+            onClick={() => setShowInterpretation(!showInterpretation)}
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg flex items-center justify-between hover:opacity-90 transition-opacity"
+          >
+            <div className="flex items-center gap-2">
+              <Activity size={20} />
+              <span className="font-semibold">Statistical Analysis Interpretation</span>
+            </div>
+            {showInterpretation ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+          
+          <AnimatePresence>
+            {showInterpretation && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-b-lg p-6"
+              >
+                {/* Overall Conclusion */}
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <Award className="text-indigo-600" size={18} />
+                    Overall Conclusion
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {tTestResults.interpretation.conclusion}
+                  </p>
+                </div>
+                
+                {/* Effect Size Explanation */}
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <TrendingUp className="text-purple-600" size={18} />
+                    Practical Significance
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {tTestResults.interpretation.effectSizeExplanation}
+                  </p>
+                </div>
+                
+                {/* Confidence Level */}
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <Info className="text-blue-600" size={18} />
+                    Confidence Level
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {tTestResults.interpretation.confidenceExplanation}
+                  </p>
+                </div>
+                
+                {/* Individual Metric Analysis */}
+                {tTestResults.interpretation.metricAnalysis && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <BarChart3 className="text-green-600" size={18} />
+                      Detailed Metric Analysis
+                    </h4>
+                    <div className="space-y-2">
+                      {Object.entries(tTestResults.interpretation.metricAnalysis).map(([metric, analysis]) => (
+                        <div key={metric} className="bg-white rounded-lg p-3 border border-gray-200">
+                          <h5 className="font-medium text-gray-800 text-sm mb-1 capitalize">
+                            {metric.replace(/([A-Z])/g, ' $1').trim()}
+                          </h5>
+                          <p className="text-sm text-gray-600 leading-relaxed">{analysis}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="mt-6 pt-6 border-t border-gray-200">
