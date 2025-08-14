@@ -27,6 +27,18 @@ const DataCenterTab = ({ config, onChange}) => {
     }));
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    // Convert empty string to 0 or keep the numeric value
+    const numericValue = value === '' ? 0 : Number(value);
+    onChange({
+      target: {
+        name,
+        value: numericValue
+      }
+    });
+  };
+
   // Generate VM cards
   useEffect(() => {
     const cards = [];
@@ -125,21 +137,27 @@ const DataCenterTab = ({ config, onChange}) => {
             label="Number of Hosts" 
             name="numHosts" 
             value={config.numHosts} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Server}
           />
           <InputField 
             label="PEs per Host" 
             name="numPesPerHost" 
             value={config.numPesPerHost} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Cpu}
           />
           <InputField 
             label="PE MIPS" 
             name="peMips" 
             value={config.peMips} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Gauge}
             unit="MIPS"
           />
@@ -147,7 +165,9 @@ const DataCenterTab = ({ config, onChange}) => {
             label="RAM per Host" 
             name="ramPerHost" 
             value={config.ramPerHost} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={MemoryStick}
             unit="MB"
           />
@@ -155,7 +175,9 @@ const DataCenterTab = ({ config, onChange}) => {
             label="Bandwidth per Host" 
             name="bwPerHost" 
             value={config.bwPerHost} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Network}
             unit="MBps"
           />
@@ -163,7 +185,9 @@ const DataCenterTab = ({ config, onChange}) => {
             label="Storage per Host" 
             name="storagePerHost" 
             value={config.storagePerHost} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Disc}
             unit="MB"
           />
@@ -182,14 +206,18 @@ const DataCenterTab = ({ config, onChange}) => {
             label="Number of VMs" 
             name="numVMs" 
             value={config.numVMs} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="0"
             icon={HardDrive}
           />
           <InputField 
             label="VM MIPS" 
             name="vmMips" 
             value={config.vmMips} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Gauge}
             unit="MIPS"
           />
@@ -197,14 +225,18 @@ const DataCenterTab = ({ config, onChange}) => {
             label="VM PEs" 
             name="vmPes" 
             value={config.vmPes} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Cpu}
           />
           <InputField 
             label="VM RAM" 
             name="vmRam" 
             value={config.vmRam} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={MemoryStick}
             unit="MB"
           />
@@ -212,7 +244,9 @@ const DataCenterTab = ({ config, onChange}) => {
             label="VM Bandwidth" 
             name="vmBw" 
             value={config.vmBw} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Network}
             unit="MBps"
           />
@@ -220,7 +254,9 @@ const DataCenterTab = ({ config, onChange}) => {
             label="VM Size" 
             name="vmSize" 
             value={config.vmSize} 
-            onChange={onChange}
+            onChange={handleInputChange}
+            type="number"
+            min="1"
             icon={Database}
             unit="MB"
           />

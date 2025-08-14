@@ -37,20 +37,21 @@ const IterationTab = ({ config, onChange }) => {
               max="100"
               value={config.iterations || 1}
               onChange={(e) => handleIterationChange(e.target.value)}
+              placeholder="1"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#319694] focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Between 1 and 100 iterations
+              Between 1 and 100 iterations (30+ recommended for academic research)
             </p>
           </div>
 
           <div className="flex items-center">
             <div className="bg-[#f0fdf4] border border-[#86efac] rounded-lg p-4 w-full">
               <p className="text-sm font-medium text-[#16a34a]">
-                Estimated Time: ~{Math.ceil((config.iterations || 1) * 2.5)} seconds
+                Estimated Time: ~{Math.ceil((config.iterations || 30) * 2.5)} seconds
               </p>
               <p className="text-xs text-[#15803d] mt-1">
-                {config.iterations > 1 ? 'Running in parallel (up to 4 at a time)' : 'Single run mode'}
+                {(config.iterations || 30) > 1 ? 'Running in parallel (up to 4 at a time)' : 'Single run mode'}
               </p>
             </div>
           </div>
@@ -76,7 +77,7 @@ const IterationTab = ({ config, onChange }) => {
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-2">
               <span className="text-[#319694] mt-1">•</span>
-              <span>Runs the simulation {config.iterations || 1} time{(config.iterations || 1) > 1 ? 's' : ''} with the same configuration</span>
+              <span>Runs the simulation {config.iterations || 30} time{(config.iterations || 30) > 1 ? 's' : ''} with the same configuration</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-[#319694] mt-1">•</span>
@@ -107,7 +108,7 @@ const IterationTab = ({ config, onChange }) => {
             <h4 className="text-lg font-medium text-gray-800">Statistics You'll Get</h4>
           </div>
           
-          {config.iterations > 1 ? (
+          {(config.iterations || 30) > 1 ? (
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
@@ -154,11 +155,11 @@ const IterationTab = ({ config, onChange }) => {
           </div>
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">Research</p>
-            <p className="text-gray-600">10-30 iterations for reliable statistics</p>
+            <p className="text-gray-600">30-50 iterations for reliable statistics</p>
           </div>
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">Publication</p>
-            <p className="text-gray-600">30-50 iterations for academic papers</p>
+            <p className="text-gray-600">50-100 iterations for academic papers</p>
           </div>
         </div>
       </motion.div>

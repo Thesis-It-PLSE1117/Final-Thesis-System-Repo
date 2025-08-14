@@ -45,7 +45,9 @@ export const useSimulationRunner = () => {
         if (useIterations) {
           return await apiClient.runIterationsWithFile(algorithm, configData, workloadFile);
         } else {
-          return await apiClient.runWithFile(algorithm, configData, workloadFile);
+          // Pass enableMatlabPlots flag with the config
+          const configWithPlots = { ...configData, enableMatlabPlots: withPlots };
+          return await apiClient.runWithFile(algorithm, configWithPlots, workloadFile);
         }
       } else {
         if (useIterations) {
@@ -204,6 +206,10 @@ export const useSimulationRunner = () => {
             console.warn('No tTestResults found in comparison response');
           }
           
+          /**
+           * I include analysis field for comparison mode 
+           * The interpretation is in tTestResults.interpretation, not separate analysis fields
+           */
           const combinedResults = {
             eaco: {
               rawResults: comparisonResults.eacoResults,
@@ -212,7 +218,9 @@ export const useSimulationRunner = () => {
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,
-              iterations: comparisonResults.iterations
+              iterations: comparisonResults.iterations,
+              // For comparison, we don't have separate analysis per algorithm
+              analysis: null
             },
             epso: {
               rawResults: comparisonResults.epsoResults,
@@ -221,7 +229,9 @@ export const useSimulationRunner = () => {
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,
-              iterations: comparisonResults.iterations
+              iterations: comparisonResults.iterations,
+              // For comparison, we don't have separate analysis per algorithm
+              analysis: null
             }
           };
           
@@ -247,15 +257,19 @@ export const useSimulationRunner = () => {
               trackingIds.epso = epsoResponse.plotTrackingId;
             }
             
-            // store results immediately (without plots)
+            /**
+             * I include analysis from backend response for async mode too
+             */
             const combinedResults = {
               eaco: {
                 rawResults: eacoResponse.simulationResults || eacoResponse,
-                summary: eacoResponse.simulationResults?.summary || eacoResponse.summary
+                summary: eacoResponse.simulationResults?.summary || eacoResponse.summary,
+                analysis: eacoResponse.analysis // Include backend analysis
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse,
-                summary: epsoResponse.simulationResults?.summary || epsoResponse.summary
+                summary: epsoResponse.simulationResults?.summary || epsoResponse.summary,
+                analysis: epsoResponse.analysis // Include backend analysis
               },
               plotsGenerating: true
             };
@@ -284,9 +298,23 @@ export const useSimulationRunner = () => {
             setProgress(70);
             const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots, workloadFile, false);
             
+            /**
+             * I extract analysis field from backend response to get interpretations
+             * The backend sends simulationResults AND analysis but we were missing it
+             */
             const combinedResults = {
-              eaco: eacoResponse,
-              epso: epsoResponse
+              eaco: {
+                rawResults: eacoResponse.simulationResults || eacoResponse.rawResults || eacoResponse,
+                summary: eacoResponse.simulationResults?.summary || eacoResponse.summary || eacoResponse.rawResults?.summary,
+                plotData: eacoResponse.plotData,
+                analysis: eacoResponse.analysis // ADD THIS - Backend interpretations!
+              },
+              epso: {
+                rawResults: epsoResponse.simulationResults || epsoResponse.rawResults || epsoResponse,
+                summary: epsoResponse.simulationResults?.summary || epsoResponse.summary || epsoResponse.rawResults?.summary,
+                plotData: epsoResponse.plotData,
+                analysis: epsoResponse.analysis // ADD THIS - Backend interpretations!
+              }
             };
             setSimulationResults(combinedResults);
             historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);

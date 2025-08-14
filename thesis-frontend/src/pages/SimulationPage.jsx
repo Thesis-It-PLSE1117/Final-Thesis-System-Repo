@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Play, Undo, Redo } from 'lucide-react';
 import { showNotification } from '../components/common/ErrorNotification';
@@ -10,12 +10,12 @@ import ProgressSteps from '../components/common/ProgressSteps';
 import Header from '../components/SimulationPage/Header';
 import TabNav from '../components/SimulationPage/TabNav';
 
-// custom hooks i created for simplicity
+// custom hooks
 import { useSimulationConfig } from '../hooks/useSimulationConfig';
 import { useUndoRedoConfig } from '../hooks/useUndoRedoConfig';
 import { useSimulationRunner } from '../hooks/useSimulationRunner';
 
-// lazy load tabs since you know for the sake of faster initial load
+// lazy load tabs
 const DataCenterTab = lazy(() => import('../components/DatacenterTab/DataCenterTab'));
 const WorkloadTab = lazy(() => import('../components/WorkloadTab/WorkloadTab'));
 const IterationTab = lazy(() => import('../components/IterationTab/IterationTab'));
@@ -28,7 +28,6 @@ import CloudLoadingModal from '../components/modals/CloudLoadingModal';
 import * as historyService from '../services/historyService';
 
 const SimulationPage = ({ onBack }) => {
-  // i use custom hooks since you know for the sake of keeping this component simple
   const config = useSimulationConfig();
   const {
     simulationResults,
@@ -45,6 +44,7 @@ const SimulationPage = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState('dataCenter');
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isCoolingDown, setIsCoolingDown] = useState(false); // Anti-spam cooldown
   const fileInputRef = useRef(null);
   
   // undo/redo functionality
@@ -79,7 +79,6 @@ const SimulationPage = ({ onBack }) => {
   const saveableConfig = config.getAllConfig();
   const { isSaving, lastSaved } = useAutoSave(saveableConfig, simulationState === 'config');
 
-  // i check for saved config since you know for the sake of resuming work
   useEffect(() => {
     const savedConfig = localStorage.getItem('simulationConfig');
     if (savedConfig) {
@@ -97,7 +96,6 @@ const SimulationPage = ({ onBack }) => {
     }
   }, []);
   
-  // i update progress step since you know for the sake of showing user where they are
   useEffect(() => {
     if (simulationState === 'config') {
       switch (activeTab) {
@@ -115,9 +113,10 @@ const SimulationPage = ({ onBack }) => {
     }
   }, [activeTab, simulationState]);
   
-  const executeSimulation = async () => {
+  const executeSimulation = useCallback(async () => {
+    if (isCoolingDown) return;
+    
     try {
-      // i validate before running since you know for the sake of preventing errors
       const totalOperations = config.dataCenterConfig.numVMs * config.cloudletConfig.numCloudlets * config.iterationConfig.iterations;
       if (totalOperations > 100000) {
         setConfirmDialog({
@@ -126,7 +125,7 @@ const SimulationPage = ({ onBack }) => {
           message: `This simulation will process ${totalOperations.toLocaleString()} operations. This may take several minutes. Do you want to continue?`,
           onConfirm: async () => {
             setConfirmDialog({ isOpen: false });
-            // i delegate to the hook since you know for the sake of keeping this simple
+            setIsCoolingDown(true);
             await runSimulation({
               dataCenterConfig: config.dataCenterConfig,
               cloudletConfig: config.cloudletConfig,
@@ -134,11 +133,13 @@ const SimulationPage = ({ onBack }) => {
               enableMatlabPlots: config.enableMatlabPlots,
               workloadFile: config.workloadFile
             });
+            setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
           }
         });
         return;
       }
       
+      setIsCoolingDown(true);
       await runSimulation({
         dataCenterConfig: config.dataCenterConfig,
         cloudletConfig: config.cloudletConfig,
@@ -146,10 +147,12 @@ const SimulationPage = ({ onBack }) => {
         enableMatlabPlots: config.enableMatlabPlots,
         workloadFile: config.workloadFile
       });
+      setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
     } catch (error) {
+      setIsCoolingDown(false);
       showNotification(`Failed to start simulation: ${error.message}`, 'error');
     }
-  };
+  }, [config, isCoolingDown, runSimulation]);
   
   const tabOrder = ['dataCenter', 'workload', 'iterations', 'history', 'help'];
   
@@ -159,8 +162,6 @@ const SimulationPage = ({ onBack }) => {
     setDirection(newIndex > currentIndex ? 1 : -1);
     setActiveTab(newTab);
   };
-  
-  // Keyboard shortcuts removed - not essential for functionality
   
   // animation variants
   const tabContentVariants = {
@@ -198,7 +199,6 @@ const SimulationPage = ({ onBack }) => {
     }
   };
   
-  // render functions
   const renderConfigContent = () => (
     <>
       <TabNav activeTab={activeTab} onChange={handleTabChange} />
@@ -239,7 +239,6 @@ const SimulationPage = ({ onBack }) => {
                 <IterationTab
                   config={config.iterationConfig}
                   onChange={(newConfig) => {
-                    // i handle the object format since you know for the sake of compatibility
                     config.setIterationConfig(newConfig);
                   }}
                 />
@@ -248,7 +247,6 @@ const SimulationPage = ({ onBack }) => {
                 <HistoryTab 
                   onBack={() => setActiveTab('dataCenter')}
                   onViewResults={(result) => {
-                    // i find paired results since you know for the sake of showing both algorithms
                     const pairedResults = historyService.getPairedHistoryResults(result.id);
                     
                     if (pairedResults) {
@@ -265,19 +263,25 @@ const SimulationPage = ({ onBack }) => {
           </motion.div>
         </AnimatePresence>
 
-        {/* i show run button only on relevant tabs */}
         {activeTab === 'workload' && (
           <div className="mt-8 flex justify-center">
             <button
               className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               onClick={executeSimulation}
-              disabled={!config.cloudletConfig.numCloudlets || isSimulating || simulationState === 'loading'}
+              disabled={
+                !config.cloudletConfig.numCloudlets || 
+                isSimulating || 
+                simulationState === 'loading' || 
+                isCoolingDown
+              }
             >
               {isSimulating || simulationState === 'loading' ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                   Processing...
                 </>
+              ) : isCoolingDown ? (
+                'Please wait...'
               ) : (
                 <>
                   <Play size={18} />
@@ -289,7 +293,6 @@ const SimulationPage = ({ onBack }) => {
         )}
       </main>
       
-      {/* floating action buttons for undo/redo */}
       {simulationState === 'config' && (
         <div className="fixed bottom-8 right-8 flex gap-2">
           <button
@@ -406,7 +409,6 @@ const SimulationPage = ({ onBack }) => {
         cancelText="Cancel"
       />
       
-      {/* i show save status since you know for the sake of user confidence */}
       {isSaving && (
         <div className="fixed bottom-4 left-4 bg-white shadow-lg px-4 py-2 rounded-lg">
           Saving...

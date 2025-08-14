@@ -113,7 +113,7 @@ export const keyMetrics = [
   {
     title: "Makespan",
     description: "Total time taken to complete all tasks",
-    unit: "sec",
+    unit: " secs",
     betterWhen: "lower",
     valueKey: "makespan",
     icon: Clock
@@ -137,7 +137,7 @@ export const keyMetrics = [
   {
     title: "Average Response Time",
     description: "Mean time taken to respond to tasks",
-    unit: "sec",
+    unit: " secs",
     betterWhen: "lower",
     valueKey: "avgResponseTime",
     icon: Gauge
@@ -145,7 +145,7 @@ export const keyMetrics = [
   {
     title: "Energy Consumption",
     description: "Total energy used by all VMs",
-    unit: "Wh",
+    unit: " Wh",
     betterWhen: "lower",
     valueKey: "energyConsumption",
     icon: BatteryFull

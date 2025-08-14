@@ -225,5 +225,10 @@ export const normalizeTTestResults = (raw) => {
       raw.significance ?? 
       raw.p_threshold
     ) ?? undefined,
+    /**
+     * I preserve the interpretation field from the backend
+     * This contains the statistical analysis explanation
+     */
+    interpretation: raw.interpretation ?? null,
   };
 };
