@@ -22,6 +22,7 @@ import AnalysisDisplay from './AnalysisDisplay';
 import AnalysisComparison from './AnalysisComparison';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 import ImageModal from '../modals/ImageModal';
+import PlotWithInterpretation from './PlotWithInterpretation';
 
 const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResults, plotData, plotsGenerating }) => {
   const [resultsRR, setResultsRR] = useState(null);
@@ -85,7 +86,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       label: 'Visualizations',
       icon: <FiActivity className="w-4 h-4" />,
       description: matlabPlotsExpected ? 'MATLAB plots and charts' : 'MATLAB plots not available for this simulation',
-      enabled: matlabPlotsExpected
+      enabled: true
     },
     {
       id: 'logs',
@@ -141,6 +142,15 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     }
   }, [eacoResults, epsoResults]);
 
+  // Debug logging for plot metadata
+  useEffect(() => {
+    console.log('=== Plot Metadata Debug ===');
+    console.log('eacoResults.plotMetadata:', eacoResults?.plotMetadata);
+    console.log('epsoResults.plotMetadata:', epsoResults?.plotMetadata);
+    console.log('eacoResults.plotData?.plotMetadata:', eacoResults?.plotData?.plotMetadata);
+    console.log('epsoResults.plotData?.plotMetadata:', epsoResults?.plotData?.plotMetadata);
+  }, [eacoResults, epsoResults]);
+
   const handleBackToAnimation = () => {
     setIsExiting(true);
     setTimeout(() => {
@@ -194,25 +204,41 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
 
   const handlePrintImage = (imageUrl, title) => {
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${title}</title>
-          <style>
-            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-            img { max-width: 100%; height: auto; }
-            @media print {
-              body { margin: 0; }
-              img { max-width: 100%; }
-            }
-          </style>
-        </head>
-        <body>
-          <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+    const doc = printWindow.document;
+    
+    // create elements safely using DOM APIs to prevent XSS
+    const html = doc.createElement('html');
+    const head = doc.createElement('head');
+    const titleElem = doc.createElement('title');
+    titleElem.textContent = title; // content assignment
+    
+    const style = doc.createElement('style');
+    style.textContent = `
+      body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+      img { max-width: 100%; height: auto; }
+      @media print {
+        body { margin: 0; }
+        img { max-width: 100%; }
+      }
+    `;
+    
+    const body = doc.createElement('body');
+    const img = doc.createElement('img');
+    img.src = imageUrl;
+    img.alt = title;
+    img.style.maxWidth = '100%';
+    img.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
+    
+    head.appendChild(titleElem);
+    head.appendChild(style);
+    body.appendChild(img);
+    html.appendChild(head);
+    html.appendChild(body);
+    
+    doc.documentElement.replaceWith(html);
   };
 
   const PlotFallback = ({ plotType, algorithm }) => {
@@ -249,6 +275,15 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
 
   const rrSummary = getSummaryData(resultsRR);
   const epsoSummary = getSummaryData(resultsEPSO);
+  const hasTTest = !!(eacoResults?.tTestResults || epsoResults?.tTestResults);
+
+  // Map frontend metric keys to backend interpretation keys
+  const mapMetricKeyToBackend = (key) => {
+    if (key === 'utilization') return 'resourceUtilization';
+    if (key === 'avgResponseTime') return 'responseTime';
+    if (key === 'imbalance') return 'loadBalance';
+    return key;
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center h-full">
@@ -298,7 +333,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             className="space-y-6"
           >
             {/* Quick Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <div className="bg-gradient-to-br from-[#319694]/10 to-[#4fd1c5]/10 rounded-lg p-4 border border-[#319694]/20">
                 <p className="text-sm text-gray-600 mb-1">Best Makespan</p>
                 <p className="text-xl font-bold text-[#319694]">
@@ -342,7 +377,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               configSnapshot: resultsEPSO?.configSnapshot,
               datasetId: resultsEPSO?.datasetId
             })}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               {resultsRR && (
                 <MetadataDisplay 
                   metadata={{
@@ -400,23 +435,24 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6"
           >
             {keyMetrics.map((metric) => (
-              <MetricCard 
-                key={`metric-${metric.valueKey}`}
-                title={metric.title}
-                description={metric.description}
-                eacoValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
-                epsoValue={epsoSummary ? epsoSummary[metric.valueKey] || 0 : 0}
-                unit={metric.unit}
-                betterWhen={metric.betterWhen}
-                icon={metric.icon}
-                backendInterpretation={{
-                  eaco: eacoResults?.analysis?.metricInterpretations?.[metric.valueKey],
-                  epso: epsoResults?.analysis?.metricInterpretations?.[metric.valueKey]
-                }}
-              />
+              <div key={`metric-${metric.valueKey}`} className="break-inside-avoid mb-6">
+                <MetricCard 
+                  title={metric.title}
+                  description={metric.description}
+                  eacoValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
+                  epsoValue={epsoSummary ? epsoSummary[metric.valueKey] || 0 : 0}
+                  unit={metric.unit}
+                  betterWhen={metric.betterWhen}
+                  icon={metric.icon}
+                  backendInterpretation={{
+                    eaco: eacoResults?.analysis?.metricInterpretations?.[mapMetricKeyToBackend(metric.valueKey)],
+                    epso: epsoResults?.analysis?.metricInterpretations?.[mapMetricKeyToBackend(metric.valueKey)]
+                  }}
+                />
+              </div>
             ))}
           </motion.div>
         );
@@ -429,7 +465,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             className="space-y-6"
           >
             {/* Highlight T-Test Results if Available */}
-            {(eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+            {hasTTest && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -454,7 +490,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             )}
             
             {/* Statistics Display */}
-            {eacoResults?.rawResults?.averageMetrics && (
+            {!hasTTest && eacoResults?.rawResults?.averageMetrics && (
               <StatisticsDisplay
                 average={eacoResults.rawResults.averageMetrics}
                 min={eacoResults.rawResults.minMetrics}
@@ -464,35 +500,35 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             )}
             
             {/* Analysis Comparison Display */}
-            {(eacoResults?.analysis || epsoResults?.analysis) && (
+            {(eacoResults?.analysis || epsoResults?.analysis) ? (
               <AnalysisComparison 
                 eacoAnalysis={eacoResults?.analysis} 
                 epsoAnalysis={epsoResults?.analysis}
               />
+            ) : (
+              // Show fallback ONLY when there are no interpretations, no t-test results,
+              // and no descriptive statistics available
+              !(eacoResults?.tTestResults || epsoResults?.tTestResults ||
+                eacoResults?.rawResults?.averageMetrics || epsoResults?.rawResults?.averageMetrics) ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-center h-64"
+                >
+                  <div className="text-center">
+                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <p className="text-gray-600 font-medium">Interpretations Not Available</p>
+                    <p className="text-gray-500 text-sm mt-2">Backend interpretation data was not provided for this run. Paired t-test and descriptive statistics (if present) are shown above.</p>
+                  </div>
+                </motion.div>
+              ) : null
             )}
           </motion.div>
         );
 
       case 'visualizations':
-        // This case should not be reachable when tab is disabled, but adding safeguard
-        if (!matlabPlotsExpected) {
-          return (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-center h-64"
-            >
-              <div className="text-center">
-                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <p className="text-gray-600 font-medium">Visualizations Not Available</p>
-                <p className="text-gray-500 text-sm mt-2">MATLAB plots were not generated for this simulation type.</p>
-              </div>
-            </motion.div>
-          );
-        }
-        
         return (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -511,8 +547,21 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               </div>
             )}
             
-            {/* MATLAB Plots Section */}
-            {renderPlots()}
+            {/* Show plots if available, otherwise show fallback message */}
+            {matlabPlotsExpected ? (
+              renderPlots()
+            ) : (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-gray-600 font-medium">Visualizations Not Available</p>
+                  <p className="text-gray-500 text-sm mt-2">MATLAB plots were not generated for this simulation type.</p>
+                  <p className="text-gray-400 text-xs mt-1">Enable MATLAB plots in simulation configuration to generate visualizations.</p>
+                </div>
+              </div>
+            )}
           </motion.div>
         );
 
@@ -526,16 +575,17 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             <div className="flex justify-between items-center">
               <h4 className="font-semibold text-gray-700 text-lg">Scheduling Logs</h4>
               <div className="relative w-64">
+ 
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiSearch className="text-gray-400" />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search logs..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                                 <input
+                   type="text"
+                   placeholder="Search logs..."
+                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent"
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                 />
               </div>
             </div>
             
@@ -596,7 +646,66 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   };
 
   /**
+   * Helper function to find plot interpretation by type
+   */
+  const findPlotInterpretation = (plotMetadata, plotType) => {
+    if (!plotMetadata || !Array.isArray(plotMetadata)) {
+      return null;
+    }
+
+    // Map frontend plot types to backend metadata types
+    const plotTypeMapping = {
+      'metrics': 'PERFORMANCE_METRICS',
+      'detailed': 'DETAILED_ANALYSIS',
+      'vm_utilization': 'VM_UTILIZATION',
+      'energy': 'ENERGY_ANALYSIS',
+      'timeline': 'SCHEDULING_TIMELINE',
+      'radar': 'RADAR_CHART'
+    };
+
+    const backendPlotType = plotTypeMapping[plotType] || plotType.toUpperCase();
+
+    // First try to find in plotMetadata array
+    console.log(`=== Finding Plot Metadata for ${plotType} ===`);
+    console.log('plotMetadata:', plotMetadata);
+    console.log('backendPlotType:', backendPlotType);
+    
+    const meta = plotMetadata.find(m => {
+      if (!m || !m.type) return false;
+      const matches = m.type.toUpperCase() === backendPlotType;
+      console.log(`Checking ${m.type} against ${backendPlotType}: ${matches}`);
+      return matches;
+    });
+
+    console.log('Found meta:', meta);
+
+    if (!meta) {
+      console.log('No meta found for plotType:', plotType);
+      return null;
+    }
+
+    // Use backend interpretation if available, otherwise return null
+    const interpretation = meta.interpretation;
+
+    console.log(`=== Plot Interpretation Debug (${plotType}) ===`);
+    console.log('meta:', meta);
+    console.log('hasBackendInterpretation:', !!meta.interpretation);
+    console.log('interpretation:', interpretation);
+
+    // Return the interpretation object with consistent structure
+    return {
+      summary: interpretation?.summary || 'No interpretation available',
+      keyFindings: interpretation?.keyFindings || null,
+      recommendations: interpretation?.recommendations || null,
+      metricExplanations: interpretation?.metricExplanations || null,
+      performanceGrade: interpretation?.performanceGrade || null,
+      dataPoints: meta.dataPoints || null
+    };
+  };
+
+  /**
    * I extract plots rendering to a separate function for cleaner code
+   * Now enhanced with integrated interpretations
    */
   const renderPlots = () => {
     if (!plotData || Object.keys(plotData).length === 0) {
@@ -625,6 +734,23 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     const epsoData = plotData.epso;
     const plotTypes = ['metrics', 'detailed', 'vm_utilization', 'energy', 'timeline', 'radar'];
     
+    // Get plot metadata/interpretations from results
+    // Based on the network response, plotMetadata is in plotData.plotMetadata
+    const eacoPlotMetadata = plotData?.eaco?.plotMetadata || [];
+    const epsoPlotMetadata = plotData?.epso?.plotMetadata || [];
+
+    console.log('=== Plot Metadata Access Debug ===');
+    console.log('plotData:', plotData);
+    console.log('plotData?.eaco:', plotData?.eaco);
+    console.log('plotData?.eaco?.plotMetadata:', plotData?.eaco?.plotMetadata);
+    console.log('plotData?.epso?.plotMetadata:', plotData?.epso?.plotMetadata);
+    console.log('Final eacoPlotMetadata:', eacoPlotMetadata);
+    console.log('Final epsoPlotMetadata:', epsoPlotMetadata);
+    console.log('eacoPlotMetadata length:', eacoPlotMetadata?.length);
+    console.log('epsoPlotMetadata length:', epsoPlotMetadata?.length);
+    
+
+    
     return (
       <div className="space-y-8">
         {plotTypes.map((type) => {
@@ -641,106 +767,62 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: plotTypes.indexOf(type) * 0.1 }}
-              className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-200"
+              className="space-y-4"
             >
-              <h5 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              <h5 className="text-lg font-semibold text-gray-800 text-center">
                 {plotTitle}
               </h5>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* EACO Plot */}
-                <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 group">
-                  <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200">
-                    EACO Algorithm
-                  </div>
-                  {eacoPlot && !plotLoadErrors.eaco[type] ? (
-                    <div className="relative" onClick={() => setModalImage({ isOpen: true, src: `${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`, alt: `EACO ${plotTitle}` })}>
-                      <img 
-                        src={`${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`} 
-                        alt={`EACO ${plotTitle}`}
-                        className="w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-95 transition-opacity"
-                        onError={() => handleImageError('eaco', type)}
-                      />
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownloadImage(`${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`, `eaco_${type}.png`, 'eaco');
-                            }}
-                            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
-                            title="Download image"
-                          >
-                            <FiDownload className="w-4 h-4" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePrintImage(`${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`, `EACO - ${plotTitle}`);
-                            }}
-                            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
-                            title="Print image"
-                          >
-                            <FiPrinter className="w-4 h-4" />
-                          </motion.button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <PlotFallback plotType={type} algorithm="EACO" />
-                  )}
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                {/* EACO Plot with Interpretation */}
+                {eacoPlot && (
+                  <PlotWithInterpretation
+                    plotUrl={`${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`}
+                    plotTitle={plotTitle}
+                    algorithm="EACO"
+                    interpretation={findPlotInterpretation(eacoPlotMetadata, type)}
+                    onImageClick={() => setModalImage({
+                      isOpen: true,
+                      src: `${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      alt: `EACO ${plotTitle}`
+                    })}
+                    onDownload={() => handleDownloadImage(
+                      `${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      `eaco_${type}.png`,
+                      'eaco'
+                    )}
+                    onPrint={() => handlePrintImage(
+                      `${API_BASE}/api/plots/${eacoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      `EACO - ${plotTitle}`
+                    )}
+                    onError={() => handleImageError('eaco', type)}
+                  />
+                )}
                 
-                {/* EPSO Plot */}
-                <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 group">
-                  <div className="bg-white text-gray-700 px-3 py-2 text-sm font-medium text-center border-b border-gray-200">
-                    EPSO Algorithm
-                  </div>
-                  {epsoPlot && !plotLoadErrors.epso[type] ? (
-                    <div className="relative" onClick={() => setModalImage({ isOpen: true, src: `${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`, alt: `EPSO ${plotTitle}` })}>
-                      <img 
-                        src={`${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`} 
-                        alt={`EPSO ${plotTitle}`}
-                        className="w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-95 transition-opacity"
-                        onError={() => handleImageError('epso', type)}
-                      />
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownloadImage(`${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`, `epso_${type}.png`, 'epso');
-                            }}
-                            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
-                            title="Download image"
-                          >
-                            <FiDownload className="w-4 h-4" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePrintImage(`${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`, `EPSO - ${plotTitle}`);
-                            }}
-                            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg shadow-md hover:bg-white transition-colors"
-                            title="Print image"
-                          >
-                            <FiPrinter className="w-4 h-4" />
-                          </motion.button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <PlotFallback plotType={type} algorithm="EPSO" />
-                  )}
-                </div>
+                {/* EPSO Plot with Interpretation */}
+                {epsoPlot && (
+                  <PlotWithInterpretation
+                    plotUrl={`${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`}
+                    plotTitle={plotTitle}
+                    algorithm="EPSO"
+                    interpretation={findPlotInterpretation(epsoPlotMetadata, type)}
+                    onImageClick={() => setModalImage({
+                      isOpen: true,
+                      src: `${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      alt: `EPSO ${plotTitle}`
+                    })}
+                    onDownload={() => handleDownloadImage(
+                      `${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      `epso_${type}.png`,
+                      'epso'
+                    )}
+                    onPrint={() => handlePrintImage(
+                      `${API_BASE}/api/plots/${epsoPlot.replace(/\\/g, '/').replace('plots/', '')}`,
+                      `EPSO - ${plotTitle}`
+                    )}
+                    onError={() => handleImageError('epso', type)}
+                  />
+                )}
               </div>
             </motion.div>
           );
@@ -793,27 +875,22 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               key={tab.id}
               onClick={() => tab.enabled && setActiveTab(tab.id)}
               disabled={!tab.enabled}
-              className={`
-                group relative py-4 px-1 flex items-center gap-2 text-sm font-medium border-b-2 transition-colors
-                ${!tab.enabled 
-                  ? 'border-transparent text-gray-300 cursor-not-allowed'
-                  : activeTab === tab.id
-                    ? 'border-[#319694] text-[#319694]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }
-              `}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
-              aria-disabled={!tab.enabled}
+                             className={`
+                 group relative py-4 px-1 flex items-center gap-2 text-sm font-medium border-b-2 transition-colors
+                 ${!tab.enabled 
+                   ? 'border-transparent text-gray-300 cursor-not-allowed'
+                   : activeTab === tab.id
+                     ? 'border-[#319694] text-[#319694]'
+                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                 }
+               `}
             >
               <div className={!tab.enabled ? 'opacity-50' : ''}>
                 {tab.icon}
               </div>
               <span className={!tab.enabled ? 'opacity-50' : ''}>{tab.label}</span>
               
-              {/* Disabled badge for Visualizations tab */}
-              {tab.id === 'visualizations' && !tab.enabled && (
-                <span className="ml-1 text-xs text-gray-400">(N/A)</span>
-              )}
+
               
               {/* Badge for T-Test Results on Analysis Tab */}
               {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
@@ -845,6 +922,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
+              
             >
               {renderTabContent()}
             </motion.div>

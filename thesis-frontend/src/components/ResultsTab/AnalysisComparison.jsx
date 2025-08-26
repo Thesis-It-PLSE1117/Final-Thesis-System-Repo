@@ -16,6 +16,7 @@ import {
   GitCompare,
   ArrowRight
 } from 'lucide-react';
+import PlotInterpretationCard from './PlotInterpretationCard';
 
 /**
  * AnalysisComparison Component
@@ -28,7 +29,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis }) => {
     metrics: false,
     efficiency: false,
     recommendations: false,
-    plots: false
+    plots: true
   });
 
   const [comparisonMode, setComparisonMode] = useState('side-by-side'); // 'side-by-side' or 'toggle'
@@ -414,6 +415,59 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis }) => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Plot Interpretations Comparison - render only when we actually have data */}
+      {(() => {
+        const hasEacoPlots = Array.isArray(eacoAnalysis?.plotInterpretations) && eacoAnalysis.plotInterpretations.length > 0;
+        const hasEpsoPlots = Array.isArray(epsoAnalysis?.plotInterpretations) && epsoAnalysis.plotInterpretations.length > 0;
+        const hasAnyPlots = hasEacoPlots || hasEpsoPlots;
+        if (!hasAnyPlots) return null;
+        return (
+          <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+            <button
+              onClick={() => toggleSection('plots')}
+              className="w-full px-6 py-4 bg-gradient-to-r from-[#319694]/60 to-[#319694]/40 text-white flex items-center justify-between hover:from-[#267b79]/60 hover:to-[#267b79]/40 transition-all">
+              <div className="flex items-center gap-3">
+                <Info size={24} />
+                <h3 className="text-xl font-bold">Visualization Interpretations</h3>
+              </div>
+              {expandedSections.plots ? <ChevronUp size={20} /> : <ChevronDown size={20} /> }
+            </button>
+
+            <AnimatePresence>
+              {expandedSections.plots && (
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  exit={{ height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {hasEacoPlots && (
+                        <div>
+                          <h4 className="text-lg font-bold text-[#319694] mb-4">EACO Interpretations</h4>
+                          {eacoAnalysis.plotInterpretations.map((interpretation) => (
+                            <PlotInterpretationCard key={interpretation.plotId} interpretation={interpretation} />
+                          ))}
+                        </div>
+                      )}
+                      {hasEpsoPlots && (
+                        <div>
+                          <h4 className="text-lg font-bold text-purple-600 mb-4">EPSO Interpretations</h4>
+                          {epsoAnalysis.plotInterpretations.map((interpretation) => (
+                            <PlotInterpretationCard key={interpretation.plotId} interpretation={interpretation} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })()}
     </motion.div>
   );
 };

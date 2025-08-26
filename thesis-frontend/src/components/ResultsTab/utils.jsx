@@ -44,7 +44,7 @@ export const normalizeData = (results) => {
           ? ((1 - results.rawResults.averageMetrics.loadBalance) * 100).toFixed(2)
           : 0,
         loadBalance: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance) || 0,
-        resourceUtilization: results.rawResults.averageMetrics ? results.rawResults.averageMetrics.resourceUtilization : 0,
+        resourceUtilization: results.rawResults.averageMetrics ? (results.rawResults.averageMetrics.resourceUtilization || results.rawResults.averageMetrics.utilization || 0) : 0,
         responseTime: results.rawResults.averageMetrics ? (results.rawResults.averageMetrics.responseTime || 0) : 0
       },
 
@@ -82,7 +82,7 @@ export const normalizeData = (results) => {
         ...s,
         loadBalancePercentage: ((1 - loadBalance) * 100).toFixed(2),
         loadBalance,
-        resourceUtilization: s.resourceUtilization !== undefined ? s.resourceUtilization : 0,
+        resourceUtilization: s.resourceUtilization !== undefined ? s.resourceUtilization : (s.utilization !== undefined ? s.utilization : 0),
         responseTime: s.responseTime || s.averageResponseTime || 0
       };
     })(),
@@ -103,7 +103,7 @@ export const getSummaryData = (results) => {
                (results.summary.loadBalance !== undefined 
                  ? ((1 - results.summary.loadBalance) * 100).toFixed(2)
                  : '0'),
-    utilization: (results.summary.resourceUtilization || 0).toFixed(2),
+    utilization: (results.summary.resourceUtilization || results.summary.utilization || 0).toFixed(2),
     avgResponseTime: (results.summary.responseTime || results.summary.averageResponseTime || 0).toFixed(2),
     energyConsumption: (results.summary.energyConsumption || 0).toFixed(2)
   };

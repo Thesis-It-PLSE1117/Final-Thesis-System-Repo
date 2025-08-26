@@ -38,11 +38,11 @@ export const useSimulationConfig = () => {
   const [enableMatlabPlots, setEnableMatlabPlots] = useState(false);
   
   /**
-   * I set iterations to 1 by default for quick testing
-   * Users can change to 30+ for statistical analysis when needed
+   * I set iterations to 30 by default for better statistical analysis
+   * This provides more reliable results for academic research
    */
   const [iterationConfig, setIterationConfigState] = useState({
-    iterations: 1,  // Default to single run for quick testing
+    iterations: 30,  // Default to 30 iterations for better analysis
   });
   
   // wrapper for setIterationConfig to handle MATLAB toggle

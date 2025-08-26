@@ -58,17 +58,29 @@ export const runWithFile = async (algorithm, config, file) => {
   }
   
   const result = await response.json();
-  
-  // Check if the response contains plot data (ProcessedResults structure)
+
+  // prefer unified response that includes analysis when available
+  if (result.analysis) {
+    return {
+      rawResults: result.simulationResults || result.rawResults || result,
+      summary: (result.simulationResults?.summary) || (result.rawResults?.summary) || result.summary,
+      analysis: result.analysis,
+      plotData: result.plotData || undefined,
+      plotMetadata: result.plotMetadata || undefined
+    };
+  }
+
+  // processedResults shape from MATLAB
   if (result.plotData) {
-    // This is a ProcessedResults with MATLAB plots
     return {
       rawResults: result.rawResults || result,
       summary: result.rawResults?.summary || result.summary,
-      plotData: result.plotData
+      plotData: result.plotData,
+      plotMetadata: result.plotMetadata
     };
   }
-  
+
+  // Raw SimulationResults
   return result;
 };
 
@@ -178,7 +190,17 @@ export const runWithPlots = async (algorithm, config) => {
     throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
   }
   
-  return response.json();
+  const result = await response.json();
+  
+  // Log the raw response from backend
+  console.log('Backend Response (runWithPlots):', {
+    result,
+    plotData: result.plotData,
+    plotMetadata: result.plotMetadata,
+    rawResults: result.rawResults
+  });
+
+  return result;
 };
 
 /**
@@ -189,6 +211,8 @@ export const runWithPlotsAsync = async (algorithm, config) => {
     ...config,
     optimizationAlgorithm: algorithm
   };
+  
+  console.log('Starting async simulation for algorithm:', algorithm, 'with config:', algorithmConfig);
   
   const response = await fetch(`${API_BASE}/api/simulate/async`, {
     method: 'POST',
@@ -203,7 +227,14 @@ export const runWithPlotsAsync = async (algorithm, config) => {
     throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
   }
   
-  return response.json();
+  const result = await response.json();
+  console.log('Async Simulation Started:', {
+    trackingId: result.trackingId,
+    status: result.status,
+    result
+  });
+  
+  return result;
 };
 
 /**
@@ -217,17 +248,25 @@ export const getPlotStatus = async (trackingId) => {
     throw new Error(`Failed to get plot status: ${errorText}`);
   }
   
-  return response.json();
+  const status = await response.json();
+  console.log('Plot Generation Status:', {
+    trackingId,
+    status,
+    isComplete: status.isComplete,
+    progress: status.progress
+  });
+  
+  return status;
 };
 
+
 /**
- * get completed plot results
+ * get completed plot results 
  */
 export const getPlotResults = async (trackingId) => {
   const response = await fetch(`${API_BASE}/api/simulate/plot-results/${trackingId}`);
   
   if (response.status === 202) {
-    // plots not ready yet
     const data = await response.json();
     return { ready: false, ...data };
   }
@@ -238,8 +277,36 @@ export const getPlotResults = async (trackingId) => {
   }
   
   const data = await response.json();
-  return { ready: true, ...data };
+
+  // Debug the metadata structure
+  console.log('Plot Metadata Structure:', {
+    rootMetadata: data.plotMetadata,
+    plotDataMetadata: data.plotData?.plotMetadata,
+    hasRootMetadata: !!data.plotMetadata,
+    hasPlotDataMetadata: !!data.plotData?.plotMetadata,
+    rootMetadataLength: data.plotMetadata?.length || 0,
+    plotDataMetadataLength: data.plotData?.plotMetadata?.length || 0
+  });
+  
+  // CORRECTED: Use root-level plotMetadata which contains interpretations
+  const plotMetadata = data.plotMetadata || [];
+  
+  console.log('Selected plotMetadata:', plotMetadata);
+
+  return {
+    ready: true,
+    simulationId: data.simulationId,
+    rawResults: data.rawResults,
+    plotData: {
+      ...data.plotData,
+      plotMetadata: plotMetadata, // This now has the interpretations
+      metrics: data.plotData?.metrics,
+      plotPaths: data.plotData?.plotPaths,
+      algorithm: data.plotData?.algorithm
+    }
+  };
 };
+
 
 /**
  * normal run of statistics
