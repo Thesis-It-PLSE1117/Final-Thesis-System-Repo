@@ -47,11 +47,8 @@ const IterationTab = ({ config, onChange }) => {
 
           <div className="flex items-center">
             <div className="bg-[#f0fdf4] border border-[#86efac] rounded-lg p-4 w-full">
-              <p className="text-sm font-medium text-[#16a34a]">
-                Estimated Time: ~{Math.ceil((config.iterations || 30) * 2.5)} seconds
-              </p>
-              <p className="text-xs text-[#15803d] mt-1">
-                {(config.iterations || 30) > 1 ? 'Running in parallel (up to 4 at a time)' : 'Single run mode'}
+              <p className="text-xs text-[#15803d]">
+                {(config.iterations || 30) > 1 ? 'Multiple iterations enabled' : 'Single iteration'}
               </p>
             </div>
           </div>
@@ -151,7 +148,7 @@ const IterationTab = ({ config, onChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">Quick Test</p>
-            <p className="text-gray-600">1-5 iterations for basic validation</p>
+            <p className="text-gray-600">30 iterations for basic validation</p>
           </div>
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">Research</p>

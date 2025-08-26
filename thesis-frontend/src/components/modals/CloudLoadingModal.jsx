@@ -111,9 +111,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
               <Clock size={14} />
               <span>Elapsed: {formatTime(elapsedTime)}</span>
             </div>
-            <span className="text-sm text-gray-600">
-              {estimateRemainingTime()}
-            </span>
+            
           </div>
           
           {/* Progress bar */}
@@ -160,7 +158,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
               <span className="text-purple-800 font-medium text-sm">Running Multiple Iterations</span>
             </div>
             <p className="text-xs text-purple-700 mt-1">
-              Executing {iterations} simulation runs in parallel (up to 4 at a time)
+              Executing {iterations} simulation run{iterations > 1 ? 's' : ''}
             </p>
           </div>
         )}

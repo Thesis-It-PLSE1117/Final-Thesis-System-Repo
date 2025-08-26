@@ -84,10 +84,12 @@ export const useSimulationRunner = () => {
           const plotData = {};
           for (const [algo, id] of Object.entries(trackingIds)) {
             const results = await apiClient.getPlotResults(id);
+            console.log(`Plot results for ${algo}:`, results);
             if (results.ready && results.plotData) {
               plotData[algo.toLowerCase()] = results.plotData;
             }
           }
+          console.log('Final plotData:', plotData);
           return { completed: true, data: plotData };
         } else if (anyFailed) {
           setPlotStatus('failed');
@@ -264,12 +266,14 @@ export const useSimulationRunner = () => {
               eaco: {
                 rawResults: eacoResponse.simulationResults || eacoResponse,
                 summary: eacoResponse.simulationResults?.summary || eacoResponse.summary,
-                analysis: eacoResponse.analysis // Include backend analysis
+                analysis: eacoResponse.analysis, // Include backend analysis
+                plotMetadata: eacoResponse.plotMetadata // Include plot metadata for interpretations
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse,
                 summary: epsoResponse.simulationResults?.summary || epsoResponse.summary,
-                analysis: epsoResponse.analysis // Include backend analysis
+                analysis: epsoResponse.analysis, // Include backend analysis
+                plotMetadata: epsoResponse.plotMetadata // Include plot metadata for interpretations
               },
               plotsGenerating: true
             };
@@ -281,13 +285,26 @@ export const useSimulationRunner = () => {
             // start polling for plot completion in background
             pollPlotStatus(trackingIds).then(plotData => {
               if (plotData) {
+                console.log('Merging plot data:', plotData);
                 // merge plot data into results
-                setSimulationResults(prev => ({
-                  ...prev,
-                  eaco: { ...prev.eaco, plotData: plotData.eaco },
-                  epso: { ...prev.epso, plotData: plotData.epso },
-                  plotsGenerating: false
-                }));
+                setSimulationResults(prev => {
+                  const updatedResults = {
+                    ...prev,
+                    eaco: { 
+                      ...prev.eaco, 
+                      plotData: plotData.eaco,
+                      plotMetadata: plotData.eaco?.plotMetadata || plotData.eaco?.plotData?.plotMetadata || prev.eaco?.plotMetadata // Merge plot metadata from multiple possible locations
+                    },
+                    epso: { 
+                      ...prev.epso, 
+                      plotData: plotData.epso,
+                      plotMetadata: plotData.epso?.plotMetadata || plotData.epso?.plotData?.plotMetadata || prev.epso?.plotMetadata // Merge plot metadata from multiple possible locations
+                    },
+                    plotsGenerating: false
+                  };
+                  console.log('Updated simulation results:', updatedResults);
+                  return updatedResults;
+                });
               }
             });
             
@@ -307,13 +324,15 @@ export const useSimulationRunner = () => {
                 rawResults: eacoResponse.simulationResults || eacoResponse.rawResults || eacoResponse,
                 summary: eacoResponse.simulationResults?.summary || eacoResponse.summary || eacoResponse.rawResults?.summary,
                 plotData: eacoResponse.plotData,
-                analysis: eacoResponse.analysis // ADD THIS - Backend interpretations!
+                analysis: eacoResponse.analysis, // ADD THIS - Backend interpretations!
+                plotMetadata: eacoResponse.plotMetadata // ADD THIS - Plot metadata for interpretations!
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse.rawResults || epsoResponse,
                 summary: epsoResponse.simulationResults?.summary || epsoResponse.summary || epsoResponse.rawResults?.summary,
                 plotData: epsoResponse.plotData,
-                analysis: epsoResponse.analysis // ADD THIS - Backend interpretations!
+                analysis: epsoResponse.analysis, // ADD THIS - Backend interpretations!
+                plotMetadata: epsoResponse.plotMetadata // ADD THIS - Plot metadata for interpretations!
               }
             };
             setSimulationResults(combinedResults);

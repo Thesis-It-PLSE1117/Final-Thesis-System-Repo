@@ -60,18 +60,33 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
   }
 
   const { metricTests, overallWinner, significantDifferences, sampleSize, alpha } = tTestResults;
+  // Derive significant count to ensure UI consistency even if backend count is stale
+  const derivedSignificant = Object.values(metricTests || {}).filter((t) => t && t.significant).length;
+  const significantCount = typeof significantDifferences === 'number' ? significantDifferences : derivedSignificant;
+
+  const detectAlgorithmFromText = (text) => {
+    if (!text || typeof text !== 'string') return null;
+    const patterns = [
+      { alg: 'EPSO', regex: /EPSO[^.]{0,60}(advantage|better|improvement|performs|superior)/i },
+      { alg: 'EACO', regex: /EACO[^.]{0,60}(advantage|better|improvement|performs|superior)/i },
+    ];
+    for (const p of patterns) {
+      if (p.regex.test(text)) return p.alg;
+    }
+    return null;
+  };
 
   // metadata: consistent icons and descriptive labels
   const getMetricMeta = (metricName) => {
     switch (metricName) {
       case 'makespan':
-        return { Icon: Clock, label: 'Total Completion Time (Makespan)', unit: 'seconds', betterWhen: 'lower' };
+        return { Icon: Clock, label: 'Total Completion Time (Makespan)', unit: 'secs', betterWhen: 'lower' };
       case 'energyConsumption':
         return { Icon: Zap, label: 'Energy Consumption', unit: 'Wh', betterWhen: 'lower' };
       case 'resourceUtilization':
         return { Icon: Gauge, label: 'Resource Utilization', unit: '%', betterWhen: 'higher' };
       case 'responseTime':
-        return { Icon: Timer, label: 'Average Response Time', unit: 'seconds', betterWhen: 'lower' };
+        return { Icon: Timer, label: 'Average Response Time', unit: 'secs', betterWhen: 'lower' };
       case 'loadBalance':
         return { Icon: Scale, label: 'Degree of Imbalance (DI)', unit: 'ratio', betterWhen: 'lower' };
       default:
@@ -167,7 +182,7 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold text-[#319694]">
-              {significantDifferences}/{Object.keys(metricTests || {}).length}
+              {significantCount}/{Object.keys(metricTests || {}).length}
             </p>
             <p className="text-sm text-gray-600">Significant Metrics</p>
           </div>
@@ -211,7 +226,7 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
                         <>
                           <CheckCircle className="text-green-500" size={16} />
                           <span className="text-sm text-green-600 font-medium">
-                            Significant: {test.betterAlgorithm} performs {test.improvementPercentage.toFixed(2)}% better
+                            Significant: {test.betterAlgorithm} performs {Number(test.improvementPercentage).toFixed(2)}% better
                           </span>
                         </>
                       ) : (
@@ -378,14 +393,22 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
                       Detailed Metric Analysis
                     </h4>
                     <div className="space-y-2">
-                      {Object.entries(tTestResults.interpretation.metricAnalysis).map(([metric, analysis]) => (
-                        <div key={metric} className="bg-white rounded-lg p-3 border border-gray-200">
-                          <h5 className="font-medium text-gray-800 text-sm mb-1 capitalize">
-                            {metric.replace(/([A-Z])/g, ' $1').trim()}
-                          </h5>
-                          <p className="text-sm text-gray-600 leading-relaxed">{analysis}</p>
-                        </div>
-                      ))}
+                      {Object.entries(tTestResults.interpretation.metricAnalysis).map(([metric, analysis]) => {
+                        const claimed = detectAlgorithmFromText(analysis);
+                        const test = metricTests?.[metric];
+                        const consistent = !test || !test.significant || !claimed || claimed === test.betterAlgorithm;
+                        return (
+                          <div key={metric} className={`bg-white rounded-lg p-3 border ${consistent ? 'border-gray-200' : 'border-amber-300'}`}>
+                            <h5 className="font-medium text-gray-800 text-sm mb-1 capitalize">
+                              {metric.replace(/([A-Z])/g, ' $1').trim()}
+                              {!consistent && (
+                                <span className="ml-2 text-xs text-amber-700">(note: text vs t-test mismatch)</span>
+                              )}
+                            </h5>
+                            <p className="text-sm text-gray-600 leading-relaxed">{analysis}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

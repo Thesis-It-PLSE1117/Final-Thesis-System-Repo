@@ -39,14 +39,14 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
             ? (epsoData.summary.loadBalance * 100).toFixed(2)
             : '0',
           makespan: (epsoData.summary?.makespan || 0).toFixed(2),
-          utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
+          utilization: (epsoData.summary?.resourceUtilization || epsoData.summary?.utilization || 0).toFixed(2)
         },
         EACO: {
           imbalance: eacoData.summary?.loadBalance !== undefined 
             ? (eacoData.summary.loadBalance * 100).toFixed(2)
             : '0',
           makespan: (eacoData.summary?.makespan || 0).toFixed(2),
-          utilization: (eacoData.summary?.resourceUtilization || 0).toFixed(2)
+          utilization: (eacoData.summary?.resourceUtilization || eacoData.summary?.utilization || 0).toFixed(2)
         }
       });
 

@@ -44,11 +44,21 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
   const absPercentDiff = Math.abs(percentDiff);
   
   // Statistical significance thresholds
-  const isNegligible = absPercentDiff < 1;
-  const isMarginal = absPercentDiff >= 1 && absPercentDiff < 5;
-  const isModerate = absPercentDiff >= 5 && absPercentDiff < 15;
-  const isSignificant = absPercentDiff >= 15 && absPercentDiff < 30;
-  const isSubstantial = absPercentDiff >= 30;
+     const isNegligible = absPercentDiff < 1;
+   const isMarginal = absPercentDiff >= 1 && absPercentDiff < 5;
+   const isModerate = absPercentDiff >= 5 && absPercentDiff < 15;
+   const isSignificant = absPercentDiff >= 15 && absPercentDiff < 30;
+   const isSubstantial = absPercentDiff >= 30;
+   
+   // Enhanced significance indicators
+   const getSignificanceLevel = () => {
+     if (isNegligible) return { level: 'Negligible', color: 'gray', icon: 'minus' };
+     if (isMarginal) return { level: 'Marginal', color: 'yellow', icon: 'info' };
+     if (isModerate) return { level: 'Moderate', color: 'orange', icon: 'trending-up' };
+     if (isSignificant) return { level: 'Significant', color: 'red', icon: 'alert-triangle' };
+     if (isSubstantial) return { level: 'Substantial', color: 'purple', icon: 'zap' };
+     return { level: 'Unknown', color: 'gray', icon: 'help-circle' };
+   };
   
   const isEqual = isNegligible;
   const isBetter = isEqual ? 'equal' : (betterWhen === "higher" ? 
@@ -56,34 +66,89 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
     (epsoNum < eacoNum ? 'epso' : 'eaco'));
 
   /**
-   * I only show backend interpretation or basic comparison, no inaccurate placeholders
+   * I only show backend interpretation or basic comparison so no inaccurate 
    */
   const getStatisticalAnalysis = () => {
-    // Use backend interpretation if available
     if (hasBackendInterpretation) {
-      const interpretation = backendInterpretation.eaco || backendInterpretation.epso;
+      const eacoInterpretation = backendInterpretation.eaco || '';
+      const epsoInterpretation = backendInterpretation.epso || '';
+      
+      // Extract key insights from interpretations
+      const extractValue = (text) => {
+        const match = text.match(/(\d+\.?\d*)\s*(seconds?|%|Wh|units?)/i);
+        return match ? `${match[1]}${match[2]}` : null;
+      };
+      
+      const extractAssessment = (text) => {
+        const assessments = ['excellent', 'good', 'moderate', 'poor', 'needs improvement'];
+        const lowerText = text.toLowerCase();
+        for (const assessment of assessments) {
+          if (lowerText.includes(assessment)) {
+            return assessment;
+          }
+        }
+        return null;
+      };
+      
+      let userFriendlyInterpretation = '';
+      
+      if (eacoInterpretation && epsoInterpretation) {
+        const eacoValue = extractValue(eacoInterpretation);
+        const epsoValue = extractValue(epsoInterpretation);
+        const eacoAssessment = extractAssessment(eacoInterpretation);
+        const epsoAssessment = extractAssessment(epsoInterpretation);
+        
+        // Build consistent comparison format
+        if (eacoValue && epsoValue) {
+          userFriendlyInterpretation = `${title}: EACO (${eacoValue}) vs EPSO (${epsoValue})`;
+        } else {
+          userFriendlyInterpretation = `${title}: Comparison available`;
+        }
+        
+        // Add consistent assessment format
+        if (eacoAssessment && epsoAssessment) {
+          if (eacoAssessment === epsoAssessment) {
+            userFriendlyInterpretation += `. Both algorithms show ${eacoAssessment} performance`;
+          } else {
+            userFriendlyInterpretation += `. EACO: ${eacoAssessment}, EPSO: ${epsoAssessment}`;
+          }
+        }
+        
+        // Add consistent performance difference format
+        if (!isEqual) {
+          userFriendlyInterpretation += `. ${isBetter === 'epso' ? 'EPSO' : 'EACO'} performs ${absPercentDiff.toFixed(1)}% better`;
+        }
+        
+        // Ensure consistent ending punctuation
+        userFriendlyInterpretation += '.';
+      } else {
+        // Fallback to single interpretation with consistent formatting
+        const singleInterpretation = eacoInterpretation || epsoInterpretation;
+        userFriendlyInterpretation = singleInterpretation || `${title}: Analysis available`;
+      }
+      
       const betterAlg = isBetter === 'epso' ? 'EPSO' : 'EACO';
       
-      return {
-        category: isBetter === 'equal' ? "Equivalent Performance" : `${betterAlg} Superior`,
-        interpretation: interpretation,
-        confidence: "Analysis based on comprehensive simulation data",
-        practical: "See detailed analysis section for specific recommendations",
-        icon: isBetter === 'equal' ? <FiMinus className="w-4 h-4" /> : 
-              (isBetter === 'epso' ? <FiTrendingUp className="w-4 h-4" /> : <FiTrendingDown className="w-4 h-4" />),
-        source: "backend",
-        hasData: true
-      };
+             return {
+         category: isBetter === 'equal' ? "Equivalent Performance" : `${betterAlg} Superior`,
+         interpretation: userFriendlyInterpretation,
+         confidence: `Analysis based on ${backendInterpretation.eaco ? 'EACO' : ''}${backendInterpretation.eaco && backendInterpretation.epso ? ' and ' : ''}${backendInterpretation.epso ? 'EPSO' : ''} simulation data`,
+         practical: `See detailed analysis for ${backendInterpretation.eaco ? 'EACO' : 'EPSO'} recommendations`,
+         icon: isBetter === 'equal' ? <FiMinus className="w-4 h-4" /> : 
+               (isBetter === 'epso' ? <FiTrendingUp className="w-4 h-4" /> : <FiTrendingDown className="w-4 h-4" />),
+         source: "backend",
+         hasData: true
+       };
     }
     
     /**
-     * I only show basic factual comparison without making up interpretations
+     * I only show basic factual comparison
      */
     const betterAlg = isBetter === 'epso' ? 'EPSO' : 'EACO';
     const percentageText = absPercentDiff.toFixed(1);
     
     return {
-      category: isEqual ? "Equivalent" : `${percentageText}% Difference`,
+      category: isEqual ? "Equivalent Performance" : `${percentageText}% Difference`,
       interpretation: null,
       showBasicComparison: true,
       betterAlgorithm: isEqual ? null : betterAlg,
@@ -97,38 +162,21 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
 
   const analysis = getStatisticalAnalysis();
 
-  // Documentation sections
   const docSections = [
     {
-      title: "Metric Definition",
+      title: "What This Measures",
       icon: <FiFileText className="w-5 h-5" />,
       content: description
     },
     {
-      title: "Statistical Framework",
+      title: "How to Read Results",
       icon: <FiBarChart2 className="w-5 h-5" />,
-      content: "Differences are categorized as: Negligible (<1%), Marginal (1-5%), Moderate (5-15%), Significant (15-30%), or Substantial (>30%). These thresholds help evaluate practical importance beyond raw numbers."
+      content: `Small differences (<5%) are usually not important. Larger differences (>15%) suggest one algorithm is clearly better. ${betterWhen === "higher" ? "Higher values are better for this metric" : "Lower values are better for this metric"}.`
     },
     {
-      title: "Algorithm Comparison",
-      icon: <FiCode className="w-5 h-5" />,
-      subsections: [
-        {
-          title: "EACO (Enhanced Ant Colony Optimization)",
-          content: "Adaptive ACO with diversity-driven pheromone evaporation, heuristic information combining execution time and resource fit, load-aware reinforcement, and multi-objective fitness."
-        },
-        {
-          title: "EPSO (Enhanced Particle Swarm Optimization)",
-          content: "PSO with nonlinear inertia weight decay, adaptive velocity clamping, and multi-objective fitness combining makespan, energy, utilization, and degree of imbalance."
-        }
-      ]
-    },
-    {
-      title: "Interpretation Guide",
+      title: "Quick Tips",
       icon: <FiHelpCircle className="w-5 h-5" />,
-      content: betterWhen === "higher" 
-        ? "For this metric, higher values indicate superior performance." 
-        : "For this metric, lower values indicate superior performance."
+      content: "Focus on the percentage difference and which algorithm performs better. The color-coded significance level helps you quickly understand the importance of the difference."
     }
   ];
 
@@ -228,86 +276,79 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
       }}
       className={`bg-white rounded-2xl shadow-lg hover:shadow-xl border border-gray-100 transition-all duration-300 overflow-hidden flex flex-col h-full relative backdrop-blur-sm ${colorScheme.shadow}`}
     >
-      {/* Help button - ISO 9241-11 Usability Standards */}
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowHelp(!showHelp);
-          if (showTooltip) setShowTooltip(false);
-        }}
-        className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white shadow-sm hover:shadow transition-all duration-200 z-10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:ring-offset-2"
-        aria-label={`Help and documentation for ${title}`}
-        aria-expanded={showHelp}
-        aria-controls="metric-help-content"
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setShowHelp(!showHelp);
-          }
-        }}
-      >
-        <FiBookOpen className="text-gray-600 w-4 h-4" aria-hidden="true" />
-      </button>
+             {/* Help button - Modern styling */}
+       <button 
+         onClick={(e) => {
+           e.stopPropagation();
+           setShowHelp(!showHelp);
+           if (showTooltip) setShowTooltip(false);
+         }}
+         className={`absolute top-4 right-4 p-2.5 rounded-full transition-all duration-200 z-10 ${
+           showHelp 
+             ? 'bg-[#319694] text-white shadow-lg' 
+             : 'bg-white/90 hover:bg-white text-gray-600 hover:text-[#319694] shadow-md hover:shadow-lg'
+         } backdrop-blur-sm`}
+         title="View documentation"
+       >
+         <FiBookOpen className="w-4 h-4" aria-hidden="true" />
+       </button>
 
-      {/* Documentation dropdown - WCAG 2.1 AA Compliant */}
-      <AnimatePresence>
-        {showHelp && (
-          <motion.div
-            id="metric-help-content"
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-14 right-4 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-20 overflow-hidden backdrop-blur-sm"
-            role="dialog"
-            aria-labelledby="help-dialog-title"
-            aria-describedby="help-dialog-description"
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') {
-                setShowHelp(false);
-              }
-            }}
-          >
-            <div className="p-5 max-h-96 overflow-y-auto" role="document">
-              <h3 id="help-dialog-title" className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FiBookOpen className="text-[#319694]" aria-hidden="true" />
-                {title} Documentation
-              </h3>
-              <p id="help-dialog-description" className="sr-only">
-                Detailed documentation and information about {title} metric
-              </p>
-              
-              <div className="space-y-4">
-                {docSections.map((section, index) => (
-                  <div key={index} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                    <div className="flex items-start gap-3">
-                      <div className="text-[#319694] mt-0.5 flex-shrink-0">{section.icon}</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800 mb-2">{section.title}</h4>
-                        {section.content && (
-                          <p className="text-sm text-gray-600 leading-relaxed">{section.content}</p>
-                        )}
-                        {section.subsections && (
-                          <div className="mt-3 space-y-3 pl-4 border-l-2 border-gray-100">
-                            {section.subsections.map((sub, subIndex) => (
-                              <div key={subIndex}>
-                                <h5 className="text-sm font-semibold text-[#319694] mb-1">{sub.title}</h5>
-                                <p className="text-xs text-gray-500 leading-relaxed">{sub.content}</p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                           {/* Documentation dropdown - Clean and Modern UI */}
+        <AnimatePresence>
+          {showHelp && (
+            <motion.div
+              id="metric-help-content"
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-14 right-4 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 z-20 overflow-hidden backdrop-blur-sm"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#319694] to-[#4fd1c5] p-4 text-white">
+                <div className="flex items-center gap-2">
+                  <FiBookOpen className="w-5 h-5" />
+                  <h3 className="font-bold text-lg">{title}</h3>
+                </div>
+                <p className="text-sm text-white/90 mt-1">Quick Reference Guide</p>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              
+              {/* Content */}
+              <div className="p-4 max-h-80 overflow-y-auto" role="document">
+                <div className="space-y-4">
+                  {docSections.map((section, index) => (
+                    <div key={index} className="group">
+                      <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="p-2 bg-[#319694]/10 rounded-lg group-hover:bg-[#319694]/20 transition-colors">
+                          <div className="text-[#319694]">{section.icon}</div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-800 mb-2 text-sm">{section.title}</h4>
+                          {section.content && (
+                            <p className="text-sm text-gray-600 leading-relaxed">{section.content}</p>
+                          )}
+                        </div>
+                      </div>
+                      {index < docSections.length - 1 && (
+                        <div className="h-px bg-gray-100 mx-3"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Footer */}
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 text-center">
+                    Click outside to close
+                  </p>
+                </div>
+                
+                {/* Extra bottom padding to ensure content is readable */}
+                <div className="h-6"></div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       <div className="p-6 flex flex-col h-full">
         {/* Header section with enhanced styling */}
@@ -337,26 +378,41 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                   />
                 </div>
                 <div className={`font-bold mt-3 text-xl ${isBetter === 'eaco' ? 'text-gray-800' : 'text-gray-600'}`}>
-                  {eacoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit}</span>
+                  {eacoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
                 </div>
               </div>
             </div>
             
-            {/* Comparison indicator */}
-            <div className="text-center relative">
-              <div className="text-xs text-gray-500 mb-2">Difference</div>
-              <motion.div 
-                className={`inline-block px-3 py-2 rounded-xl text-sm font-bold ${colorScheme.primaryBg} ${colorScheme.primaryBorder} border shadow-sm`}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-              >
-                {absPercentDiff.toFixed(1)}%
-              </motion.div>
-              <div className="text-xs text-gray-500 mt-1">
-                {betterWhen === "higher" ? "↑ Higher better" : "↓ Lower better"}
-              </div>
-            </div>
+                         {/* Comparison indicator */}
+             <div className="text-center relative">
+               <div className="text-xs text-gray-500 mb-2">Difference</div>
+               <motion.div 
+                 className={`inline-block px-3 py-2 rounded-xl text-sm font-bold ${colorScheme.primaryBg} ${colorScheme.primaryBorder} border shadow-sm`}
+                 initial={{ scale: 0 }}
+                 animate={{ scale: 1 }}
+                 transition={{ duration: 0.5, delay: 0.5 }}
+               >
+                 {absPercentDiff.toFixed(1)}%
+               </motion.div>
+               {(() => {
+                 const significance = getSignificanceLevel();
+                 return (
+                   <div className={`text-xs mt-1 px-2 py-1 rounded-full font-medium ${
+                     significance.color === 'gray' ? 'bg-gray-100 text-gray-600' :
+                     significance.color === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                     significance.color === 'orange' ? 'bg-orange-100 text-orange-700' :
+                     significance.color === 'red' ? 'bg-red-100 text-red-700' :
+                     significance.color === 'purple' ? 'bg-purple-100 text-purple-700' :
+                     'bg-gray-100 text-gray-600'
+                   }`}>
+                     {significance.level}
+                   </div>
+                 );
+               })()}
+               <div className="text-xs text-gray-500 mt-1">
+                 {betterWhen === "higher" ? "↑ Higher better" : "↓ Lower better"}
+               </div>
+             </div>
             
             {/* EPSO Column */}
             <div className="text-center">
@@ -371,7 +427,7 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                   />
                 </div>
                 <div className={`font-bold mt-3 text-xl ${isBetter === 'epso' ? 'text-gray-800' : 'text-gray-600'}`}>
-                  {epsoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit}</span>
+                  {epsoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
                 </div>
               </div>
             </div>
@@ -391,26 +447,15 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
             role="region"
             aria-label="Statistical analysis section"
           >
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-                // Close tooltip when expanding for clarity 
-                if (showTooltip) setShowTooltip(false);
-              }}
-              className={`w-full flex items-center justify-between p-4 rounded-xl ${colorScheme.primaryBg} ${colorScheme.primaryBorder} border-2 transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#319694] focus:ring-offset-2`}
-              aria-expanded={isExpanded}
-              aria-controls="metric-analysis-content"
-              aria-label={`Expand analysis for ${title}: ${analysis.category}`}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setIsExpanded(!isExpanded);
-                }
-              }}
-            >
+                         <button 
+               onClick={(e) => {
+                 e.stopPropagation();
+                 setIsExpanded(!isExpanded);
+                 // Close tooltip when expanding for clarity 
+                 if (showTooltip) setShowTooltip(false);
+               }}
+               className={`w-full flex items-center justify-between p-4 rounded-xl ${colorScheme.primaryBg} ${colorScheme.primaryBorder} border-2 transition-all duration-200 hover:shadow-md`}
+             >
               <div className="flex items-center text-left">
                 <span className="mr-3 p-1 rounded-lg bg-white/60">{analysis.icon}</span>
                 <div>
@@ -433,69 +478,58 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
           
           <AnimatePresence>
             {isExpanded && (
-              <motion.div 
-                id="metric-analysis-content"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`${colorScheme.secondaryBg} border-2 ${colorScheme.primaryBorder} border-t-0 rounded-b-xl overflow-hidden`}
-                role="region"
-                aria-labelledby="analysis-content-title"
-                aria-live="polite"
-                aria-atomic="true"
-              >
+                             <motion.div 
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                 transition={{ duration: 0.3 }}
+                 className={`${colorScheme.secondaryBg} border-2 ${colorScheme.primaryBorder} border-t-0 rounded-b-xl overflow-hidden`}
+               >
                 <div className="p-4 space-y-3" role="document">
                   {analysis.hasData ? (
                     /**
                      * I show backend interpretation when available
                      */
-                    <>
-                      <div>
-                        <h5 id="analysis-content-title" className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
-                          Interpretation 
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-normal">
-                            Data-Driven Analysis
-                          </span>
-                        </h5>
-                        <p className="text-sm text-gray-700 leading-relaxed">{analysis.interpretation}</p>
-                      </div>
-                      
-                      <div>
-                        <h5 className="font-semibold text-gray-800 mb-1">Confidence Level</h5>
-                        <p className="text-sm text-gray-700 leading-relaxed">{analysis.confidence}</p>
-                      </div>
-                      
-                      <div>
-                        <h5 className="font-semibold text-gray-800 mb-1">Practical Significance</h5>
-                        <p className="text-sm text-gray-700 leading-relaxed">{analysis.practical}</p>
-                      </div>
-                    </>
+                    <div>
+                      <h5 className="font-semibold text-gray-800 mb-3">Analysis</h5>
+                      <p className="text-sm text-gray-700 leading-relaxed">{analysis.interpretation}</p>
+                    </div>
                   ) : (
                     /**
                      * I show only factual comparison data when backend hasn't sent interpretation yet
                      */
-                    <div className="text-center py-4">
-                      <div className="mb-3">
-                        <span className="text-2xl font-bold text-gray-800">
-                          {analysis.percentage}%
-                        </span>
-                        <span className="text-sm text-gray-600 ml-2">
-                          difference observed
-                        </span>
-                      </div>
-                      {analysis.betterAlgorithm && (
-                        <p className="text-sm text-gray-700">
-                          {analysis.betterAlgorithm} shows {betterWhen === 'lower' ? 'lower' : 'higher'} {title.toLowerCase()}
-                        </p>
-                      )}
-                      <div className="mt-3 text-xs text-gray-500">
-                        <p>Based on {absPercentDiff < 1 ? 'negligible' : 
-                           absPercentDiff < 5 ? 'marginal' :
-                           absPercentDiff < 15 ? 'moderate' :
-                           absPercentDiff < 30 ? 'significant' : 'substantial'} difference</p>
-                      </div>
-                    </div>
+                                         <div className="text-center py-4">
+                       <div className="mb-3">
+                         <span className="text-2xl font-bold text-gray-800">
+                           {analysis.percentage}%
+                         </span>
+                         <span className="text-sm text-gray-600 ml-2">
+                           difference
+                         </span>
+                       </div>
+                       {analysis.betterAlgorithm && (
+                         <p className="text-sm text-gray-700 mb-3">
+                           {analysis.betterAlgorithm} performs better
+                         </p>
+                       )}
+                       <div className="mt-3">
+                         {(() => {
+                           const significance = getSignificanceLevel();
+                           return (
+                             <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                               significance.color === 'gray' ? 'bg-gray-100 text-gray-600' :
+                               significance.color === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                               significance.color === 'orange' ? 'bg-orange-100 text-orange-700' :
+                               significance.color === 'red' ? 'bg-red-100 text-red-700' :
+                               significance.color === 'purple' ? 'bg-purple-100 text-purple-700' :
+                               'bg-gray-100 text-gray-600'
+                             }`}>
+                               {significance.level} difference
+                             </div>
+                           );
+                         })()}
+                       </div>
+                     </div>
                   )}
                 </div>
               </motion.div>
