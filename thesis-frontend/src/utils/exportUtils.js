@@ -187,10 +187,21 @@ export const exportSimulationHistory = (history, format = 'json') => {
       { section: 'STATISTICAL ANALYSIS', field: 'Sample Size', extractor: (item) => item.tTestResults?.sampleSize ?? 'N/A' },
       { section: 'STATISTICAL ANALYSIS', field: 'Alpha Level', extractor: (item) => item.tTestResults?.alpha ?? 'N/A' },
       
-      // === RAW DATA (JSON) ===
+      { section: 'PLOT ANALYSIS', field: 'Plots Generated', extractor: (item) => item.plotAnalysis?.hasPlots ? 'Yes' : 'No' },
+      { section: 'PLOT ANALYSIS', field: 'Plot Count', extractor: (item) => item.plotAnalysis?.plotCount || 0 },
+      { section: 'PLOT ANALYSIS', field: 'Plot Types', extractor: (item) => {
+        if (!item.plotAnalysis?.plotTypes) return 'N/A';
+        return item.plotAnalysis.plotTypes.join(', ');
+      }},
+      { section: 'PLOT ANALYSIS', field: 'Plot Interpretations Available', extractor: (item) => {
+        if (!item.plotAnalysis?.plotMetadata) return 'No';
+        const hasInterpretations = item.plotAnalysis.plotMetadata.some(p => p.interpretation);
+        return hasInterpretations ? 'Yes' : 'No';
+      }},
+      
       { section: 'RAW DATA', field: 'VM Utilization JSON', extractor: (item) => JSON.stringify(item.vmUtilization || []) },
       { section: 'RAW DATA', field: 'Scheduling Log JSON', extractor: (item) => JSON.stringify(item.schedulingLog || []) },
-      { section: 'RAW DATA', field: 'Plot Data JSON', extractor: (item) => JSON.stringify(item.plotData || null) },
+      { section: 'RAW DATA', field: 'Plot Analysis JSON', extractor: (item) => JSON.stringify(item.plotAnalysis || null) },
       { section: 'RAW DATA', field: 'T-Test Results JSON', extractor: (item) => JSON.stringify(item.tTestResults || null) },
       { section: 'RAW DATA', field: 'Raw Results JSON', extractor: (item) => JSON.stringify(item.rawResults || null) },
     ];

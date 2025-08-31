@@ -33,6 +33,23 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
     workloadType: workloadFile ? 'CSV' : 'Random'
   };
   
+  // Helper function to extract plot metadata and analysis without large image data
+  const extractPlotAnalysis = (algorithmResults) => {
+    const plotData = algorithmResults.plotData;
+    if (!plotData) return null;
+    
+    return {
+      algorithm: plotData.algorithm,
+      simulationId: plotData.simulationId,
+      metrics: plotData.metrics, // Performance metrics are small
+      plotCount: plotData.plotPaths ? plotData.plotPaths.length : 0,
+      plotTypes: plotData.plotMetadata ? plotData.plotMetadata.map(p => p.type) : [],
+      plotMetadata: algorithmResults.plotMetadata || plotData.plotMetadata,
+      analysis: algorithmResults.analysis,
+      hasPlots: !!(plotData.plotPaths && plotData.plotPaths.length > 0)
+    };
+  };
+  
   const historyEntries = [
     {
       id: `${id}-eaco`,
@@ -45,7 +62,8 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
       energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
       vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
       schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
-      plotData: results.eaco.plotData,
+      // OPTIMIZED: Store only analysis and metadata, not large image data
+      plotAnalysis: extractPlotAnalysis(results.eaco),
       // store t-test results for statistical analysis display
       tTestResults: results.eaco.tTestResults || null,
       simulationId: results.eaco.simulationId
@@ -60,7 +78,8 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
       energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
       vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
       schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
-      plotData: results.epso.plotData,
+      // OPTIMIZED: Store only analysis and metadata, not large image data
+      plotAnalysis: extractPlotAnalysis(results.epso),
       // store t-test results for statistical analysis display
       tTestResults: results.epso.tTestResults || null,
       simulationId: results.epso.simulationId

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { showNotification } from '../components/common/ErrorNotification';
 import { validateSimulationConfig } from '../utils/validation';
 
@@ -57,6 +57,10 @@ export const useSimulationConfig = () => {
   const [workloadFile, setWorkloadFile] = useState(null);
   const [csvRowCount, setCsvRowCount] = useState(0);
   const [selectedPreset, setSelectedPreset] = useState('');
+  
+
+  const [cloudletToggleEnabled, setCloudletToggleEnabled] = useState(false);
+  const DEFAULT_CLOUDLET_COUNT = 100;
 
   // handle data center changes with validation
   const handleDataCenterChange = (e) => {
@@ -101,25 +105,39 @@ export const useSimulationConfig = () => {
     if (!e.target.files || e.target.files.length === 0) {
       setWorkloadFile(null);
       setCsvRowCount(0);
+      // re-enable cloudlet toggle when workload is removed
+      if (cloudletToggleEnabled) {
+        setCloudletConfig(prev => ({
+          ...prev,
+          numCloudlets: prev.numCloudlets
+        }));
+      }
       return;
     }
     const file = e.target.files[0];
     if (file && (file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv'))) {
       setSelectedPreset('');
+      // Set workloadFile immediately to update UI
       setWorkloadFile(file);
 
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target.result;
         const rows = text.split('\n').filter(row => row.trim() !== '');
-        const rowCount = rows.length - 1;
+        const rowCount = Math.max(0, rows.length - 1); 
+        
 
         setCsvRowCount(rowCount);
-        // i auto-adjust cloudlets since you know for the sake of matching csv size
+        // File is already set above, no need to set again
+        
+        // when workload file is uploaded, set cloudlets to match file but allow user to adjust
         setCloudletConfig(prev => ({
           ...prev,
-          numCloudlets: Math.min(prev.numCloudlets, rowCount)
+          numCloudlets: Math.min(prev.numCloudlets || rowCount, rowCount)
         }));
+        
+        // disable cloudlet toggle 
+        setCloudletToggleEnabled(false);
       };
       reader.readAsText(file);
     } else {
@@ -130,7 +148,10 @@ export const useSimulationConfig = () => {
   // handle preset selection
   const handlePresetSelect = (presetName) => {
     setSelectedPreset(presetName);
-    if (!presetName) return;
+    
+    if (!presetName) {
+      return;
+    }
 
     fetch(`/presets/${presetName}`)
       .then(res => res.text())
@@ -145,20 +166,57 @@ export const useSimulationConfig = () => {
         setCsvRowCount(rowCount);
         setCloudletConfig(prev => ({
           ...prev,
-          numCloudlets: Math.min(prev.numCloudlets, rowCount)
+          numCloudlets: Math.min(prev.numCloudlets || rowCount, rowCount)
         }));
+        
+        // Disable cloudlet toggle when preset is selected
+        setCloudletToggleEnabled(false);
       })
       .catch(() => showNotification('Failed to load preset workload', 'error'));
   };
+  
+  // handle cloudlet toggle change
+  const handleCloudletToggleChange = (enabled) => {
+    setCloudletToggleEnabled(enabled);
+    if (!enabled) {
+      // when toggle is disabled, set numCloudlets to default value
+      setCloudletConfig(prev => ({
+        ...prev,
+        numCloudlets: DEFAULT_CLOUDLET_COUNT
+      }));
+    }
+  };
+  
+  // get effective cloudlet count (either user-defined, workload-based, or default)
+  const getEffectiveCloudletCount = () => {
+    // If workload file exists, use the configured cloudlets (limited by file)
+    if (csvRowCount > 0 || workloadFile) {
+      return cloudletConfig.numCloudlets;
+    }
+    // If toggle is enabled (and no workload), use configured value
+    if (cloudletToggleEnabled) {
+      return cloudletConfig.numCloudlets;
+    }
+    // Otherwise use default
+    return DEFAULT_CLOUDLET_COUNT;
+  };
 
   // get all config data for saving/running
-  const getAllConfig = () => ({
-    dataCenterConfig,
-    cloudletConfig,
-    iterationConfig,
-    enableMatlabPlots,
-    selectedPreset
-  });
+  const getAllConfig = () => {
+    // use the effective cloudlet count which handles workload files and toggle state
+    const effectiveCloudletConfig = {
+      ...cloudletConfig,
+      numCloudlets: getEffectiveCloudletCount()
+    };
+    
+    return {
+      dataCenterConfig,
+      cloudletConfig: effectiveCloudletConfig,
+      iterationConfig,
+      enableMatlabPlots,
+      selectedPreset
+    };
+  };
 
   // restore config from saved state
   const restoreConfig = (savedConfig) => {
@@ -178,6 +236,8 @@ export const useSimulationConfig = () => {
     workloadFile,
     csvRowCount,
     selectedPreset,
+    cloudletToggleEnabled,
+    DEFAULT_CLOUDLET_COUNT,
     
     // handlers
     handleDataCenterChange,
@@ -186,9 +246,11 @@ export const useSimulationConfig = () => {
     handlePresetSelect,
     setIterationConfig,
     setEnableMatlabPlots,
+    handleCloudletToggleChange,
     
     // utilities
     getAllConfig,
-    restoreConfig
+    restoreConfig,
+    getEffectiveCloudletCount
   };
 };

@@ -17,7 +17,7 @@ const ConfigRecommendations = {
   vmSize: "Recommended: 10-50GB (10000-50000 MB) storage per VM"
 };
 
-const InputField = ({ label, name, value, onChange, icon: Icon, unit, min = 1 }) => {
+const InputField = ({ label, name, value, onChange, icon: Icon, unit, min = 1, disabled = false }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const inputRef = useRef(null);
@@ -49,14 +49,19 @@ const InputField = ({ label, name, value, onChange, icon: Icon, unit, min = 1 })
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#319694]/50 focus:border-[#319694]/30 transition-all duration-200 bg-white shadow-sm"
+          disabled={disabled}
+          className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:outline-none transition-all duration-200 shadow-sm ${
+            disabled 
+              ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed' 
+              : 'border-gray-200 bg-white focus:ring-2 focus:ring-[#319694]/50 focus:border-[#319694]/30'
+          }`}
           min={min}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          whileFocus={{
+          onFocus={() => !disabled && setIsFocused(true)}
+          onBlur={() => !disabled && setIsFocused(false)}
+          whileFocus={!disabled ? {
             boxShadow: "0 0 0 3px rgba(49, 150, 148, 0.1)",
             borderColor: "#319694"
-          }}
+          } : {}}
         />
         
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

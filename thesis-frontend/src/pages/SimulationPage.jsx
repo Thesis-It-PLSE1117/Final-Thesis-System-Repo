@@ -37,7 +37,9 @@ const SimulationPage = ({ onBack }) => {
     simulationState,
     setSimulationState,
     runSimulation,
-    cancelSimulation
+    cancelSimulation,
+    isAborting,
+    canAbort
   } = useSimulationRunner();
   
   // ui states
@@ -67,9 +69,10 @@ const SimulationPage = ({ onBack }) => {
   const [direction, setDirection] = useState(0);
   
   // computed values
+  const effectiveCloudletCount = config.getEffectiveCloudletCount();
   const completedConfigs = [
     Object.keys(config.dataCenterConfig).length > 0,
-    config.cloudletConfig.numCloudlets > 0 || config.workloadFile !== null,
+    effectiveCloudletCount > 0 || config.workloadFile !== null,
     config.iterationConfig.iterations > 0
   ].filter(Boolean).length;
 
@@ -117,7 +120,7 @@ const SimulationPage = ({ onBack }) => {
     if (isCoolingDown) return;
     
     try {
-      const totalOperations = config.dataCenterConfig.numVMs * config.cloudletConfig.numCloudlets * config.iterationConfig.iterations;
+      const totalOperations = config.dataCenterConfig.numVMs * effectiveCloudletCount * config.iterationConfig.iterations;
       if (totalOperations > 100000) {
         setConfirmDialog({
           isOpen: true,
@@ -233,6 +236,9 @@ const SimulationPage = ({ onBack }) => {
                   enableMatlabPlots={config.enableMatlabPlots}
                   onMatlabToggle={(value) => config.setEnableMatlabPlots(value)}
                   iterations={config.iterationConfig.iterations}
+                  cloudletToggleEnabled={config.cloudletToggleEnabled}
+                  onCloudletToggleChange={config.handleCloudletToggleChange}
+                  defaultCloudletCount={config.DEFAULT_CLOUDLET_COUNT}
                 />
               )}
               {activeTab === 'iterations' && (
@@ -250,7 +256,34 @@ const SimulationPage = ({ onBack }) => {
                     const pairedResults = historyService.getPairedHistoryResults(result.id);
                     
                     if (pairedResults) {
-                      setSimulationResults(pairedResults);
+                      const convertedResults = {
+                        eaco: {
+                          ...pairedResults.eaco,
+                          plotData: pairedResults.eaco.plotAnalysis ? {
+                            algorithm: pairedResults.eaco.plotAnalysis.algorithm,
+                            simulationId: pairedResults.eaco.plotAnalysis.simulationId,
+                            metrics: pairedResults.eaco.plotAnalysis.metrics,
+                            plotMetadata: pairedResults.eaco.plotAnalysis.plotMetadata,
+                            plotPaths: [] 
+                          } : null,
+                          plotMetadata: pairedResults.eaco.plotAnalysis?.plotMetadata || [],
+                          analysis: pairedResults.eaco.plotAnalysis?.analysis
+                        },
+                        epso: {
+                          ...pairedResults.epso,
+                          plotData: pairedResults.epso.plotAnalysis ? {
+                            algorithm: pairedResults.epso.plotAnalysis.algorithm,
+                            simulationId: pairedResults.epso.plotAnalysis.simulationId,
+                            metrics: pairedResults.epso.plotAnalysis.metrics,
+                            plotMetadata: pairedResults.epso.plotAnalysis.plotMetadata,
+                            plotPaths: [] 
+                          } : null,
+                          plotMetadata: pairedResults.epso.plotAnalysis?.plotMetadata || [],
+                          analysis: pairedResults.epso.plotAnalysis?.analysis
+                        }
+                      };
+                      
+                      setSimulationResults(convertedResults);
                       setSimulationState('results');
                     } else {
                       showNotification('Unable to load complete results. This may be an old history entry.', 'info');
@@ -269,7 +302,7 @@ const SimulationPage = ({ onBack }) => {
               className="bg-[#319694] text-white px-8 py-3 rounded-2xl text-lg shadow hover:bg-[#267b79] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               onClick={executeSimulation}
               disabled={
-                !config.cloudletConfig.numCloudlets || 
+                !effectiveCloudletCount || 
                 isSimulating || 
                 simulationState === 'loading' || 
                 isCoolingDown
@@ -326,11 +359,14 @@ const SimulationPage = ({ onBack }) => {
           <>
             {renderConfigContent()}
             <CloudLoadingModal 
-              numCloudlets={config.cloudletConfig.numCloudlets}
+              numCloudlets={effectiveCloudletCount}
               numHosts={config.dataCenterConfig.numHosts}
               numVMs={config.dataCenterConfig.numVMs}
               progress={progress}
               iterations={config.iterationConfig.iterations}
+              onAbort={cancelSimulation}
+              canAbort={canAbort}
+              isAborting={isAborting}
             />
           </>
         );
@@ -372,6 +408,11 @@ const SimulationPage = ({ onBack }) => {
               plotsGenerating={simulationResults?.plotsGenerating || false}
               onBackToAnimation={() => setSimulationState('animation')}
               onNewSimulation={() => setSimulationState('config')}
+              // pass analysis data for interpretation display
+              plotAnalysis={{
+                eaco: simulationResults?.eaco?.plotAnalysis,
+                epso: simulationResults?.epso?.plotAnalysis
+              }}
             />
           </Suspense>
         );
