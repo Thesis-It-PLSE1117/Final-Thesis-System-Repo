@@ -92,6 +92,7 @@ const WorkloadUploadCard = ({
     if (e.target.files?.[0]) {
       onFileUpload(e);
       onPresetSelect('');
+      // Don't clear the input value to preserve file reference
     }
   };
 
@@ -105,7 +106,7 @@ const WorkloadUploadCard = ({
     return preset?.label || selectedPreset;
   };
 
-  const hasWorkload = workloadFile || selectedPreset;
+  const hasWorkload = !!(workloadFile || selectedPreset);
 
   return (
     <motion.div 

@@ -19,11 +19,20 @@ const WorkloadConfigCard = ({
   csvRowCount,
   onPresetSelect,
   selectedPreset,
-  presetOptions = [] // Default to empty array if not provided
+  presetOptions = [], 
+  cloudletToggleEnabled,
+  defaultCloudletCount
 }) => {
   const hasWorkload = csvRowCount > 0 || (selectedPreset && selectedPreset !== '');
+
+  const canEditCloudlets = hasWorkload || cloudletToggleEnabled;
+  
+  const displayValue = hasWorkload 
+    ? config.numCloudlets  
+    : (cloudletToggleEnabled ? config.numCloudlets : defaultCloudletCount);
+  
   const inputClasses = `w-full px-4 py-2 border rounded-lg focus:outline-none transition-all ${
-    hasWorkload 
+    canEditCloudlets
       ? 'border-[#319694]/20 focus:ring-2 focus:ring-[#319694]/30 focus:border-[#319694]/50'
       : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
   }`;
@@ -58,12 +67,12 @@ const WorkloadConfigCard = ({
           <input
             type="number"
             name="numCloudlets"
-            value={config.numCloudlets}
+            value={displayValue}
             onChange={onChange}
             className={inputClasses}
             min="1"
             max={csvRowCount > 0 ? csvRowCount : undefined}
-            disabled={!hasWorkload}
+            disabled={!canEditCloudlets}
           />
           {csvRowCount > 0 ? (
             <motion.p 
@@ -75,14 +84,14 @@ const WorkloadConfigCard = ({
               <Database size={14} className="text-[#319694]" />
               Max cloudlets (tasks) based on workload: {csvRowCount}
             </motion.p>
-          ) : !hasWorkload && (
+          ) : !cloudletToggleEnabled && !hasWorkload && (
             <motion.p 
-              className="text-xs text-gray-400 mt-2"
+              className="text-xs text-gray-500 mt-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              Please select or upload a workload first
+              Using default: {defaultCloudletCount} cloudlets. Enable toggle above to customize.
             </motion.p>
           )}
         </motion.div>

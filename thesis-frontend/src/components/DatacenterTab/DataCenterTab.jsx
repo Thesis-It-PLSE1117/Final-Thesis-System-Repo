@@ -8,7 +8,6 @@ import ConfigSection from './ConfigSection';
 import InputField from './InputField';
 import VMCard from './VMCard';
 import HostCard from './HostCard';
-
 const DataCenterTab = ({ config, onChange}) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);

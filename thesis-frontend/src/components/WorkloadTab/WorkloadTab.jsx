@@ -5,6 +5,7 @@ import WorkloadConfigCard from './WorkloadConfigCard';
 import WorkloadUploadCard from './WorkloadUploadCard';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import MatlabToggle from './MatlabToggle';
+import CloudletToggle from './CloudletToggle';
 
 const WorkloadTab = ({
   config,
@@ -16,7 +17,10 @@ const WorkloadTab = ({
   selectedPreset,
   enableMatlabPlots,
   onMatlabToggle,
-  iterations
+  iterations,
+  cloudletToggleEnabled,
+  onCloudletToggleChange,
+  defaultCloudletCount
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -42,6 +46,8 @@ const WorkloadTab = ({
   const cancelClearWorkload = () => {
     setShowDeleteModal(false);
   };
+  
+  const hasWorkload = !!(workloadFile || selectedPreset);
 
   return (
     <motion.div 
@@ -67,6 +73,14 @@ const WorkloadTab = ({
         transition={{ duration: 0.3 }}
       >
         <div className="space-y-6">
+          {/* Cloudlet Configuration Control */}
+          <CloudletToggle 
+            enabled={cloudletToggleEnabled}
+            onChange={onCloudletToggleChange}
+            defaultValue={defaultCloudletCount}
+            hasWorkload={hasWorkload}
+          />
+          
           <WorkloadConfigCard 
             config={config}
             onChange={onChange}
@@ -74,6 +88,8 @@ const WorkloadTab = ({
             onPresetSelect={onPresetSelect}
             selectedPreset={selectedPreset}
             presetOptions={presetOptions}
+            cloudletToggleEnabled={cloudletToggleEnabled}
+            defaultCloudletCount={defaultCloudletCount}
           />
           
           <WorkloadUploadCard

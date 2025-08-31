@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity, Info, Repeat } from 'lucide-react';
+import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity, Info, Repeat, X } from 'lucide-react';
 
-const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iterations = 1 }) => {
+const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iterations = 1, onAbort, canAbort = false, isAborting = false }) => {
   const [elapsedTime, setElapsedTime] = React.useState(0);
   const [currentPhase, setCurrentPhase] = React.useState('initializing');
   
@@ -84,6 +84,23 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
         transition={{ type: 'spring', damping: 15 }}
         className="relative bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-100"
       >
+        {canAbort && (
+          <motion.button
+            onClick={onAbort}
+            disabled={isAborting}
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-[#319694] hover:bg-gray-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            title={isAborting ? "Cancelling..." : "Cancel simulation"}
+          >
+            {isAborting ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#319694] border-t-transparent" />
+            ) : (
+              <X size={16} />
+            )}
+          </motion.button>
+        )}
+        
         {/* Cloud header */}
         <div className="flex items-center justify-center mb-4">
           <div className="w-16 h-10 mr-3 flex items-center justify-center">

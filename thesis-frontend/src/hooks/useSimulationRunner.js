@@ -15,23 +15,22 @@ export const useSimulationRunner = () => {
   const [simulationState, setSimulationState] = useState('config');
   const [plotTrackingIds, setPlotTrackingIds] = useState(null);
   const [plotStatus, setPlotStatus] = useState(null); // 'pending', 'generating', 'completed', 'failed'
+  const [abortController, setAbortController] = useState(null);
+  const [isAborting, setIsAborting] = useState(false);
 
-  // run a single algorithm with async plot support
   const runAlgorithm = async (algorithm, configData, withPlots, workloadFile, useAsync = false, retryCount = 0) => {
     try {
-      // i check iterations as a valid for using the right endpoint
       const useIterations = configData.iterations > 1;
+      const abortSignal = abortController?.signal;
       
       console.log('DEBUG runAlgorithm:', { algorithm, withPlots, workloadFile: !!workloadFile, useIterations, iterations: configData.iterations });
       if (withPlots && !workloadFile && !useIterations) {
         console.log('SHOULD USE PLOTS API!');
-        // use async plot generation for better ux
         if (useAsync) {
-          return await apiClient.runWithPlotsAsync(algorithm, configData);
+          return await apiClient.runWithPlotsAsync(algorithm, configData, abortSignal);
         }
-        // fallback to sync if needed
         try {
-          return await apiClient.runWithPlots(algorithm, configData);
+          return await apiClient.runWithPlots(algorithm, configData, abortSignal);
         } catch (error) {
           if (error.message === 'MATLAB_WARMING_UP' && retryCount < 3) {
             // i wait here since you know for the sake of letting matlab warm up
@@ -43,20 +42,26 @@ export const useSimulationRunner = () => {
         }
       } else if (workloadFile) {
         if (useIterations) {
-          return await apiClient.runIterationsWithFile(algorithm, configData, workloadFile);
+          return await apiClient.runIterationsWithFile(algorithm, configData, workloadFile, abortSignal);
         } else {
-          // Pass enableMatlabPlots flag with the config
+          // pass enableMatlabPlots flag with the config
           const configWithPlots = { ...configData, enableMatlabPlots: withPlots };
-          return await apiClient.runWithFile(algorithm, configWithPlots, workloadFile);
+          return await apiClient.runWithFile(algorithm, configWithPlots, workloadFile, abortSignal);
         }
       } else {
         if (useIterations) {
-          return await apiClient.runIterations(algorithm, configData);
+          return await apiClient.runIterations(algorithm, configData, abortSignal);
         } else {
-          return await apiClient.run(algorithm, configData);
+          return await apiClient.run(algorithm, configData, abortSignal);
         }
       }
     } catch (error) {
+      // handle abort errors gracefully
+      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+        const cancelError = new Error('Request cancelled');
+        cancelError.name = 'CancelledError';
+        throw cancelError;
+      }
       throw error;
     }
   };
@@ -146,6 +151,10 @@ export const useSimulationRunner = () => {
       showNotification(`Please fix configuration errors: ${Object.values(errors).join(', ')}`, 'error');
       return false;
     }
+
+    const controller = new AbortController();
+    setAbortController(controller);
+    setIsAborting(false);
 
     setSimulationState('loading');
     setProgress(0);
@@ -372,11 +381,38 @@ export const useSimulationRunner = () => {
   };
 
   // cancel the simulation
-  const cancelSimulation = () => {
-    // Simple cancel - just reset states
-    setProgress(0);
-    setSimulationState('config');
-    showNotification('Simulation cancelled by user', 'info');
+  const cancelSimulation = async () => {
+    if (abortController && !isAborting) {
+      setIsAborting(true);
+      console.log('Aborting simulation...');
+      
+      // abort the ongoing requests
+      abortController.abort();
+      
+      // also request backend cancellation
+      try {
+        await apiClient.cancelSimulation();
+        console.log('Backend simulation cancellation requested');
+      } catch (error) {
+        console.warn('Failed to request backend cancellation:', error.message);
+        // don't block frontend cleanup if backend call fails
+      }
+      
+      // clean up states
+      setProgress(0);
+      setSimulationState('config');
+      setAbortController(null);
+      setIsAborting(false);
+      setPlotStatus(null);
+      setPlotTrackingIds(null);
+      
+      showNotification('Simulation cancelled by user', 'info');
+    } else {
+      // fallback for when no active simulation
+      setProgress(0);
+      setSimulationState('config');
+      showNotification('Simulation cancelled', 'info');
+    }
   };
 
   return {
@@ -389,6 +425,8 @@ export const useSimulationRunner = () => {
     runSimulation,
     cancelSimulation,
     plotStatus,
-    plotTrackingIds
+    plotTrackingIds,
+    isAborting,
+    canAbort: !!abortController && !isAborting
   };
 };

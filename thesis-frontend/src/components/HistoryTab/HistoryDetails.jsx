@@ -1,4 +1,4 @@
-import { BarChart2, Clock, Cpu, Zap, Activity } from 'lucide-react';
+import { BarChart2, Clock, Cpu, Zap, Activity, TrendingUp, Award, Eye, FileText } from 'lucide-react';
 
 const HistoryDetails = ({ result, onViewResults }) => {
   if (!result) return null;
@@ -86,6 +86,137 @@ const HistoryDetails = ({ result, onViewResults }) => {
           </div>
         </div>
       </div>
+      
+      {/* Plot Analysis Section */}
+      {result.plotAnalysis && (
+        <div className="mb-6">
+          <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+            <TrendingUp size={16} className="text-[#319694]" />
+            Plot Analysis Summary
+          </h4>
+          
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                  <BarChart2 size={14} />
+                  Plots Generated
+                </div>
+                <p className="font-semibold text-lg text-gray-800">
+                  {result.plotAnalysis.hasPlots ? 'Yes' : 'No'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {result.plotAnalysis.plotCount || 0} plots
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                  <FileText size={14} />
+                  Plot Types
+                </div>
+                <p className="font-semibold text-sm text-gray-800">
+                  {result.plotAnalysis.plotTypes ? result.plotAnalysis.plotTypes.length : 0}
+                </p>
+                <p className="text-xs text-gray-500">
+                  visualization types
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                  <Eye size={14} />
+                  Interpretations
+                </div>
+                <p className="font-semibold text-sm text-gray-800">
+                  {result.plotAnalysis.plotMetadata && 
+                   result.plotAnalysis.plotMetadata.some(p => p.interpretation) ? 'Available' : 'None'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  analysis ready
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                  <Award size={14} />
+                  Backend Analysis
+                </div>
+                <p className="font-semibold text-sm text-gray-800">
+                  {result.plotAnalysis.analysis ? 'Available' : 'None'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  insights included
+                </p>
+              </div>
+            </div>
+            
+            {/* Show plot types if available */}
+            {result.plotAnalysis.plotTypes && result.plotAnalysis.plotTypes.length > 0 && (
+              <div className="border-t border-blue-200 pt-3">
+                <p className="text-sm text-gray-600 mb-2">Available Visualizations:</p>
+                <div className="flex flex-wrap gap-2">
+                  {result.plotAnalysis.plotTypes.map((type, index) => (
+                    <span key={index} className="bg-white px-2 py-1 rounded-md text-xs font-medium text-gray-700 border border-blue-200">
+                      {type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Statistical Analysis Section */}
+      {result.tTestResults && (
+        <div className="mb-6">
+          <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+            <Award size={16} className="text-[#319694]" />
+            Statistical Analysis
+          </h4>
+          
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Overall Winner</p>
+                <p className="font-semibold text-lg text-gray-800">
+                  {result.tTestResults.overallWinner || 'No clear winner'}
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Significant Differences</p>
+                <p className="font-semibold text-lg text-gray-800">
+                  {result.tTestResults.significantDifferences || 0} / {Object.keys(result.tTestResults.metricTests || {}).length || 5}
+                </p>
+                <p className="text-xs text-gray-500">metrics</p>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Sample Size</p>
+                <p className="font-semibold text-lg text-gray-800">
+                  {result.tTestResults.sampleSize || 'N/A'}
+                </p>
+                <p className="text-xs text-gray-500">iterations</p>
+              </div>
+            </div>
+            
+            {/* Show interpretation if available */}
+            {result.tTestResults.interpretation && (
+              <div className="border-t border-green-200 pt-3 mt-3">
+                <p className="text-sm text-gray-600 mb-2">Statistical Interpretation:</p>
+                <div className="bg-white rounded-md p-3 text-sm text-gray-700">
+                  {typeof result.tTestResults.interpretation === 'object' 
+                    ? JSON.stringify(result.tTestResults.interpretation, null, 2)
+                    : result.tTestResults.interpretation
+                  }
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       
       <button
         onClick={() => onViewResults(result)}
