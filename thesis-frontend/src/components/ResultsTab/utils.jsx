@@ -40,9 +40,11 @@ export const normalizeData = (results) => {
       
       summary: {
         ...(results.rawResults.averageMetrics || {}),
-        loadBalancePercentage: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance !== undefined)
-          ? ((1 - results.rawResults.averageMetrics.loadBalance) * 100).toFixed(2)
-          : 0,
+        loadBalancePercentage: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadImbalance !== undefined)
+          ? Math.max(0, (1 - results.rawResults.averageMetrics.loadImbalance) * 100).toFixed(2)
+          : (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance !== undefined)
+            ? ((1 - results.rawResults.averageMetrics.loadBalance) * 100).toFixed(2)
+            : 0,
         loadBalance: (results.rawResults.averageMetrics && results.rawResults.averageMetrics.loadBalance) || 0,
         resourceUtilization: results.rawResults.averageMetrics ? (results.rawResults.averageMetrics.resourceUtilization || results.rawResults.averageMetrics.utilization || 0) : 0,
         responseTime: results.rawResults.averageMetrics ? (results.rawResults.averageMetrics.responseTime || 0) : 0
@@ -77,11 +79,11 @@ export const normalizeData = (results) => {
     
     summary: (() => {
       const s = data.summary || {};
-      const loadBalance = s.loadBalance !== undefined ? s.loadBalance : 0;
+      const rawDI = s.loadImbalance !== undefined ? s.loadImbalance : (s.loadBalance !== undefined ? s.loadBalance : 0);
       return {
         ...s,
-        loadBalancePercentage: ((1 - loadBalance) * 100).toFixed(2),
-        loadBalance,
+        loadBalancePercentage: Math.max(0, (1 - rawDI) * 100).toFixed(2),
+        loadBalance: s.loadBalance !== undefined ? s.loadBalance : rawDI,
         resourceUtilization: s.resourceUtilization !== undefined ? s.resourceUtilization : (s.utilization !== undefined ? s.utilization : 0),
         responseTime: s.responseTime || s.averageResponseTime || 0
       };
