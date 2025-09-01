@@ -12,8 +12,8 @@ export const useSimulationConfig = () => {
    * These values provide good performance without excessive resource consumption
    */
   const [dataCenterConfig, setDataCenterConfig] = useState({
-    numHosts: 10,               // Standard small datacenter (10 physical hosts)
-    numPesPerHost: 4,           // Quad-core processors per host (realistic)
+    numHosts: 20,               
+    numPesPerHost: 6,           
     peMips: 2500,               // 2.5 GHz processors (modern standard)
     ramPerHost: 4096,           // 4GB RAM per host (cost-effective)
     bwPerHost: 10000,           // 10 Gbps network (datacenter standard)
