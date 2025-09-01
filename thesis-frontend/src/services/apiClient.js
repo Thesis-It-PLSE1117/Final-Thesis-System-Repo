@@ -3,7 +3,24 @@
  * 
  */
 
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+/**
+ * API Client Service with Port Auto-Mapping
+ *
+ * Frontend ports map to backend ports:
+ *   5173 -> 8081
+ *   5174 -> 8082
+ *   5175 -> 8083
+ *   ...
+ */
+
+// Determine frontend port
+const frontendPort = parseInt(window.location.port, 10);
+
+// Auto-map: backendPort = 8081 + (frontendPort - 5173)
+const backendPort = frontendPort >= 5173 ? 8081 + (frontendPort - 5173) : 8081;
+
+// Final API base
+export const API_BASE = `http://localhost:${backendPort}`;
 
 /**
  *
