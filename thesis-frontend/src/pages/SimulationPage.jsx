@@ -305,7 +305,8 @@ const SimulationPage = ({ onBack }) => {
                 !effectiveCloudletCount || 
                 isSimulating || 
                 simulationState === 'loading' || 
-                isCoolingDown
+                isCoolingDown ||
+                (!config.workloadFile && !config.selectedPreset && !config.cloudletToggleEnabled)
               }
             >
               {isSimulating || simulationState === 'loading' ? (
