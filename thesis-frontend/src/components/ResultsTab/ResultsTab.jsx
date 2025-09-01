@@ -10,7 +10,8 @@ import {
   FiBarChart2,
   FiFileText,
   FiActivity,
-  FiEye
+  FiEye,
+  FiSettings
 } from 'react-icons/fi';
 import MetricCard from './MetricCard';
 import SchedulingLogTable from './SchedulingLogTable';
@@ -29,7 +30,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview'); // New state for main tabs
+  const [activeTab, setActiveTab] = useState('metadata'); 
   const [activeLogTab, setActiveLogTab] = useState('eaco');
   const [isExiting, setIsExiting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,10 +62,10 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
    */
   const tabs = [
     {
-      id: 'overview',
-      label: 'Overview',
-      icon: <FiEye className="w-4 h-4" />,
-      description: 'High-level summary and key insights',
+      id: 'metadata',
+      label: 'Metadata',
+      icon: <FiSettings className="w-4 h-4" />,
+      description: 'Simulation configuration and execution details',
       enabled: true
     },
     {
@@ -110,7 +111,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     /**
      * I auto-switch to analysis tab when t-test results are available
      */
-    if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && activeTab === 'overview') {
+    if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && activeTab === 'metadata') {
       setActiveTab('analysis');
     }
   }, [eacoResults, epsoResults]);
@@ -325,44 +326,13 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
    */
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case 'metadata':
         return (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Quick Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-              <div className="bg-gradient-to-br from-[#319694]/10 to-[#4fd1c5]/10 rounded-lg p-4 border border-[#319694]/20">
-                <p className="text-sm text-gray-600 mb-1">Best Makespan</p>
-                <p className="text-xl font-bold text-[#319694]">
-                  {Math.min(rrSummary?.makespan || Infinity, epsoSummary?.makespan || Infinity).toFixed(2)}s
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {(rrSummary?.makespan || 0) < (epsoSummary?.makespan || 0) ? 'EACO' : 'EPSO'} wins
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-blue-500/10 to-blue-400/10 rounded-lg p-4 border border-blue-500/20">
-                <p className="text-sm text-gray-600 mb-1">Best Energy</p>
-                <p className="text-xl font-bold text-blue-600">
-                  {Math.min(rrSummary?.energyConsumption || Infinity, epsoSummary?.energyConsumption || Infinity).toFixed(2)} Wh
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {(rrSummary?.energyConsumption || 0) < (epsoSummary?.energyConsumption || 0) ? 'EACO' : 'EPSO'} wins
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-purple-500/10 to-purple-400/10 rounded-lg p-4 border border-purple-500/20">
-                <p className="text-sm text-gray-600 mb-1">Best Utilization</p>
-                <p className="text-xl font-bold text-purple-600">
-                  {Math.max(rrSummary?.resourceUtilization || 0, epsoSummary?.resourceUtilization || 0).toFixed(1)}%
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {(rrSummary?.resourceUtilization || 0) > (epsoSummary?.resourceUtilization || 0) ? 'EACO' : 'EPSO'} wins
-                </p>
-              </div>
-            </div>
-
             {/* Metadata Display */}
             {console.log('=== Metadata Debug ===')}
             {console.log('resultsRR metadata:', {

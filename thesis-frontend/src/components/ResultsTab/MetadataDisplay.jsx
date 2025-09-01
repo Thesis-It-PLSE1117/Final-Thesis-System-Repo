@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiInfo, FiDatabase, FiCpu, FiHash, FiCopy, FiCheck, FiChevronDown, FiChevronUp, FiSettings, FiClock } from 'react-icons/fi';
+import { FiInfo, FiDatabase, FiCpu, FiHash, FiCopy, FiCheck, FiSettings, FiClock } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
  */
 const MetadataDisplay = ({ metadata, algorithm }) => {
   const [copiedField, setCopiedField] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   
   if (!metadata) return null;
 
@@ -74,25 +73,15 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
       role="region"
       aria-label={`${algorithm} simulation metadata`}
     >
-      {/* Header with expand/collapse control */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-          <FiSettings className={`${style.iconColor} mr-2`} />
-          <h4 className="text-sm font-semibold text-gray-700">
-            {algorithm} Simulation Metadata
-          </h4>
-          <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${style.badgeColor}`}>
-            {configSnapshot?.iterations > 1 ? `${configSnapshot.iterations} iterations` : 'Single run'}
-          </span>
-        </div>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 hover:bg-white/50 rounded transition-colors"
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
-        >
-          {isExpanded ? <FiChevronUp /> : <FiChevronDown />}
-        </button>
+      {/* Header */}
+      <div className="flex items-center mb-3">
+        <FiSettings className={`${style.iconColor} mr-2`} />
+        <h4 className="text-sm font-semibold text-gray-700">
+          {algorithm} Simulation Metadata
+        </h4>
+        <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${style.badgeColor}`}>
+          {configSnapshot?.iterations > 1 ? `${configSnapshot.iterations} iterations` : 'Single run'}
+        </span>
       </div>
       
       {/* Primary metadata grid - Always visible */}
@@ -207,60 +196,50 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
         </div>
       </div>
       
-      {/* Expandable section for detailed configuration */}
-      <AnimatePresence>
-        {isExpanded && configSnapshot && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <h5 className="text-xs font-semibold text-gray-600 mb-2">Configuration Details</h5>
-              
-              {/* Configuration summary cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                <div className="bg-white/80 rounded p-2">
-                  <span className="text-[10px] text-gray-500 block">Algorithm</span>
-                  <span className="text-xs font-medium text-gray-700">{configSnapshot.algorithm || 'N/A'}</span>
-                </div>
-                <div className="bg-white/80 rounded p-2">
-                  <span className="text-[10px] text-gray-500 block">Hosts</span>
-                  <span className="text-xs font-medium text-gray-700">{configSnapshot.numHosts || 0}</span>
-                </div>
-                <div className="bg-white/80 rounded p-2">
-                  <span className="text-[10px] text-gray-500 block">VMs</span>
-                  <span className="text-xs font-medium text-gray-700">{configSnapshot.numVMs || 0}</span>
-                </div>
-                <div className="bg-white/80 rounded p-2">
-                  <span className="text-[10px] text-gray-500 block">Cloudlets</span>
-                  <span className="text-xs font-medium text-gray-700">{configSnapshot.numCloudlets || 0}</span>
-                </div>
-              </div>
-              
-              {/* Raw JSON with copy button */}
-              <div className="relative">
-                <button
-                  onClick={() => copyToClipboard(JSON.stringify(configSnapshot, null, 2), 'config')}
-                  className="absolute top-2 right-2 p-1.5 bg-white hover:bg-gray-100 rounded border border-gray-200 transition-colors z-10"
-                  aria-label="Copy configuration JSON"
-                >
-                  {copiedField === 'config' ? (
-                    <FiCheck className="text-green-500 w-4 h-4" />
-                  ) : (
-                    <FiCopy className="text-gray-400 w-4 h-4" />
-                  )}
-                </button>
-                <pre className="p-3 bg-white/80 rounded text-[10px] overflow-x-auto border border-gray-100 font-mono">
-                  {JSON.stringify(configSnapshot, null, 2)}
-                </pre>
-              </div>
+      {/* Configuration details section - Always visible */}
+      {configSnapshot && (
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          <h5 className="text-xs font-semibold text-gray-600 mb-2">Configuration Details</h5>
+          
+          {/* Configuration summary cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+            <div className="bg-white/80 rounded p-2">
+              <span className="text-[10px] text-gray-500 block">Algorithm</span>
+              <span className="text-xs font-medium text-gray-700">{configSnapshot.algorithm || 'N/A'}</span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="bg-white/80 rounded p-2">
+              <span className="text-[10px] text-gray-500 block">Hosts</span>
+              <span className="text-xs font-medium text-gray-700">{configSnapshot.numHosts || 0}</span>
+            </div>
+            <div className="bg-white/80 rounded p-2">
+              <span className="text-[10px] text-gray-500 block">VMs</span>
+              <span className="text-xs font-medium text-gray-700">{configSnapshot.numVMs || 0}</span>
+            </div>
+            <div className="bg-white/80 rounded p-2">
+              <span className="text-[10px] text-gray-500 block">Cloudlets</span>
+              <span className="text-xs font-medium text-gray-700">{configSnapshot.numCloudlets || 0}</span>
+            </div>
+          </div>
+          
+          {/* Raw JSON with copy button */}
+          <div className="relative">
+            <button
+              onClick={() => copyToClipboard(JSON.stringify(configSnapshot, null, 2), 'config')}
+              className="absolute top-2 right-2 p-1.5 bg-white hover:bg-gray-100 rounded border border-gray-200 transition-colors z-10"
+              aria-label="Copy configuration JSON"
+            >
+              {copiedField === 'config' ? (
+                <FiCheck className="text-green-500 w-4 h-4" />
+              ) : (
+                <FiCopy className="text-gray-400 w-4 h-4" />
+              )}
+            </button>
+            <pre className="p-3 bg-white/80 rounded text-[10px] overflow-x-auto border border-gray-100 font-mono">
+              {JSON.stringify(configSnapshot, null, 2)}
+            </pre>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
