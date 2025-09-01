@@ -87,7 +87,7 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
             viewport={{ once: false }}
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-              Data Center Simulation
+              Simulation  Guide
             </span>
           </motion.h3>
           
