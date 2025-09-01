@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { useMatlabFeatures } from '../../hooks/useFeatureFlags';
 
 const MatlabToggle = ({ enabled, onChange, disabled = false }) => {
+  const { showMatlabToggle } = useMatlabFeatures();
   const [matlabStatus, setMatlabStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null); // Track if we encountered an error
+  
+  if (!showMatlabToggle) {
+    return null;
+  }
 
   useEffect(() => {
     // Only check status when MATLAB is enabled and not disabled
