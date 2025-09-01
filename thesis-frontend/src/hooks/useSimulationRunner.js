@@ -230,7 +230,7 @@ export const useSimulationRunner = () => {
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,
               iterations: comparisonResults.iterations,
-              // For comparison, we don't have separate analysis per algorithm
+              totalExecutionTime: comparisonResults.totalExecutionTime, 
               analysis: null
             },
             epso: {
@@ -241,7 +241,7 @@ export const useSimulationRunner = () => {
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,
               iterations: comparisonResults.iterations,
-              // For comparison, we don't have separate analysis per algorithm
+              totalExecutionTime: comparisonResults.totalExecutionTime, 
               analysis: null
             }
           };
@@ -275,14 +275,16 @@ export const useSimulationRunner = () => {
               eaco: {
                 rawResults: eacoResponse.simulationResults || eacoResponse,
                 summary: eacoResponse.simulationResults?.summary || eacoResponse.summary,
-                analysis: eacoResponse.analysis, // Include backend analysis
-                plotMetadata: eacoResponse.plotMetadata // Include plot metadata for interpretations
+                analysis: eacoResponse.analysis,
+                plotMetadata: eacoResponse.plotMetadata,
+                executionTimeMs: eacoResponse.executionTimeMs 
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse,
                 summary: epsoResponse.simulationResults?.summary || epsoResponse.summary,
-                analysis: epsoResponse.analysis, // Include backend analysis
-                plotMetadata: epsoResponse.plotMetadata // Include plot metadata for interpretations
+                analysis: epsoResponse.analysis,
+                plotMetadata: epsoResponse.plotMetadata,
+                executionTimeMs: epsoResponse.executionTimeMs 
               },
               plotsGenerating: true
             };
@@ -333,15 +335,17 @@ export const useSimulationRunner = () => {
                 rawResults: eacoResponse.simulationResults || eacoResponse.rawResults || eacoResponse,
                 summary: eacoResponse.simulationResults?.summary || eacoResponse.summary || eacoResponse.rawResults?.summary,
                 plotData: eacoResponse.plotData,
-                analysis: eacoResponse.analysis, // ADD THIS - Backend interpretations!
-                plotMetadata: eacoResponse.plotMetadata // ADD THIS - Plot metadata for interpretations!
+                analysis: eacoResponse.analysis,
+                plotMetadata: eacoResponse.plotMetadata,
+                executionTimeMs: eacoResponse.executionTimeMs 
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse.rawResults || epsoResponse,
                 summary: epsoResponse.simulationResults?.summary || epsoResponse.summary || epsoResponse.rawResults?.summary,
                 plotData: epsoResponse.plotData,
-                analysis: epsoResponse.analysis, // ADD THIS - Backend interpretations!
-                plotMetadata: epsoResponse.plotMetadata // ADD THIS - Plot metadata for interpretations!
+                analysis: epsoResponse.analysis,
+                plotMetadata: epsoResponse.plotMetadata,
+                executionTimeMs: epsoResponse.executionTimeMs 
               }
             };
             setSimulationResults(combinedResults);

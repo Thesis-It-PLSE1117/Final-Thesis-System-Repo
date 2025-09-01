@@ -454,6 +454,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                 </div>
                 <PairedTTestDisplay 
                   tTestResults={eacoResults?.tTestResults || epsoResults?.tTestResults}
+                  comparisonResults={eacoResults || epsoResults}
                   isLoading={false}
                 />
               </motion.div>
@@ -474,6 +475,8 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               <AnalysisComparison 
                 eacoAnalysis={eacoResults?.analysis} 
                 epsoAnalysis={epsoResults?.analysis}
+                eacoResults={eacoResults}
+                epsoResults={epsoResults}
               />
             ) : (
               // Show fallback ONLY when there are no interpretations, no t-test results,

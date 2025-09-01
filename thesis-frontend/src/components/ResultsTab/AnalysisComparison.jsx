@@ -17,13 +17,9 @@ import {
   ArrowRight
 } from 'lucide-react';
 import PlotInterpretationCard from './PlotInterpretationCard';
+import ExecutionTimeDisplay from './ExecutionTimeDisplay';
 
-/**
- * AnalysisComparison Component
- * Provides side-by-side comparison of EACO and EPSO analyses
- * Complies with ISO 9241-110 (Dialogue principles) and ISO 9241-12 (Presentation of information)
- */
-const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis }) => {
+const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResults }) => {
   const [expandedSections, setExpandedSections] = useState({
     overall: true,
     metrics: false,
@@ -134,6 +130,11 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis }) => {
           </div>
         </div>
       </div>
+
+      <ExecutionTimeDisplay 
+        eacoResults={eacoResults} 
+        epsoResults={epsoResults}
+      />
 
       {/* Overall Performance Comparison */}
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">

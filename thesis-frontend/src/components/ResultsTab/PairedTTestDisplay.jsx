@@ -19,8 +19,8 @@ import {
   Activity
 } from 'lucide-react';
 
-const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
-  // Debug: inspect incoming t-test results
+const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false }) => {
+
   try {
     if (tTestResults && tTestResults.metricTests) {
       const sample = Object.entries(tTestResults.metricTests)[0];
@@ -39,7 +39,9 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
         });
       }
     }
-  } catch {}
+  } catch (error) {
+
+  }
   const [expandedMetric, setExpandedMetric] = useState(null);
   const [showMethodology, setShowMethodology] = useState(false);
   const [showInterpretation, setShowInterpretation] = useState(true);
@@ -63,6 +65,24 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
   // Derive significant count to ensure UI consistency even if backend count is stale
   const derivedSignificant = Object.values(metricTests || {}).filter((t) => t && t.significant).length;
   const significantCount = typeof significantDifferences === 'number' ? significantDifferences : derivedSignificant;
+  
+  // Format timing information from comparison results
+  const formatDuration = (milliseconds) => {
+    if (!milliseconds || milliseconds < 0) return 'N/A';
+    const seconds = milliseconds / 1000;
+    if (seconds < 60) {
+      return `${seconds.toFixed(2)}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    }
+  };
 
   const detectAlgorithmFromText = (text) => {
     if (!text || typeof text !== 'string') return null;
@@ -126,13 +146,26 @@ const PairedTTestDisplay = ({ tTestResults, isLoading = false }) => {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setShowMethodology(!showMethodology)}
-          className="text-sm text-[#319694] hover:text-[#267b79] flex items-center gap-1"
-        >
-          <Info size={16} />
-          Methodology
-        </button>
+        <div className="flex items-center gap-4">
+          {comparisonResults?.totalExecutionTime && (
+            <div className="text-right">
+              <div className="flex items-center gap-2 mb-1">
+                <Timer className="text-[#319694]" size={16} />
+                <span className="text-sm font-medium text-gray-700">Analysis Time</span>
+              </div>
+              <span className="text-lg font-bold text-[#319694]">
+                {formatDuration(comparisonResults.totalExecutionTime)}
+              </span>
+            </div>
+          )}
+          <button
+            onClick={() => setShowMethodology(!showMethodology)}
+            className="text-sm text-[#319694] hover:text-[#267b79] flex items-center gap-1"
+          >
+            <Info size={16} />
+            Methodology
+          </button>
+        </div>
       </div>
 
       {/* Methodology Explanation */}
