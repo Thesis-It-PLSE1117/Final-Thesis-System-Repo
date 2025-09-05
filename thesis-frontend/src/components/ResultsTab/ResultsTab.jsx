@@ -21,6 +21,7 @@ import PairedTTestDisplay from './PairedTTestDisplay';
 import MetadataDisplay from './MetadataDisplay';
 import AnalysisDisplay from './AnalysisDisplay';
 import AnalysisComparison from './AnalysisComparison';
+import IterationDetailsDisplay from './IterationDetailsDisplay';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 import ImageModal from '../modals/ImageModal';
 import PlotWithInterpretation from './PlotWithInterpretation';
@@ -49,12 +50,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     (plotData.eaco?.plotPaths?.length > 0 || plotData.epso?.plotPaths?.length > 0);
   const matlabPlotsExpected = plotsGenerating === true || hasMatlabPlots;
   
-  // Debug logging for plot data
-  console.log('=== Plot Data Debug ===');
-  console.log('plotData:', plotData);
-  console.log('plotsGenerating:', plotsGenerating);
-  console.log('hasMatlabPlots:', hasMatlabPlots);
-  console.log('matlabPlotsExpected:', matlabPlotsExpected);
   
   /**
    * I define tabs following UI/UX best practices for progressive disclosure
@@ -98,16 +93,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     }
   ];
   
-  /**
-   * I add debug logging to see what data we're receiving
-   */
   useEffect(() => {
-    console.log('=== ResultsTab Debug ===');
-    console.log('eacoResults:', eacoResults);
-    console.log('eacoResults.analysis:', eacoResults?.analysis);
-    console.log('epsoResults:', epsoResults);
-    console.log('epsoResults.analysis:', epsoResults?.analysis);
-    
     /**
      * I auto-switch to analysis tab when t-test results are available
      */
@@ -143,14 +129,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     }
   }, [eacoResults, epsoResults]);
 
-  // Debug logging for plot metadata
-  useEffect(() => {
-    console.log('=== Plot Metadata Debug ===');
-    console.log('eacoResults.plotMetadata:', eacoResults?.plotMetadata);
-    console.log('epsoResults.plotMetadata:', epsoResults?.plotMetadata);
-    console.log('eacoResults.plotData?.plotMetadata:', eacoResults?.plotData?.plotMetadata);
-    console.log('epsoResults.plotData?.plotMetadata:', epsoResults?.plotData?.plotMetadata);
-  }, [eacoResults, epsoResults]);
 
   const handleBackToAnimation = () => {
     setIsExiting(true);
@@ -457,6 +435,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                   comparisonResults={eacoResults || epsoResults}
                   isLoading={false}
                 />
+                
+                {/* Individual Iteration Details */}
+                {hasTTest && eacoResults?.rawResults && epsoResults?.rawResults && (
+                  <IterationDetailsDisplay 
+                    eacoResults={eacoResults?.rawResults} 
+                    epsoResults={epsoResults?.rawResults}
+                  />
+                )}
               </motion.div>
             )}
             

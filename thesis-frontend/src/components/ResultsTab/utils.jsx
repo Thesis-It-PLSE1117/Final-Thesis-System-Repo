@@ -13,7 +13,6 @@ export const normalizeData = (results) => {
     return null;
   }
   
-  console.log('normalizeData input:', results);
   
 
   if (results.rawResults && results.rawResults.totalIterations) {
@@ -21,11 +20,6 @@ export const normalizeData = (results) => {
     const bestResult = results.rawResults.bestResult || 
                       (results.rawResults.individualResults && results.rawResults.individualResults[0]) || {};
     
-    if (!bestResult.vmUtilization) {
-      console.warn('No valid bestResult.vmUtilization found in iteration data; using safe defaults');
-    }
-    
-    console.log('Processing iteration result, bestResult:', bestResult);
     
 
     const normalized = {
@@ -55,17 +49,11 @@ export const normalizeData = (results) => {
       iterationData: results.rawResults
     };
     
-    console.log('Normalized iteration result:', normalized);
     return normalized;
   }
   
   const data = results.rawResults || results || {};
   
-  if (!data.vmUtilization) {
-    console.warn('No vmUtilization found in single run data; using safe defaults');
-  }
-
-  console.log('Processing single run result');
 
   const normalized = {
     ...data,
@@ -91,7 +79,6 @@ export const normalizeData = (results) => {
     plotData: results.plotData || data.plotData
   };
   
-  console.log('Normalized single run result:', normalized);
   return normalized;
 };
 
