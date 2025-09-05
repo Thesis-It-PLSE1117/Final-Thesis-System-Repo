@@ -48,43 +48,53 @@ const WorkloadHelp = () => {
         <h3 className="text-xl font-semibold text-gray-800">Workload Configuration</h3>
       </div>
       <p className="text-gray-600 mb-4">
-        The simulation supports two CSV schemas. Use whichever matches your source:
+        The simulation supports two CSV schemas from the manuscript specification. Each schema addresses different workload data sources with specific preprocessing requirements:
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 rounded-lg border border-[#319694]/10 bg-white/80">
           <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
             <Columns className="text-[#319694]" size={18} /> Normalized Schema
           </h4>
+          <p className="text-xs text-gray-600 mb-3">For preprocessed workload data with normalized task parameters</p>
           <ul className="space-y-2">
             {[
-              "length: Cloudlet work in MI",
-              "pes: Processing elements per task",
-              "file_size: Normalized 0–1, scaled to bytes",
-              "output_size: Normalized 0–1, scaled to bytes"
+              "length: Cloudlet computational work measured in Million Instructions (MI)",
+              "pes: Number of Processing Elements required per task (integer)",
+              "file_size: Input data size normalized to 0–1 range, scaled to bytes during simulation",
+              "output_size: Output data size normalized to 0–1 range, scaled to bytes during simulation"
             ].map((text, i) => (
-              <motion.li key={`norm-${i}`} className="text-gray-700 p-2 rounded" whileHover={listItemHover}>
+              <motion.li key={`norm-${i}`} className="text-gray-700 p-2 rounded text-sm" whileHover={listItemHover}>
                 {text}
               </motion.li>
             ))}
           </ul>
+          <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-800">
+            <strong>Usage:</strong> Ideal for custom datasets or academic benchmarks
+          </div>
         </div>
         <div className="p-4 rounded-lg border border-[#319694]/10 bg-white/80">
           <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-            <Columns className="text-[#319694]" size={18} /> Google Schema
+            <Columns className="text-[#319694]" size={18} /> Google Cluster Schema
           </h4>
+          <p className="text-xs text-gray-600 mb-3">Based on Google Cluster Traces dataset format with time-based submission</p>
           <ul className="space-y-2">
             {[
-              "arrival_ts (μs): Converted to seconds and normalized to start at 0",
-              "cpu_request (0–1) and memory_request (0–1)",
-              "file_size, output_size: Treated as 0–1 and scaled to bytes",
-              "pes_number: Rounded to integer PEs",
-              "time_window (optional): If present, used with cpu_request to derive MI"
+              "arrival_ts (μs): Task arrival timestamp in microseconds, normalized using t := (arrival_ts - min(arrival_ts)) / 1e6",
+              "cpu_request: CPU resource demand as fraction (0.0–1.0) of total host capacity",
+              "memory_request: Memory resource demand as fraction (0.0–1.0) of total host capacity",
+              "file_size: Input file size treated as normalized fraction (0–1), scaled to bytes",
+              "output_size: Output file size treated as normalized fraction (0–1), scaled to bytes",
+              "pes_number: Processing elements required, rounded to nearest integer",
+              "time_window (optional): If present, combined with cpu_request to derive computational MI"
             ].map((text, i) => (
-              <motion.li key={`ggl-${i}`} className="text-gray-700 p-2 rounded" whileHover={listItemHover}>
+              <motion.li key={`ggl-${i}`} className="text-gray-700 p-2 rounded text-sm" whileHover={listItemHover}>
                 {text}
               </motion.li>
             ))}
           </ul>
+          <div className="mt-3 p-2 bg-green-50 rounded text-xs text-green-800">
+            <strong>Source:</strong> Preprocessed subset of Google Cluster Dataset
+          </div>
         </div>
       </div>
 
@@ -120,9 +130,23 @@ const WorkloadHelp = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-800">Documentation Notes</h3>
           </div>
-          <ul className="space-y-2 text-gray-700">
-            <li>Survey collected via Google Forms (Likert scale); results summarized in the manuscript.</li>
-            <li>Data provenance: Google Cluster subset; arrival_ts in μs, normalized to seconds.</li>
+          <ul className="space-y-3 text-gray-700">
+            <li className="flex items-start gap-2">
+              <span className="text-[#319694] text-sm font-mono mt-0.5">•</span>
+              <span><strong>Timestamp Normalization:</strong> arrival_ts converted from microseconds to seconds using: <code className="bg-gray-100 px-1 rounded text-xs">t := (arrival_ts - min(arrival_ts)) / 1e6</code></span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#319694] text-sm font-mono mt-0.5">•</span>
+              <span><strong>Data Scaling:</strong> file_size and output_size values interpreted as normalized fractions (0–1) and scaled to bytes during simulation</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#319694] text-sm font-mono mt-0.5">•</span>
+              <span><strong>Survey Methodology:</strong> End-user and IT-expert evaluation via Google Forms (Likert scale); aggregated findings reported in manuscript</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#319694] text-sm font-mono mt-0.5">•</span>
+              <span><strong>Missing Data:</strong> Tasks with missing arrival_ts default to t=0 (batch submission mode)</span>
+            </li>
           </ul>
         </motion.div>
       </div>
