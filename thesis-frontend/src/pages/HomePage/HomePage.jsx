@@ -186,8 +186,16 @@ const HomePage = () => {
             },
             {
               title: "System Architecture",
-              content: "The system consists of a frontend built with React.js and a backend simulation engine. The visualization components help understand how tasks are distributed across VMs in real-time.",
-              icon: <Settings className="text-[#4fd1c5]" />
+              content: "CloudSim-based simulation framework with Spring Boot backend and React.js frontend. CustomBroker class inherits from CloudSim's DatacenterBroker and implements ISchedulingAlgorithm interface. MATLAB integration provides advanced visualization and statistical analysis of results.",
+              icon: <Settings className="text-[#4fd1c5]" />,
+              list: [
+                "CustomBroker governs task and VM assignment",
+                "EnhancedACO and EnhancedPSO implement ISchedulingAlgorithm interface",
+                "DataCenterConfigurator manages simulation setup",
+                "MATLAB Engine integration for advanced analytics",
+                "Spring Boot + CloudSim core backend",
+                "React.js frontend with Chart.js visualization"
+              ]
             },
             {
               title: "Key Features",
@@ -216,12 +224,12 @@ const HomePage = () => {
         isOpen={activeModal === 'aco'} 
         onClose={closeModal}
         algorithm={{
-          name: "Enhanced Ant Colony Optimization",
+          name: "Enhanced Ant Colony Optimization (EACO)",
           enhancements: [
-            "Adaptive pheromone evaporation based on system load",
-            "Heuristic-guided initial pheromone distribution",
-            "Dynamic exploration-exploitation balance",
-            "Workload-aware parameter adjustment"
+            "Adaptive pheromone evaporation: p(t) = p_min + (p_max - p_min) × ((f_avg - f_best) / f_best)",
+            "Heuristic load-based reinforcement: Δτ_ij = 1 / (1 + L_j)",
+            "Pheromone update rule: τ_ij(t+1) = (1 - p(t)) × τ_ij(t) + Δτ_ij(t)",
+            "Dynamic exploration-exploitation balance based on convergence"
           ],
           parameters: [
             "Dynamic pheromone coefficient (α)",
@@ -243,12 +251,12 @@ const HomePage = () => {
         isOpen={activeModal === 'pso'} 
         onClose={closeModal}
         algorithm={{
-          name: "Enhanced Particle Swarm Optimization",
+          name: "Enhanced Particle Swarm Optimization (EPSO)",
           enhancements: [
-            "Nonlinear inertia weight reduction",
-            "Adaptive velocity clamping",
-            "Dynamic neighborhood topology",
-            "Hybrid local-global search strategy"
+            "Nonlinear inertia weight: w = w_max - (w_max - w_min) × (iteration/maxIterations)²",
+            "Adaptive velocity clamping: V_max decreases quadratically over iterations",
+            "Standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients",
+            "No VM migration required for energy efficiency"
           ],
           parameters: [
             "Initial inertia weight (w_initial)",

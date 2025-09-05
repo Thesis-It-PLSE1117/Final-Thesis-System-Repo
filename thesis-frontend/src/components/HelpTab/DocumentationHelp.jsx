@@ -16,58 +16,106 @@ const DocumentationHelp = () => {
     {
       title: "Introduction",
       icon: <FileText className="w-5 h-5" />,
-      content: "Overview of the cloud load balancing simulation project and its objectives."
+      content: "This cloud load balancing simulation system compares Enhanced Particle Swarm Optimization (EPSO) and Enhanced Ant Colony Optimization (EACO) algorithms using CloudSim framework with realistic Google Cluster Dataset workloads."
     },
     {
       title: "Dataset & Provenance",
       icon: <BookOpen className="w-5 h-5" />,
-      content: "We use subsets of the Google Cluster Traces. Timestamps (arrival_ts) are provided in microseconds and normalized to seconds (t := (arrival_ts - min(arrival_ts)) / 1e6). file_size and output_size values are interpreted as normalized fractions (0–1) and scaled to bytes."
+      content: "We use preprocessed subsets of the Google Cluster Traces dataset. Timestamps (arrival_ts) are provided in microseconds and normalized to seconds using the formula: t := (arrival_ts - min(arrival_ts)) / 1e6. The file_size and output_size values are interpreted as normalized fractions (0–1) and scaled to bytes for simulation.",
+      subsections: [
+        { 
+          title: "Two CSV Schemas Supported", 
+          content: "(1) Normalized Schema: length (cloudlet work in MI), pes (processing elements per task), file_size (normalized 0–1, scaled to bytes), output_size (normalized 0–1, scaled to bytes). (2) Google Schema: arrival_ts (μs, converted to seconds), cpu_request (0–1), memory_request (0–1), file_size (0–1, scaled), output_size (0–1, scaled), pes_number (rounded to integer), time_window (optional, used with cpu_request to derive MI)." 
+        }
+      ]
     },
     {
-      title: "Preprocessing & Submission Modes",
-      icon: <Cpu className="w-5 h-5" />,
-      content: "Two CSV schemas are supported: (1) Normalized: length, pes, file_size, output_size; (2) Google: arrival_ts, cpu_request, memory_request, file_size, output_size, pes_number, [time_window]. The system supports batch submission (default; all tasks at t=0) and optional staged submission that respects arrival_ts."
+      title: "Performance Metrics (Five Key Metrics)",
+      icon: <BarChart2 className="w-5 h-5" />,
+      subsections: [
+        {
+          title: "1. Response Time",
+          content: "Duration between task submission and completion. Formula: (1/n) × Σ(completion_time - submission_time). Critical for measuring system responsiveness and user satisfaction."
+        },
+        {
+          title: "2. Resource Utilization", 
+          content: "Efficiency of CPU and memory usage across VMs. Formula: (1/m) × Σ(U_j^P) where U_j^P is CPU utilization of host j. Higher utilization indicates better resource usage."
+        },
+        {
+          title: "3. Energy Efficiency",
+          content: "Power consumption during task scheduling using Zhang & Li's energy model. Formula: Energy = Σ P_j where P_j considers busy power (215W) and idle power (162W) based on CPU utilization."
+        },
+        {
+          title: "4. Degree of Imbalance (DI)",
+          content: "Measures workload distribution evenness across VMs. Formula: DI = (MaxTime - MinTime) / AverageTime. Lower values indicate better load balancing."
+        },
+        {
+          title: "5. Makespan",
+          content: "Total time to complete all tasks in the system. Formula: Makespan = Max(Σ CompletionTime). Determined by the VM that finishes last, indicating overall scheduling efficiency."
+        }
+      ]
     },
     {
-      title: "Algorithms",
+      title: "Enhanced Algorithms",
       icon: <Code className="w-5 h-5" />,
       subsections: [
         {
           title: "Enhanced Ant Colony Optimization (EACO)",
-          content: "Adaptive ACO for task-to-VM scheduling with: (a) diversity-driven pheromone evaporation within [ρ_min, ρ_max]; (b) heuristic information combining execution time and resource fit; (c) load-aware reinforcement (inversely proportional to VM load); (d) pheromone capping and early-stopping based on convergence variance. Multi-objective fitness over makespan, energy, utilization, and load balance (weighted)."
+          content: "Adaptive ACO with two key enhancements: (1) Adaptive pheromone evaporation: p(t) = p_min + (p_max - p_min) × ((f_avg - f_best) / f_best), (2) Heuristic load-based reinforcement: Δτ_ij = 1 / (1 + L_j). Pheromone update: τ_ij(t+1) = (1 - p(t)) × τ_ij(t) + Δτ_ij(t). Balances exploration vs exploitation based on convergence and current system load."
         },
         {
           title: "Enhanced PSO (EPSO)",
-          content: "PSO with nonlinear inertia weight decay, adaptive velocity clamping (v_max initial→final), optional early-stopping, and multi-objective fitness combining makespan, energy, utilization, and degree of imbalance (weighted)."
+          content: "PSO with nonlinear inertia weight reduction: w = w_max - (w_max - w_min) × (iteration/maxIterations)², and adaptive velocity clamping: V_max decreases quadratically over iterations. No VM migration required. Uses standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients."
         }
       ]
     },
     {
       title: "System Architecture",
       icon: <BarChart2 className="w-5 h-5" />,
-      content: "Spring Boot backend + CloudSim core. EnhancedSimulationManager orchestrates datacenter/VM build, workload loading, algorithmic scheduling via a custom broker, and metrics computation. React frontend manages configuration, runs, iterations, comparisons, and visualization."
-    },
-    {
-      title: "Frontend Guide",
-      icon: <HelpCircle className="w-5 h-5" />,
+      content: "CloudSim-based simulation framework with Spring Boot backend and React frontend. CustomBroker class inherits from CloudSim's DatacenterBroker and implements ISchedulingAlgorithm interface. MATLAB integration provides advanced visualization and statistical analysis of results.",
       subsections: [
-        { title: "Overview", content: "General frontend structure and capabilities" },
-        { title: "UI Walkthrough", content: "How to navigate the interface" },
-        { title: "Features", content: "Configuration tabs, results visualization, t-test panel, history and export." },
-        { title: "Interaction Diagrams", content: "Visual representations of user flows" }
+        {
+          title: "Core Components",
+          content: "CustomBroker governs task and VM assignment, EnhancedACO and EnhancedPSO implement ISchedulingAlgorithm interface, DataCenterConfigurator manages simulation setup with hosts, VMs, and power models."
+        },
+        {
+          title: "Technology Stack",
+          content: "Backend: Spring Boot + CloudSim core + MATLAB Engine. Frontend: React.js + Chart.js for visualization. Data: Google Cluster Dataset preprocessing with Python + pandas/numpy."
+        }
       ]
     },
     {
-      title: "Results & Analysis",
-      icon: <LinkIcon className="w-5 h-5" />,
-      content: "We report per-iteration metrics and summary statistics. Comparative analysis uses paired t-tests (per metric) with effect sizes and confidence intervals."
+      title: "Research Methodology",
+      icon: <HelpCircle className="w-5 h-5" />,
+      content: "Quantitative, simulation-based research design with expert evaluation. 30 participants: 15 IT experts and 15 end users (11 cloud specialists + 4 academic professionals). Purposive sampling method ensures relevant expertise.",
+      subsections: [
+        {
+          title: "Statistical Analysis",
+          content: "Paired t-test for algorithm comparison: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size. Significance level α = 0.05, two-tailed test."
+        },
+        {
+          title: "Survey Evaluation",
+          content: "Likert scale with four response options: 4 (Strongly Agree, 3.26–4.00), 3 (Agree, 2.51–3.25), 2 (Disagree, 1.76–2.50), 1 (Strongly Disagree, 1.00–1.75). Median scores used for stability with small groups."
+        }
+      ]
+    },
+    {
+      title: "Submission Modes",
+      icon: <Cpu className="w-5 h-5" />,
+      content: "Two submission modes supported: (1) Batch submission (default) - all tasks submitted at t=0 for controlled algorithm comparison, (2) Staged submission (optional) - tasks submitted according to normalized arrival times when arrival_ts is present and enabled."
     },
     {
       title: "Methodology Notes",
       icon: <BookOpen className="w-5 h-5" />,
       subsections: [
-        { title: "Surveys", content: "End-user and IT-expert questionnaires are administered via Google Forms (Likert scale). Aggregated findings are reported in the manuscript; this app does not store survey responses." },
-        { title: "Data Provenance", content: "Google Cluster subset; arrival_ts provided in μs and normalized to seconds for simulation. When arrival_ts is present and enabled, the system stages submissions by time; otherwise, tasks run in a batch at t=0." }
+        { 
+          title: "Survey Administration", 
+          content: "End-user and IT-expert questionnaires administered via Google Forms using Likert scale. Participants evaluate functional suitability, interaction capability, performance efficiency, and scalability. Aggregated findings reported in manuscript; this app does not store survey responses." 
+        },
+        { 
+          title: "Data Provenance & Ethics", 
+          content: "Google Cluster subset with arrival_ts in μs, normalized to seconds. Voluntary participation with informed consent. Confidentiality maintained throughout evaluation process. Results validated through expert feedback from cloud specialists and IT professionals." 
+        }
       ]
     }
   ];
