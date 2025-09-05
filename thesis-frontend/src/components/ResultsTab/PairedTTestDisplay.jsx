@@ -21,27 +21,6 @@ import {
 
 const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false }) => {
 
-  try {
-    if (tTestResults && tTestResults.metricTests) {
-      const sample = Object.entries(tTestResults.metricTests)[0];
-      if (sample) {
-        const [name, test] = sample;
-        // eslint-disable-next-line no-console
-        console.debug('[TTEST DEBUG] Sample metric:', name, {
-          tStatistic: test?.tStatistic,
-          pValue: test?.pValue,
-          df: test?.degreesOfFreedom,
-          types: {
-            tStatistic: typeof test?.tStatistic,
-            pValue: typeof test?.pValue,
-            df: typeof test?.degreesOfFreedom,
-          },
-        });
-      }
-    }
-  } catch (error) {
-
-  }
   const [expandedMetric, setExpandedMetric] = useState(null);
   const [showMethodology, setShowMethodology] = useState(false);
   const [showInterpretation, setShowInterpretation] = useState(true);

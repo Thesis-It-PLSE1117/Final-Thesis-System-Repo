@@ -331,20 +331,8 @@ export const getPlotResults = async (trackingId) => {
   
   const data = await response.json();
 
-  // Debug the metadata structure
-  console.log('Plot Metadata Structure:', {
-    rootMetadata: data.plotMetadata,
-    plotDataMetadata: data.plotData?.plotMetadata,
-    hasRootMetadata: !!data.plotMetadata,
-    hasPlotDataMetadata: !!data.plotData?.plotMetadata,
-    rootMetadataLength: data.plotMetadata?.length || 0,
-    plotDataMetadataLength: data.plotData?.plotMetadata?.length || 0
-  });
-  
-  // CORRECTED: Use root-level plotMetadata which contains interpretations
+  // Use root-level plotMetadata which contains interpretations
   const plotMetadata = data.plotMetadata || [];
-  
-  console.log('Selected plotMetadata:', plotMetadata);
 
   return {
     ready: true,
@@ -443,15 +431,12 @@ export const cancelSimulation = async () => {
       if (response.ok) {
         const result = await response.json();
         results.push({ endpoint, success: true, result });
-        console.log(`Cancel request successful for ${endpoint}:`, result);
       } else {
         const errorText = await response.text();
         results.push({ endpoint, success: false, error: errorText });
-        console.warn(`Cancel request failed for ${endpoint}: ${errorText}`);
       }
     } catch (error) {
       results.push({ endpoint, success: false, error: error.message });
-      console.warn(`Cancel request error for ${endpoint}:`, error.message);
       lastError = error;
     }
   }
