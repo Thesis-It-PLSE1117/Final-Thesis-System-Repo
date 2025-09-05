@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Repeat, Info, TrendingUp, BarChart3 } from 'lucide-react';
+import { Repeat, Info, TrendingUp, BarChart3, Circle } from 'lucide-react';
 
 const IterationTab = ({ config, onChange }) => {
   const handleIterationChange = (value) => {
@@ -73,19 +73,19 @@ const IterationTab = ({ config, onChange }) => {
           
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-2">
-              <span className="text-[#319694] mt-1">•</span>
+              <Circle className="text-[#319694] mt-1" size={6} fill="currentColor" />
               <span>Runs the simulation {config.iterations || 30} time{(config.iterations || 30) > 1 ? 's' : ''} with the same configuration</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#319694] mt-1">•</span>
+              <Circle className="text-[#319694] mt-1" size={6} fill="currentColor" />
               <span>Each run uses the same parameters but may produce slightly different results</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#319694] mt-1">•</span>
+              <Circle className="text-[#319694] mt-1" size={6} fill="currentColor" />
               <span>Helps identify performance consistency and reliability</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#319694] mt-1">•</span>
+              <Circle className="text-[#319694] mt-1" size={6} fill="currentColor" />
               <span>Useful for academic research and benchmarking</span>
             </li>
           </ul>

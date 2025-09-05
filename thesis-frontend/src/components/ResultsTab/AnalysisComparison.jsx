@@ -63,7 +63,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
           <span className={`absolute -top-2 -right-2 text-xs font-bold px-1.5 py-0.5 rounded-full ${
             isBetter ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'
           }`}>
-            {isBetter ? '✓' : ''}
+            {isBetter ? <CheckCircle size={10} /> : ''}
           </span>
         )}
       </div>

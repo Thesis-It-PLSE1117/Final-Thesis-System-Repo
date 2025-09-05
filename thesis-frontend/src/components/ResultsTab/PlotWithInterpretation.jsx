@@ -6,6 +6,7 @@ import {
   FiMaximize2,
   FiInfo
 } from 'react-icons/fi';
+import { Dot } from 'lucide-react';
 import PlotInterpretationCard from './PlotInterpretationCard';
 
 /**
@@ -53,7 +54,7 @@ const PlotWithInterpretation = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-gray-700">{algorithm}</span>
-            <span className="text-sm text-gray-500">•</span>
+            <Dot className="text-gray-500" size={16} />
             <span className="text-sm text-gray-600">{plotTitle}</span>
           </div>
                      <button

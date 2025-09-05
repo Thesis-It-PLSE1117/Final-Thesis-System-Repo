@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronUp, HelpCircle } from 'lucide-react';
+import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronUp, HelpCircle, Dot } from 'lucide-react';
 import Papa from 'papaparse';
 
 const WorkloadUploadCard = ({
@@ -273,7 +273,7 @@ const WorkloadUploadCard = ({
                     </table>
                   </div>
                   <div className="px-3 py-1.5 text-xs text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10 sticky bottom-0">
-                    Showing {csvPreview.rows.length} of {csvRowCount} rows • {csvPreview.type === 'preset' ? 'Preset workload' : 'Uploaded file'}
+                    Showing {csvPreview.rows.length} of {csvRowCount} rows <Dot className="inline mx-1" size={12} /> {csvPreview.type === 'preset' ? 'Preset workload' : 'Uploaded file'}
                   </div>
                 </div>
               </motion.div>
