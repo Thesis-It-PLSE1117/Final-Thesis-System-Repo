@@ -18,7 +18,9 @@ import {
   ChartBar,
   Database,
   Activity,
-  GitCompare
+  GitCompare,
+  ArrowUp,
+  Dot
 } from 'lucide-react';
 
 const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
@@ -196,7 +198,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                 Individual Iteration Results
               </h3>
               <p className={`text-sm mt-0.5 ${showDetails ? 'text-white/80' : 'text-gray-600'}`}>
-                Detailed analysis of {Math.max(eacoIterations.length, epsoIterations.length)} iterations • Raw paired data used in t-test
+                Detailed analysis of {Math.max(eacoIterations.length, epsoIterations.length)} iterations <Dot className="inline mx-1" size={12} /> Raw paired data used in t-test
               </p>
             </div>
           </div>
@@ -300,7 +302,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                             <span className={`px-2 py-1 text-xs font-bold rounded-full ${
                               stats.winner === 'EACO' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                             }`}>
-                              {stats.winner} ↑{stats.improvement.toFixed(1)}%
+                              {stats.winner} <ArrowUp size={12} className="inline" />{stats.improvement.toFixed(1)}%
                             </span>
                           )}
                         </div>

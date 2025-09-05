@@ -1,8 +1,9 @@
+import { Search } from 'lucide-react';
+
 const HistoryCard = ({ result, isSelected, onClick }) => {
   const date = new Date(result.timestamp);
   const formattedDate = date.toLocaleString();
   
-  // Handle cases where summary might be undefined
   const makespan = result.summary?.makespan || 0;
   const config = result.config || {};
   
@@ -60,8 +61,8 @@ const HistoryCard = ({ result, isSelected, onClick }) => {
               </span>
             )}
             {hasInterpretations && (
-              <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                🔍 Interpretations
+              <span className="bg-green-100 text-green-700 px-2 py-1 rounded flex items-center gap-1">
+                <Search size={12} /> Interpretations
               </span>
             )}
             {hasStatisticalAnalysis && (

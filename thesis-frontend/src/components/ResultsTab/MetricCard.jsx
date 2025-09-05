@@ -20,6 +20,7 @@ import {
   FiTrendingDown,
   FiMinus
 } from 'react-icons/fi';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen, icon: Icon, backendInterpretation }) => {
   /**
@@ -409,8 +410,12 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                    </div>
                  );
                })()}
-               <div className="text-xs text-gray-500 mt-1">
-                 {betterWhen === "higher" ? "↑ Higher better" : "↓ Lower better"}
+               <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                 {betterWhen === "higher" ? (
+                   <><ArrowUp size={12} /> Higher better</>
+                 ) : (
+                   <><ArrowDown size={12} /> Lower better</>
+                 )}
                </div>
              </div>
             

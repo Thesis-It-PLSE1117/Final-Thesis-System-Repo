@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaUniversity } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
+import { Hand } from 'lucide-react';
 import danmelImage from '../../assets/2x2-laranga.png';
 import kierImage from '../../assets/2x2-reyes.png';
 import alfredImage from '../../assets/2x2-violanta.png';
@@ -122,7 +123,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                 >
-                  👋
+                  <Hand className="text-[#319694]" size={28} />
                 </motion.div>
               </motion.h2>
 
