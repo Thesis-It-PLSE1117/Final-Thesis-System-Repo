@@ -22,6 +22,7 @@ import MetadataDisplay from './MetadataDisplay';
 import AnalysisDisplay from './AnalysisDisplay';
 import AnalysisComparison from './AnalysisComparison';
 import IterationDetailsDisplay from './IterationDetailsDisplay';
+import ExecutionTimeDisplay from './ExecutionTimeDisplay';
 import { normalizeData, getSummaryData, keyMetrics } from './utils';
 import ImageModal from '../modals/ImageModal';
 import PlotWithInterpretation from './PlotWithInterpretation';
@@ -349,6 +350,11 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                 />
               )}
             </div>
+
+            <ExecutionTimeDisplay 
+              eacoResults={eacoResults} 
+              epsoResults={epsoResults}
+            />
 
             {/* Iteration info if applicable */}
             {(eacoResults?.iterationsAdjusted || epsoResults?.iterationsAdjusted) && (
