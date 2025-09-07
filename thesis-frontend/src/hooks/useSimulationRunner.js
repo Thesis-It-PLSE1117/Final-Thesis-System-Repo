@@ -17,6 +17,7 @@ export const useSimulationRunner = () => {
   const [plotStatus, setPlotStatus] = useState(null); // 'pending', 'generating', 'completed', 'failed'
   const [abortController, setAbortController] = useState(null);
   const [isAborting, setIsAborting] = useState(false);
+  const [progressInterval, setProgressInterval] = useState(null);
 
   const runAlgorithm = async (algorithm, configData, withPlots, workloadFile, useAsync = false, retryCount = 0) => {
     try {
@@ -183,7 +184,7 @@ export const useSimulationRunner = () => {
       // i adjust speed since you know for the sake of showing realistic progress
       const progressMultiplier = iterationConfig.iterations > 1 ? 0.6 : 1.0;
       
-      let progressInterval = setInterval(() => {
+      const interval = setInterval(() => {
         setProgress(prev => {
           if (prev < 10) return prev + (2 * progressMultiplier);
           if (prev < 30) return prev + (1.5 * progressMultiplier);
@@ -193,6 +194,7 @@ export const useSimulationRunner = () => {
           return prev + (0.3 * progressMultiplier);
         });
       }, 500);
+      setProgressInterval(interval);
       
       try {
         // i use comparison for 30+ iterations since you know for the sake of statistical significance
@@ -353,7 +355,10 @@ export const useSimulationRunner = () => {
           }
         }
         
-        clearInterval(progressInterval);
+        if (progressInterval) {
+          clearInterval(progressInterval);
+          setProgressInterval(null);
+        }
         setProgress(100);
         
         setTimeout(() => {
@@ -362,7 +367,10 @@ export const useSimulationRunner = () => {
         
         return true;
       } catch (algorithmError) {
-        clearInterval(progressInterval);
+        if (progressInterval) {
+          clearInterval(progressInterval);
+          setProgressInterval(null);
+        }
         // Check if the error is due to cancellation
         if (algorithmError.name === 'CancelledError' || algorithmError.message === 'Request cancelled') {
           showNotification('Simulation cancelled', 'info');
@@ -386,6 +394,12 @@ export const useSimulationRunner = () => {
 
   // cancel the simulation
   const cancelSimulation = async () => {
+    // Clear the progress interval first
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      setProgressInterval(null);
+    }
+    
     if (abortController && !isAborting) {
       setIsAborting(true);
       console.log('Aborting simulation...');
