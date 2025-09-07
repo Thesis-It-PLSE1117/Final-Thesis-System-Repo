@@ -50,15 +50,20 @@ export const run = async (algorithm, config, abortSignal = null) => {
     fetchOptions.signal = abortSignal;
   }
   
-
+  const startTime = Date.now();
   const response = await fetch(`${API_BASE}/api/simulate/raw`, fetchOptions);
+  const executionTimeMs = Date.now() - startTime;
   
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Server responded with ${response.status} for ${algorithm}: ${errorText}`);
   }
   
-  return response.json();
+  const result = await response.json();
+  return {
+    ...result,
+    executionTimeMs: result.executionTimeMs || executionTimeMs
+  };
 };
 
 /**
@@ -102,7 +107,8 @@ export const runWithFile = async (algorithm, config, file, abortSignal = null) =
       summary: (result.simulationResults?.summary) || (result.rawResults?.summary) || result.summary,
       analysis: result.analysis,
       plotData: result.plotData || undefined,
-      plotMetadata: result.plotMetadata || undefined
+      plotMetadata: result.plotMetadata || undefined,
+      executionTimeMs: result.executionTimeMs || undefined
     };
   }
 
@@ -112,12 +118,15 @@ export const runWithFile = async (algorithm, config, file, abortSignal = null) =
       rawResults: result.rawResults || result,
       summary: result.rawResults?.summary || result.summary,
       plotData: result.plotData,
-      plotMetadata: result.plotMetadata
+      plotMetadata: result.plotMetadata,
+      executionTimeMs: result.executionTimeMs || undefined
     };
   }
 
-  // Raw SimulationResults
-  return result;
+  return {
+    ...result,
+    executionTimeMs: result.executionTimeMs || undefined
+  };
 };
 
 /**
@@ -141,7 +150,9 @@ export const runIterations = async (algorithm, config, abortSignal = null) => {
     fetchOptions.signal = abortSignal;
   }
   
+  const startTime = Date.now();
   const response = await fetch(`${API_BASE}/api/run-iterations`, fetchOptions);
+  const executionTimeMs = Date.now() - startTime;
   
   if (!response.ok) {
     const errorText = await response.text();
@@ -155,11 +166,15 @@ export const runIterations = async (algorithm, config, abortSignal = null) => {
     return {
       rawResults: result,
       summary: result.averageMetrics,
-      isIterationResult: true
+      isIterationResult: true,
+      executionTimeMs: result.executionTimeMs || executionTimeMs
     };
   }
   
-  return result;
+  return {
+    ...result,
+    executionTimeMs: result.executionTimeMs || executionTimeMs
+  };
 };
 
 /**
@@ -187,7 +202,9 @@ export const runIterationsWithFile = async (algorithm, config, file, abortSignal
     fetchOptions.signal = abortSignal;
   }
   
+  const startTime = Date.now();
   const response = await fetch(`${API_BASE}/api/run-iterations-with-file`, fetchOptions);
+  const executionTimeMs = Date.now() - startTime;
   
   if (!response.ok) {
     const errorText = await response.text();
