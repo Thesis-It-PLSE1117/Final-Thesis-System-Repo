@@ -12,7 +12,23 @@ import * as historyService from '../services/historyService';
 export const useSimulationRunner = () => {
   const [simulationResults, setSimulationResults] = useState(null);
   const [progress, setProgress] = useState(0);
-  const [simulationState, setSimulationState] = useState('config');
+  const [simulationState, setSimulationState] = useState(() => {
+    // session storage on mount
+    const stored = sessionStorage.getItem('activeSimulation');
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        const timeSince = Date.now() - data.timestamp;
+        // restore the loading state
+        if (timeSince < 7200000 && data.state === 'loading') {
+          return 'loading';
+        }
+      } catch (e) {
+        sessionStorage.removeItem('activeSimulation');
+      }
+    }
+    return 'config';
+  });
   const [plotTrackingIds, setPlotTrackingIds] = useState(null);
   const [plotStatus, setPlotStatus] = useState(null); // 'pending', 'generating', 'completed', 'failed'
   const [abortController, setAbortController] = useState(null);
@@ -160,6 +176,17 @@ export const useSimulationRunner = () => {
     setSimulationState('loading');
     setProgress(0);
     
+    // Store simulation start in session storage
+    sessionStorage.setItem('activeSimulation', JSON.stringify({
+      state: 'loading',
+      timestamp: Date.now(),
+      config: {
+        numCloudlets: cloudletConfig.numCloudlets,
+        numVMs: dataCenterConfig.numVMs,
+        iterations: iterationConfig.iterations
+      }
+    }));
+    
     const configData = {
       numHosts: dataCenterConfig.numHosts,
       numVMs: dataCenterConfig.numVMs,
@@ -190,7 +217,8 @@ export const useSimulationRunner = () => {
           if (prev < 30) return prev + (1.5 * progressMultiplier);
           if (prev < 60) return prev + (0.8 * progressMultiplier);
           if (prev < 90) return prev + (0.5 * progressMultiplier);
-          if (prev >= 95) return prev;
+          if (prev >= 95 && prev < 99.5) return prev + 0.01;
+          if (prev >= 99.5) return 99.5; 
           return prev + (0.3 * progressMultiplier);
         });
       }, 500);
@@ -361,6 +389,9 @@ export const useSimulationRunner = () => {
         }
         setProgress(100);
         
+        // Clear session storage on successful completion
+        sessionStorage.removeItem('activeSimulation');
+        
         setTimeout(() => {
           setSimulationState('animation');
         }, 500);
@@ -378,6 +409,7 @@ export const useSimulationRunner = () => {
           showNotification(`Failed to run algorithms: ${algorithmError.message}`, 'error');
         }
         setSimulationState('config');
+        sessionStorage.removeItem('activeSimulation');
         return false;
       }
     } catch (err) {
@@ -388,6 +420,7 @@ export const useSimulationRunner = () => {
         showNotification(`Failed to run simulation: ${err.message}`, 'error');
       }
       setSimulationState('config');
+      sessionStorage.removeItem('activeSimulation');
       return false;
     }
   };
