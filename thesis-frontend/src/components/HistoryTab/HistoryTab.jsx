@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import HistoryPlaceholder from './HistoryPlaceholder';
+import HistoryPlaceholder from './HistoryPlaceHolder';
 import { exportSimulationHistory } from '../../utils/exportUtils';
 import HistoryDropdown from './HistoryDropdown';
 import HistoryDetails from './HistoryDetails';
