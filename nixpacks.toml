@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x"]
+
+[phases.install]
+cmds = ["cd thesis-frontend && npm ci"]
+
+[phases.build]
+cmds = ["cd thesis-frontend && npm run build:production"]
+
+[start]
+cmd = "cd thesis-frontend && npm run start"
