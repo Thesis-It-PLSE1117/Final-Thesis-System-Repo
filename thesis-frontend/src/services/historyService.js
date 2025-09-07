@@ -2,8 +2,10 @@
  * history Service
  */
 
+import { getStorageInfo, cleanupStorageIfNeeded } from '../utils/storageUtils';
+
 const HISTORY_KEY = 'simulationHistory';
-const MAX_HISTORY_ENTRIES = 50;
+const MAX_HISTORY_ENTRIES = 100; // Support 50 simulation runs (2 entries per run)
 
 /**
  * get all history entries
@@ -87,18 +89,44 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
   ];
   
   try {
+    // Clean up storage if needed before saving
+    cleanupStorageIfNeeded(0.7); // Clean at 70% usage
+    
     const existingHistory = getHistory();
     const updatedHistory = [...historyEntries, ...existingHistory].slice(0, MAX_HISTORY_ENTRIES);
+    
+    // Log storage info for debugging
+    const storageInfo = getStorageInfo();
+    if (storageInfo) {
+      console.log(`Storage: ${storageInfo.totalSizeFormatted} / ${storageInfo.estimatedLimitFormatted} (${storageInfo.percentUsed.toFixed(1)}% used)`);
+    }
     
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
     } catch (quotaError) {
       // Handle quota exceeded error
       if (quotaError.name === 'QuotaExceededError' || quotaError.message.includes('quota')) {
-        console.log('Storage quota exceeded, reducing history size...');
-        // Keep only 10 most recent entries
-        const reducedHistory = [...historyEntries, ...existingHistory].slice(0, 10);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(reducedHistory));
+        console.log('Storage quota exceeded, applying progressive reduction...');
+        // Try progressively smaller sizes: 60 (30 runs), 40 (20 runs), 20 (10 runs)
+        const reductionSizes = [60, 40, 20, 10];
+        let saved = false;
+        
+        for (const size of reductionSizes) {
+          try {
+            const reducedHistory = [...historyEntries, ...existingHistory].slice(0, size);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(reducedHistory));
+            console.log(`Successfully saved with ${size} entries (${size/2} simulation runs)`);
+            saved = true;
+            break;
+          } catch (e) {
+            console.log(`Failed with ${size} entries, trying smaller...`);
+          }
+        }
+        
+        if (!saved) {
+          // Last resort: save only current entry
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(historyEntries));
+        }
       } else {
         throw quotaError;
       }
