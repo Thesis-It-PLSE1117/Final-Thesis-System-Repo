@@ -382,6 +382,16 @@ const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
   // We don't actually timeout the request, just warn the user
   return new Promise(async (resolve, reject) => {
     let timeoutWarningShown = false;
+    let keepAliveInterval = null;
+    
+    
+    if (url.includes('/compare')) {
+      keepAliveInterval = setInterval(() => {
+        fetch(`${API_BASE}/api/health`, { method: 'GET' }).catch(() => {
+        });
+        console.log(`[${new Date().toLocaleTimeString()}] Keep-alive ping sent to prevent timeout`);
+      }, 600000); // 10 minutes
+    }
     
     // Show warning after 5 minutes
     const warningTimeout = setTimeout(() => {
@@ -392,9 +402,16 @@ const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
     try {
       const response = await fetch(url, options);
       clearTimeout(warningTimeout);
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+        console.log('Keep-alive pings stopped - request completed');
+      }
       resolve(response);
     } catch (error) {
       clearTimeout(warningTimeout);
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+      }
       // Check if it's a real network error or timeout
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
         reject(new Error('Network connection lost. The simulation may still be running on the server. Check History tab later.'));
