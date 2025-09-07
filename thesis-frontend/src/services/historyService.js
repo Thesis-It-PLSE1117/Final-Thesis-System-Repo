@@ -1,80 +1,19 @@
 /**
- * Optimized localStorage History Service
- * Implements compression and data optimization techniques
+ * history Service
  */
+
+import { getStorageInfo, cleanupStorageIfNeeded } from '../utils/storageUtils';
 
 const HISTORY_KEY = 'simulationHistory';
-const MAX_HISTORY_ENTRIES = 50;
-
-// Simple compression using JSON.stringify with replacer
-const compressData = (data) => {
-  try {
-    // Remove null/undefined values and compress repeated data
-    return JSON.stringify(data, (key, value) => {
-      if (value === null || value === undefined) return undefined;
-      if (typeof value === 'number') return Math.round(value * 1000) / 1000; // Round to 3 decimals
-      return value;
-    });
-  } catch (error) {
-    console.error('Compression failed:', error);
-    return JSON.stringify(data);
-  }
-};
-
-const decompressData = (compressedString) => {
-  try {
-    return JSON.parse(compressedString);
-  } catch (error) {
-    console.error('Decompression failed:', error);
-    return null;
-  }
-};
+const MAX_HISTORY_ENTRIES = 100; // Support 50 simulation runs (2 entries per run)
 
 /**
- * Get storage usage info for localStorage
- */
-export const getStorageInfo = () => {
-  try {
-    let totalUsed = 0;
-    let historySize = 0;
-    
-    for (let key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
-        const value = localStorage[key];
-        totalUsed += key.length + value.length;
-        if (key === HISTORY_KEY) {
-          historySize = value.length;
-        }
-      }
-    }
-    
-    // localStorage limit is typically 5MB (5,242,880 bytes)
-    const estimatedLimit = 5242880;
-    
-    return {
-      totalUsed: totalUsed,
-      historySize: historySize,
-      estimatedLimit: estimatedLimit,
-      available: estimatedLimit - totalUsed,
-      usagePercentage: Math.round((totalUsed / estimatedLimit) * 100),
-      historyPercentage: Math.round((historySize / estimatedLimit) * 100)
-    };
-  } catch (error) {
-    console.error('Failed to calculate storage info:', error);
-    return null;
-  }
-};
-
-/**
- * Get all history entries with decompression
+ * get all history entries
  */
 export const getHistory = () => {
   try {
-    const compressedHistory = localStorage.getItem(HISTORY_KEY);
-    if (!compressedHistory) return [];
-    
-    const history = decompressData(compressedHistory);
-    return history || [];
+    const history = localStorage.getItem(HISTORY_KEY);
+    return history ? JSON.parse(history) : [];
   } catch (error) {
     console.error('Failed to load history:', error);
     return [];
@@ -82,57 +21,21 @@ export const getHistory = () => {
 };
 
 /**
- * Optimized data extraction - remove large redundant data
- */
-const optimizeForStorage = (entry) => {
-  const optimized = { ...entry };
-  
-  // Remove or compress large data structures
-  if (optimized.rawResults) {
-    // Keep only essential raw results data
-    const essential = {
-      summary: optimized.rawResults.summary,
-      energyConsumption: optimized.rawResults.energyConsumption,
-      // Keep only aggregated VM utilization, not detailed logs
-      vmUtilization: optimized.rawResults.vmUtilization ? {
-        average: optimized.rawResults.vmUtilization.average,
-        peak: optimized.rawResults.vmUtilization.peak,
-        summary: optimized.rawResults.vmUtilization.summary
-      } : null
-    };
-    optimized.rawResults = essential;
-  }
-  
-  // Truncate scheduling logs if too large
-  if (optimized.schedulingLog && optimized.schedulingLog.length > 100) {
-    optimized.schedulingLog = [
-      ...optimized.schedulingLog.slice(0, 50), // First 50 entries
-      { truncated: true, totalEntries: optimized.schedulingLog.length },
-      ...optimized.schedulingLog.slice(-50) // Last 50 entries
-    ];
-  }
-  
-  // Remove plot image data (keep only metadata and analysis)
-  if (optimized.plotAnalysis && optimized.plotAnalysis.plotPaths) {
-    delete optimized.plotAnalysis.plotPaths;
-  }
-  
-  return optimized;
-};
-
-/**
- * Save simulation results to history with optimization and compression
+ * save simulation results to history
+ * creates paired entries for EACO and EPSO results
  */
 export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloadFile) => {
   const timestamp = new Date().toISOString();
   const id = Date.now();
   
+  // Create full config object including cloudlet config
   const fullConfig = {
     ...dataCenterConfig,
     numCloudlets: cloudletConfig.numCloudlets,
     workloadType: workloadFile ? 'CSV' : 'Random'
   };
   
+  // Helper function to extract plot metadata and analysis without large image data
   const extractPlotAnalysis = (algorithmResults) => {
     const plotData = algorithmResults.plotData;
     if (!plotData) return null;
@@ -140,7 +43,7 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
     return {
       algorithm: plotData.algorithm,
       simulationId: plotData.simulationId,
-      metrics: plotData.metrics,
+      metrics: plotData.metrics, // Performance metrics are small
       plotCount: plotData.plotPaths ? plotData.plotPaths.length : 0,
       plotTypes: plotData.plotMetadata ? plotData.plotMetadata.map(p => p.type) : [],
       plotMetadata: algorithmResults.plotMetadata || plotData.plotMetadata,
@@ -149,18 +52,21 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
     };
   };
   
-  let historyEntries = [
+  const historyEntries = [
     {
       id: `${id}-eaco`,
       timestamp,
       algorithm: 'EACO',
       config: fullConfig,
+      // store full rawResults if present so results view can reconstruct exactly
       rawResults: results.eaco.rawResults || null,
       summary: results.eaco.rawResults?.summary || results.eaco.summary,
       energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
       vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
       schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
+      // OPTIMIZED: Store only analysis and metadata, not large image data
       plotAnalysis: extractPlotAnalysis(results.eaco),
+      // store t-test results for statistical analysis display
       tTestResults: results.eaco.tTestResults || null,
       simulationId: results.eaco.simulationId
     },
@@ -174,51 +80,53 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
       energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
       vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
       schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
+      // OPTIMIZED: Store only analysis and metadata, not large image data
       plotAnalysis: extractPlotAnalysis(results.epso),
+      // store t-test results for statistical analysis display
       tTestResults: results.epso.tTestResults || null,
       simulationId: results.epso.simulationId
     }
   ];
   
-  // Optimize entries for storage
-  historyEntries = historyEntries.map(optimizeForStorage);
-  
   try {
-    const existingHistory = getHistory();
-    let updatedHistory = [...historyEntries, ...existingHistory].slice(0, MAX_HISTORY_ENTRIES);
+    // Clean up storage if needed before saving
+    cleanupStorageIfNeeded(0.7); // Clean at 70% usage
     
-    // Try to save with compression
-    const compressedData = compressData(updatedHistory);
+    const existingHistory = getHistory();
+    const updatedHistory = [...historyEntries, ...existingHistory].slice(0, MAX_HISTORY_ENTRIES);
+    
+    // Log storage info for debugging
+    const storageInfo = getStorageInfo();
+    if (storageInfo) {
+      console.log(`Storage: ${storageInfo.totalSizeFormatted} / ${storageInfo.estimatedLimitFormatted} (${storageInfo.percentUsed.toFixed(1)}% used)`);
+    }
     
     try {
-      localStorage.setItem(HISTORY_KEY, compressedData);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
     } catch (quotaError) {
+      // Handle quota exceeded error
       if (quotaError.name === 'QuotaExceededError' || quotaError.message.includes('quota')) {
-        console.log('Storage quota exceeded, reducing history size and optimizing further...');
+        console.log('Storage quota exceeded, applying progressive reduction...');
+        // Try progressively smaller sizes: 60 (30 runs), 40 (20 runs), 20 (10 runs)
+        const reductionSizes = [60, 40, 20, 10];
+        let saved = false;
         
-        // More aggressive optimization
-        updatedHistory = updatedHistory.slice(0, 20).map(entry => {
-          const ultraOptimized = { ...entry };
-          
-          // Remove even more data
-          if (ultraOptimized.schedulingLog) {
-            delete ultraOptimized.schedulingLog;
+        for (const size of reductionSizes) {
+          try {
+            const reducedHistory = [...historyEntries, ...existingHistory].slice(0, size);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(reducedHistory));
+            console.log(`Successfully saved with ${size} entries (${size/2} simulation runs)`);
+            saved = true;
+            break;
+          } catch (e) {
+            console.log(`Failed with ${size} entries, trying smaller...`);
           }
-          
-          // Keep only summary data from rawResults
-          if (ultraOptimized.rawResults) {
-            ultraOptimized.rawResults = {
-              summary: ultraOptimized.rawResults.summary
-            };
-          }
-          
-          return ultraOptimized;
-        });
+        }
         
-        const ultraCompressed = compressData(updatedHistory);
-        localStorage.setItem(HISTORY_KEY, ultraCompressed);
-        
-        console.log('Applied ultra optimization to fit storage quota');
+        if (!saved) {
+          // Last resort: save only current entry
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(historyEntries));
+        }
       } else {
         throw quotaError;
       }
@@ -227,27 +135,17 @@ export const saveToHistory = (results, dataCenterConfig, cloudletConfig, workloa
     return true;
   } catch (error) {
     console.error('Failed to save to history:', error);
-    
-    // Last resort: clear history if all else fails
+    // Try to clear history if all else fails
     if (error.name === 'QuotaExceededError') {
       clearHistory();
-      console.log('Cleared history due to persistent quota issues');
-      
-      // Try to save just the current entries
-      try {
-        const compressedCurrent = compressData(historyEntries);
-        localStorage.setItem(HISTORY_KEY, compressedCurrent);
-        return true;
-      } catch (finalError) {
-        console.error('Failed to save even current entries:', finalError);
-      }
+      console.log('Cleared history due to quota issues');
     }
     return false;
   }
 };
 
 /**
- * Clear all history entries
+ * clear all history entries
  */
 export const clearHistory = () => {
   try {
@@ -260,7 +158,8 @@ export const clearHistory = () => {
 };
 
 /**
- * Get paired history results with decompression
+ * get paired history results
+ * returns both EACO and EPSO results from the same simulation run
  */
 export const getPairedHistoryResults = (resultId) => {
   const history = getHistory();
@@ -280,20 +179,20 @@ export const getPairedHistoryResults = (resultId) => {
 };
 
 /**
- * Delete a specific history entry and its pair
+ * delete a specific history entry and its pair
  */
 export const deleteHistoryEntry = (resultId) => {
   try {
     const history = getHistory();
     const baseId = resultId.split('-')[0];
     
+    // remove both paired entries
     const filteredHistory = history.filter(entry => {
       const entryBaseId = entry.id.split('-')[0];
       return entryBaseId !== baseId;
     });
     
-    const compressedData = compressData(filteredHistory);
-    localStorage.setItem(HISTORY_KEY, compressedData);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(filteredHistory));
     return true;
   } catch (error) {
     console.error('Failed to delete history entry:', error);

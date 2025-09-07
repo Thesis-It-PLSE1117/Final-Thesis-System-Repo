@@ -1,6 +1,6 @@
 // strg util
 const STORAGE_KEY = 'simulationHistory';
-const MAX_ITEMS = 50;
+const MAX_ITEMS = 100; 
 
 export const getHistory = () => {
   try {
