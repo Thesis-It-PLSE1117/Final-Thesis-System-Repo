@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:analyze": "cross-env ANALYZE=true vite build",
     "build:production": "vite build --mode production",
-    "start": "serve dist -s -l tcp://0.0.0.0:${PORT:-3000}",
+    "start": "serve -s dist -l tcp://0.0.0.0:${PORT:-3000}",
     "lint": "eslint .",
     "preview": "vite preview",
     "optimize": "npm run build && echo 'Build complete. Check dist/ folder for output.'"
