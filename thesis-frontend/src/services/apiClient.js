@@ -13,14 +13,21 @@
  *   ...
  */
 
-// Determine frontend port
-const frontendPort = parseInt(window.location.port, 10);
-
-// Auto-map: backendPort = 8081 + (frontendPort - 5173)
-const backendPort = frontendPort >= 5173 ? 8081 + (frontendPort - 5173) : 8081;
+// Use environment variable for production, fallback to localhost for development
+const getApiBase = () => {
+  // Check for environment variable first
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // Fallback to localhost with port mapping for local development
+  const frontendPort = parseInt(window.location.port, 10);
+  const backendPort = frontendPort >= 5173 ? 8081 + (frontendPort - 5173) : 8081;
+  return `http://localhost:${backendPort}`;
+};
 
 // Final API base
-export const API_BASE = `http://localhost:${backendPort}`;
+export const API_BASE = getApiBase();
 
 /**
  *
