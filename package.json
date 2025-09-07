@@ -1,0 +1,15 @@
+{
+  "name": "thesis-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install": "cd thesis-frontend && npm install",
+    "build": "cd thesis-frontend && npm run build:production",
+    "start": "cd thesis-frontend && npm run start",
+    "dev": "cd thesis-frontend && npm run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "npm-9_x"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = ["cd thesis-frontend && npm ci"]
@@ -8,4 +8,4 @@ cmds = ["cd thesis-frontend && npm ci"]
 cmds = ["cd thesis-frontend && npm run build:production"]
 
 [start]
-cmd = "cd thesis-frontend && npm run start"
+cmd = "cd thesis-frontend && npx serve dist -s -l ${PORT:-3000}"
