@@ -49,6 +49,47 @@ const SimulationPage = ({ onBack }) => {
   const [isCoolingDown, setIsCoolingDown] = useState(false); // Anti-spam cooldown
   const fileInputRef = useRef(null);
   
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && simulationState === 'config') {
+        const stored = sessionStorage.getItem('activeSimulation');
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            const timeSince = Date.now() - data.timestamp;
+            if (timeSince < 7200000 && data.state === 'loading') {
+              setSimulationState('loading');
+              const estimatedProgress = Math.min(99, (timeSince / 60000) * 2); 
+              setProgress(Math.max(progress, estimatedProgress));
+              showNotification('Reconnected to ongoing simulation', 'info');
+            }
+          } catch (e) {
+            console.error('Failed to restore simulation state:', e);
+          }
+        }
+      } else if (document.hidden && simulationState === 'loading') {
+        const stored = sessionStorage.getItem('activeSimulation');
+        if (stored) {
+          const data = JSON.parse(stored);
+          data.lastProgress = progress;
+          sessionStorage.setItem('activeSimulation', JSON.stringify(data));
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const handleFocus = () => {
+      handleVisibilityChange();
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [simulationState, progress, setSimulationState, setProgress]);
+  
   // undo/redo functionality
   const { canUndo, canRedo, handleUndo, handleRedo } = useUndoRedoConfig(
     config.getAllConfig(),

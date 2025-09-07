@@ -357,6 +357,38 @@ export const getPlotResults = async (trackingId) => {
 
 
 /**
+ * Helper to create fetch with extended timeout for long operations
+ * Browser default timeout is often 5-10 minutes which is too short for large simulations
+ */
+const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
+  // Default 2 hours for very long operations
+  // We don't actually timeout the request, just warn the user
+  return new Promise(async (resolve, reject) => {
+    let timeoutWarningShown = false;
+    
+    // Show warning after 5 minutes
+    const warningTimeout = setTimeout(() => {
+      timeoutWarningShown = true;
+      console.warn('Simulation is taking longer than expected. Large simulations can take 30+ minutes. Please keep this tab open.');
+    }, 300000); // 5 minutes
+    
+    try {
+      const response = await fetch(url, options);
+      clearTimeout(warningTimeout);
+      resolve(response);
+    } catch (error) {
+      clearTimeout(warningTimeout);
+      // Check if it's a real network error or timeout
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        reject(new Error('Network connection lost. The simulation may still be running on the server. Check History tab later.'));
+      } else {
+        reject(error);
+      }
+    }
+  });
+};
+
+/**
  * normal run of statistics
  */
 export const compare = async (config, abortSignal = null) => {
@@ -372,7 +404,8 @@ export const compare = async (config, abortSignal = null) => {
     fetchOptions.signal = abortSignal;
   }
   
-  const response = await fetch(`${API_BASE}/api/compare`, fetchOptions);
+  // Use extended timeout wrapper for long operations
+  const response = await fetchWithExtendedTimeout(`${API_BASE}/api/compare`, fetchOptions);
   
   if (!response.ok) {
     const errorText = await response.text();
@@ -402,7 +435,8 @@ export const compareWithFile = async (config, file, abortSignal = null) => {
     fetchOptions.signal = abortSignal;
   }
   
-  const response = await fetch(`${API_BASE}/api/compare-with-file`, fetchOptions);
+  // Use extended timeout wrapper for long operations with files
+  const response = await fetchWithExtendedTimeout(`${API_BASE}/api/compare-with-file`, fetchOptions);
   
   if (!response.ok) {
     const errorText = await response.text();
