@@ -105,28 +105,43 @@ const IterationTab = ({ config, onChange }) => {
             <h4 className="text-lg font-medium text-gray-800">Statistics You'll Get</h4>
           </div>
           
-          {(config.iterations || 30) > 1 ? (
+          {(config.iterations || 30) >= 30 ? (
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span><strong>Average:</strong> Mean value across all runs</span>
+                <span><strong>Paired T-Test:</strong> Statistical significance analysis (p-values, t-statistics)</span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span><strong>Min/Max:</strong> Best and worst case results</span>
+                <span><strong>Average Metrics:</strong> Mean performance across all iterations</span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span><strong>Std Deviation:</strong> Measure of result variability</span>
+                <span><strong>Individual Results:</strong> Detailed per-iteration breakdown with export</span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span><strong>Success Rate:</strong> Percentage of successful runs</span>
+                <span><strong>Overall Winner:</strong> Statistically determined best algorithm</span>
+              </li>
+            </ul>
+          ) : (config.iterations || 30) > 1 ? (
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start gap-2">
+                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
+                <span><strong>Average Metrics:</strong> Mean performance across {config.iterations} runs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
+                <span><strong>Individual Results:</strong> Per-iteration breakdown available</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
+                <span><strong>Basic Comparison:</strong> Side-by-side algorithm performance</span>
               </li>
             </ul>
           ) : (
             <p className="text-sm text-gray-500">
-              Enable multiple iterations to see statistical analysis
+              Single iteration: Basic algorithm comparison without statistical analysis
             </p>
           )}
         </motion.div>
@@ -147,16 +162,16 @@ const IterationTab = ({ config, onChange }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="bg-white rounded-lg p-3">
-            <p className="font-medium text-[#319694]">Quick Test</p>
-            <p className="text-gray-600">30 iterations for basic validation</p>
+            <p className="font-medium text-[#319694]">Quick Test (30 iterations)</p>
+            <p className="text-gray-600">Gets statistical analysis with paired t-tests</p>
           </div>
           <div className="bg-white rounded-lg p-3">
-            <p className="font-medium text-[#319694]">Research</p>
-            <p className="text-gray-600">30-50 iterations for reliable statistics</p>
+            <p className="font-medium text-[#319694]">Research (30-50 iterations)</p>
+            <p className="text-gray-600">Reliable t-test results for academic work</p>
           </div>
           <div className="bg-white rounded-lg p-3">
-            <p className="font-medium text-[#319694]">Publication</p>
-            <p className="text-gray-600">50-100 iterations for academic papers</p>
+            <p className="font-medium text-[#319694]">Publication (50-100 iterations)</p>
+            <p className="text-gray-600">High confidence statistical validation</p>
           </div>
         </div>
       </motion.div>
