@@ -8,4 +8,4 @@ cmds = ["cd thesis-frontend && npm ci"]
 cmds = ["cd thesis-frontend && npm run build:production"]
 
 [start]
-cmd = "cd thesis-frontend && npx serve dist -s -l ${PORT:-3000}"
+cmd = "cd thesis-frontend && npx serve -s dist -l tcp://0.0.0.0:${PORT:-3000}"
