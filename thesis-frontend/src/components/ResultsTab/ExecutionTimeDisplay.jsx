@@ -5,27 +5,30 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
   const getExecutionInfo = (results) => {
     if (!results) return null;
     
-    
     let duration = null;
     let timestamp = null;
     let isComparison = false;
     
+
     if (results.totalExecutionTime) {
-      duration = results.totalExecutionTime / 1000; // ms to seconds
+      duration = results.totalExecutionTime / 1000; 
       isComparison = true;
     } else if (results.executionTimeMs) {
-      duration = results.executionTimeMs / 1000; // ms to seconds
+      duration = results.executionTimeMs / 1000; 
+    } else if (results.rawResults?.totalExecutionTime) {
+      duration = results.rawResults.totalExecutionTime / 1000;
+    } else if (results.rawResults?.executionTimeMs) {
+      duration = results.rawResults.executionTimeMs / 1000;
     }
     
     timestamp = results.metadata?.timestamp || results.timestamp || new Date().toISOString();
-    
     
     return {
       duration,
       timestamp,
       completedAt: timestamp,
       isComparisonResult: isComparison,
-      totalIterations: results.totalIterations || results.iterations || 1
+      totalIterations: results.totalIterations || results.rawResults?.totalIterations || results.iterations || 1
     };
   };
   
