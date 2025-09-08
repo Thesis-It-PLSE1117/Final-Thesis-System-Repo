@@ -4,6 +4,7 @@ import { validateSimulationConfig } from '../utils/validation';
 import { normalizeTTestResults } from '../utils/ttestNormalizer';
 import * as apiClient from '../services/apiClient';
 import * as historyService from '../services/historyService';
+import { getCachedResult, cacheResult, isCacheAvailable } from '../utils/resultCache';
 
 /**
  * custom hook for running simulations
@@ -148,7 +149,7 @@ export const useSimulationRunner = () => {
   };
 
   // validate and run simulation
-  const runSimulation = async (config) => {
+  const runSimulation = async (config, useCache = true) => {
     const {
       dataCenterConfig,
       cloudletConfig,
@@ -167,6 +168,27 @@ export const useSimulationRunner = () => {
     if (Object.keys(errors).length > 0) {
       showNotification(`Please fix configuration errors: ${Object.values(errors).join(', ')}`, 'error');
       return false;
+    }
+
+    // Check cache first if enabled
+    if (useCache && isCacheAvailable()) {
+      const simulationType = workloadFile ? 
+        (iterationConfig.iterations > 1 ? 'iterations-with-file' : 'with-file') :
+        (iterationConfig.iterations > 1 ? 'iterations' : 'raw');
+      
+      const cachedResult = getCachedResult(config, simulationType);
+      if (cachedResult) {
+        showNotification('Using cached results (instant!)', 'success');
+        setSimulationResults(cachedResult);
+        setSimulationState('results');
+        setProgress(100);
+        
+        // Still save to history for consistency
+        historyService.saveToHistory(cachedResult, dataCenterConfig, cloudletConfig, workloadFile);
+        
+        console.log('[Cache] Simulation completed using cached results');
+        return true;
+      }
     }
 
     const controller = new AbortController();
@@ -278,6 +300,11 @@ export const useSimulationRunner = () => {
           
           setSimulationResults(combinedResults);
           historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          
+          if (isCacheAvailable()) {
+            const simulationType = workloadFile ? 'compare-with-file' : 'compare';
+            cacheResult(config, combinedResults, simulationType);
+          }
         } else {
           // use async plot generation when matlab plots are enabled
           const useAsyncPlots = enableMatlabPlots && !workloadFile && iterationConfig.iterations === 1;
@@ -380,6 +407,14 @@ export const useSimulationRunner = () => {
             };
             setSimulationResults(combinedResults);
             historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+            
+            // Cache the results for future use
+            if (isCacheAvailable()) {
+              const simulationType = workloadFile ? 
+                (iterationConfig.iterations > 1 ? 'iterations-with-file' : 'with-file') :
+                (iterationConfig.iterations > 1 ? 'iterations' : 'raw');
+              cacheResult(config, combinedResults, simulationType);
+            }
           }
         }
         
@@ -437,16 +472,15 @@ export const useSimulationRunner = () => {
       setIsAborting(true);
       console.log('Aborting simulation...');
       
-      // abort the ongoing requests
+      sessionStorage.removeItem('activeSimulation');
+      
       abortController.abort();
       
-      // also request backend cancellation
       try {
         await apiClient.cancelSimulation();
         console.log('Backend simulation cancellation requested');
       } catch (error) {
         console.warn('Failed to request backend cancellation:', error.message);
-        // don't block frontend cleanup if backend call fails
       }
       
       // clean up states
@@ -462,6 +496,7 @@ export const useSimulationRunner = () => {
       // fallback for when no active simulation
       setProgress(0);
       setSimulationState('config');
+      sessionStorage.removeItem('activeSimulation');
       showNotification('Simulation cancelled', 'info');
     }
   };

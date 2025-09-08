@@ -46,13 +46,14 @@ const SimulationPage = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState('dataCenter');
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
-  const [isCoolingDown, setIsCoolingDown] = useState(false); // Anti-spam cooldown
+  const [isCoolingDown, setIsCoolingDown] = useState(false); // anti-spam cooldown
+  const [userCancelledSession, setUserCancelledSession] = useState(false); // track user cancellation
   const fileInputRef = useRef(null);
   
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && simulationState === 'config') {
+      if (!document.hidden && simulationState === 'config' && !userCancelledSession) {
         const stored = sessionStorage.getItem('activeSimulation');
         if (stored) {
           try {
@@ -88,7 +89,7 @@ const SimulationPage = ({ onBack }) => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [simulationState, progress, setSimulationState, setProgress]);
+  }, [simulationState, progress, setSimulationState, setProgress, userCancelledSession]);
   
   // undo/redo functionality
   const { canUndo, canRedo, handleUndo, handleRedo } = useUndoRedoConfig(
@@ -170,6 +171,7 @@ const SimulationPage = ({ onBack }) => {
           onConfirm: async () => {
             setConfirmDialog({ isOpen: false });
             setIsCoolingDown(true);
+            setUserCancelledSession(false); 
             await runSimulation({
               dataCenterConfig: config.dataCenterConfig,
               cloudletConfig: config.cloudletConfig,
@@ -184,6 +186,7 @@ const SimulationPage = ({ onBack }) => {
       }
       
       setIsCoolingDown(true);
+      setUserCancelledSession(false); // Reset cancellation flag when starting new simulation
       await runSimulation({
         dataCenterConfig: config.dataCenterConfig,
         cloudletConfig: config.cloudletConfig,
@@ -406,7 +409,10 @@ const SimulationPage = ({ onBack }) => {
               numVMs={config.dataCenterConfig.numVMs}
               progress={progress}
               iterations={config.iterationConfig.iterations}
-              onAbort={cancelSimulation}
+              onAbort={() => {
+                setUserCancelledSession(true);
+                cancelSimulation();
+              }}
               canAbort={canAbort}
               isAborting={isAborting}
             />
