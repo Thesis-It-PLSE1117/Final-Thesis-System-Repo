@@ -9,7 +9,7 @@ const CACHE_EXPIRY_HOURS = 24;
 /**
  *generate unique cache key from simconfig
  */
-export const generateCacheKey = (config) => {
+export const generateCacheKey = (config, simulationType = 'raw') => {
   const {
     dataCenterConfig,
     cloudletConfig,
@@ -33,31 +33,33 @@ export const generateCacheKey = (config) => {
     vmBw: dataCenterConfig.vmBw,
     vmSize: dataCenterConfig.vmSize,
     vmScheduler: dataCenterConfig.vmScheduler,
-    
+
     numCloudlets: cloudletConfig.numCloudlets,
-    
+
     iterations: iterationConfig.iterations,
-    
+
     // Workload identifier
     workloadId: workloadFile ? `file_${workloadFile.name}_${workloadFile.size}` : 'synthetic',
-    
+
     // Plotting option wala na to eh
-    enableMatlabPlots: enableMatlabPlots || false
+    enableMatlabPlots: enableMatlabPlots || false,
+
+    // Add simulation type to differentiate cache keys
+    simulationType: simulationType // 'raw', 'with-file', 'iterations', 'iterations-with-file', 'compare', 'compare-with-file'
   };
 
   //hash of the configuration
   const configString = JSON.stringify(normalizedConfig);
   const hash = btoa(configString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
-  
   return `${CACHE_PREFIX}${CACHE_VERSION}_${hash}`;
 };
 
 /**
  * cached result exists and is still valid
  */
-export const getCachedResult = (config) => {
+export const getCachedResult = (config, simulationType = 'raw') => {
   try {
-    const cacheKey = generateCacheKey(config);
+    const cacheKey = generateCacheKey(config, simulationType);
     const cached = localStorage.getItem(cacheKey);
     
     if (!cached) {
@@ -94,9 +96,9 @@ export const getCachedResult = (config) => {
 /**
  * simulation results to cache
  */
-export const cacheResult = (config, results) => {
+export const cacheResult = (config, results, simulationType = 'raw') => {
   try {
-    const cacheKey = generateCacheKey(config);
+    const cacheKey = generateCacheKey(config, simulationType);
     
        //dont cache plot data 
     const resultsToCache = {
