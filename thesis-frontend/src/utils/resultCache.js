@@ -51,7 +51,6 @@ export const generateCacheKey = (config, simulationType = 'raw') => {
   //hash of the configuration
   const configString = JSON.stringify(normalizedConfig);
   const hash = btoa(configString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
-
   return `${CACHE_PREFIX}${CACHE_VERSION}_${hash}`;
 };
 

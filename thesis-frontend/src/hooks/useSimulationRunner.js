@@ -179,6 +179,8 @@ export const useSimulationRunner = () => {
       const cachedResult = getCachedResult(config, simulationType);
       if (cachedResult) {
         showNotification('Using cached results (instant!)', 'success');
+        
+        // Set results immediately
         setSimulationResults(cachedResult);
         setSimulationState('results');
         setProgress(100);
@@ -301,6 +303,7 @@ export const useSimulationRunner = () => {
           setSimulationResults(combinedResults);
           historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
           
+          // cache the results for future use
           if (isCacheAvailable()) {
             const simulationType = workloadFile ? 'compare-with-file' : 'compare';
             cacheResult(config, combinedResults, simulationType);
