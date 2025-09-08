@@ -4,6 +4,7 @@ import { validateSimulationConfig } from '../utils/validation';
 import { normalizeTTestResults } from '../utils/ttestNormalizer';
 import * as apiClient from '../services/apiClient';
 import * as historyService from '../services/historyService';
+import { getCachedResult, cacheResult, isCacheAvailable } from '../utils/resultCache';
 
 /**
  * custom hook for running simulations
@@ -148,7 +149,7 @@ export const useSimulationRunner = () => {
   };
 
   // validate and run simulation
-  const runSimulation = async (config) => {
+  const runSimulation = async (config, useCache = true) => {
     const {
       dataCenterConfig,
       cloudletConfig,
@@ -167,6 +168,25 @@ export const useSimulationRunner = () => {
     if (Object.keys(errors).length > 0) {
       showNotification(`Please fix configuration errors: ${Object.values(errors).join(', ')}`, 'error');
       return false;
+    }
+
+    // Check cache first if enabled
+    if (useCache && isCacheAvailable()) {
+      const cachedResult = getCachedResult(config);
+      if (cachedResult) {
+        showNotification('Using cached results (instant!)', 'success');
+        
+        // Set results immediately
+        setSimulationResults(cachedResult);
+        setSimulationState('results');
+        setProgress(100);
+        
+        // Still save to history for consistency
+        historyService.saveToHistory(cachedResult, dataCenterConfig, cloudletConfig, workloadFile);
+        
+        console.log('[Cache] Simulation completed using cached results');
+        return true;
+      }
     }
 
     const controller = new AbortController();
@@ -278,6 +298,11 @@ export const useSimulationRunner = () => {
           
           setSimulationResults(combinedResults);
           historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          
+          // cache the results for future use
+          if (isCacheAvailable()) {
+            cacheResult(config, combinedResults);
+          }
         } else {
           // use async plot generation when matlab plots are enabled
           const useAsyncPlots = enableMatlabPlots && !workloadFile && iterationConfig.iterations === 1;
@@ -380,6 +405,11 @@ export const useSimulationRunner = () => {
             };
             setSimulationResults(combinedResults);
             historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+            
+            // Cache the results for future use
+            if (isCacheAvailable()) {
+              cacheResult(config, combinedResults);
+            }
           }
         }
         
