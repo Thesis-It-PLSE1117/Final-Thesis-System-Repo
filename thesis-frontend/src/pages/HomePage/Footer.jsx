@@ -39,7 +39,7 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Cloud className="w-8 h-8" />
-            <h4 className="text-xl font-bold">Cloud Load Balancer</h4>
+            <h4 className="text-xl font-bold">Cloud Load Balancer Simulator</h4>
           </div>
           <p className="text-white/80">
             A research project comparing load balancing algorithms for cloud computing environments.
@@ -80,7 +80,7 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
         transition={{ delay: 0.5 }}
       >
         <p className="text-white/70 text-sm">
-          &copy; {new Date().getFullYear()} Cloud Load Balancer. All rights reserved.
+          &copy; {new Date().getFullYear()} Cloud Load Balancer Simulator. All rights reserved.
         </p>
         
         <div className="flex gap-4 mt-4 md:mt-0">

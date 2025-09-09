@@ -313,19 +313,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             className="space-y-6"
           >
             {/* Metadata Display */}
-            {console.log('=== Metadata Debug ===')}
-            {console.log('resultsRR metadata:', {
-              runId: resultsRR?.runId,
-              seed: resultsRR?.seed,
-              configSnapshot: resultsRR?.configSnapshot,
-              datasetId: resultsRR?.datasetId
-            })}
-            {console.log('resultsEPSO metadata:', {
-              runId: resultsEPSO?.runId,
-              seed: resultsEPSO?.seed,
-              configSnapshot: resultsEPSO?.configSnapshot,
-              datasetId: resultsEPSO?.datasetId
-            })}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               {resultsRR && (
                 <MetadataDisplay 
@@ -631,31 +618,17 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     const backendPlotType = plotTypeMapping[plotType] || plotType.toUpperCase();
 
     // First try to find in plotMetadata array
-    console.log(`=== Finding Plot Metadata for ${plotType} ===`);
-    console.log('plotMetadata:', plotMetadata);
-    console.log('backendPlotType:', backendPlotType);
-    
     const meta = plotMetadata.find(m => {
       if (!m || !m.type) return false;
-      const matches = m.type.toUpperCase() === backendPlotType;
-      console.log(`Checking ${m.type} against ${backendPlotType}: ${matches}`);
-      return matches;
+      return m.type.toUpperCase() === backendPlotType;
     });
 
-    console.log('Found meta:', meta);
-
     if (!meta) {
-      console.log('No meta found for plotType:', plotType);
       return null;
     }
 
     // Use backend interpretation if available, otherwise return null
     const interpretation = meta.interpretation;
-
-    console.log(`=== Plot Interpretation Debug (${plotType}) ===`);
-    console.log('meta:', meta);
-    console.log('hasBackendInterpretation:', !!meta.interpretation);
-    console.log('interpretation:', interpretation);
 
     // Return the interpretation object with consistent structure
     return {
@@ -704,15 +677,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     const eacoPlotMetadata = plotData?.eaco?.plotMetadata || [];
     const epsoPlotMetadata = plotData?.epso?.plotMetadata || [];
 
-    console.log('=== Plot Metadata Access Debug ===');
-    console.log('plotData:', plotData);
-    console.log('plotData?.eaco:', plotData?.eaco);
-    console.log('plotData?.eaco?.plotMetadata:', plotData?.eaco?.plotMetadata);
-    console.log('plotData?.epso?.plotMetadata:', plotData?.epso?.plotMetadata);
-    console.log('Final eacoPlotMetadata:', eacoPlotMetadata);
-    console.log('Final epsoPlotMetadata:', epsoPlotMetadata);
-    console.log('eacoPlotMetadata length:', eacoPlotMetadata?.length);
-    console.log('epsoPlotMetadata length:', epsoPlotMetadata?.length);
     
 
     

@@ -41,18 +41,6 @@ const Header = ({ onStartSimulation }) => {
           <span>How It Works</span>
         </motion.button>
         
-        <motion.button
-          onClick={onStartSimulation}
-          className="hidden md:flex items-center gap-3 bg-white px-6 py-3 rounded-full text-[#1a5654] hover:bg-gray-100 transition-all border border-white/30 font-semibold shadow-lg"
-          whileHover={{ 
-            scale: 1.05,
-            boxShadow: "0 5px 15px -3px rgba(255, 255, 255, 0.2)"
-          }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <span>Start Simulation</span>
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </motion.button>
       </div>
     </motion.header>
   );
