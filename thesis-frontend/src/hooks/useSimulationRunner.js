@@ -41,9 +41,7 @@ export const useSimulationRunner = () => {
       const useIterations = configData.iterations > 1;
       const abortSignal = abortController?.signal;
       
-      console.log('DEBUG runAlgorithm:', { algorithm, withPlots, workloadFile: !!workloadFile, useIterations, iterations: configData.iterations });
       if (withPlots && !workloadFile && !useIterations) {
-        console.log('SHOULD USE PLOTS API!');
         if (useAsync) {
           return await apiClient.runWithPlotsAsync(algorithm, configData, abortSignal);
         }
@@ -107,12 +105,10 @@ export const useSimulationRunner = () => {
           const plotData = {};
           for (const [algo, id] of Object.entries(trackingIds)) {
             const results = await apiClient.getPlotResults(id);
-            console.log(`Plot results for ${algo}:`, results);
             if (results.ready && results.plotData) {
               plotData[algo.toLowerCase()] = results.plotData;
             }
           }
-          console.log('Final plotData:', plotData);
           return { completed: true, data: plotData };
         } else if (anyFailed) {
           setPlotStatus('failed');
@@ -260,16 +256,12 @@ export const useSimulationRunner = () => {
         const useComparison = iterationConfig.iterations >= 30;
         
         if (useComparison) {
-          console.log('Using comparison');
-          
           let comparisonResults;
           if (workloadFile) {
             comparisonResults = await apiClient.compareWithFile(configData, workloadFile);
           } else {
             comparisonResults = await apiClient.compare(configData);
           }
-          console.log('Comparison results received:', comparisonResults);
-          
           // i normalize t-test results since you know for the sake of handling different backend formats
           const tTestResultsNormalized = normalizeTTestResults(
             comparisonResults.tTestResults || comparisonResults.ttestResults || null
@@ -362,7 +354,6 @@ export const useSimulationRunner = () => {
             // start polling for plot completion in background
             pollPlotStatus(trackingIds).then(plotData => {
               if (plotData) {
-                console.log('Merging plot data:', plotData);
                 // merge plot data into results
                 setSimulationResults(prev => {
                   const updatedResults = {
@@ -379,7 +370,6 @@ export const useSimulationRunner = () => {
                     },
                     plotsGenerating: false
                   };
-                  console.log('Updated simulation results:', updatedResults);
                   return updatedResults;
                 });
               }
@@ -454,7 +444,6 @@ export const useSimulationRunner = () => {
           clearInterval(progressInterval);
           setProgressInterval(null);
         }
-        // Check if the error is due to cancellation
         if (algorithmError.name === 'CancelledError' || algorithmError.message === 'Request cancelled') {
           showNotification('Simulation cancelled', 'info');
         } else {
@@ -465,7 +454,6 @@ export const useSimulationRunner = () => {
         return false;
       }
     } catch (err) {
-      // Check if the error is due to cancellation
       if (err.name === 'CancelledError' || err.message === 'Request cancelled') {
         showNotification('Simulation cancelled', 'info');
       } else {
@@ -487,7 +475,6 @@ export const useSimulationRunner = () => {
     
     if (abortController && !isAborting) {
       setIsAborting(true);
-      console.log('Aborting simulation...');
       
       sessionStorage.removeItem('activeSimulation');
       
@@ -495,9 +482,7 @@ export const useSimulationRunner = () => {
       
       try {
         await apiClient.cancelSimulation();
-        console.log('Backend simulation cancellation requested');
       } catch (error) {
-        console.warn('Failed to request backend cancellation:', error.message);
       }
       
       // clean up states
@@ -514,7 +499,7 @@ export const useSimulationRunner = () => {
       setProgress(0);
       setSimulationState('config');
       sessionStorage.removeItem('activeSimulation');
-      showNotification('Simulation cancelled', 'info');
+      showNotification('✓ Operation cancelled', 'success');
     }
   };
 

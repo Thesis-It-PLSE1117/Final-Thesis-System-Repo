@@ -149,7 +149,7 @@ const HeroSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.7 }}
         >
           <StatHighlight value="5" label="Metrics Compared" />
-          <StatHighlight value="10K" label="Cloudlets Simulated" />
+          <StatHighlight value="5K+" label="Simulations Tested" />
           <StatHighlight value="30" label="Test Runs" />
           <StatHighlight value="95%" label="Statistical Confidence" />
         </motion.div>
@@ -184,66 +184,6 @@ const HeroSection = ({ onStartSimulation }) => {
           >
             <span>Simulation Guide</span>
             <Settings className="w-5 h-5" />
-          </motion.button>
-        </motion.div>
-        
-        {/* Objective Analysis Section */}
-        <motion.div
-          className="bg-white rounded-2xl p-8 max-w-4xl mx-auto border border-gray-200 shadow-sm mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3 }}
-        >
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-3">Objective Analysis</h2>
-            <p className="text-gray-600 text-lg">Key observations from the comparative study</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold text-[#319694] mb-2">EACO Algorithm</h3>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Demonstrated stronger performance in load balancing</li>
-                <li>• Showed improved resource utilization metrics</li>
-                <li>• Achieved better energy efficiency in most scenarios</li>
-              </ul>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold text-[#4fd1c5] mb-2">EPSO Algorithm</h3>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Performed consistently across test conditions</li>
-                <li>• Showed competitive results in specific metrics</li>
-                <li>• Provided stable performance baseline</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <h3 className="font-semibold text-blue-700 mb-2">Research Context</h3>
-            <p className="text-sm text-gray-700">
-              These findings contribute to the ongoing research in cloud load balancing optimization. 
-              Algorithm performance can vary based on specific workload characteristics and infrastructure configurations.
-            </p>
-          </div>
-        </motion.div>
-        
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
-          <motion.button
-            className="text-[#319694] flex flex-col items-center gap-2 mx-auto hover:text-[#267b79] transition-colors"
-            whileHover={{ y: 5 }}
-          >
-            <span className="text-sm font-medium">Explore Detailed Analysis</span>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <ChevronDown size={24} />
-            </motion.div>
           </motion.button>
         </motion.div>
       </div>

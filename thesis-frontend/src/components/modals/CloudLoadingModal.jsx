@@ -39,16 +39,10 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
   };
   
   const tips = [
-    "EPSO enhances traditional PSO by using adaptive inertia weights that decrease from 0.9 to 0.4 during optimization.",
-    "EACO improves upon standard ACO by incorporating dynamic pheromone evaporation rates based on solution quality.",
-    "Your multi-objective fitness function balances makespan (25%), cost (25%), energy (25%), and load balance (25%).",
-    "The load balance metric uses standard deviation of VM utilization - lower values indicate better distribution.",
-    "EPSO's cognitive (c1=2.0) and social (c2=2.0) factors guide particles toward personal and global best solutions.",
-    "EACO uses alpha=1.0 for pheromone influence and beta=2.0 for heuristic information in probability calculations.",
-    "Both algorithms run for 50 iterations with population sizes optimized for convergence speed vs solution quality.",
-    "Energy consumption is calculated using VM power models: 120W at peak + 60% at idle state.",
-    "The simulation uses CloudSim 7.0's enhanced architecture for more accurate cloud environment modeling.",
-    "MATLAB integration provides 3D surface plots, convergence graphs, and comparative performance visualizations."
+    "EPSO and EACO are enhanced optimization algorithms designed for better cloud resource scheduling.",
+    "The simulation balances multiple objectives: execution time, cost efficiency, energy usage, and load distribution.",
+    "Both algorithms are optimized for convergence speed while maintaining high solution quality.",
+    "Results include detailed performance metrics and statistical comparisons between algorithms."
   ];
   
   const [currentTipIndex, setCurrentTipIndex] = React.useState(0);
@@ -56,7 +50,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
   React.useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTipIndex(prev => (prev + 1) % tips.length);
-    }, 10000); // 10 secs
+    }, 15000); 
     
     return () => clearInterval(tipInterval);
   }, []);
@@ -91,7 +85,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-[#319694] hover:bg-gray-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            title={isAborting ? "Cancelling..." : "Cancel simulation"}
+            title={isAborting ? "Stopping simulation..." : "Stop simulation"}
           >
             {isAborting ? (
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#319694] border-t-transparent" />
@@ -120,15 +114,14 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
           />
         </div>
 
-        {/* Enhanced Progress Information */}
+        {/* enhanced Progress Information */}
         <div className="mb-4">
-          {/* Time information */}
-          <div className="flex justify-between items-center mb-2">
+          {/* time information */}
+          <div className="flex justify-center items-center mb-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Clock size={14} />
-              <span>Elapsed: {formatTime(elapsedTime)}</span>
+              <span>{formatTime(elapsedTime)} elapsed</span>
             </div>
-            
           </div>
           
           {/* Progress bar */}
