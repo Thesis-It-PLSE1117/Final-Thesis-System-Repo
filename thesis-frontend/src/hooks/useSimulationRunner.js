@@ -171,7 +171,8 @@ export const useSimulationRunner = () => {
     }
 
 
-    if (useCache && isCacheAvailable()) {
+    const cacheEnabled = import.meta.env.VITE_ENABLE_RESULT_CACHE === 'true';
+    if (useCache && isCacheAvailable() && cacheEnabled) {
       const useComparison = iterationConfig.iterations >= 30;
       let simulationType;
       
@@ -183,10 +184,9 @@ export const useSimulationRunner = () => {
         simulationType = iterationConfig.iterations > 1 ? 'iterations' : 'raw';
       }
       
-      console.log(`[Cache] Looking for cached result with simulationType: ${simulationType}, iterations: ${iterationConfig.iterations}, workloadFile: ${!!workloadFile}`);
       const cachedResult = getCachedResult(config, simulationType);
       if (cachedResult) {
-        showNotification('Using cached results (instant!)', 'success');
+        showNotification('Retrieved previous simulation results', 'success');
         
         // Set results immediately
         setSimulationResults(cachedResult);
@@ -196,7 +196,6 @@ export const useSimulationRunner = () => {
         // Still save to history for consistency
         historyService.saveToHistory(cachedResult, dataCenterConfig, cloudletConfig, workloadFile);
         
-        console.log('[Cache] Simulation completed using cached results');
         return true;
       }
     }
@@ -311,10 +310,8 @@ export const useSimulationRunner = () => {
           setSimulationResults(combinedResults);
           historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
           
-          // cache the results for future use
-          if (isCacheAvailable()) {
+          if (isCacheAvailable() && cacheEnabled) {
             const simulationType = workloadFile ? 'compare-with-file' : 'compare';
-            console.log(`[Cache] Storing comparison results with simulationType: ${simulationType}, iterations: ${iterationConfig.iterations}`);
             cacheResult(config, combinedResults, simulationType);
           }
         } else {
@@ -420,7 +417,8 @@ export const useSimulationRunner = () => {
             setSimulationResults(combinedResults);
             historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
             
-            if (isCacheAvailable()) {
+            // Cache results if enabled
+            if (isCacheAvailable() && cacheEnabled) {
               const useComparisonForCaching = iterationConfig.iterations >= 30;
               let simulationType;
               
@@ -432,7 +430,6 @@ export const useSimulationRunner = () => {
                 simulationType = iterationConfig.iterations > 1 ? 'iterations' : 'raw';
               }
               
-              console.log(`[Cache] Storing non-comparison results with simulationType: ${simulationType}, iterations: ${iterationConfig.iterations}`);
               cacheResult(config, combinedResults, simulationType);
             }
           }
