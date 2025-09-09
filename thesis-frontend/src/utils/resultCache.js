@@ -60,6 +60,7 @@ export const generateCacheKey = (config, simulationType = 'raw') => {
 export const getCachedResult = (config, simulationType = 'raw') => {
   try {
     const cacheKey = generateCacheKey(config, simulationType);
+    console.log(`[Cache] getCachedResult called with simulationType: ${simulationType}, iterations: ${config.iterationConfig?.iterations}, key: ${cacheKey}`);
     const cached = localStorage.getItem(cacheKey);
     
     if (!cached) {
@@ -99,6 +100,7 @@ export const getCachedResult = (config, simulationType = 'raw') => {
 export const cacheResult = (config, results, simulationType = 'raw') => {
   try {
     const cacheKey = generateCacheKey(config, simulationType);
+    console.log(`[Cache] cacheResult called with simulationType: ${simulationType}, iterations: ${config.iterationConfig?.iterations}, key: ${cacheKey}`);
     
        //dont cache plot data 
     const resultsToCache = {

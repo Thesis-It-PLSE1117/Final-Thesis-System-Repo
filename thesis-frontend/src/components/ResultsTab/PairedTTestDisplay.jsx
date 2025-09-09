@@ -41,7 +41,16 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
   }
 
   const { metricTests, overallWinner, significantDifferences, sampleSize, alpha } = tTestResults;
-  // Derive significant count to ensure UI consistency even if backend count is stale
+  
+  const eacoWins = Object.values(metricTests || {}).filter(
+    (t) => t && t.significant && t.betterAlgorithm === 'EACO'
+  ).length;
+  const epsoWins = Object.values(metricTests || {}).filter(
+    (t) => t && t.significant && t.betterAlgorithm === 'EPSO'
+  ).length;
+  const winnerCount = overallWinner === 'EACO' ? eacoWins : 
+                     overallWinner === 'EPSO' ? epsoWins : 0;
+  
   const derivedSignificant = Object.values(metricTests || {}).filter((t) => t && t.significant).length;
   const significantCount = typeof significantDifferences === 'number' ? significantDifferences : derivedSignificant;
   
@@ -194,9 +203,15 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold text-[#319694]">
-              {significantCount}/{Object.keys(metricTests || {}).length}
+              {overallWinner === 'No clear winner' ? (
+                `${significantCount}/${Object.keys(metricTests || {}).length}`
+              ) : (
+                `${winnerCount}/${Object.keys(metricTests || {}).length}`
+              )}
             </p>
-            <p className="text-sm text-gray-600">Significant Metrics</p>
+            <p className="text-sm text-gray-600">
+              {overallWinner === 'No clear winner' ? 'Significant Metrics' : 'Metrics Won'}
+            </p>
           </div>
         </div>
       </div>
