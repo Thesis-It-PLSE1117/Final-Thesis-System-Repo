@@ -17,10 +17,10 @@ const DeleteConfirmationModal = ({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
       >
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Confirm Deletion</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Confirm Removal</h3>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to remove the {fileType}? 
-          This action cannot be undone.
+          Please confirm the removal of the {fileType}. 
+          This action is permanent and cannot be reversed.
         </p>
         <div className="flex justify-end gap-3">
           <button
@@ -33,7 +33,7 @@ const DeleteConfirmationModal = ({
             onClick={onConfirm}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
           >
-            Delete
+            Remove
           </button>
         </div>
       </motion.div>

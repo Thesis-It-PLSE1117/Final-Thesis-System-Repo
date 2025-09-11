@@ -269,7 +269,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     <div className="flex items-center justify-center h-full">
       <div className="p-6 text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#319694] mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading results...</p>
+        <p className="text-gray-600">Processing simulation results...</p>
       </div>
     </div>
   );
@@ -282,7 +282,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
         className="mt-4 bg-[#319694] text-white px-6 py-2 rounded-lg hover:bg-[#2a827f] transition-colors shadow-md"
         onClick={() => window.location.reload()}
       >
-        Try Again
+        Reload Page
       </button>
     </div>
   );
@@ -301,7 +301,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
 
   /**
    * I render tab content based on active tab
-   * This follows progressive disclosure principle
    */
   const renderTabContent = () => {
     switch (activeTab) {

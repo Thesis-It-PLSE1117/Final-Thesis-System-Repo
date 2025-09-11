@@ -137,8 +137,8 @@ const HeroSection = ({ onStartSimulation }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          Empirical performance metrics from <span className="font-semibold text-[#319694]">10,000 cloudlet simulations</span> across 
-          <span className="font-semibold text-[#4fd1c5]"> 30 test runs</span> provide insights into algorithm performance
+          Compare algorithm performance with <span className="font-semibold text-[#319694]">configurable workload sizes</span> and 
+          <span className="font-semibold text-[#4fd1c5]">statistical validation</span> through multiple iteration support
         </motion.p>
 
         {/* Key Statistics */}
