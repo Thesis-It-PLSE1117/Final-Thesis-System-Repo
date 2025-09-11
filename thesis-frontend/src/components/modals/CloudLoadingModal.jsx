@@ -117,6 +117,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
           </div>
         </div>
 
+        {/* Enhanced Progress Information */}
         <div className="mb-4">
           {/* time information */}
           <div className="flex justify-center items-center mb-2">

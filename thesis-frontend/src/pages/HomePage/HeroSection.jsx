@@ -148,10 +148,10 @@ const HeroSection = ({ onStartSimulation }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          <StatHighlight value="5" label="Key Metrics" />
-          <StatHighlight value="10K+" label="Tasks Supported" />
-          <StatHighlight value="≥30" label="Iterations for T-test" />
-          <StatHighlight value="α=0.05" label="Significance Level" />
+          <StatHighlight value="5" label="Metrics Compared" />
+          <StatHighlight value="5K+" label="Simulations Tested" />
+          <StatHighlight value="30" label="Test Runs" />
+          <StatHighlight value="95%" label="Statistical Confidence" />
         </motion.div>
         
         <motion.div
