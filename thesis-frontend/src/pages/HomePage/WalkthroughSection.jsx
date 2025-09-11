@@ -26,13 +26,19 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
     'Imbalance Degree': 'Quantifies how unevenly the workload is distributed across available hosts'
   };
 
-  const metrics = [
+  const coreMetrics = [
     { icon: <BarChart2 size={24} />, label: 'Resource Utilization' },
     { icon: <Clock size={24} />, label: 'Response Time' },
-    { icon: <Battery size={24} />, label: 'Energy Efficiency' },
+    { icon: <Battery size={24} />, label: 'Energy Efficiency' }
+  ];
+  
+  const additionalMetrics = [
     { icon: <Calendar size={24} />, label: 'Makespan' },
     { icon: <Scale size={24} />, label: 'Imbalance Degree' }
   ];
+  
+  const [showAllMetrics, setShowAllMetrics] = useState(false);
+  const displayedMetrics = showAllMetrics ? [...coreMetrics, ...additionalMetrics] : coreMetrics;
 
   return (
     <motion.section 
@@ -123,9 +129,8 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
         >
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 rounded-2xl" />
           
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-20 mb-8">
-            {metrics.map((metric, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-20 mb-6">
+            {displayedMetrics.map((metric, index) => (
               <motion.div
                 key={index}
                 className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl border border-[#319694]/10 flex flex-col items-center text-center relative group/metric overflow-visible transition-all duration-300 hover:-translate-y-2"
@@ -174,20 +179,38 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
               </motion.div>
             ))}
           </div>
+          
+          {/* Show More/Less Button */}
+          <div className="text-center mb-8">
+            <motion.button
+              onClick={() => setShowAllMetrics(!showAllMetrics)}
+              className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium text-[#319694] hover:bg-white transition-all shadow-sm border border-[#319694]/20"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {showAllMetrics ? 'Show Less' : 'Show More Metrics'}
+              <motion.div
+                animate={{ rotate: showAllMetrics ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown size={16} />
+              </motion.div>
+            </motion.button>
+          </div>
 
           {/* Description Section */}
           <div className="relative z-10 text-center">
             <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-4 shadow-inner border border-[#319694]/20">
               <BarChart2 className="w-5 h-5 text-[#319694]" />
-              <span className="text-sm font-semibold text-[#267b79]">Performance Analytics</span>
+              <span className="text-sm font-semibold text-[#267b79]">Key Performance Metrics</span>
             </div>
             
             <h4 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#319694] mb-4">
               Understanding the Metrics
             </h4>
             <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">
-              The simulation provides comprehensive metrics to evaluate your data center configuration's performance across multiple iterations. 
-              <span className="font-semibold text-[#319694]"> Hover over each metric</span> to learn more about what it measures and how it impacts your system's efficiency.
+              These metrics evaluate your data center configuration's performance across multiple iterations. 
+              <span className="font-semibold text-[#319694]"> Hover over each metric</span> to learn how it impacts your system's efficiency.
             </p>
           </div>
 
@@ -197,21 +220,6 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           </div>
         </motion.div>
 
-        <motion.div
-          className="mt-16 text-center"
-          initial={{ opacity: 0.8 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-          viewport={{ once: true }}
-        >
-          <button
-            onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-            className="text-[#319694] flex flex-col items-center gap-2 mx-auto group transition-all duration-300 hover:-translate-y-1"
-          >
-            <span className="text-sm font-medium">Ready to Simulate?</span>
-            <ChevronDown size={24} className="group-hover:text-[#267b79] transition-colors duration-300" />
-          </button>
-        </motion.div>
       </div>
     </motion.section>
   );

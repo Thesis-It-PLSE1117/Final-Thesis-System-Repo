@@ -14,12 +14,19 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#267b79]/20 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center"
     >
+      <motion.div 
+        className="absolute inset-0 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      />
+      
       <motion.div
-        initial={{ y: -20, scale: 0.98 }}
-        animate={{ y: 0, scale: 1 }}
-        className={`relative bg-white rounded-xl shadow-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-t-4 ${isEACO ? 'border-[#319694]' : 'border-[#4fd1c5]'}`}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ type: 'spring', damping: 15 }}
+        className="relative bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
       >
         <div className="flex items-start gap-4 mb-6">
           <div className={`p-3 rounded-lg ${bgColor} ${textColor}`}>

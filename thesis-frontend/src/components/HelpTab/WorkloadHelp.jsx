@@ -163,9 +163,9 @@ const WorkloadHelp = () => {
             <div className="p-2 bg-[#319694]/10 rounded-lg">
               <Download className="text-xl text-[#319694]" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-800">Dependencies</h3>
+            <h3 className="text-xl font-semibold text-gray-800">Optional: Data Preprocessing</h3>
           </div>
-          <p className="text-gray-600 mb-3">Ensure these libraries are installed:</p>
+          <p className="text-gray-600 mb-3">For developers preparing custom datasets offline, Python tools can be used:</p>
           <motion.div 
             className="bg-[#319694]/5 p-4 rounded-lg border border-[#319694]/10"
             initial={{ backgroundColor: "rgba(49, 150, 148, 0.05)" }}
@@ -175,6 +175,7 @@ const WorkloadHelp = () => {
               <code>pip install pandas numpy</code>
             </pre>
           </motion.div>
+          <p className="text-xs text-gray-500 mt-2">Note: This is not required for running simulations - only for custom data preparation.</p>
         </motion.div>
 
         {/* Custom Dataset Card */}

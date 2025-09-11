@@ -165,23 +165,17 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
 
   const docSections = [
     {
-      title: "What This Measures",
+      title: "About This Metric",
       icon: <FiFileText className="w-5 h-5" />,
-      content: description
+      content: `${description} ${betterWhen === "higher" ? "Higher values are better." : "Lower values are better."}`
     },
     {
-      title: "How to Read Results",
+      title: "Reading Results",
       icon: <FiBarChart2 className="w-5 h-5" />,
-      content: `Small differences (<5%) are usually not important. Larger differences (>15%) suggest one algorithm is clearly better. ${betterWhen === "higher" ? "Higher values are better for this metric" : "Lower values are better for this metric"}.`
-    },
-    {
-      title: "Quick Tips",
-      icon: <FiHelpCircle className="w-5 h-5" />,
-      content: "Focus on the percentage difference and which algorithm performs better. The color-coded significance level helps you quickly understand the importance of the difference."
+      content: "Focus on the percentage difference and which algorithm performs better. Larger differences indicate more significant performance gaps."
     }
   ];
 
-  // Enhanced color scheme with gradient backgrounds
   const getColorScheme = () => {
     if (isEqual) return {
       primaryBg: 'bg-gradient-to-br from-slate-50 to-gray-50',
@@ -343,9 +337,6 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                     Click outside to close
                   </p>
                 </div>
-                
-                {/* Extra bottom padding to ensure content is readable */}
-                <div className="h-6"></div>
               </div>
             </motion.div>
           )}
@@ -379,7 +370,7 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                   />
                 </div>
                 <div className={`font-bold mt-3 text-xl ${isBetter === 'eaco' ? 'text-gray-800' : 'text-gray-600'}`}>
-                  {eacoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
+                  {eacoNum.toFixed(2)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
                 </div>
               </div>
             </div>
@@ -432,7 +423,7 @@ const MetricCard = ({ title, description, eacoValue, epsoValue, unit, betterWhen
                   />
                 </div>
                 <div className={`font-bold mt-3 text-xl ${isBetter === 'epso' ? 'text-gray-800' : 'text-gray-600'}`}>
-                  {epsoNum.toFixed(3)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
+                  {epsoNum.toFixed(2)}<span className="text-sm ml-1 font-normal">{unit === 'seconds' ? 'secs' : unit}</span>
                 </div>
               </div>
             </div>

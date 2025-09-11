@@ -32,23 +32,17 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
   
 
   const estimateRemainingTime = () => {
-    if (progress === 0 || elapsedTime === 0) return 'Calculating...';
+    if (progress === 0 || elapsedTime === 0) return 'Estimating time...';
     const estimatedTotal = (elapsedTime / progress) * 100;
     const remaining = Math.max(0, estimatedTotal - elapsedTime);
-    return `~${formatTime(Math.round(remaining))} remaining`;
+    return `Approximately ${formatTime(Math.round(remaining))} remaining`;
   };
   
   const tips = [
-    "EPSO enhances traditional PSO by using adaptive inertia weights that decrease from 0.9 to 0.4 during optimization.",
-    "EACO improves upon standard ACO by incorporating dynamic pheromone evaporation rates based on solution quality.",
-    "Your multi-objective fitness function balances makespan (25%), cost (25%), energy (25%), and load balance (25%).",
-    "The load balance metric uses standard deviation of VM utilization - lower values indicate better distribution.",
-    "EPSO's cognitive (c1=2.0) and social (c2=2.0) factors guide particles toward personal and global best solutions.",
-    "EACO uses alpha=1.0 for pheromone influence and beta=2.0 for heuristic information in probability calculations.",
-    "Both algorithms run for 50 iterations with population sizes optimized for convergence speed vs solution quality.",
-    "Energy consumption is calculated using VM power models: 120W at peak + 60% at idle state.",
-    "The simulation uses CloudSim 7.0's enhanced architecture for more accurate cloud environment modeling.",
-    "MATLAB integration provides 3D surface plots, convergence graphs, and comparative performance visualizations."
+    "EPSO and EACO are enhanced optimization algorithms designed for better cloud resource scheduling.",
+    "The simulation balances multiple objectives: execution time, cost efficiency, energy usage, and load distribution.",
+    "Both algorithms are optimized for convergence speed while maintaining high solution quality.",
+    "Results include detailed performance metrics and statistical comparisons between algorithms."
   ];
   
   const [currentTipIndex, setCurrentTipIndex] = React.useState(0);
@@ -56,7 +50,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
   React.useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTipIndex(prev => (prev + 1) % tips.length);
-    }, 10000); // 10 secs
+    }, 15000); 
     
     return () => clearInterval(tipInterval);
   }, []);
@@ -91,7 +85,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-[#319694] hover:bg-gray-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            title={isAborting ? "Cancelling..." : "Cancel simulation"}
+            title={isAborting ? "Stopping simulation..." : "Stop simulation"}
           >
             {isAborting ? (
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#319694] border-t-transparent" />
@@ -101,44 +95,44 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
           </motion.button>
         )}
         
-        {/* Cloud header */}
+        {/* Header */}
         <div className="flex items-center justify-center mb-4">
-          <div className="w-16 h-10 mr-3 flex items-center justify-center">
-            <Cloud size={32} className="text-blue-500" />
+          <div className="p-3 bg-[#319694]/10 rounded-lg mr-3">
+            <Activity size={24} className="text-[#319694]" />
           </div>
           <h3 id="cloud-loading-title" className="text-xl font-bold text-gray-800">
-            Cloud Simulation Progress
+            Simulation Processing
           </h3>
         </div>
 
-        {/* Loading GIF animation */}
+
         <div className="flex justify-center mb-6">
-          <img 
-            src="/loading/cloud_loading.gif" 
-            alt="Cloud simulation in progress"
-            className="h-36 w-auto"
-          />
+          <div className="relative w-32 h-32">
+            <div className="absolute inset-0 border-4 border-[#319694]/20 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-transparent border-t-[#319694] rounded-full animate-spin"></div>
+            <div className="absolute inset-4 border-4 border-transparent border-b-[#4fd1c5] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Server className="text-[#319694]" size={32} />
+            </div>
+          </div>
         </div>
 
-        {/* Enhanced Progress Information */}
         <div className="mb-4">
-          {/* Time information */}
-          <div className="flex justify-between items-center mb-2">
+          {/* time information */}
+          <div className="flex justify-center items-center mb-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Clock size={14} />
-              <span>Elapsed: {formatTime(elapsedTime)}</span>
+              <span>{formatTime(elapsedTime)} elapsed</span>
             </div>
-            
           </div>
           
-          {/* Progress bar */}
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Overall Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <motion.div
-              className="h-2.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-600"
+              className="h-2.5 rounded-full bg-gradient-to-r from-[#319694] to-[#4fd1c5]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
@@ -146,12 +140,10 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
           </div>
         </div>
 
-        <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-1.5 bg-amber-100 rounded">
-              <Info className="text-amber-800" size={16} />
-            </div>
-            <span className="text-amber-800 font-medium text-sm">Did You Know?</span>
+            <Info className="text-gray-600" size={16} />
+            <span className="text-gray-700 font-medium text-sm">Processing Information</span>
           </div>
           <motion.p 
             key={currentTipIndex}
@@ -159,48 +151,50 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.5 }}
-            className="text-xs text-amber-700 leading-relaxed"
+            className="text-xs text-gray-600 leading-relaxed"
           >
             {tips[currentTipIndex]}
           </motion.p>
         </div>
         
-        {/*running multiple */}
         {iterations > 1 && (
-          <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="mb-4 p-3 bg-[#319694]/5 rounded-lg border border-[#319694]/20">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-purple-100 rounded">
-                <Repeat className="text-purple-800" size={16} />
-              </div>
-              <span className="text-purple-800 font-medium text-sm">Running Multiple Iterations</span>
+              <Repeat className="text-[#319694]" size={16} />
+              <span className="text-gray-700 font-medium text-sm">Multiple Iterations</span>
             </div>
-            <p className="text-xs text-purple-700 mt-1">
-              Executing {iterations} simulation run{iterations > 1 ? 's' : ''}
+            <p className="text-xs text-gray-600 mt-1">
+              Executing {iterations} simulation iteration{iterations > 1 ? 's' : ''}
             </p>
           </div>
         )}
         
-        {/* Resource allocation info */}
         <div className="grid grid-cols-3 gap-2 text-sm">
-          <div className="bg-blue-50 p-2 rounded-lg flex items-center gap-2">
-            <Server className="text-blue-500" size={16} />
-            <div>
-              <div className="font-medium text-blue-800">Hosts</div>
-              <div className="text-blue-600">{numHosts}</div>
+          <div className="bg-gray-50 p-2 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2">
+              <Server className="text-[#319694]" size={16} />
+              <div>
+                <div className="font-medium text-gray-700">Hosts</div>
+                <div className="text-gray-900 font-semibold">{numHosts}</div>
+              </div>
             </div>
           </div>
-          <div className="bg-green-50 p-2 rounded-lg flex items-center gap-2">
-            <Cpu className="text-green-500" size={16} />
-            <div>
-              <div className="font-medium text-green-800">Cloudlets</div>
-              <div className="text-green-600">{numCloudlets}</div>
+          <div className="bg-gray-50 p-2 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2">
+              <Database className="text-[#319694]" size={16} />
+              <div>
+                <div className="font-medium text-gray-700">Tasks</div>
+                <div className="text-gray-900 font-semibold">{numCloudlets}</div>
+              </div>
             </div>
           </div>
-          <div className="bg-amber-50 p-2 rounded-lg flex items-center gap-2">
-            <HardDrive className="text-amber-500" size={16} />
-            <div>
-              <div className="font-medium text-amber-800">VMs</div>
-              <div className="text-amber-600">{numVMs}</div>
+          <div className="bg-gray-50 p-2 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2">
+              <HardDrive className="text-[#319694]" size={16} />
+              <div>
+                <div className="font-medium text-gray-700">VMs</div>
+                <div className="text-gray-900 font-semibold">{numVMs}</div>
+              </div>
             </div>
           </div>
         </div>

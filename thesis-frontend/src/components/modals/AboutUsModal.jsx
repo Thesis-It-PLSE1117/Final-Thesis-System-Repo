@@ -180,32 +180,32 @@ const AboutUsModal = ({ isOpen, onClose }) => {
 
               <motion.div 
                 variants={itemVariants}
-                className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6"
+                className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6"
               >
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2m-2 6h2a2 2 0 012 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2v-6a2 2 0 012-2z" />
                   </svg>
-                  <h4 className="font-semibold text-blue-800">Research Methodology</h4>
+                  <h4 className="font-semibold text-gray-800">Research Methodology</h4>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-2">
-                    <p><span className="font-medium text-blue-700">Participants:</span> 30 total</p>
-                    <ul className="text-xs text-blue-600 ml-4 space-y-1">
+                    <p><span className="font-medium text-gray-700">Participants:</span> 30 total</p>
+                    <ul className="text-xs text-gray-600 ml-4 space-y-1">
                       <li>• 15 IT Experts (5+ years experience)</li>
                       <li>• 15 Cloud Specialists (certified)</li>
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p><span className="font-medium text-blue-700">Analysis:</span> Statistical comparison</p>
-                    <ul className="text-xs text-blue-600 ml-4 space-y-1">
+                    <p><span className="font-medium text-gray-700">Analysis:</span> Statistical comparison</p>
+                    <ul className="text-xs text-gray-600 ml-4 space-y-1">
                       <li>• Paired t-test (α = 0.05)</li>
                       <li>• Likert scale evaluation</li>
                       <li>• Purposive sampling</li>
                     </ul>
                   </div>
                 </div>
-                <p className="text-xs text-blue-600 text-center mt-3">
+                <p className="text-xs text-gray-600 text-center mt-3">
                   Evaluating Enhanced PSO (EPSO) vs Enhanced ACO (EACO) using CloudSim simulation with Google Cluster Dataset
                 </p>
               </motion.div>

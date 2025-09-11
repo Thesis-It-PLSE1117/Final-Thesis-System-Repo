@@ -117,7 +117,7 @@ const HomePage = () => {
       title: "Resources",
       links: [
         { text: "Documentation", href: "#", icon: <BookText size={16} />, onClick: () => openModal('documentation') },
-        { text: "Research Paper", href: "https://docs.google.com/document/d/1NYjfhNk7LM67LDS1SdULkZ0WgZGMHuDq/edit?fbclid=IwZXh0bgNhZW0CMTEAAR7ulWdWXKfO8zESkvZ8M0iVmr80DYh5V9x8uNWXZBtTUkpMYF-Xbou2F0jx0w_aem_A7Q6gt6Js_R74zj6Yo7J_A", icon: <FileText size={16} /> },
+        { text: "Research Paper", href: "https://docs.google.com/document/d/1NYjfhNk7LM67LDS1SdULkZ0WgZGMHuDq/edit", icon: <FileText size={16} /> },
         { text: "GitHub Repository", href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git", icon: <GitCompare size={16} /> }
       ]
     },
@@ -256,7 +256,7 @@ const HomePage = () => {
             "Nonlinear inertia weight: w = w_max - (w_max - w_min) × (iteration/maxIterations)²",
             "Adaptive velocity clamping: V_max decreases quadratically over iterations",
             "Standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients",
-            "No VM migration required for energy efficiency"
+            "Efficient initial task-to-VM scheduling without requiring VM migration"
           ],
           parameters: [
             "Initial inertia weight (w_initial)",
@@ -307,7 +307,7 @@ const HomePage = () => {
           ],
           recommendations: [
             "Run simulations with both algorithms for comprehensive comparison",
-            "Test with realistic workloads from Google Cluster Traces)",
+            "Test with realistic workloads from Google Cluster Traces",
             "Compare performance across different data center sizes",
             "Evaluate energy efficiency alongside performance metrics",
           ]
