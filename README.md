@@ -42,6 +42,10 @@ npm install
 Create a .env file:
 ```env
 VITE_API_BASE_URL=http://localhost:8081
+
+# MATLAB Feature Flags
+VITE_ENABLE_MATLAB_PLOTS=true
+VITE_ENABLE_MATLAB_TOGGLE=true
 ```
 
 Start development server:
@@ -88,6 +92,118 @@ Vite config highlights (vite.config.js):
 - Gzip + Brotli compression during build
 - Vendor chunk splitting for faster loads
 - Optional bundle analyzer (ANALYZE=true)
+
+## MATLAB Configuration
+
+The frontend supports MATLAB integration through environment variables. MATLAB features are controlled by feature flags that can be enabled or disabled based on your setup.
+
+### Enable MATLAB Features (Local Development)
+
+To enable MATLAB plots and analysis features:
+
+**Step 1: Configure Environment Variables**
+Create or update your `.env` file:
+```env
+VITE_API_BASE_URL=http://localhost:8081
+
+# Enable MATLAB Features
+VITE_ENABLE_MATLAB_PLOTS=true
+VITE_ENABLE_MATLAB_TOGGLE=true
+VITE_ENABLE_HISTORY=true
+```
+
+**Step 2: Ensure Backend MATLAB Support**
+- Backend must be running with MATLAB profile enabled
+- See backend documentation for MATLAB setup
+
+**Step 3: Restart Development Server**
+```bash
+npm run dev
+```
+
+**Step 4: Use MATLAB Features**
+1. Navigate to any simulation tab
+2. Look for "Generate Plots with MATLAB" toggle
+3. **Enable the toggle** before running simulation
+4. Run simulation and view results in Results tab
+
+### Disable MATLAB Features (Production)
+
+For production deployment without MATLAB:
+
+**Option 1: Use .env.production**
+The included `.env.production` automatically disables MATLAB:
+```env
+VITE_API_BASE_URL=https://your-backend.railway.app
+
+# MATLAB Features Disabled
+VITE_ENABLE_MATLAB_PLOTS=false
+VITE_ENABLE_MATLAB_TOGGLE=false
+```
+
+**Option 2: Manual Configuration**
+Set environment variables to false:
+```env
+VITE_ENABLE_MATLAB_PLOTS=false
+VITE_ENABLE_MATLAB_TOGGLE=false
+```
+
+### Environment Variable Reference
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_ENABLE_MATLAB_PLOTS` | `false` | Shows/hides MATLAB plot visualizations |
+| `VITE_ENABLE_MATLAB_TOGGLE` | `false` | Shows/hides "Generate Plots" toggle |
+| `VITE_ENABLE_HISTORY` | `true` | Enable simulation history feature |
+| `VITE_MAX_HISTORY_ENTRIES` | `50` | Maximum number of history entries |
+
+### UI Behavior Based on Configuration
+
+**When MATLAB is ENABLED:**
+- "Generate Plots with MATLAB" toggle appears
+- Plot galleries display MATLAB-generated visualizations
+- Plot interpretation cards show detailed analysis
+- Advanced statistical charts are available
+- Full feature set is accessible
+
+**When MATLAB is DISABLED:**
+- MATLAB toggle is hidden
+- Uses Chart.js fallback visualizations
+- Basic charts and metrics still work
+- Simulation functionality remains intact
+- Clean UI without unused features
+
+### Testing Your Configuration
+
+**Check if MATLAB features are enabled:**
+1. Start the development server
+2. Open browser developer console
+3. Check for MATLAB-related UI elements
+4. Look for "Generate Plots" toggles in simulation tabs
+
+**Verify environment variables:**
+```bash
+# In your terminal, check if variables are set
+echo $VITE_ENABLE_MATLAB_PLOTS
+echo $VITE_ENABLE_MATLAB_TOGGLE
+```
+
+### Troubleshooting
+
+**MATLAB toggle not appearing:**
+- Check `VITE_ENABLE_MATLAB_TOGGLE=true` in .env
+- Restart development server after .env changes
+- Verify .env file is in project root
+
+**Plots not generating:**
+- Ensure `VITE_ENABLE_MATLAB_PLOTS=true`
+- Verify backend has MATLAB support enabled
+- Check browser console for API errors
+
+**Environment changes not taking effect:**
+- Restart development server completely
+- Check .env file syntax (no spaces around =)
+- Ensure .env is not gitignored if sharing configuration
 
 ## Backend
 
