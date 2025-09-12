@@ -96,7 +96,9 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
       case 'responseTime':
         return { Icon: Timer, label: 'Average Response Time', unit: 'secs', betterWhen: 'lower' };
       case 'loadBalance':
-        return { Icon: Scale, label: 'Degree of Imbalance (DI)', unit: 'ratio', betterWhen: 'lower' };
+      case 'loadImbalance':
+      case 'degreeOfImbalance':
+        return { Icon: Scale, label: 'Degree of Imbalance (DI)', unit: '', betterWhen: 'lower' };
       default:
         return { Icon: BarChart3, label: metricName, unit: '', betterWhen: 'lower' };
     }
@@ -420,10 +422,12 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                         const claimed = detectAlgorithmFromText(analysis);
                         const test = metricTests?.[metric];
                         const consistent = !test || !test.significant || !claimed || claimed === test.betterAlgorithm;
+                        const displayName = metric === 'loadBalance' ? 'Degree of Imbalance' : 
+                                          metric.replace(/([A-Z])/g, ' $1').trim();
                         return (
                           <div key={metric} className={`bg-white rounded-lg p-3 border ${consistent ? 'border-gray-200' : 'border-amber-300'}`}>
                             <h5 className="font-medium text-gray-800 text-sm mb-1 capitalize">
-                              {metric.replace(/([A-Z])/g, ' $1').trim()}
+                              {displayName}
                               {!consistent && (
                                 <span className="ml-2 text-xs text-amber-700">(note: text vs t-test mismatch)</span>
                               )}

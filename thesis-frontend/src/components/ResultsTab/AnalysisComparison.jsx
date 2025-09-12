@@ -514,7 +514,9 @@ const ToggleView = ({ eacoContent, epsoContent, type }) => {
             {Object.entries(content).map(([metric, interpretation]) => (
               <div key={metric} className={`bg-${algorithmColor}-50 border border-${algorithmColor}-200 rounded-lg p-3`}>
                 <h5 className="font-medium text-sm text-gray-800 capitalize mb-1">
-                  {metric.replace(/([A-Z])/g, ' $1').trim()}
+                  {metric === 'loadBalance' ? 'Degree of Imbalance' : 
+                   metric === 'loadImbalance' ? 'Degree of Imbalance' :
+                   metric.replace(/([A-Z])/g, ' $1').trim()}
                 </h5>
                 <p className="text-xs text-gray-600">{interpretation}</p>
               </div>
@@ -596,7 +598,9 @@ const MetricComparison = ({ eacoMetrics, epsoMetrics }) => {
       {Array.from(allMetrics).map(metric => (
         <div key={metric} className="border border-gray-200 rounded-lg p-4">
           <h5 className="font-semibold text-gray-800 capitalize mb-3">
-            {metric.replace(/([A-Z])/g, ' $1').trim()}
+            {metric === 'loadBalance' ? 'Degree of Imbalance' : 
+             metric === 'loadImbalance' ? 'Degree of Imbalance' :
+             metric.replace(/([A-Z])/g, ' $1').trim()}
           </h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-teal-50 border-l-4 border-teal-400 rounded-lg p-3">
