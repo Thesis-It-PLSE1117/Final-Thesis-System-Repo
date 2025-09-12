@@ -86,34 +86,31 @@ export const getSummaryData = (results) => {
   if (!results || !results.summary) return null;
 
   return {
-    makespan: (results.summary.makespan || 0).toFixed(2),
-
-    imbalance: results.summary.loadBalancePercentage || 
-               (results.summary.loadBalance !== undefined 
-                 ? ((1 - results.summary.loadBalance) * 100).toFixed(2)
-                 : '0'),
-    utilization: (results.summary.resourceUtilization || results.summary.utilization || 0).toFixed(2),
+    // response time
     avgResponseTime: (results.summary.responseTime || results.summary.averageResponseTime || 0).toFixed(2),
-    energyConsumption: (results.summary.energyConsumption || 0).toFixed(2)
+    // resource util
+    utilization: (results.summary.resourceUtilization || results.summary.utilization || 0).toFixed(2),
+    // energy efficiency
+    energyConsumption: (results.summary.energyConsumption || 0).toFixed(2),
+    // di value
+    degreeOfImbalance: (results.summary.loadImbalance !== undefined 
+                 ? results.summary.loadImbalance.toFixed(4)
+                 : results.summary.loadBalance !== undefined
+                   ? results.summary.loadBalance.toFixed(4)
+                   : '0.0000'),
+    // makespan
+    makespan: (results.summary.makespan || 0).toFixed(2)
   };
 };
 
 export const keyMetrics = [
   {
-    title: "Makespan",
-    description: "Total time taken to complete all tasks",
+    title: "Response Time",
+    description: "Average time taken to respond to tasks",
     unit: " secs",
     betterWhen: "lower",
-    valueKey: "makespan",
-    icon: Clock
-  },
-  {
-    title: "Balance",
-    description: "Load distribution balance across VMs (100% - DI)",
-    unit: "%",
-    betterWhen: "higher",
-    valueKey: "imbalance",
-    icon: Scale
+    valueKey: "avgResponseTime",
+    icon: Gauge
   },
   {
     title: "Resource Utilization",
@@ -124,19 +121,27 @@ export const keyMetrics = [
     icon: Cpu
   },
   {
-    title: "Average Response Time",
-    description: "Mean time taken to respond to tasks",
-    unit: " secs",
-    betterWhen: "lower",
-    valueKey: "avgResponseTime",
-    icon: Gauge
-  },
-  {
-    title: "Energy Consumption",
-    description: "Total energy used by all VMs",
+    title: "Energy Efficiency",
+    description: "Total energy consumed by all VMs",
     unit: " Wh",
     betterWhen: "lower",
     valueKey: "energyConsumption",
     icon: BatteryFull
+  },
+  {
+    title: "Degree of Imbalance",
+    description: "Load imbalance metric (DI = (MaxTime - MinTime) / AvgTime)",
+    unit: "",
+    betterWhen: "lower",
+    valueKey: "degreeOfImbalance",
+    icon: Scale
+  },
+  {
+    title: "Makespan",
+    description: "Total time to complete all tasks",
+    unit: " secs",
+    betterWhen: "lower",
+    valueKey: "makespan",
+    icon: Clock
   }
 ];

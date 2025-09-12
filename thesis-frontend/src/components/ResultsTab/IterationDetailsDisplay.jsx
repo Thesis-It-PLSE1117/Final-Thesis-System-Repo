@@ -48,7 +48,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
     { key: 'energyConsumption', label: 'Energy', unit: 'Wh', format: (v) => v.toFixed(2), color: 'yellow' },
     { key: 'resourceUtilization', label: 'Resource Util', unit: '%', format: (v) => v.toFixed(2), color: 'green' },
     { key: 'responseTime', label: 'Response Time', unit: 's', format: (v) => v.toFixed(3), color: 'purple' },
-    { key: 'loadBalance', label: 'Load Balance', unit: '', format: (v) => v.toFixed(4), color: 'indigo' },
+    { key: 'loadImbalance', label: 'Degree of Imbalance', unit: '', format: (v) => v.toFixed(4), color: 'indigo' },
     { key: 'fitness', label: 'Fitness Score', unit: '', format: (v) => v.toFixed(4), color: 'pink' }
   ];
 
@@ -62,7 +62,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
     const diff = eacoValue - epsoValue;
     const percentDiff = epsoValue !== 0 ? (diff / epsoValue) * 100 : 0;
     
-    const isLowerBetter = ['makespan', 'energyConsumption', 'responseTime', 'loadBalance', 'fitness'].includes(metric);
+    const isLowerBetter = ['makespan', 'energyConsumption', 'responseTime', 'loadImbalance', 'fitness'].includes(metric);
     
     let trend = 'neutral';
     if (diff < 0) trend = isLowerBetter ? 'better' : 'worse';
