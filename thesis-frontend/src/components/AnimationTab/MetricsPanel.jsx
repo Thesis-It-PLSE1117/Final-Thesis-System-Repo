@@ -5,8 +5,8 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <MetricCard 
         title="Degree of Imbalance" 
-        value={`${metrics.imbalance}%`} 
-        subtitle="Measure of load imbalance (0% = perfect balance)" 
+        value={metrics.imbalance} 
+        subtitle="DI = (MaxTime - MinTime) / AvgTime (lower)" 
         colorClass={colorClass}
       />
       <MetricCard 
