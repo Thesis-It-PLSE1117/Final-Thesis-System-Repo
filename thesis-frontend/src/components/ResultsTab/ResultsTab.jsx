@@ -6,14 +6,12 @@ import {
   FiSearch,
   FiDownload,
   FiPrinter,
-  FiGrid,
   FiBarChart2,
   FiFileText,
   FiActivity,
   FiEye,
   FiSettings
 } from 'react-icons/fi';
-import MetricCard from './MetricCard';
 import SchedulingLogTable from './SchedulingLogTable';
 import IterationBadge from './IterationBadge';
 import StatisticsDisplay from './StatisticsDisplay';
@@ -23,7 +21,7 @@ import AnalysisDisplay from './AnalysisDisplay';
 import AnalysisComparison from './AnalysisComparison';
 import IterationDetailsDisplay from './IterationDetailsDisplay';
 import ExecutionTimeDisplay from './ExecutionTimeDisplay';
-import { normalizeData, getSummaryData, keyMetrics } from './utils';
+import { normalizeData, getSummaryData } from './utils';
 import ImageModal from '../modals/ImageModal';
 import PlotWithInterpretation from './PlotWithInterpretation';
 
@@ -62,13 +60,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       label: 'Metadata',
       icon: <FiSettings className="w-4 h-4" />,
       description: 'Simulation configuration and execution details',
-      enabled: true
-    },
-    {
-      id: 'metrics',
-      label: 'Metrics',
-      icon: <FiGrid className="w-4 h-4" />,
-      description: 'Detailed performance metrics comparison',
       enabled: true
     },
     {
@@ -367,33 +358,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             {eacoResults?.rawResults?.totalIterations > 1 && (
               <IterationBadge iterationData={eacoResults.rawResults} />
             )}
-          </motion.div>
-        );
-
-      case 'metrics':
-        return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6"
-          >
-            {keyMetrics.map((metric) => (
-              <div key={`metric-${metric.valueKey}`} className="break-inside-avoid mb-6">
-                <MetricCard 
-                  title={metric.title}
-                  description={metric.description}
-                  eacoValue={rrSummary ? rrSummary[metric.valueKey] || 0 : 0}
-                  epsoValue={epsoSummary ? epsoSummary[metric.valueKey] || 0 : 0}
-                  unit={metric.unit}
-                  betterWhen={metric.betterWhen}
-                  icon={metric.icon}
-                  backendInterpretation={{
-                    eaco: eacoResults?.analysis?.metricInterpretations?.[mapMetricKeyToBackend(metric.valueKey)],
-                    epso: epsoResults?.analysis?.metricInterpretations?.[mapMetricKeyToBackend(metric.valueKey)]
-                  }}
-                />
-              </div>
-            ))}
           </motion.div>
         );
 
