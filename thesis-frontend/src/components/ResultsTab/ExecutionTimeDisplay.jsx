@@ -100,7 +100,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
           <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
             <div className="flex items-center gap-2">
               <GitCompare className="text-blue-600" size={16} />
-              <span className="font-medium text-blue-800">Total Analysis Time</span>
+              <span className="font-medium text-blue-800">Backend Processing Time</span>
             </div>
             <span className="text-lg font-bold text-blue-700">
               {formatDuration(eacoInfo.duration)}
@@ -119,9 +119,9 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
             )}
             
             {epsoInfo?.duration && (
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                <span className="font-medium text-purple-800">EPSO</span>
-                <span className="text-lg font-bold text-purple-700">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium text-gray-800">EPSO</span>
+                <span className="text-lg font-bold text-gray-700">
                   {formatDuration(epsoInfo.duration)}
                 </span>
               </div>

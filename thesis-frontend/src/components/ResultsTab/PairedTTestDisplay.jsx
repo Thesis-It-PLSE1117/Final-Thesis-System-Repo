@@ -362,7 +362,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
         <div className="mt-6">
           <button
             onClick={() => setShowInterpretation(!showInterpretation)}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg flex items-center justify-between hover:opacity-90 transition-opacity"
+            className="w-full bg-gradient-to-r from-[#319694] to-[#267b79] text-white p-4 rounded-lg flex items-center justify-between hover:opacity-90 transition-opacity"
           >
             <div className="flex items-center gap-2">
               <Activity size={20} />
@@ -377,12 +377,11 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-b-lg p-6"
+                className="bg-gradient-to-br from-[#319694]/5 to-[#319694]/10 border border-[#319694]/30 rounded-b-lg p-6"
               >
-                {/* Overall Conclusion */}
                 <div className="mb-4">
                   <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                    <Award className="text-indigo-600" size={18} />
+                    <Award className="text-[#319694]" size={18} />
                     Overall Conclusion
                   </h4>
                   <p className="text-gray-700 leading-relaxed">
@@ -390,10 +389,9 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                   </p>
                 </div>
                 
-                {/* Effect Size Explanation */}
                 <div className="mb-4">
                   <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                    <TrendingUp className="text-purple-600" size={18} />
+                    <TrendingUp className="text-[#319694]" size={18} />
                     Practical Significance
                   </h4>
                   <p className="text-gray-700 leading-relaxed">
@@ -401,10 +399,9 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                   </p>
                 </div>
                 
-                {/* Confidence Level */}
                 <div className="mb-4">
                   <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                    <Info className="text-blue-600" size={18} />
+                    <Info className="text-[#319694]" size={18} />
                     Confidence Level
                   </h4>
                   <p className="text-gray-700 leading-relaxed">
@@ -412,11 +409,10 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                   </p>
                 </div>
                 
-                {/* Individual Metric Analysis */}
                 {tTestResults.interpretation.metricAnalysis && (
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <BarChart3 className="text-green-600" size={18} />
+                      <BarChart3 className="text-[#319694]" size={18} />
                       Detailed Metric Analysis
                     </h4>
                     <div className="space-y-2">

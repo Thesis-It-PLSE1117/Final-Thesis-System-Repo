@@ -138,7 +138,7 @@ const HeroSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.6, duration: 0.8 }}
         >
           Compare algorithm performance with <span className="font-semibold text-[#319694]">configurable workload sizes</span> and 
-          <span className="font-semibold text-[#4fd1c5]">statistical validation</span> through multiple iteration support
+          <span className="font-semibold text-[#4fd1c5]"> statistical validation</span> through multiple iteration support
         </motion.p>
 
         {/* Key Statistics */}

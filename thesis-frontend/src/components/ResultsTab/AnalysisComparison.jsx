@@ -206,7 +206,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                       gradeComparison.epsoBetter ? 'border-green-400 bg-green-50/30' : 'border-gray-200'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-bold text-purple-600">EPSO</h4>
+                        <h4 className="text-lg font-bold text-gray-700">EPSO</h4>
                         {epsoAnalysis?.overallPerformance?.grade && 
                           renderGrade(epsoAnalysis.overallPerformance.grade, gradeComparison.epsoBetter)}
                       </div>
