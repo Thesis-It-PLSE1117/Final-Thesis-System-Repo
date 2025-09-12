@@ -46,7 +46,7 @@ const IterationBadge = ({ iterationData }) => {
           <div className="flex items-center gap-2">
             <Clock className="text-blue-600" size={16} />
             <span className="text-gray-700">
-              <span className="font-semibold">{formatTime(iterationData.totalExecutionTime)}</span> Total Time
+              <span className="font-semibold">{formatTime(iterationData.totalExecutionTime)}</span> Simulation Runtime
             </span>
           </div>
         </div>

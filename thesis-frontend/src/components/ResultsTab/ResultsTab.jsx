@@ -248,14 +248,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   const epsoSummary = getSummaryData(resultsEPSO);
   const hasTTest = !!(eacoResults?.tTestResults || epsoResults?.tTestResults);
 
-  // Map frontend metric keys to backend interpretation keys
-  const mapMetricKeyToBackend = (key) => {
-    if (key === 'utilization') return 'resourceUtilization';
-    if (key === 'avgResponseTime') return 'responseTime';
-    if (key === 'imbalance') return 'loadBalance';
-    return key;
-  };
-
   if (loading) return (
     <div className="flex items-center justify-center h-full">
       <div className="p-6 text-center">
@@ -368,22 +360,22 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Highlight T-Test Results if Available */}
+            {/* T-Test Results if Available */}
             {hasTTest && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 shadow-lg"
+                className="bg-gradient-to-r from-[#319694]/5 to-[#319694]/10 border-2 border-[#319694]/30 rounded-xl p-6 shadow-lg"
               >
                 <div className="flex items-center mb-4">
-                  <div className="bg-purple-100 rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="bg-[#319694]/10 rounded-full p-2 mr-3">
+                    <svg className="w-6 h-6 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-purple-800">Paired T-Test Analysis</h3>
-                    <p className="text-sm text-purple-600">Statistical comparison between EACO and EPSO algorithms</p>
+                    <h3 className="text-lg font-bold text-gray-800">Paired T-Test Analysis</h3>
+                    <p className="text-sm text-gray-600">Statistical comparison between EACO and EPSO algorithms</p>
                   </div>
                 </div>
                 <PairedTTestDisplay 
@@ -787,8 +779,8 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               {/* Badge for T-Test Results on Analysis Tab */}
               {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
                 <span className="absolute -top-1 -right-2 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#319694] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#319694]"></span>
                 </span>
               )}
               
@@ -796,7 +788,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                 {tab.description}
                 {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
-                  <span className="block text-purple-300 mt-1">T-Test results available!</span>
+                  <span className="block text-[#319694] font-medium mt-1">T-Test results available</span>
                 )}
               </div>
             </button>
