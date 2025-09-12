@@ -51,6 +51,7 @@ export const generateCacheKey = (config, simulationType = 'raw') => {
   //hash of the configuration
   const configString = JSON.stringify(normalizedConfig);
   const hash = btoa(configString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+
   return `${CACHE_PREFIX}${CACHE_VERSION}_${hash}`;
 };
 
@@ -61,23 +62,25 @@ export const getCachedResult = (config, simulationType = 'raw') => {
   try {
     const cacheKey = generateCacheKey(config, simulationType);
     const cached = localStorage.getItem(cacheKey);
-    
+
     if (!cached) {
       console.log('[Cache] No cached result found');
       return null;
     }
-    
+
     const parsedCache = JSON.parse(cached);
     const now = Date.now();
     const expiryTime = CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
-    
+
     //cache has expired
     if (now - parsedCache.timestamp > expiryTime) {
       console.log('[Cache] Cached result expired, removing...');
       localStorage.removeItem(cacheKey);
       return null;
     }
-    
+
+    console.log(`[Cache] HIT! Using cached result from ${new Date(parsedCache.timestamp).toLocaleString()}`);
+
     //cached results with metadata
     return {
       ...parsedCache.results,
@@ -94,9 +97,9 @@ export const getCachedResult = (config, simulationType = 'raw') => {
 /**
  * simulation results to cache
  */
-export const cacheResult = (config, results, simulationType = 'raw') => {
+export const cacheResult = (config, results) => {
   try {
-    const cacheKey = generateCacheKey(config, simulationType);
+    const cacheKey = generateCacheKey(config);
     
        //dont cache plot data 
     const resultsToCache = {
