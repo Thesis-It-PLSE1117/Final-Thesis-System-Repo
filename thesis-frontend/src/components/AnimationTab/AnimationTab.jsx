@@ -31,20 +31,23 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
       const epsoData = epsoResults.rawResults || epsoResults;
       const eacoData = eacoResults.rawResults || eacoResults;
 
-      // Set metrics from backend data
-      // Use loadBalance directly as degree of imbalance (0=perfect, 1=worst)
+      
       setMetrics({
         EPSO: {
-          imbalance: epsoData.summary?.loadBalance !== undefined 
-            ? (epsoData.summary.loadBalance * 100).toFixed(2)
-            : '0',
+          imbalance: epsoData.summary?.loadImbalance !== undefined 
+            ? epsoData.summary.loadImbalance.toFixed(4)
+            : epsoData.summary?.loadBalance !== undefined
+              ? epsoData.summary.loadBalance.toFixed(4)
+              : '0.0000',
           makespan: (epsoData.summary?.makespan || 0).toFixed(2),
           utilization: (epsoData.summary?.resourceUtilization || epsoData.summary?.utilization || 0).toFixed(2)
         },
         EACO: {
-          imbalance: eacoData.summary?.loadBalance !== undefined 
-            ? (eacoData.summary.loadBalance * 100).toFixed(2)
-            : '0',
+          imbalance: eacoData.summary?.loadImbalance !== undefined 
+            ? eacoData.summary.loadImbalance.toFixed(4)
+            : eacoData.summary?.loadBalance !== undefined
+              ? eacoData.summary.loadBalance.toFixed(4)
+              : '0.0000',
           makespan: (eacoData.summary?.makespan || 0).toFixed(2),
           utilization: (eacoData.summary?.resourceUtilization || eacoData.summary?.utilization || 0).toFixed(2)
         }
@@ -259,30 +262,34 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
           setCpuLoads({ EPSO: currentEpsoLoads, EACO: currentEacoLoads });
           setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
 
-          // Use loadBalance directly as degree of imbalance
-          const epsoImbalancePercent = epsoData.summary?.loadBalance !== undefined 
-            ? epsoData.summary.loadBalance * 100
-            : 0;
-          const eacoImbalancePercent = eacoData.summary?.loadBalance !== undefined 
-            ? eacoData.summary.loadBalance * 100
-            : 0;
+          // Use loadImbalance (raw DI value) directly
+          const epsoImbalance = epsoData.summary?.loadImbalance !== undefined 
+            ? epsoData.summary.loadImbalance
+            : epsoData.summary?.loadBalance !== undefined
+              ? epsoData.summary.loadBalance
+              : 0;
+          const eacoImbalance = eacoData.summary?.loadImbalance !== undefined 
+            ? eacoData.summary.loadImbalance
+            : eacoData.summary?.loadBalance !== undefined
+              ? eacoData.summary.loadBalance
+              : 0;
 
           setMetrics({
             EPSO: newProgress >= 99 ? {
-              imbalance: epsoImbalancePercent.toFixed(2),
+              imbalance: epsoImbalance.toFixed(4),
               makespan: (epsoData.summary?.makespan || 0).toFixed(2),
               utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
             } : {
-              imbalance: (epsoImbalancePercent * (newProgress / 100)).toFixed(2),
+              imbalance: (epsoImbalance * (newProgress / 100)).toFixed(4),
               makespan: ((epsoData.summary?.makespan || 0) * (newProgress / 100)).toFixed(2),
               utilization: ((epsoData.summary?.resourceUtilization || 0) * (newProgress / 100)).toFixed(2)
             },
             EACO: newProgress >= 99 ? {
-              imbalance: eacoImbalancePercent.toFixed(2),
+              imbalance: eacoImbalance.toFixed(4),
               makespan: (eacoData.summary?.makespan || 0).toFixed(2),
               utilization: (eacoData.summary?.resourceUtilization || 0).toFixed(2)
             } : {
-              imbalance: (eacoImbalancePercent * (newProgress / 100)).toFixed(2),
+              imbalance: (eacoImbalance * (newProgress / 100)).toFixed(4),
               makespan: ((eacoData.summary?.makespan || 0) * (newProgress / 100)).toFixed(2),
               utilization: ((eacoData.summary?.resourceUtilization || 0) * (newProgress / 100)).toFixed(2)
             }
@@ -298,12 +305,12 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
             setCpuLoads({ EPSO: finalEpsoLoads, EACO: finalEacoLoads });
             setMetrics({
               EPSO: {
-                imbalance: epsoImbalancePercent.toFixed(2),
+                imbalance: epsoImbalance.toFixed(4),
                 makespan: (epsoData.summary?.makespan || 0).toFixed(2),
                 utilization: (epsoData.summary?.resourceUtilization || 0).toFixed(2)
               },
               EACO: {
-                imbalance: eacoImbalancePercent.toFixed(2),
+                imbalance: eacoImbalance.toFixed(4),
                 makespan: (eacoData.summary?.makespan || 0).toFixed(2),
                 utilization: (eacoData.summary?.resourceUtilization || 0).toFixed(2)
               }
