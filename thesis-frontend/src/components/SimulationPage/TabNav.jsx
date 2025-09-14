@@ -14,7 +14,7 @@ const TabNav = ({ activeTab, onChange }) => {
   ];
 
   return (
-    <div className="flex border-b border-gray-200 px-6">
+    <div className="flex border-b border-gray-200 px-6" role="tablist" aria-label="Simulation sections">
       {tabs.map(tab => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -22,6 +22,10 @@ const TabNav = ({ activeTab, onChange }) => {
         return (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={isActive}
+            aria-controls={`${tab.id}-panel`}
+            id={`${tab.id}-tab`}
             className={`
               py-4 px-6 font-medium flex items-center gap-2 transition-colors
               ${isActive 
@@ -31,7 +35,7 @@ const TabNav = ({ activeTab, onChange }) => {
             `}
             onClick={() => onChange(tab.id)}
           >
-            <Icon size={18} />
+            <Icon size={18} aria-hidden="true" />
             {tab.label}
           </button>
         );

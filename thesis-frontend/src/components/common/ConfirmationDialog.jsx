@@ -58,6 +58,9 @@ const ConfirmationDialog = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", duration: 0.3 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-dialog-title"
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg mx-4"
           >
             <div className="bg-white rounded-xl shadow-xl border border-[#319694]/10">
@@ -67,7 +70,7 @@ const ConfirmationDialog = ({
                   <div className="p-2 bg-[#319694]/10 rounded-lg">
                     {getIcon()}
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+                  <h3 id="confirm-dialog-title" className="text-xl font-semibold text-gray-800">{title}</h3>
                 </div>
                 <button
                   onClick={onClose}

@@ -5,6 +5,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        brand: {
+          primary: '#319694',
+          primaryDark: '#267b79',
+          accent: '#4fd1c5'
+        }
+      },
       animation: {
         'fade-in': 'fadeIn 1.2s ease-in-out',
       },

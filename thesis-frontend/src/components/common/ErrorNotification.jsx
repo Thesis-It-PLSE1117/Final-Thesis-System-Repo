@@ -48,6 +48,8 @@ const ErrorNotification = ({ message, type = 'error', onClose, duration = 5000 }
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
+          role="status"
+          aria-live="polite"
           className={`fixed top-4 right-4 z-50 max-w-md p-4 rounded-lg border shadow-lg ${getColors()}`}
         >
           <div className="flex items-start gap-3">

@@ -66,6 +66,36 @@ const DocumentationHelp = () => {
         {
           title: "Enhanced PSO (EPSO)",
           content: "PSO with nonlinear inertia weight reduction: w = w_max - (w_max - w_min) × (iteration/maxIterations)², and adaptive velocity clamping: V_max decreases quadratically over iterations. No VM migration required. Uses standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients."
+        },
+        {
+          title: "Original Algorithm References",
+          content: (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 mb-3">
+                Learn more about the foundational algorithms that inspired our enhanced versions:
+              </p>
+              <div className="flex flex-col gap-2">
+                <a 
+                  href="https://www.techscience.com/cmc/v82n2/59521/html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-[#319694] hover:text-[#267b79] transition-colors"
+                >
+                  <LinkIcon className="w-4 h-4" />
+                  Particle Swarm Optimization (PSO) - Technical Overview
+                </a>
+                <a 
+                  href="https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-[#319694] hover:text-[#267b79] transition-colors"
+                >
+                  <LinkIcon className="w-4 h-4" />
+                  Ant Colony Optimization (ACO) - Algorithm Overview
+                </a>
+              </div>
+            </div>
+          )
         }
       ]
     },
