@@ -50,6 +50,8 @@ const InputField = ({ label, name, value, onChange, icon: Icon, unit, min = 1, d
           value={value}
           onChange={onChange}
           disabled={disabled}
+          aria-label={label}
+          aria-describedby={(isFocused || isHovered) ? `${name}-helper` : undefined}
           className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:outline-none transition-all duration-200 shadow-sm ${
             disabled 
               ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed' 
@@ -96,6 +98,7 @@ const InputField = ({ label, name, value, onChange, icon: Icon, unit, min = 1, d
       <AnimatePresence>
         {(isFocused || isHovered) && (
           <motion.div
+            id={`${name}-helper`}
             className="absolute z-50 w-full mt-1 px-3 py-2 text-sm text-gray-700 bg-[#f8fafc] rounded-lg shadow-md border border-gray-200"
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}

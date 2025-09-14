@@ -88,7 +88,7 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
             title={isAborting ? "Stopping simulation..." : "Stop simulation"}
           >
             {isAborting ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#319694] border-t-transparent" />
+              <div className="animate-spin motion-reduce:animate-none rounded-full h-4 w-4 border-2 border-[#319694] border-t-transparent" />
             ) : (
               <X size={16} />
             )}
@@ -109,8 +109,8 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
         <div className="flex justify-center mb-6">
           <div className="relative w-32 h-32">
             <div className="absolute inset-0 border-4 border-[#319694]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-transparent border-t-[#319694] rounded-full animate-spin"></div>
-            <div className="absolute inset-4 border-4 border-transparent border-b-[#4fd1c5] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            <div className="absolute inset-0 border-4 border-transparent border-t-[#319694] rounded-full animate-spin motion-reduce:animate-none"></div>
+            <div className="absolute inset-4 border-4 border-transparent border-b-[#4fd1c5] rounded-full animate-spin motion-reduce:animate-none" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
             <div className="absolute inset-0 flex items-center justify-center">
               <Server className="text-[#319694]" size={32} />
             </div>
