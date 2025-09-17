@@ -71,22 +71,22 @@ export const useSimulationRunner = () => {
   const [currentJobId, setCurrentJobId] = useState(null);
   const [iterationPollingInterval, setIterationPollingInterval] = useState(null);
 
-  useEffect(() => {
-    const activeJobs = jobService.getActiveJobs();
-    if (activeJobs.length > 0) {
-      const mostRecent = activeJobs[0];
-      showNotification(
-        `Found active job ${mostRecent.jobId} from ${new Date(mostRecent.startTime).toLocaleTimeString()}`,
-        'info'
-      );
-    }
-    
-    // Clean up old jobs
-    const cleaned = jobService.cleanupOldJobs();
-    if (cleaned > 0) {
-      console.log(`Cleaned up ${cleaned} old job entries`);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const activeJobs = jobService.getActiveJobs();
+  //   if (activeJobs.length > 0) {
+  //     const mostRecent = activeJobs[0];
+  //     showNotification(
+  //       `Found active job ${mostRecent.jobId} from ${new Date(mostRecent.startTime).toLocaleTimeString()}`,
+  //       'info'
+  //     );
+  //   }
+  //   
+  //   // Clean up old jobs
+  //   const cleaned = jobService.cleanupOldJobs();
+  //   if (cleaned > 0) {
+  //     console.log(`Cleaned up ${cleaned} old job entries`);
+  //   }
+  // }, []);
 
   // Handler for large file async processing
   const runLargeFileAsync = async (fullConfig, file, csvRowCount) => {
@@ -95,37 +95,38 @@ export const useSimulationRunner = () => {
     setSimulationResults(null);
     
     try {
-      const results = await jobService.runAsyncJobWithPolling(
-        fullConfig,
-        file,
-        // Progress callback
-        (status) => {
-          // Update progress state
-          if (status.progress !== undefined) {
-            setProgress(status.progress);
-          }
-          
-          // Update message
-          if (status.message) {
-            console.log(`Job ${status.jobId}: ${status.message}`);
-          }
-          
-          // Update status display
-          if (status.status === 'PROCESSING') {
-            sessionStorage.setItem('activeSimulation', JSON.stringify({
-              state: 'loading',
-              jobId: status.jobId,
-              timestamp: Date.now(),
-              progress: status.progress
-            }));
-          }
-        },
-        // Error callback
-        (error) => {
-          console.warn('Job polling error:', error);
-        },
-        3000 // Poll every 3 seconds
-      );
+      // const results = await jobService.runAsyncJobWithPolling(
+      //   fullConfig,
+      //   file,
+      //   // Progress callback
+      //   (status) => {
+      //     // Update progress state
+      //     if (status.progress !== undefined) {
+      //       setProgress(status.progress);
+      //     }
+      //     
+      //     // Update message
+      //     if (status.message) {
+      //       console.log(`Job ${status.jobId}: ${status.message}`);
+      //     }
+      //     
+      //     // Update status display
+      //     if (status.status === 'PROCESSING') {
+      //       sessionStorage.setItem('activeSimulation', JSON.stringify({
+      //         state: 'loading',
+      //         jobId: status.jobId,
+      //         timestamp: Date.now(),
+      //         progress: status.progress
+      //       }));
+      //     }
+      //   },
+      //   // Error callback
+      //   (error) => {
+      //     console.warn('Job polling error:', error);
+      //   },
+      //   3000 // Poll every 3 seconds
+      // );
+      throw new Error('Async job processing is disabled in production');
       
       // Process results same as normal
       if (results.eacoResults && results.epsoResults) {
@@ -625,7 +626,7 @@ export const useSimulationRunner = () => {
     // Cancel async job if running
     if (currentJobId) {
       try {
-        await jobService.cancelJob(currentJobId);
+        // await jobService.cancelJob(currentJobId);
         showNotification('Job cancelled successfully', 'info');
       } catch (error) {
         console.error('Failed to cancel job:', error);
