@@ -4,7 +4,23 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
   const date = new Date(result.timestamp);
   const formattedDate = compact ? date.toLocaleDateString() : date.toLocaleString();
   
-  const makespan = result.summary?.makespan || 0;
+  // makespan from individualResults since summary is undefined
+  const calculateMakespan = () => {
+    const individualResults = result.rawResults?.individualResults;
+    if (!individualResults || !Array.isArray(individualResults) || individualResults.length === 0) {
+      return 0;
+    }
+    
+    const values = individualResults
+      .map(item => item.summary?.makespan || 0)
+      .filter(val => typeof val === 'number' && !isNaN(val));
+    
+    if (values.length === 0) return 0;
+    
+    return values.reduce((sum, val) => sum + val, 0) / values.length;
+  };
+
+  const makespan = result.summary?.makespan || calculateMakespan() || 0;
   const config = result.config || {};
   
   const hasPlotAnalysis = result.plotAnalysis?.hasPlots;
@@ -28,7 +44,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
             {compact ? (
               <>
                 {result.algorithm || 'Run'} <span className="font-semibold">{idSuffix}</span>
-              </>
+              </>>
             ) : (
               `${result.algorithm || 'Run'} #${result.id}`
             )}
