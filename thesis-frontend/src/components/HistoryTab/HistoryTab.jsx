@@ -160,7 +160,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       const text = await file.text();
       const backupData = JSON.parse(text);
       
-      if (window.confirm('This will replace all existing history. Continue?')) {
+      if (window.confirm('This will add the imported data to your existing history. Continue?')) {
         const success = await importHistory(backupData);
         if (success) {
           await loadHistory();
@@ -258,8 +258,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             )}
           </div>
           
-          {history.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
+            {/* Export Selected - only show when there's history and a selection */}
+            {history.length > 0 && (
               <button
                 onClick={() => handleExportSelected('csv')}
                 disabled={!selectedResult}
@@ -269,9 +270,12 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Export
+                Export CSV
               </button>
-              
+            )}
+            
+            {/* Backup All - only show when there's history */}
+            {history.length > 0 && (
               <button
                 onClick={handleExportAll}
                 disabled={isExporting}
@@ -281,20 +285,24 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {isExporting ? 'Exporting...' : 'Backup'}
+                {isExporting ? 'Exporting...' : 'Download JSON'}
               </button>
-              
-              <button
-                onClick={() => setShowImportDialog(true)}
-                className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
-                title="Import history from backup"
-              >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                Import
-              </button>
-              
+            )}
+            
+            {/* Import - always available */}
+            <button
+              onClick={() => setShowImportDialog(true)}
+              className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
+              title="Import history from backup"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Import JSON
+            </button>
+            
+            {/* Clear - only show when there's history */}
+            {history.length > 0 && (
               <button
                 onClick={handleClearHistory}
                 className="bg-white text-red-500 px-3 py-2 rounded-lg text-sm border border-red-100 hover:bg-red-50 flex items-center transition-colors"
@@ -305,8 +313,8 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 </svg>
                 Clear
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -403,14 +411,14 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             onClick={() => setShowDeleteConfirm(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Delete Simulation</h3>
@@ -443,19 +451,19 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             onClick={() => setShowImportDialog(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Import History</h3>
               <p className="text-gray-600 mb-4 text-sm">
-                Select a backup file to import. This will replace all existing history.
+                Select a backup file to import. This will add the imported data to your existing history.
               </p>
               <input
                 type="file"
