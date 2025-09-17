@@ -2,9 +2,29 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Cloud, HardDrive, Cpu, Network, Database, Server, Clock, Activity, Info, Repeat, X } from 'lucide-react';
 
-const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iterations = 1, onAbort, canAbort = false, isAborting = false }) => {
+const CloudLoadingModal = ({ 
+  numCloudlets, 
+  numHosts, 
+  numVMs, 
+  progress, 
+  iterations = 1, 
+  onAbort, 
+  canAbort = false, 
+  isAborting = false,
+  currentIteration = null,
+  iterationStage = null,
+  totalTasks = null,
+  eta = null,
+  message = null
+}) => {
   const [elapsedTime, setElapsedTime] = React.useState(0);
   const [currentPhase, setCurrentPhase] = React.useState('initializing');
+  
+  const isLargeTaskSet = (totalTasks || numCloudlets) > 1000;
+  const isMultipleIterations = iterations > 1;
+  const effectiveTaskCount = totalTasks || numCloudlets;
+  
+  const estimatedCurrentIteration = currentIteration || (isMultipleIterations ? Math.max(1, Math.ceil((progress / 100) * iterations)) : 1);
   
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -32,9 +52,50 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
   
 
   const estimateRemainingTime = () => {
-    if (progress === 0 || elapsedTime === 0) return 'Estimating time...';
-    const estimatedTotal = (elapsedTime / progress) * 100;
-    const remaining = Math.max(0, estimatedTotal - elapsedTime);
+    // Use backend ETA if available
+    if (eta && eta > 0) {
+      return `Approximately ${formatTime(eta)} remaining`;
+    }
+    
+    if (progress === 0 || elapsedTime === 0) {
+      if (isLargeTaskSet) {
+        const baseTimePerTask = 0.12; 
+        const iterationMultiplier = isMultipleIterations ? iterations : 1;
+        const totalEstimatedSeconds = effectiveTaskCount * baseTimePerTask * iterationMultiplier;
+        
+        const overhead = isMultipleIterations ? totalEstimatedSeconds * 0.3 : 0;
+        const finalEstimate = totalEstimatedSeconds + overhead;
+        
+        const estimatedMinutes = Math.ceil(finalEstimate / 60);
+        return `Estimated time: ${estimatedMinutes} minutes for ${effectiveTaskCount.toLocaleString()} tasks${isMultipleIterations ? ` × ${iterations} iterations` : ''}`;
+      } else if (isMultipleIterations) {
+        const estimatedMinutes = Math.ceil((iterations * 30) / 60); // ~30 seconds per iteration
+        return `Estimated time: ${estimatedMinutes} minutes for ${iterations} iterations`;
+      }
+      return 'Estimating time...';
+    }
+    
+    
+    const safeProgress = Math.min(progress, 85); 
+    const estimatedTotal = (elapsedTime / safeProgress) * 100;
+    let remaining = Math.max(0, estimatedTotal - elapsedTime);
+    
+    if (isLargeTaskSet) {
+
+      const conservativeBuffer = 1.4; 
+      remaining = remaining * conservativeBuffer;
+      
+      if (isMultipleIterations && estimatedCurrentIteration < iterations) {
+
+        const iterationsLeft = iterations - estimatedCurrentIteration;
+        const avgTimePerIteration = elapsedTime / Math.max(1, estimatedCurrentIteration);
+        const iterationTimeRemaining = iterationsLeft * avgTimePerIteration;
+        remaining = Math.max(remaining, iterationTimeRemaining);
+      }
+      
+      return `Approximately ${formatTime(Math.round(remaining))} remaining (large dataset)`;
+    }
+    
     return `Approximately ${formatTime(Math.round(remaining))} remaining`;
   };
   
@@ -129,15 +190,22 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
           
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Overall Progress</span>
-            <span>{Math.round(progress)}%</span>
+            <span>{Math.round(Math.min(progress, 99))}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <motion.div
               className="h-2.5 rounded-full bg-gradient-to-r from-[#319694] to-[#4fd1c5]"
               initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              animate={{ width: `${Math.min(progress, 99)}%` }}
               transition={{ duration: 0.5 }}
             />
+          </div>
+          
+          {/* Enhanced ETA Display */}
+          <div className="flex justify-center items-center mt-2">
+            <div className="text-xs text-gray-600">
+              {estimateRemainingTime()}
+            </div>
           </div>
         </div>
 
@@ -146,6 +214,12 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
             <Info className="text-gray-600" size={16} />
             <span className="text-gray-700 font-medium text-sm">Processing Information</span>
           </div>
+          {message ? (
+            <div className="text-xs text-gray-700 font-medium mb-2">
+              {message}
+            </div>
+          ) : null}
+          
           <motion.p 
             key={currentTipIndex}
             initial={{ opacity: 0, y: 5 }}
@@ -160,13 +234,29 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
         
         {iterations > 1 && (
           <div className="mb-4 p-3 bg-[#319694]/5 rounded-lg border border-[#319694]/20">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-2">
               <Repeat className="text-[#319694]" size={16} />
               <span className="text-gray-700 font-medium text-sm">Multiple Iterations</span>
             </div>
-            <p className="text-xs text-gray-600 mt-1">
-              Executing {iterations} simulation iteration{iterations > 1 ? 's' : ''}
-            </p>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-600">
+                  Iteration {estimatedCurrentIteration} of {iterations}
+                </span>
+                {iterationStage && (
+                  <span className="text-xs text-[#319694] font-medium">
+                    {iterationStage}
+                  </span>
+                )}
+              </div>
+              
+              {isLargeTaskSet && (
+                <div className="text-xs text-amber-600">
+                  ⚠ Processing large dataset ({effectiveTaskCount.toLocaleString()} tasks)
+                </div>
+              )}
+            </div>
           </div>
         )}
         
@@ -185,7 +275,10 @@ const CloudLoadingModal = ({ numCloudlets, numHosts, numVMs, progress, iteration
               <Database className="text-[#319694]" size={16} />
               <div>
                 <div className="font-medium text-gray-700">Tasks</div>
-                <div className="text-gray-900 font-semibold">{numCloudlets}</div>
+                <div className="text-gray-900 font-semibold">
+                  {effectiveTaskCount.toLocaleString()}
+                  {isLargeTaskSet && <span className="text-xs text-amber-600 ml-1">⚠</span>}
+                </div>
               </div>
             </div>
           </div>
