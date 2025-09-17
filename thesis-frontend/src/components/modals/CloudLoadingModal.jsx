@@ -24,7 +24,8 @@ const CloudLoadingModal = ({
   const isMultipleIterations = iterations > 1;
   const effectiveTaskCount = totalTasks || numCloudlets;
   
-  const estimatedCurrentIteration = currentIteration || (isMultipleIterations ? Math.max(1, Math.ceil((progress / 100) * iterations)) : 1);
+  const actualCurrentIteration = currentIteration || (isMultipleIterations ? Math.max(1, Math.ceil((progress / 100) * iterations)) : 1);
+  const displayStage = iterationStage || (currentIteration ? 'Processing...' : null);
   
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -85,10 +86,10 @@ const CloudLoadingModal = ({
       const conservativeBuffer = 1.4; 
       remaining = remaining * conservativeBuffer;
       
-      if (isMultipleIterations && estimatedCurrentIteration < iterations) {
+        if (isMultipleIterations && actualCurrentIteration < iterations) {
 
-        const iterationsLeft = iterations - estimatedCurrentIteration;
-        const avgTimePerIteration = elapsedTime / Math.max(1, estimatedCurrentIteration);
+        const iterationsLeft = iterations - actualCurrentIteration;
+        const avgTimePerIteration = elapsedTime / Math.max(1, actualCurrentIteration);
         const iterationTimeRemaining = iterationsLeft * avgTimePerIteration;
         remaining = Math.max(remaining, iterationTimeRemaining);
       }
@@ -242,13 +243,8 @@ const CloudLoadingModal = ({
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-600">
-                  Iteration {estimatedCurrentIteration} of {iterations}
+                  Iteration {actualCurrentIteration} of {iterations}
                 </span>
-                {iterationStage && (
-                  <span className="text-xs text-[#319694] font-medium">
-                    {iterationStage}
-                  </span>
-                )}
               </div>
               
               {isLargeTaskSet && (
