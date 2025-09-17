@@ -456,9 +456,6 @@ export const importHistory = async (backupData) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     
-    // Clear existing data
-    await store.clear();
-    
     // Import entries
     await Promise.all(
       backupData.entries.map(entry => store.add(entry))

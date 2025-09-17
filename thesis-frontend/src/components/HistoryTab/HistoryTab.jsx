@@ -260,7 +260,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
           
           <div className="flex flex-wrap gap-2">
             {/* Export Selected - only show when there's history and a selection */}
-            {history.length > 0 && (
+            {/* {history.length > 0 && (
               <button
                 onClick={() => handleExportSelected('csv')}
                 disabled={!selectedResult}
@@ -270,9 +270,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Export CSV
+                Export CSV 
               </button>
-            )}
+            )} */}
             
             {/* Backup All - only show when there's history */}
             {history.length > 0 && (
@@ -285,7 +285,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {isExporting ? 'Exporting...' : 'Download JSON'}
+                {isExporting ? 'Exporting...' : 'Download All History (JSON)'}
               </button>
             )}
             
