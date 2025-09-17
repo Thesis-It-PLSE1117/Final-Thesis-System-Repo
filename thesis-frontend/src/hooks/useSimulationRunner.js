@@ -6,7 +6,7 @@ import * as apiClient from '../services/apiClient';
 import { API_BASE } from '../services/apiClient';
 import * as historyService from '../services/historyService';
 import { getCachedResult, cacheResult, isCacheAvailable } from '../utils/resultCache';
-import jobService from '../services/jobService';
+//import jobService from '../services/jobService';
 
 /**
  * custom hook for running simulations
