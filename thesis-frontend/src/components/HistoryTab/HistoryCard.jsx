@@ -1,8 +1,8 @@
 import { Search } from 'lucide-react';
 
-const HistoryCard = ({ result, isSelected, onClick }) => {
+const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
   const date = new Date(result.timestamp);
-  const formattedDate = date.toLocaleString();
+  const formattedDate = compact ? date.toLocaleDateString() : date.toLocaleString();
   
   const makespan = result.summary?.makespan || 0;
   const config = result.config || {};
@@ -12,38 +12,49 @@ const HistoryCard = ({ result, isSelected, onClick }) => {
   const hasStatisticalAnalysis = result.tTestResults;
   const hasBackendAnalysis = result.plotAnalysis?.analysis;
   
+  // Extract the suffix from the ID (eaco, epso, etc.)
+  const idSuffix = result.id.includes('-') ? result.id.split('-').pop().toUpperCase() : '';
+  
   return (
     <div
       onClick={onClick}
-      className={`p-4 border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors ${
-        isSelected ? 'bg-[#e0f7f6]' : 'hover:bg-gray-50'
-      }`}
+      className={`cursor-pointer transition-colors ${
+        isSelected ? 'bg-[#e0f7f6] border-l-2 border-l-[#319694]' : 'hover:bg-gray-50'
+      } ${compact ? 'p-2 text-xs' : 'p-4 border-b border-gray-100 last:border-b-0'}`}
     >
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <h4 className="font-medium text-gray-800">
-            {result.algorithm || 'Run'} #{result.id}
+          <h4 className={`font-medium text-gray-800 ${compact ? 'text-sm' : ''}`}>
+            {compact ? (
+              <>
+                {result.algorithm || 'Run'} <span className="font-semibold">{idSuffix}</span>
+              </>
+            ) : (
+              `${result.algorithm || 'Run'} #${result.id}`
+            )}
           </h4>
           
-          <div className="flex gap-1">
-            {hasPlotAnalysis && (
-              <div className="w-2 h-2 bg-blue-500 rounded-full" title="Plots available" />
-            )}
-            {hasInterpretations && (
-              <div className="w-2 h-2 bg-green-500 rounded-full" title="Interpretations available" />
-            )}
-            {hasStatisticalAnalysis && (
-              <div className="w-2 h-2 bg-purple-500 rounded-full" title="Statistical analysis available" />
-            )}
-            {hasBackendAnalysis && (
-              <div className="w-2 h-2 bg-orange-500 rounded-full" title="Backend analysis available" />
-            )}
-          </div>
+          {!compact && (
+            <div className="flex gap-1">
+              {hasPlotAnalysis && (
+                <div className="w-2 h-2 bg-blue-500 rounded-full" title="Plots available" />
+              )}
+              {hasInterpretations && (
+                <div className="w-2 h-2 bg-green-500 rounded-full" title="Interpretations available" />
+              )}
+              {hasStatisticalAnalysis && (
+                <div className="w-2 h-2 bg-purple-500 rounded-full" title="Statistical analysis available" />
+              )}
+              {hasBackendAnalysis && (
+                <div className="w-2 h-2 bg-orange-500 rounded-full" title="Backend analysis available" />
+              )}
+            </div>
+          )}
         </div>
-        <span className="text-xs text-gray-500">{formattedDate}</span>
+        <span className={`text-gray-500 ${compact ? 'text-xs' : ''}`}>{formattedDate}</span>
       </div>
       
-      <div className="mt-2 flex justify-between text-sm">
+      <div className={`flex justify-between ${compact ? 'mt-1' : 'mt-2 text-sm'}`}>
         <span className="text-gray-600">
           {config.numHosts || 0} Hosts, {config.numVMs || 0} VMs
         </span>
@@ -52,7 +63,7 @@ const HistoryCard = ({ result, isSelected, onClick }) => {
         </span>
       </div>
       
-      {(hasPlotAnalysis || hasInterpretations || hasStatisticalAnalysis || hasBackendAnalysis) && (
+      {(hasPlotAnalysis || hasInterpretations || hasStatisticalAnalysis || hasBackendAnalysis) && !compact && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="flex flex-wrap gap-2 text-xs">
             {hasPlotAnalysis && (
@@ -76,6 +87,24 @@ const HistoryCard = ({ result, isSelected, onClick }) => {
               </span>
             )}
           </div>
+        </div>
+      )}
+      
+      {/* Compact version badges */}
+      {(hasPlotAnalysis || hasInterpretations || hasStatisticalAnalysis || hasBackendAnalysis) && compact && (
+        <div className="mt-1 flex gap-1">
+          {hasPlotAnalysis && (
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title="Plots available" />
+          )}
+          {hasInterpretations && (
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full" title="Interpretations available" />
+          )}
+          {hasStatisticalAnalysis && (
+            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" title="Statistical analysis available" />
+          )}
+          {hasBackendAnalysis && (
+            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full" title="Backend analysis available" />
+          )}
         </div>
       )}
     </div>
