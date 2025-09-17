@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, ChevronRight, Home, FileText, Cpu, Code, BarChart2, HelpCircle, Link as LinkIcon, Zap } from "lucide-react";
 import { useState } from "react";
 
-const DocumentationHelp = () => {
+const ProjectOverview = () => {
   const [activeSections, setActiveSections] = useState({});
 
   const toggleSection = (index) => {
@@ -14,7 +14,7 @@ const DocumentationHelp = () => {
 
   const sections = [
     {
-      title: "Introduction",
+      title: "Project Introduction",
       icon: <FileText className="w-5 h-5" />,
       content: "This cloud load balancing simulation system compares Enhanced Particle Swarm Optimization (EPSO) and Enhanced Ant Colony Optimization (EACO) algorithms using CloudSim framework with realistic Google Cluster Dataset workloads."
     },
@@ -30,7 +30,7 @@ const DocumentationHelp = () => {
       ]
     },
     {
-      title: "Performance Metrics (Five Key Metrics)",
+      title: "Performance Metrics",
       icon: <BarChart2 className="w-5 h-5" />,
       subsections: [
         {
@@ -56,7 +56,7 @@ const DocumentationHelp = () => {
       ]
     },
     {
-      title: "Enhanced Algorithms",
+      title: "Core Algorithms",
       icon: <Code className="w-5 h-5" />,
       subsections: [
         {
@@ -68,7 +68,7 @@ const DocumentationHelp = () => {
           content: "PSO with nonlinear inertia weight reduction: w = w_max - (w_max - w_min) × (iteration/maxIterations)², and adaptive velocity clamping: V_max decreases quadratically over iterations. No VM migration required. Uses standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients."
         },
         {
-          title: "Original Algorithm References",
+          title: "Algorithm References",
           content: (
             <div className="space-y-2">
               <p className="text-sm text-gray-600 mb-3">
@@ -115,7 +115,7 @@ const DocumentationHelp = () => {
       ]
     },
     {
-      title: "Research Methodology",
+      title: "Research Approach",
       icon: <HelpCircle className="w-5 h-5" />,
       content: "Quantitative, simulation-based research design with expert evaluation. 30 participants: 15 IT experts and 15 end users (11 cloud specialists + 4 academic professionals). Purposive sampling method ensures relevant expertise.",
       subsections: [
@@ -124,7 +124,7 @@ const DocumentationHelp = () => {
           content: "Paired t-test for algorithm comparison: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size. Significance level α = 0.05, two-tailed test."
         },
         {
-          title: "Survey Evaluation",
+          title: "Evaluation Methodology",
           content: "Likert scale with four response options: 4 (Strongly Agree, 3.26–4.00), 3 (Agree, 2.51–3.25), 2 (Disagree, 1.76–2.50), 1 (Strongly Disagree, 1.00–1.75). Median scores used for stability with small groups."
         }
       ]
@@ -167,7 +167,7 @@ const DocumentationHelp = () => {
           <Zap className="text-[#319694] animate-pulse" />
         </div>
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-          Project Documentation
+          Project Overview
         </h2>
       </motion.div>
 
@@ -250,39 +250,8 @@ const DocumentationHelp = () => {
           </div>
         ))}
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-12 bg-[#319694]/10 rounded-xl p-6 border border-[#319694]/20"
-      >
-        <h3 className="font-semibold text-[#319694] mb-3 flex items-center gap-2">
-          <Home className="w-5 h-5" /> Getting Started
-        </h3>
-        <p className="text-gray-600 mb-4">
-          New to the project? Begin with our installation guide and tutorial walkthroughs.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {['Installation', 'Simulation Guide', 'Custom Workloads'].map((item, idx) => (
-            <motion.button
-              key={idx}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-white rounded-lg p-4 shadow-xs border border-[#319694]/10 text-left"
-            >
-              <h4 className="font-medium text-[#319694]">{item}</h4>
-              <p className="text-sm text-gray-500 mt-1">
-                {idx === 0 && "How to set up the simulation environment"}
-                {idx === 1 && "Running your first load balancing simulation"}
-                {idx === 2 && "Using custom datasets and workload patterns"}
-              </p>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
     </motion.div>
   );
 };
 
-export default DocumentationHelp;
+export default ProjectOverview;
