@@ -10,7 +10,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
     if (!individualResults || !Array.isArray(individualResults) || individualResults.length === 0) {
       return 0;
     }
-    
+    //get indiv res
     const values = individualResults
       .map(item => item.summary?.makespan || 0)
       .filter(val => typeof val === 'number' && !isNaN(val));
