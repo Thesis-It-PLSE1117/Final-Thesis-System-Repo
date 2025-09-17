@@ -30,41 +30,74 @@ const HistoryDetails = ({ result, onViewResults }) => {
   }
 
   // Safely access properties with defaults
-  const summary = result.summary || {};
+  let summary = result.summary || {};
+  if (typeof summary === 'string') {
+    try {
+      summary = JSON.parse(summary);
+    } catch (e) {
+      console.warn('Failed to parse summary:', e);
+      summary = {};
+    }
+  }
   const config = result.config || {};
+  
+  // Calculate metrics from individualResults since averageMetrics is null
+  const calculateMetricFromIndividual = (metricName) => {
+    const individualResults = result.rawResults?.individualResults;
+    if (!individualResults || !Array.isArray(individualResults) || individualResults.length === 0) {
+      return 0;
+    }
+    
+    // Get all values for this metric from individual results
+    const values = individualResults
+      .map(item => item.summary?.[metricName] || 0)
+      .filter(val => typeof val === 'number' && !isNaN(val));
+    
+    if (values.length === 0) return 0;
+    
+    // Return the average
+    return values.reduce((sum, val) => sum + val, 0) / values.length;
+  };
+  
+  const getMetric = (metricName) => {
+    return summary[metricName] || 
+           summary.averageMetrics?.[metricName] || 
+           result.rawResults?.summary?.[metricName] || 
+           result.rawResults?.averageMetrics?.[metricName] || 
+           result[metricName] || 
+           calculateMetricFromIndividual(metricName) ||
+           0;
+  };
   
   const metrics = [
     {
       icon: <Clock size={20} className="text-[#319694]" />,
       title: "Makespan",
-      value: (summary.makespan || 0).toFixed(2),
-      unit: "ms"
+      value: getMetric('makespan').toFixed(2),
+      unit: "s"
     },
     {
       icon: <Timer size={20} className="text-[#319694]" />,
       title: "Response Time",
-      value: (summary.responseTime || summary.avgResponseTime || 0).toFixed(2),
+      value: (getMetric('responseTime') || getMetric('avgResponseTime')).toFixed(2),
       unit: "ms"
     },
     {
       icon: <Cpu size={20} className="text-[#319694]" />,
       title: "Resource Utilization",
-      value: (summary.resourceUtilization || summary.utilization || 0).toFixed(2),
+      value: getMetric('resourceUtilization').toFixed(2),
       unit: "%"
     },
     {
       icon: <Zap size={20} className="text-[#319694]" />,
       title: "Energy Consumption",
-      value: (typeof result.energyConsumption === 'number' 
-        ? result.energyConsumption 
-        : result.energyConsumption?.totalEnergyWh || 0
-      ).toFixed(2),
+      value: getMetric('energyConsumption').toFixed(3),
       unit: "Wh"
     },
     {
       icon: <Activity size={20} className="text-[#319694]" />,
       title: "Load Imbalance",
-      value: (summary.loadImbalance || summary.imbalanceDegree || summary.imbalance || 0).toFixed(4),
+      value: getMetric('loadImbalance').toFixed(4),
       unit: ""
     }
   ];
