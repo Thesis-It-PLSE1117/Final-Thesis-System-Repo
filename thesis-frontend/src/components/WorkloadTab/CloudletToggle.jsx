@@ -10,7 +10,7 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
       ? 'Cloudlet configuration is not available' 
       : enabled
         ? 'Customize cloudlet numbers for your simulation'
-        : `Using standard default: ${defaultValue} cloudlets`;
+        : `Standard default: ${defaultValue} cloudlets`;
   };
 
   return (
