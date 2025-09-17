@@ -44,7 +44,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
             {compact ? (
               <>
                 {result.algorithm || 'Run'} <span className="font-semibold">{idSuffix}</span>
-              </>>
+              </>
             ) : (
               `${result.algorithm || 'Run'} #${result.id}`
             )}
