@@ -124,6 +124,20 @@ const SimulationPage = ({ onBack }) => {
       setWorkflowStep(5);
     }
   }, [activeTab, simulationState]);
+
+  // Handle data center changes including preset application
+  const handleDataCenterChange = useCallback((e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'applyPreset') {
+      // This is a preset selection
+      config.applyPresetConfig(value);
+      return;
+    }
+    
+    // Handle regular data center changes
+    config.handleDataCenterChange(e);
+  }, [config]);
   
   const executeSimulation = useCallback(async () => {
     if (isCoolingDown) return;
@@ -187,6 +201,7 @@ const SimulationPage = ({ onBack }) => {
           setSimulationResults={setSimulationResults}
           setSimulationState={setSimulationState}
           setActiveTab={setActiveTab}
+          handleDataCenterChange={handleDataCenterChange}
         />
 
         {activeTab === 'workload' && (

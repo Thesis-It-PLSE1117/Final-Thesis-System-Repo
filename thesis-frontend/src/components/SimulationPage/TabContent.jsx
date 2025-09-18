@@ -34,7 +34,15 @@ const tabContentVariants = {
   })
 };
 
-export const TabContent = ({ activeTab, direction, config, setSimulationResults, setSimulationState, setActiveTab }) => {
+export const TabContent = ({ 
+  activeTab, 
+  direction, 
+  config, 
+  setSimulationResults, 
+  setSimulationState, 
+  setActiveTab, 
+  handleDataCenterChange 
+}) => {
   const handleViewResults = async (result) => {
     console.log('onViewResults called with:', result);
     
@@ -122,9 +130,14 @@ export const TabContent = ({ activeTab, direction, config, setSimulationResults,
       >
         <Suspense fallback={<div>Loading...</div>}>
           {activeTab === 'dataCenter' && (
+            // In the TabContent component or wherever DataCenterTab is rendered:
             <DataCenterTab
               config={config.dataCenterConfig}
-              onChange={config.handleDataCenterChange}
+              onChange={handleDataCenterChange}
+              presetConfigs={config.presetConfigs}
+              selectedPreset={config.selectedPreset}
+              clearPreset={config.clearPreset}  // This should be passed directly
+              applyPreset={config.applyPresetConfig} // This should be passed directly
             />
           )}
           {activeTab === 'workload' && (

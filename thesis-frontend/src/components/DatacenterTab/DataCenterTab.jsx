@@ -1,21 +1,26 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
-  Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, HardDriveDownload, 
-  HardDriveUpload, Disc, Play, MoreHorizontal 
+  Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, 
+  HardDriveDownload, HardDriveUpload, Disc, Play, MoreHorizontal, 
+  ChevronDown, ChevronRight, Settings, ChevronUp, X
 } from 'lucide-react';
-import ConfigSection from './ConfigSection';
+import ConfigSection from './ConfigurationPanel';
 import InputField from './InputField';
 import VMCard from './VMCard';
 import HostCard from './HostCard';
+import PresetSelector from './PresetSelector';
+import ConfigurationPanel from './ConfigurationPanel';
+import VisualizationSection from './VisualizationSection';
 
-const DataCenterTab = ({ config, onChange}) => {
+const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearPreset, applyPreset }) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);
   const [expandedHost, setExpandedHost] = useState(null);
+  const [presetDropdownOpen, setPresetDropdownOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState({
     hostConfig: true,
-    vmConfig: false,
+    vmConfig: true,
     distribution: false,
     preview: false
   });
@@ -41,6 +46,36 @@ const DataCenterTab = ({ config, onChange}) => {
         value: numericValue
       }
     });
+  };
+
+  // Handle preset selection - use the passed applyPreset function or fallback to onChange
+  const handlePresetSelect = (presetName) => {
+    setPresetDropdownOpen(false);
+    if (applyPreset) {
+      applyPreset(presetName);
+    } else {
+      onChange({
+        target: {
+          name: 'applyPreset',
+          value: presetName
+        }
+      });
+    }
+  };
+
+  // Handle clearing preset - use the passed clearPreset function or fallback to onChange
+  const handleClearPreset = () => {
+    setPresetDropdownOpen(false);
+    if (clearPreset) {
+      clearPreset();
+    } else {
+      onChange({
+        target: {
+          name: 'applyPreset',
+          value: null
+        }
+      });
+    }
   };
 
   // Generate VM cards with limitation
@@ -180,172 +215,171 @@ const DataCenterTab = ({ config, onChange}) => {
       config.vmMips, config.vmRam, config.vmPes, config.vmBw]);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Host Configuration Panel */}
-      <ConfigSection 
-        title="Host Configuration" 
-        icon={Server} 
-        expanded={expandedSection.hostConfig} 
-        onToggle={() => toggleSection('hostConfig')}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputField 
-            label="Number of Hosts" 
-            name="numHosts" 
-            value={config.numHosts} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
+    <div className="flex flex-col lg:flex-row gap-6">
+      {/* Sidebar with Preset Configurations */}
+      <div className="lg:w-1/4">
+        <PresetSelector
+          presetConfigs={presetConfigs}
+          selectedPreset={selectedPreset}
+          presetDropdownOpen={presetDropdownOpen}
+          setPresetDropdownOpen={setPresetDropdownOpen}
+          handlePresetSelect={handlePresetSelect}
+          clearPreset={handleClearPreset}
+        />
+      </div>
+
+      {/* Main Content Area */}
+      <div className="lg:w-3/4">
+        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Data Center Configuration</h3>
+          
+          {/* Host Configuration Panel */}
+          <ConfigurationPanel
+            title="Host Configuration"
             icon={Server}
-          />
-          <InputField 
-            label="PEs per Host" 
-            name="numPesPerHost" 
-            value={config.numPesPerHost} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Cpu}
-          />
-          <InputField 
-            label="PE MIPS" 
-            name="peMips" 
-            value={config.peMips} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Gauge}
-            unit="MIPS"
-          />
-          <InputField 
-            label="RAM per Host" 
-            name="ramPerHost" 
-            value={config.ramPerHost} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={MemoryStick}
-            unit="MB"
-          />
-          <InputField 
-            label="Bandwidth per Host" 
-            name="bwPerHost" 
-            value={config.bwPerHost} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Network}
-            unit="MBps"
-          />
-          <InputField 
-            label="Storage per Host" 
-            name="storagePerHost" 
-            value={config.storagePerHost} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Disc}
-            unit="MB"
-          />
-        </div>
-      </ConfigSection>
+            expanded={expandedSection.hostConfig}
+            toggleSection={() => toggleSection('hostConfig')}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-8">
+              <InputField 
+                label="Number of Hosts" 
+                name="numHosts" 
+                value={config.numHosts} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Server}
+              />
+              <InputField 
+                label="PEs per Host" 
+                name="numPesPerHost" 
+                value={config.numPesPerHost} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Cpu}
+              />
+              <InputField 
+                label="PE MIPS" 
+                name="peMips" 
+                value={config.peMips} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Gauge}
+                unit="MIPS"
+              />
+              <InputField 
+                label="RAM per Host" 
+                name="ramPerHost" 
+                value={config.ramPerHost} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={MemoryStick}
+                unit="MB"
+              />
+              <InputField 
+                label="Bandwidth per Host" 
+                name="bwPerHost" 
+                value={config.bwPerHost} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Network}
+                unit="MBps"
+              />
+              <InputField 
+                label="Storage per Host" 
+                name="storagePerHost" 
+                value={config.storagePerHost} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Disc}
+                unit="MB"
+              />
+            </div>
+          </ConfigurationPanel>
 
-      {/* VM Configuration Panel */}
-      <ConfigSection 
-        title="VM Configuration" 
-        icon={HardDrive} 
-        expanded={expandedSection.vmConfig} 
-        onToggle={() => toggleSection('vmConfig')}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputField 
-            label="Number of VMs" 
-            name="numVMs" 
-            value={config.numVMs} 
-            onChange={handleInputChange}
-            type="number"
-            min="0"
+          {/* VM Configuration Panel */}
+          <ConfigurationPanel
+            title="VM Configuration"
             icon={HardDrive}
-          />
-          <InputField 
-            label="VM MIPS" 
-            name="vmMips" 
-            value={config.vmMips} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Gauge}
-            unit="MIPS"
-          />
-          <InputField 
-            label="VM PEs" 
-            name="vmPes" 
-            value={config.vmPes} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Cpu}
-          />
-          <InputField 
-            label="VM RAM" 
-            name="vmRam" 
-            value={config.vmRam} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={MemoryStick}
-            unit="MB"
-          />
-          <InputField 
-            label="VM Bandwidth" 
-            name="vmBw" 
-            value={config.vmBw} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Network}
-            unit="MBps"
-          />
-          <InputField 
-            label="VM Size" 
-            name="vmSize" 
-            value={config.vmSize} 
-            onChange={handleInputChange}
-            type="number"
-            min="1"
-            icon={Database}
-            unit="MB"
-          />
+            expanded={expandedSection.vmConfig}
+            toggleSection={() => toggleSection('vmConfig')}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-8">
+              <InputField 
+                label="Number of VMs" 
+                name="numVMs" 
+                value={config.numVMs} 
+                onChange={handleInputChange}
+                type="number"
+                min="0"
+                icon={HardDrive}
+              />
+              <InputField 
+                label="VM MIPS" 
+                name="vmMips" 
+                value={config.vmMips} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Gauge}
+                unit="MIPS"
+              />
+              <InputField 
+                label="VM PEs" 
+                name="vmPes" 
+                value={config.vmPes} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Cpu}
+              />
+              <InputField 
+                label="VM RAM" 
+                name="vmRam" 
+                value={config.vmRam} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={MemoryStick}
+                unit="MB"
+              />
+              <InputField 
+                label="VM Bandwidth" 
+                name="vmBw" 
+                value={config.vmBw} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Network}
+                unit="MBps"
+              />
+              <InputField 
+                label="VM Size" 
+                name="vmSize" 
+                value={config.vmSize} 
+                onChange={handleInputChange}
+                type="number"
+                min="1"
+                icon={Database}
+                unit="MB"
+              />
+            </div>
+          </ConfigurationPanel>
         </div>
-      </ConfigSection>
 
-      {/* Host-VM Distribution */}
-      <ConfigSection 
-        title="Host-VM Distribution" 
-        icon={HardDriveUpload} 
-        expanded={expandedSection.distribution} 
-        onToggle={() => toggleSection('distribution')}
-      >
-        <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-1">
-            {hostVisualization}
-          </div>
-        </div>
-      </ConfigSection>
-
-      {/* Virtual Machines Preview */}
-      <ConfigSection 
-        title="Virtual Machines Preview" 
-        icon={HardDriveDownload} 
-        expanded={expandedSection.preview} 
-        onToggle={() => toggleSection('preview')}
-      >
-        <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-1">
-            {vmCards}
-          </div>
-        </div>
-      </ConfigSection>
+        {/* Visualization Section */}
+        <VisualizationSection
+          hostVisualization={hostVisualization}
+          vmCards={vmCards}
+          expandedSection={expandedSection}
+          toggleSection={toggleSection}
+        />
+      </div>
     </div>
   );
 };
