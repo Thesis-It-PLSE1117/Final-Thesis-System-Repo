@@ -39,7 +39,10 @@ const SimulationPage = ({ onBack }) => {
     runSimulation,
     cancelSimulation,
     isAborting,
-    canAbort
+    canAbort,
+    currentIteration,
+    totalIterations,
+    iterationStage
   } = useSimulationRunner();
   
   // ui states
@@ -177,7 +180,8 @@ const SimulationPage = ({ onBack }) => {
               cloudletConfig: config.cloudletConfig,
               iterationConfig: config.iterationConfig,
               enableMatlabPlots: config.enableMatlabPlots,
-              workloadFile: config.workloadFile
+              workloadFile: config.workloadFile,
+              csvRowCount: config.csvRowCount
             });
             setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
           }
@@ -192,7 +196,8 @@ const SimulationPage = ({ onBack }) => {
         cloudletConfig: config.cloudletConfig,
         iterationConfig: config.iterationConfig,
         enableMatlabPlots: config.enableMatlabPlots,
-        workloadFile: config.workloadFile
+        workloadFile: config.workloadFile,
+        csvRowCount: config.csvRowCount
       });
       setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
     } catch (error) {
@@ -296,41 +301,46 @@ const SimulationPage = ({ onBack }) => {
               {activeTab === 'history' && (
                 <HistoryTab 
                   onBack={() => setActiveTab('dataCenter')}
-                  onViewResults={(result) => {
-                    const pairedResults = historyService.getPairedHistoryResults(result.id);
-                    
-                    if (pairedResults) {
-                      const convertedResults = {
-                        eaco: {
-                          ...pairedResults.eaco,
-                          plotData: pairedResults.eaco.plotAnalysis ? {
-                            algorithm: pairedResults.eaco.plotAnalysis.algorithm,
-                            simulationId: pairedResults.eaco.plotAnalysis.simulationId,
-                            metrics: pairedResults.eaco.plotAnalysis.metrics,
-                            plotMetadata: pairedResults.eaco.plotAnalysis.plotMetadata,
-                            plotPaths: [] 
-                          } : null,
-                          plotMetadata: pairedResults.eaco.plotAnalysis?.plotMetadata || [],
-                          analysis: pairedResults.eaco.plotAnalysis?.analysis
-                        },
-                        epso: {
-                          ...pairedResults.epso,
-                          plotData: pairedResults.epso.plotAnalysis ? {
-                            algorithm: pairedResults.epso.plotAnalysis.algorithm,
-                            simulationId: pairedResults.epso.plotAnalysis.simulationId,
-                            metrics: pairedResults.epso.plotAnalysis.metrics,
-                            plotMetadata: pairedResults.epso.plotAnalysis.plotMetadata,
-                            plotPaths: [] 
-                          } : null,
-                          plotMetadata: pairedResults.epso.plotAnalysis?.plotMetadata || [],
-                          analysis: pairedResults.epso.plotAnalysis?.analysis
-                        }
-                      };
+                  onViewResults={async (result) => {
+                    try {
+                      const pairedResults = await historyService.getPairedHistoryResults(result.id);
                       
-                      setSimulationResults(convertedResults);
-                      setSimulationState('results');
-                    } else {
-                      showNotification('Unable to load complete results. This may be an old history entry.', 'info');
+                      if (pairedResults) {
+                        const convertedResults = {
+                          eaco: {
+                            ...pairedResults.eaco,
+                            plotData: pairedResults.eaco.plotAnalysis ? {
+                              algorithm: pairedResults.eaco.plotAnalysis.algorithm,
+                              simulationId: pairedResults.eaco.plotAnalysis.simulationId,
+                              metrics: pairedResults.eaco.plotAnalysis.metrics,
+                              plotMetadata: pairedResults.eaco.plotAnalysis.plotMetadata,
+                              plotPaths: [] 
+                            } : null,
+                            plotMetadata: pairedResults.eaco.plotAnalysis?.plotMetadata || [],
+                            analysis: pairedResults.eaco.plotAnalysis?.analysis
+                          },
+                          epso: {
+                            ...pairedResults.epso,
+                            plotData: pairedResults.epso.plotAnalysis ? {
+                              algorithm: pairedResults.epso.plotAnalysis.algorithm,
+                              simulationId: pairedResults.epso.plotAnalysis.simulationId,
+                              metrics: pairedResults.epso.plotAnalysis.metrics,
+                              plotMetadata: pairedResults.epso.plotAnalysis.plotMetadata,
+                              plotPaths: [] 
+                            } : null,
+                            plotMetadata: pairedResults.epso.plotAnalysis?.plotMetadata || [],
+                            analysis: pairedResults.epso.plotAnalysis?.analysis
+                          }
+                        };
+                        
+                        setSimulationResults(convertedResults);
+                        setSimulationState('results');
+                      } else {
+                        showNotification('Unable to load complete results. This may be an old history entry.', 'info');
+                      }
+                    } catch (error) {
+                      console.error('Failed to load history results:', error);
+                      showNotification('Failed to load history results', 'error');
                     }
                   }}
                 />
@@ -409,12 +419,17 @@ const SimulationPage = ({ onBack }) => {
               numVMs={config.dataCenterConfig.numVMs}
               progress={progress}
               iterations={config.iterationConfig.iterations}
+              totalTasks={effectiveCloudletCount}
               onAbort={() => {
                 setUserCancelledSession(true);
                 cancelSimulation();
               }}
               canAbort={canAbort}
               isAborting={isAborting}
+              currentIteration={currentIteration || null} 
+              iterationStage={iterationStage || null}   
+              eta={null}             
+              message={null}         
             />
           </>
         );
