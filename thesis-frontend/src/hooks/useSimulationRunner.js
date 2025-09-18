@@ -148,7 +148,7 @@ export const useSimulationRunner = () => {
         };
         
         setSimulationResults(combinedResults);
-        historyService.saveToHistory(combinedResults, fullConfig, { numCloudlets: csvRowCount }, file);
+        await historyService.saveToHistory(combinedResults, fullConfig, { numCloudlets: csvRowCount }, file);
         showNotification(`Simulation completed successfully! Processed ${csvRowCount} tasks.`, 'success');
         setProgress(100);
         setTimeout(() => {
@@ -336,8 +336,8 @@ export const useSimulationRunner = () => {
         setSimulationState('results');
         setProgress(100);
         
-        // Still save to history for consistency
-        historyService.saveToHistory(cachedResult, dataCenterConfig, cloudletConfig, workloadFile);
+        //save to history
+        await historyService.saveToHistory(cachedResult, dataCenterConfig, cloudletConfig, workloadFile);
         
         return true;
       }
@@ -447,7 +447,7 @@ export const useSimulationRunner = () => {
           };
           
           setSimulationResults(combinedResults);
-          historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+          await historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
           
           if (isCacheAvailable() && cacheEnabled) {
             const simulationType = workloadFile ? 'compare-with-file' : 'compare';
@@ -522,7 +522,7 @@ export const useSimulationRunner = () => {
               }
             });
             
-            historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+            await historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
           } else {
             // use synchronous plot generation
             const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots, workloadFile, false);
@@ -552,7 +552,7 @@ export const useSimulationRunner = () => {
               }
             };
             setSimulationResults(combinedResults);
-            historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
+            await historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
             
             // Cache results if enabled
             if (isCacheAvailable() && cacheEnabled) {
@@ -615,6 +615,22 @@ export const useSimulationRunner = () => {
     }
   };
 
+  // cleanup effect to stop polling when simulation is complete
+  useEffect(() => {
+    if (simulationState !== 'loading') {
+      stopIterationPolling();
+    }
+    
+    if (iterationStage === 'INITIALIZING' && totalIterations === 0) {
+      stopIterationPolling();
+    }
+    
+    // Cleanup function to stop polling when component unmounts
+    return () => {
+      stopIterationPolling();
+    };
+  }, [simulationState, iterationStage, totalIterations]);
+
   // cancel the simulation
   const cancelSimulation = async () => {
     // Clear the progress interval first
@@ -653,6 +669,7 @@ export const useSimulationRunner = () => {
       setIsAborting(false);
       setPlotStatus(null);
       setPlotTrackingIds(null);
+      stopIterationPolling(); // stop progress polling on cancellation
       
       showNotification('Simulation cancelled by user', 'info');
     } else {
@@ -660,6 +677,7 @@ export const useSimulationRunner = () => {
       setProgress(0);
       setSimulationState('config');
       sessionStorage.removeItem('activeSimulation');
+      stopIterationPolling(); // Stop progress polling on fallback cancellation
       showNotification('✓ Operation cancelled', 'success');
     }
   };
