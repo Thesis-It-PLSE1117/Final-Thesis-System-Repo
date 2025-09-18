@@ -81,7 +81,8 @@ const WorkloadTab = ({
     onPresetSelect(presetValue);
   };
   
-  const hasWorkload = !!(workloadFile || selectedPreset);
+  // In the WorkloadTab component, update the hasWorkload calculation:
+  const hasWorkload = !!(workloadFile || selectedPreset) && csvRowCount > 0;
 
   return (
     <motion.div 
@@ -123,7 +124,7 @@ const WorkloadTab = ({
             selectedPreset={selectedPreset}
             presetOptions={presetOptions}
             cloudletToggleEnabled={cloudletToggleEnabled}
-            defaultCloudletCount={defaultCloudletCount}
+            defaultCloudletCount={defaultCloudletCount} // Make sure this is passed
           />
           
           <WorkloadUploadCard

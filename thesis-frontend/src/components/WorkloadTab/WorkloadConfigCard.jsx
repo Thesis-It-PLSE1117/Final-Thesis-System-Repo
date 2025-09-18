@@ -24,18 +24,21 @@ const WorkloadConfigCard = ({
   defaultCloudletCount
 }) => {
   const hasWorkload = csvRowCount > 0 || (selectedPreset && selectedPreset !== '');
-
-  const canEditCloudlets = hasWorkload || cloudletToggleEnabled;
   
-  const displayValue = hasWorkload 
-    ? config.numCloudlets  
-    : (cloudletToggleEnabled ? config.numCloudlets : defaultCloudletCount);
+  // Always disable when cloudlet toggle is off, regardless of workload
+  const isDisabled = !cloudletToggleEnabled;
   
   const inputClasses = `w-full px-4 py-2 border rounded-lg focus:outline-none transition-all ${
-    canEditCloudlets
+    !isDisabled
       ? 'border-[#319694]/20 focus:ring-2 focus:ring-[#319694]/30 focus:border-[#319694]/50'
       : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
   }`;
+
+  const handleInputChange = (e) => {
+    if (!isDisabled) {
+      onChange(e);
+    }
+  };
 
   return (
     <motion.div 
@@ -67,12 +70,12 @@ const WorkloadConfigCard = ({
           <input
             type="number"
             name="numCloudlets"
-            value={displayValue}
-            onChange={onChange}
+            value={config.numCloudlets} // Always show the actual config value
+            onChange={handleInputChange}
             className={inputClasses}
             min="1"
             max={csvRowCount > 0 ? csvRowCount : undefined}
-            disabled={!canEditCloudlets}
+            disabled={isDisabled}
           />
           {csvRowCount > 0 ? (
             <motion.p 
@@ -84,14 +87,24 @@ const WorkloadConfigCard = ({
               <Database size={14} className="text-[#319694]" />
               Max cloudlets (tasks) based on workload: {csvRowCount}
             </motion.p>
-          ) : !cloudletToggleEnabled && !hasWorkload && (
+          ) : isDisabled && (
             <motion.p 
               className="text-xs text-gray-500 mt-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              Using default: {defaultCloudletCount} cloudlets. Enable toggle above to customize.
+              Using: {config.numCloudlets} cloudlets. Enable toggle above to customize.
+            </motion.p>
+          )}
+          {!isDisabled && !hasWorkload && (
+            <motion.p 
+              className="text-xs text-blue-500 mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Custom cloudlet configuration enabled
             </motion.p>
           )}
         </motion.div>

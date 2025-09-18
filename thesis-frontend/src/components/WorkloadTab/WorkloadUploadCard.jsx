@@ -20,6 +20,7 @@ const WorkloadUploadCard = ({
   const [validationError, setValidationError] = useState(null);
 
   // Check if we should show the upload section
+  // In the WorkloadUploadCard component, update the shouldShowUploadSection logic:
   const shouldShowUploadSection = !workloadFile && !selectedPreset || csvRowCount === 0;
 
   // Validate CSV content
