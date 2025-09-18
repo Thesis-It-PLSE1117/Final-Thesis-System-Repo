@@ -74,17 +74,23 @@ const PresetSelector = ({
   const configSummary = getConfigSummary(currentConfig);
 
   return (
-    <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm max-w-full">
-      <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
-        <Settings className="mr-2 text-blue-600" size={18} />
-        {windowWidth > 400 ? 'Configuration' : 'Config'}
-      </h3>
+    <motion.div
+      className="bg-gradient-to-br from-white to-[#f0fdfa] rounded-xl p-4 border border-[#319694]/15 shadow-md hover:shadow-lg transition-all duration-300 max-w-full"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center mb-4">
+        <div className="p-2 bg-[#319694]/10 rounded-lg mr-3">
+          <Settings className="text-[#319694]" size={20} />
+        </div>
+        <h3 className="text-lg font-bold text-gray-800">
+          {windowWidth > 400 ? 'Workload Presets' : 'Presets'}
+        </h3>
+      </div>
       
       {/* Preset Dropdown */}
       <div className="mb-3">
-        <label className="block text-xs font-medium text-gray-700 mb-2">
-          {windowWidth > 380 ? 'Workload Presets' : 'Presets'}
-        </label>
         <div className="relative">
           <button
             className="w-full flex items-center justify-between p-2.5 bg-gray-50 border border-gray-300 rounded-md text-left hover:bg-blue-50 hover:border-blue-300 transition-colors duration-150 text-sm"
@@ -175,61 +181,152 @@ const PresetSelector = ({
       
       {/* Configuration Details */}
       {currentConfig && (
-        <div className={`mb-3 rounded-md p-2.5 border ${
-          selectedPreset 
-            ? 'bg-blue-50 border-blue-200' 
-            : 'bg-green-50 border-green-200'
-        }`}>
-          <h4 className={`text-xs font-medium mb-2 flex items-center ${
-            selectedPreset ? 'text-blue-700' : 'text-green-700'
-          }`}>
-            <Server size={14} className="mr-1.5" />
-            {selectedPreset ? `${getPresetInfo(selectedPreset).title} Active` : 'Default Active'}
-          </h4>
-          
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className={`${selectedPreset ? 'text-blue-600' : 'text-green-600'}`}>
-              <div className="font-medium mb-1">Infrastructure</div>
-              <div className="space-y-0.5">
-                <div>Hosts: <span className="font-semibold">{currentConfig.numHosts}</span></div>
-                <div>VMs: <span className="font-semibold">{currentConfig.numVMs}</span></div>
+        <motion.div
+          className={`mb-4 rounded-xl p-4 border-2 shadow-sm ${
+            selectedPreset
+              ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'
+              : 'bg-gradient-to-br from-[#319694]/10 to-[#319694]/20 border-[#319694]/30'
+          }`}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <div className="flex items-center mb-3">
+            <div className={`p-2 rounded-lg mr-3 ${
+              selectedPreset ? 'bg-blue-100' : 'bg-[#319694]/20'
+            }`}>
+              <Server className={`${
+                selectedPreset ? 'text-blue-600' : 'text-[#319694]'
+              }`} size={16} />
+            </div>
+            <h4 className={`text-sm font-bold ${
+              selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+            }`}>
+              {selectedPreset ? `${getPresetInfo(selectedPreset).title} Active` : 'Default Active'}
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {/* Infrastructure Column */}
+            <div className={`p-3 rounded-lg border ${
+              selectedPreset
+                ? 'bg-white/60 border-blue-200'
+                : 'bg-white/70 border-[#319694]/20'
+            }`}>
+              <div className={`flex items-center mb-2 ${
+                selectedPreset ? 'text-blue-700' : 'text-[#319694]'
+              }`}>
+                <Server size={14} className="mr-1.5" />
+                <span className="text-xs font-semibold">Infrastructure</span>
+              </div>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Hosts:</span>
+                  <span className={`font-bold ${
+                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                  }`}>
+                    {currentConfig.numHosts}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">VMs:</span>
+                  <span className={`font-bold ${
+                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                  }`}>
+                    {currentConfig.numVMs}
+                  </span>
+                </div>
                 {windowWidth > 420 && (
-                  <div>Ratio: <span className="font-semibold">{configSummary?.hostToVMRatio}:1</span></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Ratio:</span>
+                    <span className={`font-bold ${
+                      selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                    }`}>
+                      {configSummary?.hostToVMRatio}:1
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
-            <div className={`${selectedPreset ? 'text-blue-600' : 'text-green-600'}`}>
-              <div className="font-medium mb-1">Resources</div>
-              <div className="space-y-0.5">
-                <div>PEs: <span className="font-semibold">{configSummary?.totalPEs}</span></div>
-                <div>RAM: <span className="font-semibold">{configSummary?.totalRAM}G</span></div>
+
+            {/* Resources Column */}
+            <div className={`p-3 rounded-lg border ${
+              selectedPreset
+                ? 'bg-white/60 border-blue-200'
+                : 'bg-white/70 border-[#319694]/20'
+            }`}>
+              <div className={`flex items-center mb-2 ${
+                selectedPreset ? 'text-blue-700' : 'text-[#319694]'
+              }`}>
+                <Settings size={14} className="mr-1.5" />
+                <span className="text-xs font-semibold">Resources</span>
+              </div>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">PEs:</span>
+                  <span className={`font-bold ${
+                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                  }`}>
+                    {configSummary?.totalPEs}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">RAM:</span>
+                  <span className={`font-bold ${
+                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                  }`}>
+                    {configSummary?.totalRAM}G
+                  </span>
+                </div>
                 {windowWidth > 420 && (
-                  <div>Storage: <span className="font-semibold">{configSummary?.totalStorage}T</span></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Storage:</span>
+                    <span className={`font-bold ${
+                      selectedPreset ? 'text-blue-800' : 'text-[#319694]'
+                    }`}>
+                      {configSummary?.totalStorage}T
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
       
       {/* Research Information - Only show on larger screens */}
       {windowWidth > 640 && (
-        <div className="bg-gray-50 rounded-md p-2.5 border border-gray-200">
-          <h4 className="text-xs font-medium text-gray-700 mb-2 flex items-center">
-            <Info size={14} className="mr-1.5 text-indigo-600" />
-            Research Standards
-          </h4>
-          <div className="text-xs text-gray-600 space-y-1.5">
-            <p className="leading-tight">
-              <strong>Task Counts:</strong> Standard benchmarks for algorithm evaluation.
-            </p>
-            <p className="leading-tight">
-              <strong>Scalability:</strong> Assess performance as workloads grow.
-            </p>
+        <motion.div
+          className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-200 shadow-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <div className="flex items-center mb-3">
+            <div className="p-2 bg-indigo-100 rounded-lg mr-3">
+              <Info className="text-indigo-600" size={16} />
+            </div>
+            <h4 className="text-sm font-bold text-gray-800">
+              Research Standards
+            </h4>
           </div>
-        </div>
+          <div className="space-y-2 text-sm text-gray-600">
+            <div className="flex items-start">
+              <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+              <div>
+                <span className="font-semibold text-indigo-700">Task Counts:</span> Standard benchmarks for algorithm evaluation.
+              </div>
+            </div>
+            <div className="flex items-start">
+              <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+              <div>
+                <span className="font-semibold text-indigo-700">Scalability:</span> Assess performance as workloads grow.
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
