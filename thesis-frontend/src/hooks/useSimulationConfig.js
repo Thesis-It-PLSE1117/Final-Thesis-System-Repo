@@ -5,7 +5,7 @@ import { showNotification } from '../components/common/ErrorNotification';
 // Default configuration - used as fallback when presets are cleared
 const DEFAULT_CONFIG = {
   numHosts: 20,               
-  numPesPerHost: 6,           
+  numPesPerHost: 8,           
   peMips: 2500,               // 2.5 GHz processors (modern standard)
   ramPerHost: 4096,           // 4GB RAM per host (cost-effective)
   bwPerHost: 10000,           // 10 Gbps network (datacenter standard)
@@ -140,12 +140,33 @@ export const useSimulationConfig = () => {
     const preset = PRESET_CONFIGS[presetName];
     if (preset) {
       setDataCenterConfig(preset);
-      setSelectedPreset(presetName);
+      setSelectedPreset(presetName)
 
-      // Keep workloadFile alone here — we'll try to load a CSV in handlePresetSelect.
+      // Enable cloudlet toggle when preset is selected
+      setCloudletToggleEnabled(true);
+      
+      // Set cloudlet count based on preset (you can adjust these values as needed)
+      let presetCloudletCount = DEFAULT_CLOUDLET_COUNT;
+      switch(presetName) {
+        case '1k-tasks':
+          presetCloudletCount = 1000;
+          break;
+        case '5k-tasks':
+          presetCloudletCount = 5000;
+          break;
+        case '10k-tasks':
+          presetCloudletCount = 10000;
+          break;
+        case '20k-tasks':
+          presetCloudletCount = 20000;
+          break;
+        default:
+          presetCloudletCount = DEFAULT_CLOUDLET_COUNT;
+      }
+
       setCloudletConfig(prev => ({
         ...prev,
-        numCloudlets: DEFAULT_CLOUDLET_COUNT
+        numCloudlets: presetCloudletCount
       }));
 
       showNotification(`Applied ${presetName} configuration`, 'success');
@@ -162,7 +183,9 @@ export const useSimulationConfig = () => {
     // Clear workload file and related state
     setWorkloadFile(null);
     setCsvRowCount(0);
-    setCloudletToggleEnabled(false);
+    
+    // Keep cloudlet toggle enabled but reset to default count
+    setCloudletToggleEnabled(true);
     setCloudletConfig(prev => ({
       ...prev,
       numCloudlets: DEFAULT_CLOUDLET_COUNT
@@ -212,20 +235,19 @@ export const useSimulationConfig = () => {
   // handle file upload
   const handleFileUpload = (e) => {
     if (!e.target.files || e.target.files.length === 0) {
+      // Only clear the file and row count, don't reset the preset
       setWorkloadFile(null);
       setCsvRowCount(0);
-      // re-enable cloudlet toggle when workload is removed
-      if (cloudletToggleEnabled) {
-        setCloudletConfig(prev => ({
-          ...prev,
-          numCloudlets: prev.numCloudlets
-        }));
+      
+      // If a preset is selected, keep cloudlet toggle enabled
+      if (selectedPreset) {
+        setCloudletToggleEnabled(true);
       }
       return;
     }
     const file = e.target.files[0];
-    if (file && (file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv'))) {
-      setSelectedPreset('');
+    if (file && (file.type === 'csv' || file.name.toLowerCase().endsWith('.csv'))) {
+      // Don't clear selected preset when uploading a file
       // Set workloadFile immediately to update UI
       setWorkloadFile(file);
 
@@ -245,7 +267,7 @@ export const useSimulationConfig = () => {
           numCloudlets: Math.min(prev.numCloudlets || rowCount, rowCount)
         }));
         
-        // disable cloudlet toggle 
+        // disable cloudlet toggle when using workload file
         setCloudletToggleEnabled(false);
       };
       reader.readAsText(file);
@@ -272,15 +294,6 @@ const handlePresetSelect = async (presetName) => {
 
     const contentType = (res.headers.get('content-type') || '').toLowerCase();
     console.info('[preset] fetch', presetName, 'status=', res.status, 'content-type=', contentType);
-
-    // Accept CSV, plain text, or generic binary — but reject HTML
-    const isCsvLike = contentType.includes('csv') || contentType.includes('text/plain') || contentType.includes('application/octet-stream');
-
-    if (!res.ok || !isCsvLike || contentType.includes('html')) {
-      // Most common cause: SPA fallback returned index.html (text/html)
-      throw new Error(`Server returned non-CSV content (status ${res.status}, content-type: ${contentType})`);
-    }
-
     const text = await res.text();
     const rows = text.split('\n').filter(r => r.trim() !== '');
     const rowCount = Math.max(0, rows.length - 1);
@@ -308,8 +321,14 @@ const handlePresetSelect = async (presetName) => {
   // handle cloudlet toggle change
   const handleCloudletToggleChange = (enabled) => {
     setCloudletToggleEnabled(enabled);
-    if (!enabled) {
-      // when toggle is disabled, set numCloudlets to default value
+    if (!enabled && workloadFile) {
+      // when toggle is disabled but workload file exists, use file row count
+      setCloudletConfig(prev => ({
+        ...prev,
+        numCloudlets: csvRowCount
+      }));
+    } else if (!enabled) {
+      // when toggle is disabled and no workload, set to default value
       setCloudletConfig(prev => ({
         ...prev,
         numCloudlets: DEFAULT_CLOUDLET_COUNT
@@ -355,6 +374,7 @@ const handlePresetSelect = async (presetName) => {
     if (savedConfig.iterationConfig) setIterationConfig(savedConfig.iterationConfig);
     if (savedConfig.enableMatlabPlots !== undefined) setEnableMatlabPlots(savedConfig.enableMatlabPlots);
     if (savedConfig.selectedPreset !== undefined) setSelectedPreset(savedConfig.selectedPreset);
+    if (savedConfig.cloudletToggleEnabled !== undefined) setCloudletToggleEnabled(savedConfig.cloudletToggleEnabled);
   };
 
   return {
