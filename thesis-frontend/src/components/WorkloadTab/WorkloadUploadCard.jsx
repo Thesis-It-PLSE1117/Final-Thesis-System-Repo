@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronUp, HelpCircle, Dot } from 'lucide-react';
+import { Upload, Cloud, FileText, Database, Zap, X, Table, ChevronUp, HelpCircle, Dot, AlertCircle } from 'lucide-react';
 import Papa from 'papaparse';
 
 const WorkloadUploadCard = ({
@@ -17,35 +17,83 @@ const WorkloadUploadCard = ({
   const [csvPreview, setCsvPreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [validationError, setValidationError] = useState(null);
+
+  // Check if we should show the upload section
+  const shouldShowUploadSection = !workloadFile && !selectedPreset || csvRowCount === 0;
+
+  // Validate CSV content
+  const validateCSV = (file, callback) => {
+    Papa.parse(file, {
+      header: true,
+      preview: 5, // Check first 5 rows for validation
+      skipEmptyLines: true,
+      complete: (results) => {
+        // Basic validation - check if it has headers and at least one data row
+        if (!results.meta.fields || results.meta.fields.length === 0) {
+          callback('CSV file must have headers');
+          return;
+        }
+        
+        if (results.data.length === 0) {
+          callback('CSV file must contain data rows');
+          return;
+        }
+        
+        // If validation passes
+        callback(null, results);
+      },
+      error: (error) => {
+        callback('Failed to parse CSV file');
+      }
+    });
+  };
 
   // Load preview when file or preset changes
   useEffect(() => {
     const loadPreview = async () => {
-      if (workloadFile) {
+      if (workloadFile && csvRowCount > 0) {
         setIsLoadingPreview(true);
-        Papa.parse(workloadFile, {
-          header: true,
-          preview: 10,
-          complete: (results) => {
-            setCsvPreview({
-              headers: results.meta.fields,
-              rows: results.data,
-              type: 'upload'
-            });
+        setValidationError(null);
+        
+        // Validate the file first
+        validateCSV(workloadFile, (error, results) => {
+          if (error) {
+            setValidationError(error);
             setIsLoadingPreview(false);
-          },
-          error: (error) => {
-            setIsLoadingPreview(false);
+            setCsvPreview(null);
+            return;
           }
+          
+          // If validation passed, load full preview
+          Papa.parse(workloadFile, {
+            header: true,
+            preview: 10,
+            skipEmptyLines: true,
+            complete: (results) => {
+              setCsvPreview({
+                headers: results.meta.fields,
+                rows: results.data,
+                type: 'upload'
+              });
+              setIsLoadingPreview(false);
+            },
+            error: (error) => {
+              setValidationError('Failed to parse CSV file');
+              setIsLoadingPreview(false);
+            }
+          });
         });
-      } else if (selectedPreset) {
+      } else if (selectedPreset && csvRowCount > 0) {
         setIsLoadingPreview(true);
+        setValidationError(null);
         try {
           const response = await fetch(`/presets/${selectedPreset}`);
           const text = await response.text();
           Papa.parse(text, {
             header: true,
             preview: 10,
+            skipEmptyLines: true,
             complete: (results) => {
               setCsvPreview({
                 headers: results.meta.fields,
@@ -55,20 +103,23 @@ const WorkloadUploadCard = ({
               setIsLoadingPreview(false);
             },
             error: (error) => {
+              setValidationError('Failed to parse preset CSV');
               setIsLoadingPreview(false);
             }
           });
         } catch (error) {
+          setValidationError('Failed to load preset');
           setIsLoadingPreview(false);
         }
       } else {
         setCsvPreview(null);
         setShowPreview(false);
+        setValidationError(null);
       }
     };
 
     loadPreview();
-  }, [workloadFile, selectedPreset]);
+  }, [workloadFile, selectedPreset, csvRowCount]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -92,7 +143,6 @@ const WorkloadUploadCard = ({
     if (e.target.files?.[0]) {
       onFileUpload(e);
       onPresetSelect('');
-      // Don't clear the input value to preserve file reference
     }
   };
 
@@ -106,8 +156,6 @@ const WorkloadUploadCard = ({
     return preset?.label || selectedPreset;
   };
 
-  const hasWorkload = !!(workloadFile || selectedPreset);
-
   return (
     <motion.div 
       className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-md border border-[#319694]/10"
@@ -115,8 +163,8 @@ const WorkloadUploadCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Upload area - only shown when no file is selected */}
-      {!hasWorkload && (
+      {/* Upload area - shown when no file is selected or CSV has 0 rows */}
+      {shouldShowUploadSection && (
         <>
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-[#319694]/10 rounded-lg">
@@ -140,24 +188,32 @@ const WorkloadUploadCard = ({
 
           <div className="flex items-center justify-center w-full">
             <motion.label 
-              className={`flex flex-col items-center justify-center w-full h-40 border-2 ${
-                isDragging ? 'border-[#319694] bg-[#f0fdfa]' : 'border-[#319694]/30'
-              } border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f0fdfa] transition-all`}
+              className="flex items-center justify-center w-full"
               whileTap={{ scale: 0.98 }}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
             >
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <motion.div animate={{ y: isDragging ? [-3, 3, -3] : 0 }}>
-                  <Upload className="text-[#319694] mb-3" size={28} />
-                </motion.div>
-                <p className="mb-2 text-sm text-gray-600">
-                  <span className="font-semibold text-[#319694]">Click to upload</span> or drag and drop
-                </p>
+              <div 
+                className="flex flex-col items-center justify-center w-full p-4 border-2 border-[#319694]/30 border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f0fdfa] transition-all"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <motion.button
+                  className="px-6 py-3 bg-[#319694] text-white rounded-lg font-medium flex items-center gap-2 mb-3"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('file-input').click();
+                  }}
+                >
+                  <Upload size={18} />
+                  Select CSV File
+                </motion.button>
+                <p className="text-sm text-gray-600 mb-1">or drag and drop your file here</p>
                 <p className="text-xs text-gray-500">CSV files only</p>
               </div>
               <input
+                id="file-input"
                 type="file"
                 className="hidden"
                 accept=".csv"
@@ -165,73 +221,105 @@ const WorkloadUploadCard = ({
               />
             </motion.label>
           </div>
+
+          {/* Show error message if CSV has 0 rows */}
+          {csvRowCount === 0 && workloadFile && (
+            <motion.div 
+              className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <AlertCircle className="text-red-500 mt-0.5" size={16} />
+              <div>
+                <p className="text-sm font-medium text-red-800">Invalid CSV file</p>
+                <p className="text-xs text-red-600">The CSV file contains no data or is improperly formatted.</p>
+              </div>
+            </motion.div>
+          )}
         </>
       )}
 
-      {/* File info and preview - only shown when file is selected */}
-      {hasWorkload && (
+      {/* File info and preview - only shown when file is selected and has rows */}
+      {!shouldShowUploadSection && csvRowCount > 0 && (
         <div className="space-y-3">
           <motion.div 
-            className="p-4 bg-[#f0fdfa] rounded-lg border border-[#319694]/20 flex items-center"
+            className="p-4 bg-[#f0fdfa] rounded-lg border border-[#319694]/20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <div className="p-2 bg-white rounded-lg mr-4 border border-[#319694]/10">
-              <FileText className="text-[#319694]" size={20} />
-            </div>
-            <div className="flex-grow">
-              <p className="text-sm font-medium text-gray-800">
-                {workloadFile ? workloadFile.name : getPresetDisplayName()}
-              </p>
-              <div className="flex flex-wrap gap-3 mt-2 items-center">
-                {workloadFile && (
+            <div className="flex items-center">
+              <div className="p-2 bg-white rounded-lg mr-4 border border-[#319694]/10">
+                <FileText className="text-[#319694]" size={20} />
+              </div>
+              <div className="flex-grow">
+                <p className="text-sm font-medium text-gray-800">
+                  {workloadFile ? workloadFile.name : getPresetDisplayName()}
+                </p>
+                <div className="flex flex-wrap gap-3 mt-2 items-center">
+                  {workloadFile && (
+                    <span className="text-xs text-gray-600 flex items-center gap-1">
+                      <Database size={14} className="text-[#319694]" /> 
+                      {(workloadFile.size / 1024).toFixed(2)} KB
+                    </span>
+                  )}
                   <span className="text-xs text-gray-600 flex items-center gap-1">
-                    <Database size={14} className="text-[#319694]" /> 
-                    {(workloadFile.size / 1024).toFixed(2)} KB
+                    <Zap size={14} className="text-[#319694]" /> 
+                    {csvRowCount} tasks
                   </span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {csvPreview && !validationError && (
+                  <motion.button
+                    onClick={togglePreview}
+                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg border border-[#319694]/20 hover:bg-[#319694]/10 text-[#319694] transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {showPreview ? (
+                      <>
+                        <ChevronUp size={14} />
+                        Hide Preview
+                      </>
+                    ) : (
+                      <>
+                        <Table size={14} />
+                        Show Preview
+                      </>
+                    )}
+                  </motion.button>
                 )}
-                <span className="text-xs text-gray-600 flex items-center gap-1">
-                  <Zap size={14} className="text-[#319694]" /> 
-                  {csvRowCount} tasks
-                </span>
+                <motion.button 
+                  className="p-1 text-gray-400 hover:text-[#319694] rounded-full"
+                  onClick={onClearWorkload}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={18} />
+                </motion.button>
               </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              {csvPreview && (
-                <motion.button
-                  onClick={togglePreview}
-                  className="flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg border border-[#319694]/20 hover:bg-[#319694]/10 text-[#319694] transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {showPreview ? (
-                    <>
-                      <ChevronUp size={14} />
-                      Hide Preview
-                    </>
-                  ) : (
-                    <>
-                      <Table size={14} />
-                      Show Preview
-                    </>
-                  )}
-                </motion.button>
-              )}
-              <motion.button 
-                className="p-1 text-gray-400 hover:text-[#319694] rounded-full"
-                onClick={onClearWorkload}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+
+            {/* Validation error message */}
+            {validationError && (
+              <motion.div 
+                className="mt-3 p-2 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
               >
-                <X size={18} />
-              </motion.button>
-            </div>
+                <AlertCircle className="text-red-500 mt-0.5" size={16} />
+                <div>
+                  <p className="text-sm font-medium text-red-800">Invalid CSV file</p>
+                  <p className="text-xs text-red-600">{validationError}</p>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Preview section with smooth animations */}
           <AnimatePresence>
-            {showPreview && csvPreview && (
+            {showPreview && csvPreview && !validationError && (
               <motion.div
                 key="preview"
                 initial={{ opacity: 0, height: 0 }}
