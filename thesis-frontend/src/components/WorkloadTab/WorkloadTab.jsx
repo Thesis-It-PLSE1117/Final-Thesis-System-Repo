@@ -20,7 +20,9 @@ const WorkloadTab = ({
   iterations,
   cloudletToggleEnabled,
   onCloudletToggleChange,
-  defaultCloudletCount
+  defaultCloudletCount,
+  fileInputRef,
+  clearWorkloadFile
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -38,13 +40,45 @@ const WorkloadTab = ({
   };
 
   const confirmClearWorkload = () => {
-    onFileUpload({ target: { files: [] } });
-    onPresetSelect('');
+    // Use the enhanced clear function passed from parent
+    if (clearWorkloadFile) {
+      clearWorkloadFile();
+    } else {
+      // Fallback to direct calls
+      onFileUpload({ target: { files: [] } });
+      onPresetSelect('');
+      
+      // Clear the file input if ref is available
+      if (fileInputRef?.current) {
+        fileInputRef.current.value = '';
+      }
+    }
     setShowDeleteModal(false);
   };
 
   const cancelClearWorkload = () => {
     setShowDeleteModal(false);
+  };
+
+  // Enhanced file upload handler that works with fileInputRef
+  const handleFileUpload = (event) => {
+    // Call the original handler
+    onFileUpload(event);
+    
+    // If we have files and a preset was selected, clear the preset
+    if (event.target.files && event.target.files.length > 0 && selectedPreset) {
+      onPresetSelect('');
+    }
+  };
+
+  // Enhanced preset selection handler
+  const handlePresetSelect = (presetValue) => {
+    // If selecting a preset and we have an uploaded file, clear it
+    if (presetValue && workloadFile && fileInputRef?.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    onPresetSelect(presetValue);
   };
   
   const hasWorkload = !!(workloadFile || selectedPreset);
@@ -85,7 +119,7 @@ const WorkloadTab = ({
             config={config}
             onChange={onChange}
             csvRowCount={csvRowCount}
-            onPresetSelect={onPresetSelect}
+            onPresetSelect={handlePresetSelect}
             selectedPreset={selectedPreset}
             presetOptions={presetOptions}
             cloudletToggleEnabled={cloudletToggleEnabled}
@@ -95,13 +129,14 @@ const WorkloadTab = ({
           <WorkloadUploadCard
             isDragging={isDragging}
             setIsDragging={setIsDragging}
-            onFileUpload={onFileUpload}
+            onFileUpload={handleFileUpload}
             workloadFile={workloadFile}
             csvRowCount={csvRowCount}
-            onPresetSelect={onPresetSelect}
+            onPresetSelect={handlePresetSelect}
             selectedPreset={selectedPreset}
             presetOptions={presetOptions}
             onClearWorkload={handleClearWorkload}
+            fileInputRef={fileInputRef}
           />
         </div>
       </motion.div>

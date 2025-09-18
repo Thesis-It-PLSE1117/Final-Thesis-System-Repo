@@ -6,16 +6,20 @@ export const useDataCenterConfig = () => {
   const [dataCenterConfig, setDataCenterConfig] = useState(DEFAULT_CONFIG);
   const [selectedPreset, setSelectedPreset] = useState('');
 
-  // handle data center changes with validation
   const handleDataCenterChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     
-    // i validate here since you know for the sake of preventing invalid configs
-    // const errors = validateSimulationConfig({ ...dataCenterConfig, [name]: value });
-    // if (Object.keys(errors).length > 0) {
-    //   showNotification(Object.values(errors)[0], 'warning');
-    //   return;
-    // }
+    // Check if this is a preset selection from a dropdown/select
+    if (name === 'applyPreset') {
+      // Handle preset selection separately
+      applyPresetConfig(value);
+      return;
+    }
+    
+    // Clear preset when manually changing config
+    if (selectedPreset && name !== 'applyPreset') {
+      setSelectedPreset('');
+    }
     
     if (name === 'optimizationAlgorithm' || name === 'vmScheduler') {
       setDataCenterConfig(prev => ({
@@ -35,14 +39,17 @@ export const useDataCenterConfig = () => {
     if (preset) {
       setDataCenterConfig(preset);
       setSelectedPreset(presetName);
-      showNotification(`Applied ${presetName} configuration`, 'success');
+      showNotification(`Applied ${presetName} configuration preset`, 'success');
+      return true;
     }
+    showNotification(`Preset ${presetName} not found`, 'error');
+    return false;
   };
 
   const clearPreset = () => {
-    setDataCenterConfig(PRESET_CONFIGS['default']);
+    setDataCenterConfig(DEFAULT_CONFIG);
     setSelectedPreset('');
-    showNotification('Reverted to default configuration', 'success');
+    showNotification('Cleared preset configuration', 'info');
   };
 
   return {

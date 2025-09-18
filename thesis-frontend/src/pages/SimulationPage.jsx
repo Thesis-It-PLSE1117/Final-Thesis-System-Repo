@@ -139,6 +139,24 @@ const SimulationPage = ({ onBack }) => {
     config.handleDataCenterChange(e);
   }, [config]);
   
+  // Enhanced clear preset function that also clears file input
+  const enhancedClearPreset = useCallback(() => {
+    config.clearPreset();
+    // Clear the file input if it exists
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [config]);
+
+  // Enhanced clear workload file function that also clears file input
+  const enhancedClearWorkloadFile = useCallback(() => {
+    config.clearWorkloadFile();
+    // Clear the file input if it exists
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [config]);
+  
   const executeSimulation = useCallback(async () => {
     if (isCoolingDown) return;
     
@@ -202,6 +220,9 @@ const SimulationPage = ({ onBack }) => {
           setSimulationState={setSimulationState}
           setActiveTab={setActiveTab}
           handleDataCenterChange={handleDataCenterChange}
+          fileInputRef={fileInputRef}
+          clearWorkloadFile={enhancedClearWorkloadFile}
+          clearPreset={enhancedClearPreset}
         />
 
         {activeTab === 'workload' && (

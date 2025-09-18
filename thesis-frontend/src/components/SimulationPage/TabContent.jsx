@@ -41,7 +41,10 @@ export const TabContent = ({
   setSimulationResults, 
   setSimulationState, 
   setActiveTab, 
-  handleDataCenterChange 
+  handleDataCenterChange,
+  fileInputRef,
+  clearWorkloadFile,
+  clearPreset
 }) => {
   const handleViewResults = async (result) => {
     console.log('onViewResults called with:', result);
@@ -130,14 +133,13 @@ export const TabContent = ({
       >
         <Suspense fallback={<div>Loading...</div>}>
           {activeTab === 'dataCenter' && (
-            // In the TabContent component or wherever DataCenterTab is rendered:
             <DataCenterTab
               config={config.dataCenterConfig}
               onChange={handleDataCenterChange}
               presetConfigs={config.presetConfigs}
               selectedPreset={config.selectedPreset}
-              clearPreset={config.clearPreset}  // This should be passed directly
-              applyPreset={config.applyPresetConfig} // This should be passed directly
+              clearPreset={clearPreset}
+              applyPreset={config.applyPresetConfig}
             />
           )}
           {activeTab === 'workload' && (
@@ -150,11 +152,13 @@ export const TabContent = ({
               onPresetSelect={config.handlePresetSelect}
               selectedPreset={config.selectedPreset}
               enableMatlabPlots={config.enableMatlabPlots}
-              onMatlabToggle={(value) => config.setEnableMatlabPlots(value)}
+              onMatlabToggle={config.setEnableMatlabPlots}
               iterations={config.iterationConfig.iterations}
               cloudletToggleEnabled={config.cloudletToggleEnabled}
               onCloudletToggleChange={config.handleCloudletToggleChange}
               defaultCloudletCount={config.DEFAULT_CLOUDLET_COUNT}
+              fileInputRef={fileInputRef}
+              clearWorkloadFile={clearWorkloadFile}
             />
           )}
           {activeTab === 'iterations' && (
