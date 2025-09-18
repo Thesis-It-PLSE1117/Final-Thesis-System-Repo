@@ -1,4 +1,3 @@
-import React from 'react';
 import { Settings, Play, Repeat, BarChart2, Info } from 'lucide-react';
 
 /**
