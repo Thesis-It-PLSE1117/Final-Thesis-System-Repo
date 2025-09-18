@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
   Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, HardDriveDownload, 
-  HardDriveUpload, Disc, Play 
+  HardDriveUpload, Disc, Play, MoreHorizontal 
 } from 'lucide-react';
 import ConfigSection from './ConfigSection';
 import InputField from './InputField';
 import VMCard from './VMCard';
 import HostCard from './HostCard';
+
 const DataCenterTab = ({ config, onChange}) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);
@@ -18,6 +19,10 @@ const DataCenterTab = ({ config, onChange}) => {
     distribution: false,
     preview: false
   });
+
+  // Limit the number of displayed hosts and VMs
+  const MAX_DISPLAY_HOSTS = 20;
+  const MAX_DISPLAY_VMS = 20;
 
   const toggleSection = (section) => {
     setExpandedSection(prev => ({
@@ -38,10 +43,12 @@ const DataCenterTab = ({ config, onChange}) => {
     });
   };
 
-  // Generate VM cards
+  // Generate VM cards with limitation
   useEffect(() => {
     const cards = [];
-    for (let i = 0; i < config.numVMs; i++) {
+    const displayVmCount = Math.min(config.numVMs, MAX_DISPLAY_VMS);
+    
+    for (let i = 0; i < displayVmCount; i++) {
       cards.push(
         <VMCard 
           key={i}
@@ -51,32 +58,60 @@ const DataCenterTab = ({ config, onChange}) => {
           vmSize={config.vmSize}
           vmBw={config.vmBw}
           vmPes={config.vmPes}
+          isCompact={true}
         />
       );
     }
+    
+    // Add indicator if there are more VMs than displayed
+    if (config.numVMs > MAX_DISPLAY_VMS) {
+      cards.push(
+        <div key="more-vms" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500">
+          <MoreHorizontal size={24} className="mb-1" />
+          <p className="text-xs font-medium">{config.numVMs - MAX_DISPLAY_VMS} more VMs</p>
+          <p className="text-xs">Total: {config.numVMs} VMs</p>
+        </div>
+      );
+    }
+    
     setVmCards(cards);
   }, [config.numVMs, config.vmMips, config.vmRam, config.vmSize, config.vmBw, config.vmPes]);
 
-  // Generate host visualization
+  // Generate host visualization with limitation - FIXED DISTRIBUTION
   useEffect(() => {
     const hosts = [];
-    const vmsPerHost = Math.ceil(config.numVMs / config.numHosts);
+    const displayHostCount = Math.min(config.numHosts, MAX_DISPLAY_HOSTS);
     
-    for (let hostId = 0; hostId < config.numHosts; hostId++) {
-      const startVM = hostId * vmsPerHost;
-      const endVM = Math.min(startVM + vmsPerHost, config.numVMs);
-      const hostVMs = [];
+    // Calculate VMs per host using CloudSim-like distribution
+    const vmsPerHost = Math.floor(config.numVMs / config.numHosts);
+    const remainingVMs = config.numVMs % config.numHosts;
+    
+    for (let hostId = 0; hostId < displayHostCount; hostId++) {
+      // Distribute VMs - first 'remainingVMs' hosts get one extra VM
+      const vmsInThisHost = hostId < remainingVMs ? vmsPerHost + 1 : vmsPerHost;
       
-      for (let vmId = startVM; vmId < endVM; vmId++) {
+      const hostVMs = [];
+      // Calculate starting VM ID for this host
+      let startVM = 0;
+      for (let i = 0; i < hostId; i++) {
+        startVM += (i < remainingVMs) ? vmsPerHost + 1 : vmsPerHost;
+      }
+      
+      // Limit VMs per host for display
+      const maxVmsPerHostDisplay = 6;
+      const displayVmsCount = Math.min(vmsInThisHost, maxVmsPerHostDisplay);
+      
+      for (let i = 0; i < displayVmsCount; i++) {
+        const vmId = startVM + i;
         hostVMs.push(
           <motion.div 
             key={vmId} 
-            className="bg-[#f0fdfa] p-2 rounded-md shadow-xs border border-[#319694]/10 text-xs cursor-pointer hover:bg-[#e0f8f6] transition-colors"
+            className="bg-[#f0fdfa] p-1 rounded border border-[#319694]/10 text-xs cursor-pointer hover:bg-[#e0f8f6] transition-colors"
             whileHover={{ scale: 1.03 }}
             onClick={() => setExpandedHost(expandedHost === vmId ? null : vmId)}
           >
             <div className="flex items-center">
-              <HardDrive className="text-[#319694] mr-1" size={12} />
+              <HardDrive className="text-[#319694] mr-1" size={10} />
               <span>VM {vmId + 1}</span>
             </div>
             <AnimatePresence>
@@ -103,6 +138,15 @@ const DataCenterTab = ({ config, onChange}) => {
         );
       }
       
+      // Add indicator if there are more VMs in this host than displayed
+      if (vmsInThisHost > maxVmsPerHostDisplay) {
+        hostVMs.push(
+          <div key={`more-${hostId}`} className="text-center p-1 bg-gray-100 rounded border border-gray-200 text-xs text-gray-500">
+            +{vmsInThisHost - maxVmsPerHostDisplay} more
+          </div>
+        );
+      }
+      
       hosts.push(
         <HostCard
           key={hostId}
@@ -113,7 +157,20 @@ const DataCenterTab = ({ config, onChange}) => {
           bwPerHost={config.bwPerHost}
           storagePerHost={config.storagePerHost}
           vms={hostVMs}
+          totalVms={vmsInThisHost}
+          isCompact={true}
         />
+      );
+    }
+    
+    // Add indicator if there are more hosts than displayed
+    if (config.numHosts > MAX_DISPLAY_HOSTS) {
+      hosts.push(
+        <div key="more-hosts" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500">
+          <MoreHorizontal size={24} className="mb-1" />
+          <p className="text-xs font-medium">{config.numHosts - MAX_DISPLAY_HOSTS} more hosts</p>
+          <p className="text-xs">Total: {config.numHosts} hosts</p>
+        </div>
       );
     }
     
@@ -270,7 +327,7 @@ const DataCenterTab = ({ config, onChange}) => {
         onToggle={() => toggleSection('distribution')}
       >
         <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-1">
             {hostVisualization}
           </div>
         </div>
@@ -284,7 +341,7 @@ const DataCenterTab = ({ config, onChange}) => {
         onToggle={() => toggleSection('preview')}
       >
         <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-1">
             {vmCards}
           </div>
         </div>
