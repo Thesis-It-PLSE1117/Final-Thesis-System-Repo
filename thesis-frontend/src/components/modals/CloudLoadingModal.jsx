@@ -94,7 +94,7 @@ const CloudLoadingModal = ({
         remaining = Math.max(remaining, iterationTimeRemaining);
       }
       
-      return `Approximately ${formatTime(Math.round(remaining))} remaining (large dataset)`;
+      return `Approximately ${formatTime(Math.round(remaining))} remaining`;
     }
     
     return `Approximately ${formatTime(Math.round(remaining))} remaining`;
@@ -247,11 +247,6 @@ const CloudLoadingModal = ({
                 </span>
               </div>
               
-              {isLargeTaskSet && (
-                <div className="text-xs text-amber-600">
-                  ⚠ Processing large dataset ({effectiveTaskCount.toLocaleString()} tasks)
-                </div>
-              )}
             </div>
           </div>
         )}
