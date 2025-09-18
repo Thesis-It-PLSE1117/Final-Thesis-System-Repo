@@ -231,7 +231,12 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
       {/* Main Content Area */}
       <div className="lg:w-3/4">
         <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Data Center Configuration</h3>
+          <div className="flex items-center mb-4">
+            <div className="p-2 bg-[#319694]/10 rounded-lg mr-3">
+              <Server className="text-[#319694]" size={20} />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800">Data Center Configuration</h3>
+          </div>
           
           {/* Host Configuration Panel */}
           <ConfigurationPanel
