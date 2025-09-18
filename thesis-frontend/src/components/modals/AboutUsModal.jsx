@@ -93,17 +93,22 @@ const AboutUsModal = ({ isOpen, onClose }) => {
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
         >
+          <div 
+            className="fixed inset-0 bg-black/30" 
+            onClick={onClose}
+          />
+          
           <motion.div
             variants={modalVariants}
-            className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 relative mx-4"
+            className="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl p-6 relative mx-4 overflow-y-auto"
           >
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl z-10 bg-white rounded-full p-1"
             >
               <IoClose />
             </motion.button>
@@ -116,35 +121,35 @@ const AboutUsModal = ({ isOpen, onClose }) => {
             >
               <motion.h2 
                 variants={itemVariants}
-                className="text-3xl font-bold text-[#319694] mb-6 flex items-center gap-2"
+                className="text-2xl md:text-3xl font-bold text-[#319694] mb-4 flex items-center gap-2"
               >
                 About The Team
                 <motion.div 
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                 >
-                  <Hand className="text-[#319694]" size={28} />
+                  <Hand className="text-[#319694]" size={24} />
                 </motion.div>
               </motion.h2>
 
-              <motion.p variants={itemVariants} className="mb-6 text-lg">
+              <motion.p variants={itemVariants} className="mb-6 text-base md:text-lg">
                 This thesis project was developed by passionate Computer Science students:
               </motion.p>
 
               <motion.div 
                 variants={containerVariants}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
               >
                 {teamMembers.map((member, index) => (
                   <motion.div
                     key={index}
                     variants={itemVariants}
                     whileHover={cardVariants.hover}
-                    className="bg-gradient-to-b from-gray-50 to-white rounded-xl p-5 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                    className="bg-gradient-to-b from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <motion.div 
                       whileHover={{ rotate: 5, scale: 1.1 }}
-                      className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#319694]/10 flex items-center justify-center overflow-hidden"
+                      className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 rounded-full bg-[#319694]/10 flex items-center justify-center overflow-hidden"
                     >
                       <img 
                         loading="lazy"
@@ -153,8 +158,8 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                         className="w-full h-full object-cover"
                       />
                     </motion.div>
-                    <h3 className="font-bold text-gray-800 text-lg">{member.name}</h3>
-                    <p className="text-sm text-[#319694] font-medium mb-2">{member.role}</p>
+                    <h3 className="font-bold text-gray-800 text-sm md:text-base">{member.name}</h3>
+                    <p className="text-xs md:text-sm text-[#319694] font-medium mb-1">{member.role}</p>
                     <p className="text-xs text-gray-500">{member.description}</p>
                   </motion.div>
                 ))}
@@ -162,13 +167,13 @@ const AboutUsModal = ({ isOpen, onClose }) => {
 
               <motion.div 
                 variants={itemVariants}
-                className="bg-[#319694]/10 rounded-xl p-4 mb-6"
+                className="bg-[#319694]/10 rounded-xl p-4 mb-4"
               >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <FaUniversity className="text-[#319694]" />
-                  <h4 className="font-semibold text-[#319694]">University of Cabuyao</h4>
+                  <h4 className="font-semibold text-[#319694] text-sm md:text-base">University of Cabuyao</h4>
                 </div>
-                <div className="text-sm text-gray-700 text-center space-y-2">
+                <div className="text-xs md:text-sm text-gray-700 text-center space-y-2">
                   <p>
                     <span className="font-medium">Thesis Title:</span> Enhanced PSO and ACO for Cloud Load Balancing: A Comparative Study
                   </p>
@@ -180,39 +185,39 @@ const AboutUsModal = ({ isOpen, onClose }) => {
 
               <motion.div 
                 variants={itemVariants}
-                className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6"
+                className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4"
               >
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <svg className="w-5 h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2m-2 6h2a2 2 0 012 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2v-6a2 2 0 012-2z" />
                   </svg>
-                  <h4 className="font-semibold text-gray-800">Research Methodology</h4>
+                  <h4 className="font-semibold text-gray-800 text-sm md:text-base">Research Methodology</h4>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm">
+                  <div className="space-y-1">
                     <p><span className="font-medium text-gray-700">Participants:</span> 30 total</p>
-                    <ul className="text-xs text-gray-600 ml-4 space-y-1">
+                    <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
                       <li>• 15 IT Experts (5+ years experience)</li>
                       <li>• 15 Cloud Specialists (certified)</li>
                     </ul>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <p><span className="font-medium text-gray-700">Analysis:</span> Statistical comparison</p>
-                    <ul className="text-xs text-gray-600 ml-4 space-y-1">
+                    <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
                       <li>• Paired t-test (α = 0.05)</li>
                       <li>• Likert scale evaluation</li>
                       <li>• Purposive sampling</li>
                     </ul>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 text-center mt-3">
+                <p className="text-xs text-gray-600 text-center mt-2">
                   Evaluating Enhanced PSO (EPSO) vs Enhanced ACO (EACO) using CloudSim simulation with Google Cluster Dataset
                 </p>
               </motion.div>
 
               <motion.div 
                 variants={itemVariants}
-                className="flex justify-center gap-4"
+                className="flex justify-center gap-4 pt-2"
               >
                 <motion.a 
                   whileHover={{ y: -2 }}
