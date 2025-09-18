@@ -8,7 +8,7 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
     return disabled 
       ? 'Cloudlet configuration is not available' 
       : enabled
-        ? 'Customize cloudlet numbers for your simulation'
+        ? 'Using synthetic workload with all tasks arriving at time 0'
         : `Standard default: ${defaultValue} cloudlets`;
   };
 
@@ -57,14 +57,14 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
             <Settings className="text-[#319694]" size={16} />
             <span className="text-sm text-gray-700">
-              Custom cloudlet configuration enabled
+              Synthetic workload enabled - all tasks arriving at time 0
             </span>
           </div>
 
           <div className="p-3 bg-blue-50 rounded-md">
             <p className="text-sm text-blue-700">
               <strong>Note:</strong> You can now customize the number of cloudlets in the configuration below. 
-              This allows for fine-tuned workload sizing and testing scenarios.
+              This will generate a synthetic workload where all tasks arrive simultaneously at time 0.
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
             <Info className="text-gray-500" size={16} />
             <span className="text-sm text-gray-700">
-              No valid workload uploaded - cloudlet configuration can be customized
+              No valid workload uploaded - toggle to generate synthetic workload with arrival times at 0
             </span>
           </div>
         </div>
