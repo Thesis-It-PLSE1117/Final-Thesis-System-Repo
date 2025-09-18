@@ -3,7 +3,7 @@ import { useState } from "react";
 import { HelpCircle, BookOpen } from "lucide-react";
 import DataCenterHelp from "./DataCenterHelp";
 import WorkloadHelp from "./WorkloadHelp";
-import DocumentationHelp from "./DocumentationHelp";
+import ProjectOverview from "./ProjectOverview";
 
 // Animation variants
 const containerVariants = {
@@ -95,7 +95,7 @@ const HelpTab = () => {
           onClick={() => setActiveTab('documentation')}
         >
           <BookOpen size={16} />
-          Documentation
+          Project Overview
         </button>
       </motion.nav>
 
@@ -111,7 +111,7 @@ const HelpTab = () => {
       >
         {activeTab === 'datacenter' && <DataCenterHelp />}
         {activeTab === 'workload' && <WorkloadHelp />}
-        {activeTab === 'documentation' && <DocumentationHelp />}
+        {activeTab === 'documentation' && <ProjectOverview />}
       </motion.div>
     </motion.div>
   );

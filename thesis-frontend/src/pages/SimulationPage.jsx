@@ -39,10 +39,7 @@ const SimulationPage = ({ onBack }) => {
     runSimulation,
     cancelSimulation,
     isAborting,
-    canAbort,
-    currentIteration,
-    totalIterations,
-    iterationStage
+    canAbort
   } = useSimulationRunner();
   
   // ui states
@@ -180,8 +177,7 @@ const SimulationPage = ({ onBack }) => {
               cloudletConfig: config.cloudletConfig,
               iterationConfig: config.iterationConfig,
               enableMatlabPlots: config.enableMatlabPlots,
-              workloadFile: config.workloadFile,
-              csvRowCount: config.csvRowCount
+              workloadFile: config.workloadFile
             });
             setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
           }
@@ -196,8 +192,7 @@ const SimulationPage = ({ onBack }) => {
         cloudletConfig: config.cloudletConfig,
         iterationConfig: config.iterationConfig,
         enableMatlabPlots: config.enableMatlabPlots,
-        workloadFile: config.workloadFile,
-        csvRowCount: config.csvRowCount
+        workloadFile: config.workloadFile
       });
       setTimeout(() => setIsCoolingDown(false), 1000); // 1 second cooldown
     } catch (error) {
@@ -302,12 +297,19 @@ const SimulationPage = ({ onBack }) => {
                 <HistoryTab 
                   onBack={() => setActiveTab('dataCenter')}
                   onViewResults={async (result) => {
+                    console.log('onViewResults called with:', result);
+                    
                     try {
                       const pairedResults = await historyService.getPairedHistoryResults(result.id);
+                      console.log('pairedResults:', pairedResults);
                       
-                      if (pairedResults) {
+                      if (pairedResults && (pairedResults.eaco || pairedResults.epso)) {
+                        console.log('pairedResults.eaco:', pairedResults.eaco);
+                        console.log('pairedResults.epso:', pairedResults.epso);
+                        
+                        // Add safety checks for eaco and epso existence
                         const convertedResults = {
-                          eaco: {
+                          eaco: pairedResults.eaco ? {
                             ...pairedResults.eaco,
                             plotData: pairedResults.eaco.plotAnalysis ? {
                               algorithm: pairedResults.eaco.plotAnalysis.algorithm,
@@ -318,8 +320,8 @@ const SimulationPage = ({ onBack }) => {
                             } : null,
                             plotMetadata: pairedResults.eaco.plotAnalysis?.plotMetadata || [],
                             analysis: pairedResults.eaco.plotAnalysis?.analysis
-                          },
-                          epso: {
+                          } : null,
+                          epso: pairedResults.epso ? {
                             ...pairedResults.epso,
                             plotData: pairedResults.epso.plotAnalysis ? {
                               algorithm: pairedResults.epso.plotAnalysis.algorithm,
@@ -330,17 +332,41 @@ const SimulationPage = ({ onBack }) => {
                             } : null,
                             plotMetadata: pairedResults.epso.plotAnalysis?.plotMetadata || [],
                             analysis: pairedResults.epso.plotAnalysis?.analysis
-                          }
+                          } : null
                         };
+                        
+                        console.log('convertedResults:', convertedResults);
                         
                         setSimulationResults(convertedResults);
                         setSimulationState('results');
                       } else {
-                        showNotification('Unable to load complete results. This may be an old history entry.', 'info');
+                        console.log('No paired results found, trying single result');
+                        
+                        // Fall back to using the single result
+                        const singleResult = {
+                          eaco: result.algorithm === 'EACO' ? {
+                            ...result,
+                            plotData: null,
+                            plotMetadata: [],
+                            analysis: result.analysis
+                          } : null,
+                          epso: result.algorithm === 'EPSO' ? {
+                            ...result,
+                            plotData: null,
+                            plotMetadata: [],
+                            analysis: result.analysis
+                          } : null
+                        };
+                        
+                        console.log('singleResult:', singleResult);
+                        
+                        setSimulationResults(singleResult);
+                        setSimulationState('results');
+                        showNotification('Viewing single algorithm result', 'info');
                       }
                     } catch (error) {
-                      console.error('Failed to load history results:', error);
-                      showNotification('Failed to load history results', 'error');
+                      console.error('Error loading results:', error);
+                      showNotification('Error loading results: ' + error.message, 'error');
                     }
                   }}
                 />
@@ -419,17 +445,12 @@ const SimulationPage = ({ onBack }) => {
               numVMs={config.dataCenterConfig.numVMs}
               progress={progress}
               iterations={config.iterationConfig.iterations}
-              totalTasks={effectiveCloudletCount}
               onAbort={() => {
                 setUserCancelledSession(true);
                 cancelSimulation();
               }}
               canAbort={canAbort}
               isAborting={isAborting}
-              currentIteration={currentIteration || null} 
-              iterationStage={iterationStage || null}   
-              eta={null}             
-              message={null}         
             />
           </>
         );

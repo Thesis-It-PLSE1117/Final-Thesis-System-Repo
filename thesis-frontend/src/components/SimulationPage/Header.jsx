@@ -85,13 +85,13 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
             </div>
           </div>
           
-          {simulationState !== 'config' && simulationState !== 'loading' && (
+          {simulationState !== 'config' && simulationState !== 'loading' && simulationState !== 'animation' && (
             <button
               onClick={onGoToConfig}
               className="text-white hover:bg-[#267b79] px-4 py-2 rounded-lg transition-all flex items-center gap-2"
             >
               <Settings size={18} />
-              <span className="hidden md:inline">Configuration</span>
+              <span className="hidden md:inline">Return to Configurations</span>
             </button>
           )}
         </div>
