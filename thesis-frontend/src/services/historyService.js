@@ -6,7 +6,7 @@
 import { openDB, deleteDB } from 'idb';
 
 const DB_NAME = 'SimulationHistoryDB';
-const DB_VERSION = 5; // Increased version to handle existing database
+const DB_VERSION = 1; // Increased version to handle existing database
 const STORE_NAME = 'history';
 const MAX_HISTORY_ENTRIES = 200; // Increased limit due to better storage capacity
 

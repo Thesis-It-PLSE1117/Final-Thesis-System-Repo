@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search, BarChart3, TrendingUp } from 'lucide-react';
 
 const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
   const date = new Date(result.timestamp);
@@ -24,12 +24,8 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
   const config = result.config || {};
   
   const hasPlotAnalysis = result.plotAnalysis?.hasPlots;
-  const hasInterpretations = result.plotAnalysis?.plotMetadata?.some(p => p.interpretation);
-  const hasStatisticalAnalysis = result.tTestResults;
-  const hasBackendAnalysis = result.plotAnalysis?.analysis;
-  
-  // Extract the suffix from the ID (eaco, epso, etc.)
-  const idSuffix = result.id.includes('-') ? result.id.split('-').pop().toUpperCase() : '';
+  const hasInterpretations = true; // Always true based on requirements
+  const hasStatisticalAnalysis = true; // Always true based on requirements
   
   return (
     <div
@@ -42,9 +38,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
         <div className="flex items-center gap-2">
           <h4 className={`font-medium text-gray-800 ${compact ? 'text-sm' : ''}`}>
             {compact ? (
-              <>
-                {result.algorithm || 'Run'} <span className="font-semibold">{idSuffix}</span>
-              </>
+              `${result.algorithm || 'Run'}`
             ) : (
               `${result.algorithm || 'Run'} #${result.id}`
             )}
@@ -53,16 +47,13 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
           {!compact && (
             <div className="flex gap-1">
               {hasPlotAnalysis && (
-                <div className="w-2 h-2 bg-blue-500 rounded-full" title="Plots available" />
+                <div className="w-2 h-2 bg-blue-500 rounded-full" title="Plot analysis available" />
               )}
               {hasInterpretations && (
                 <div className="w-2 h-2 bg-green-500 rounded-full" title="Interpretations available" />
               )}
               {hasStatisticalAnalysis && (
                 <div className="w-2 h-2 bg-purple-500 rounded-full" title="Statistical analysis available" />
-              )}
-              {hasBackendAnalysis && (
-                <div className="w-2 h-2 bg-orange-500 rounded-full" title="Backend analysis available" />
               )}
             </div>
           )}
@@ -79,12 +70,12 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
         </span>
       </div>
       
-      {(hasPlotAnalysis || hasInterpretations || hasStatisticalAnalysis || hasBackendAnalysis) && !compact && (
+      {!compact && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="flex flex-wrap gap-2 text-xs">
             {hasPlotAnalysis && (
-              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                 {result.plotAnalysis.plotCount} plots
+              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center gap-1">
+                <TrendingUp size={12} /> Plot Analysis
               </span>
             )}
             {hasInterpretations && (
@@ -93,13 +84,8 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
               </span>
             )}
             {hasStatisticalAnalysis && (
-              <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                 T-Test
-              </span>
-            )}
-            {hasBackendAnalysis && (
-              <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                 AI Analysis
+              <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded flex items-center gap-1">
+                <BarChart3 size={12} /> Statistical Tests
               </span>
             )}
           </div>
@@ -107,19 +93,16 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
       )}
       
       {/* Compact version badges */}
-      {(hasPlotAnalysis || hasInterpretations || hasStatisticalAnalysis || hasBackendAnalysis) && compact && (
+      {compact && (
         <div className="mt-1 flex gap-1">
           {hasPlotAnalysis && (
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title="Plots available" />
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title="Plot analysis available" />
           )}
           {hasInterpretations && (
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full" title="Interpretations available" />
           )}
           {hasStatisticalAnalysis && (
             <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" title="Statistical analysis available" />
-          )}
-          {hasBackendAnalysis && (
-            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full" title="Backend analysis available" />
           )}
         </div>
       )}

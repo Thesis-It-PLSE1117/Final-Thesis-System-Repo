@@ -10,9 +10,10 @@ import {
   importHistory
 } from '../../services/historyService';
 import HistoryPlaceholder from './HistoryPlaceHolder';
-import { exportSimulationHistory } from '../../utils/exportUtils';
+// import { exportSimulationHistory } from '../../utils/exportUtils';
 import HistoryDropdown from './HistoryDropdown';
 import HistoryDetails from './HistoryDetails';
+import { DeleteConfirmationDialog, ImportDialog } from './HistoryDialogs';
 
 const HistoryTab = ({ onBack, onViewResults }) => {
   const [history, setHistory] = useState([]);
@@ -118,14 +119,14 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     }
   };
 
-  const handleExportSelected = (format) => {
-    const dataToExport = selectedResult ? [selectedResult] : (filteredHistory.length > 0 ? [filteredHistory[0]] : []);
-    if (dataToExport.length === 0) {
-      alert('No simulation data to export');
-      return;
-    }
-    exportSimulationHistory(dataToExport, format);
-  };
+  // const handleExportSelected = (format) => {
+  //   const dataToExport = selectedResult ? [selectedResult] : (filteredHistory.length > 0 ? [filteredHistory[0]] : []);
+  //   if (dataToExport.length === 0) {
+  //     alert('No simulation data to export');
+  //     return;
+  //   }
+  //   exportSimulationHistory(dataToExport, format);
+  // };
 
   const handleExportAll = async () => {
     try {
@@ -294,6 +295,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               onClick={() => setShowImportDialog(true)}
               className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
               title="Import history from backup"
+              data-testid="import-button"
             >
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -404,83 +406,24 @@ const HistoryTab = ({ onBack, onViewResults }) => {
         </>
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* Dialogs */}
       <AnimatePresence>
         {showDeleteConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowDeleteConfirm(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl border border-white/20"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Delete Simulation</h3>
-              <p className="text-gray-600 mb-5 text-sm">
-                Are you sure you want to delete this simulation and its paired results? This action cannot be undone.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowDeleteConfirm(null)}
-                  className="px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 text-sm font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleDeleteEntry(showDeleteConfirm)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+          <DeleteConfirmationDialog
+            showDeleteConfirm={showDeleteConfirm}
+            setShowDeleteConfirm={setShowDeleteConfirm}
+            handleDeleteEntry={handleDeleteEntry}
+          />
         )}
       </AnimatePresence>
 
-      {/* Import Dialog */}
       <AnimatePresence>
         {showImportDialog && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowImportDialog(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl border border-white/20"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Import History</h3>
-              <p className="text-gray-600 mb-4 text-sm">
-                Select a backup file to import. This will add the imported data to your existing history.
-              </p>
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImportHistory}
-                className="w-full mb-5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#319694] file:text-white hover:file:bg-[#267b79] transition-colors"
-              />
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowImportDialog(false)}
-                  className="px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 text-sm font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+          <ImportDialog
+            showImportDialog={showImportDialog}
+            setShowImportDialog={setShowImportDialog}
+            handleImportHistory={handleImportHistory}
+          />
         )}
       </AnimatePresence>
     </motion.div>
