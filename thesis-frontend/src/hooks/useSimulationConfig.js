@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { showNotification } from '../components/common/ErrorNotification';
-import { validateSimulationConfig } from '../utils/validation';
+// import { validateSimulationConfig } from '../utils/validation';
 
 /**
  * custom hook for managing simulation configuration
@@ -67,11 +67,11 @@ export const useSimulationConfig = () => {
     const { name, value } = e.target;
     
     // i validate here since you know for the sake of preventing invalid configs
-    const errors = validateSimulationConfig({ ...dataCenterConfig, [name]: value });
-    if (Object.keys(errors).length > 0) {
-      showNotification(Object.values(errors)[0], 'warning');
-      return;
-    }
+    // const errors = validateSimulationConfig({ ...dataCenterConfig, [name]: value });
+    // if (Object.keys(errors).length > 0) {
+    //   showNotification(Object.values(errors)[0], 'warning');
+    //   return;
+    // }
     
     if (name === 'optimizationAlgorithm' || name === 'vmScheduler') {
       setDataCenterConfig(prev => ({
