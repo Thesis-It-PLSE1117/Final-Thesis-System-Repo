@@ -26,7 +26,7 @@ const WorkloadConfigCard = ({
   const hasWorkload = csvRowCount > 0 || (selectedPreset && selectedPreset !== '');
   
   // Always disable when cloudlet toggle is off, regardless of workload
-  const isDisabled = !cloudletToggleEnabled;
+  const isDisabled = false;
   
   const inputClasses = `w-full px-4 py-2 border rounded-lg focus:outline-none transition-all ${
     !isDisabled
