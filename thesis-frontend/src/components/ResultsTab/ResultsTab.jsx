@@ -86,11 +86,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   ];
   
   useEffect(() => {
-    /**
-     * I auto-switch to analysis tab when t-test results are available
-     */
-    if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && activeTab === 'metadata') {
+    const hasAutoSwitched = sessionStorage.getItem('results-tab-auto-switched');
+    
+    
+    if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && 
+        activeTab === 'metadata' && 
+        !hasAutoSwitched) {
       setActiveTab('analysis');
+      sessionStorage.setItem('results-tab-auto-switched', 'true');
     }
     
     // if in visualization, switch to analysis
