@@ -150,8 +150,8 @@ const HeroSection = ({ onStartSimulation }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          Compare algorithm performance with <span className="font-semibold text-[#319694]">configurable workload sizes</span> and 
-          <span className="font-semibold text-[#4fd1c5]"> statistical validation</span> through multiple iteration support
+          Research-focused comparison of <span className="font-semibold text-[#319694]">Enhanced ACO vs Enhanced PSO</span> algorithms for 
+          <span className="font-semibold text-[#4fd1c5]">virtual machine task scheduling</span> with statistical validation
         </motion.p>
 
         {/* Key Statistics */}
