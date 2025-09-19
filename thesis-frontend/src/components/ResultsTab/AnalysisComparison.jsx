@@ -100,16 +100,16 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
       className="space-y-6"
     >
       {/* Comparison Mode Toggle */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
-            <GitCompare className="text-[#319694]" size={20} />
-            <h3 className="font-semibold text-gray-800">Comparison View</h3>
+            <GitCompare className="text-[#319694]" size={18} />
+            <h3 className="font-semibold text-gray-800 text-base">Comparison View</h3>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setComparisonMode('side-by-side')}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                 comparisonMode === 'side-by-side'
                   ? 'bg-[#319694] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -119,7 +119,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
             </button>
             <button
               onClick={() => setComparisonMode('toggle')}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                 comparisonMode === 'toggle'
                   ? 'bg-[#319694] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -143,8 +143,8 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
           className="w-full px-6 py-4 bg-gradient-to-r from-[#319694] to-[#319694]/80 text-white flex items-center justify-between hover:from-[#267b79] hover:to-[#267b79]/80 transition-all"
         >
           <div className="flex items-center gap-3">
-            <Award size={24} />
-            <h3 className="text-xl font-bold">Overall Performance Comparison</h3>
+            <Award size={20} />
+            <h3 className="text-lg sm:text-xl font-bold">Overall Performance Comparison</h3>
           </div>
           {expandedSections.overall ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </button>
@@ -157,9 +157,9 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
               exit={{ height: 0 }}
               className="overflow-hidden"
             >
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {comparisonMode === 'side-by-side' ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* EACO Column */}
                     <div className={`border-2 rounded-lg p-4 ${
                       gradeComparison.eacoBetter ? 'border-green-400 bg-green-50/30' : 'border-gray-200'
@@ -172,7 +172,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                       
                       {eacoAnalysis?.overallPerformance && (
                         <>
-                          <p className="text-sm text-gray-700 mb-4">
+                          <p className="text-base text-gray-700 mb-4 leading-relaxed">
                             {eacoAnalysis.overallPerformance.summary}
                           </p>
                           
@@ -182,7 +182,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                                 <CheckCircle className="text-green-600" size={16} />
                                 <span className="font-medium text-sm text-gray-800">Strengths</span>
                               </div>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-sm text-gray-600">
                                 {eacoAnalysis.overallPerformance.strengths}
                               </p>
                             </div>
@@ -192,7 +192,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                                 <AlertTriangle className="text-amber-600" size={16} />
                                 <span className="font-medium text-sm text-gray-800">Improvements</span>
                               </div>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-sm text-gray-600">
                                 {eacoAnalysis.overallPerformance.weaknesses}
                               </p>
                             </div>
@@ -213,7 +213,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                       
                       {epsoAnalysis?.overallPerformance && (
                         <>
-                          <p className="text-sm text-gray-700 mb-4">
+                          <p className="text-base text-gray-700 mb-4 leading-relaxed">
                             {epsoAnalysis.overallPerformance.summary}
                           </p>
                           
@@ -223,7 +223,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                                 <CheckCircle className="text-green-600" size={16} />
                                 <span className="font-medium text-sm text-gray-800">Strengths</span>
                               </div>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-sm text-gray-600">
                                 {epsoAnalysis.overallPerformance.strengths}
                               </p>
                             </div>
@@ -233,7 +233,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                                 <AlertTriangle className="text-amber-600" size={16} />
                                 <span className="font-medium text-sm text-gray-800">Improvements</span>
                               </div>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-sm text-gray-600">
                                 {epsoAnalysis.overallPerformance.weaknesses}
                               </p>
                             </div>
@@ -323,10 +323,10 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                       <h4 className="font-semibold text-[#319694]">EACO Efficiency</h4>
                       {eacoAnalysis?.efficiencyAnalysis && Object.entries(eacoAnalysis.efficiencyAnalysis).map(([key, value]) => (
                         <div key={key} className="bg-teal-50 border border-teal-200 rounded-lg p-3">
-                          <p className="text-sm font-medium text-gray-800 capitalize mb-1">
+                          <p className="text-base font-medium text-gray-800 capitalize mb-1">
                             {key.replace(/([A-Z])/g, ' $1').trim()}
                           </p>
-                          <p className="text-xs text-gray-600">{value}</p>
+                          <p className="text-sm text-gray-600">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -335,10 +335,10 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                       <h4 className="font-semibold text-purple-600">EPSO Efficiency</h4>
                       {epsoAnalysis?.efficiencyAnalysis && Object.entries(epsoAnalysis.efficiencyAnalysis).map(([key, value]) => (
                         <div key={key} className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                          <p className="text-sm font-medium text-gray-800 capitalize mb-1">
+                          <p className="text-base font-medium text-gray-800 capitalize mb-1">
                             {key.replace(/([A-Z])/g, ' $1').trim()}
                           </p>
-                          <p className="text-xs text-gray-600">{value}</p>
+                          <p className="text-sm text-gray-600">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -386,7 +386,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                         {eacoAnalysis?.recommendations?.map((rec, index) => (
                           <div key={index} className="flex items-start gap-2 bg-teal-50 border border-teal-200 rounded-lg p-2">
                             <ArrowRight className="text-teal-600 mt-0.5 flex-shrink-0" size={14} />
-                            <p className="text-xs text-gray-700">{rec}</p>
+                            <p className="text-sm text-gray-700">{rec}</p>
                           </div>
                         ))}
                       </div>
@@ -398,7 +398,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
                         {epsoAnalysis?.recommendations?.map((rec, index) => (
                           <div key={index} className="flex items-start gap-2 bg-purple-50 border border-purple-200 rounded-lg p-2">
                             <ArrowRight className="text-purple-600 mt-0.5 flex-shrink-0" size={14} />
-                            <p className="text-xs text-gray-700">{rec}</p>
+                            <p className="text-sm text-gray-700">{rec}</p>
                           </div>
                         ))}
                       </div>
@@ -494,15 +494,15 @@ const ToggleView = ({ eacoContent, epsoContent, type }) => {
                 {content.grade}
               </span>
             </div>
-            <p className="text-sm text-gray-700 mb-4">{content.summary}</p>
+            <p className="text-base text-gray-700 mb-4 leading-relaxed">{content.summary}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <h5 className="font-medium text-sm text-gray-800 mb-1">Strengths</h5>
-                <p className="text-xs text-gray-600">{content.strengths}</p>
+                <h5 className="font-medium text-base text-gray-800 mb-1">Strengths</h5>
+                <p className="text-sm text-gray-600">{content.strengths}</p>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <h5 className="font-medium text-sm text-gray-800 mb-1">Improvements</h5>
-                <p className="text-xs text-gray-600">{content.weaknesses}</p>
+                <h5 className="font-medium text-base text-gray-800 mb-1">Improvements</h5>
+                <p className="text-sm text-gray-600">{content.weaknesses}</p>
               </div>
             </div>
           </div>
@@ -513,12 +513,12 @@ const ToggleView = ({ eacoContent, epsoContent, type }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {Object.entries(content).map(([metric, interpretation]) => (
               <div key={metric} className={`bg-${algorithmColor}-50 border border-${algorithmColor}-200 rounded-lg p-3`}>
-                <h5 className="font-medium text-sm text-gray-800 capitalize mb-1">
+                <h5 className="font-medium text-base text-gray-800 capitalize mb-1">
                   {metric === 'loadBalance' ? 'Degree of Imbalance' : 
                    metric === 'loadImbalance' ? 'Degree of Imbalance' :
                    metric.replace(/([A-Z])/g, ' $1').trim()}
                 </h5>
-                <p className="text-xs text-gray-600">{interpretation}</p>
+                <p className="text-sm text-gray-600">{interpretation}</p>
               </div>
             ))}
           </div>
@@ -529,10 +529,10 @@ const ToggleView = ({ eacoContent, epsoContent, type }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {Object.entries(content).map(([key, value]) => (
               <div key={key} className={`bg-${algorithmColor}-50 border border-${algorithmColor}-200 rounded-lg p-3`}>
-                <p className="text-sm font-medium text-gray-800 capitalize mb-1">
+                <p className="text-base font-medium text-gray-800 capitalize mb-1">
                   {key.replace(/([A-Z])/g, ' $1').trim()}
                 </p>
-                <p className="text-xs text-gray-600">{value}</p>
+                <p className="text-sm text-gray-600">{value}</p>
               </div>
             ))}
           </div>
@@ -544,7 +544,7 @@ const ToggleView = ({ eacoContent, epsoContent, type }) => {
             {content.map((rec, index) => (
               <div key={index} className={`flex items-start gap-2 bg-${algorithmColor}-50 border border-${algorithmColor}-200 rounded-lg p-2`}>
                 <ArrowRight className={`text-${algorithmColor}-600 mt-0.5 flex-shrink-0`} size={14} />
-                <p className="text-xs text-gray-700">{rec}</p>
+                <p className="text-sm text-gray-700">{rec}</p>
               </div>
             ))}
           </div>
@@ -597,21 +597,21 @@ const MetricComparison = ({ eacoMetrics, epsoMetrics }) => {
     <div className="space-y-4">
       {Array.from(allMetrics).map(metric => (
         <div key={metric} className="border border-gray-200 rounded-lg p-4">
-          <h5 className="font-semibold text-gray-800 capitalize mb-3">
+          <h5 className="font-semibold text-lg text-gray-800 capitalize mb-3">
             {metric === 'loadBalance' ? 'Degree of Imbalance' : 
              metric === 'loadImbalance' ? 'Degree of Imbalance' :
              metric.replace(/([A-Z])/g, ' $1').trim()}
           </h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-teal-50 border-l-4 border-teal-400 rounded-lg p-3">
-              <span className="text-xs font-semibold text-teal-700">EACO</span>
-              <p className="text-xs text-gray-600 mt-1">
+              <span className="text-sm font-semibold text-teal-700">EACO</span>
+              <p className="text-sm text-gray-600 mt-1">
                 {eacoMetrics?.[metric] || 'No interpretation available'}
               </p>
             </div>
             <div className="bg-purple-50 border-l-4 border-purple-400 rounded-lg p-3">
-              <span className="text-xs font-semibold text-purple-700">EPSO</span>
-              <p className="text-xs text-gray-600 mt-1">
+              <span className="text-sm font-semibold text-purple-700">EPSO</span>
+              <p className="text-sm text-gray-600 mt-1">
                 {epsoMetrics?.[metric] || 'No interpretation available'}
               </p>
             </div>

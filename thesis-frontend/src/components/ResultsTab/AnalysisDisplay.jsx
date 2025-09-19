@@ -111,7 +111,7 @@ const AnalysisDisplay = ({ analysis, algorithmName }) => {
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 leading-relaxed">{overallPerformance.summary}</p>
+                  <p className="text-base text-gray-700 leading-relaxed">{overallPerformance.summary}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

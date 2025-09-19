@@ -16,10 +16,10 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
           case 'help': return 'Help & Documentation';
           default: return 'Simulation Configuration';
         }
-      case 'loading': return 'Running Simulation';
-      case 'animation': return 'Distribution Visualization';
-      case 'results': return 'Result Analysis';
-      default: return 'Cloud Simulation';
+      case 'loading': return 'Running Algorithm Comparison';
+      case 'animation': return 'Task Scheduling Visualization';
+      case 'results': return 'Performance Analysis';
+      default: return 'Load Balancing Simulation';
     }
   };
 
@@ -28,15 +28,15 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
       case 'config':
         switch (activeTab) {
           case 'dataCenter': return 'Configure your data center infrastructure';
-          case 'workload': return 'Set up your cloud workload parameters';
-          case 'iterations': return 'Configure simulation iterations';
-          case 'history': return 'View past simulation results';
+          case 'workload': return 'Set up task workload parameters for load balancing';
+          case 'iterations': return 'Configure iterations for statistical analysis';
+          case 'history': return 'View past algorithm comparison results';
           case 'help': return 'Documentation and keyboard shortcuts';
-          default: return 'Set up your simulation parameters';
+          default: return 'Set up your load balancing simulation parameters';
         }
-      case 'loading': return 'Processing your cloud workload';
-      case 'animation': return 'Visualizing the task scheduling process';
-      case 'results': return 'Analyze the performance metrics';
+      case 'loading': return 'Comparing EACO vs EPSO algorithms';
+      case 'animation': return 'Visualizing EACO/EPSO task scheduling process';
+      case 'results': return 'Analyze algorithm performance metrics';
       default: return '';
     }
   };

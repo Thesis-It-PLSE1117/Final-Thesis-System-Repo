@@ -17,7 +17,7 @@ const CtaSection = ({ onStartSimulation }) => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          Ready to Optimize Your Cloud Performance?
+          Ready to Compare Load Balancing Algorithms?
         </motion.h3>
         <motion.p
           className="text-xl text-white/90 mb-10"
@@ -25,7 +25,7 @@ const CtaSection = ({ onStartSimulation }) => {
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          Start simulating and discover the best load balancing strategy for your infrastructure.
+          Start simulating EACO vs EPSO algorithms and discover the optimal task scheduling strategy for your cloud infrastructure.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}
