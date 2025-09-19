@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Server, Cpu, Zap, Clock, Gauge, RefreshCw, BarChart3, TrendingUp, BookText, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { formatMetricValue, getMetricIcon, getMetricDisplayName, RESEARCH_STATISTICS } from '../../constants/metricsConfig';
+import { formatMetricValue, getMetricIcon, getMetricDisplayName, RESEARCH_STATISTICS } from '../../constants/metricsConfig.js';
 
 const DemoSection = ({ isPlaying, setIsPlaying }) => {
   // Real data from your JSON files

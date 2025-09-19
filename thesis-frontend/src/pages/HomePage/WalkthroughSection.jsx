@@ -10,7 +10,7 @@ import {
   Info 
 } from 'lucide-react';
 import WalkthroughStep from './WalkthroughStep';
-import { METRICS_CONFIG, getCoreMetrics, getAdditionalMetrics } from '../../constants/metricsConfig';
+import { METRICS_CONFIG, getCoreMetrics, getAdditionalMetrics } from '../../constants/metricsConfig.js';
 
 const WalkthroughSection = ({ walkthroughSteps }) => {
   const [hoveredMetric, setHoveredMetric] = useState(null);

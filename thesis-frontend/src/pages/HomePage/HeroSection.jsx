@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Settings, ChevronDown, Server, Cpu, Zap, Clock, Scale, Layers, TrendingUp, Award } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { RESEARCH_STATISTICS } from '../../constants/metricsConfig';
+import { RESEARCH_STATISTICS } from '../../constants/metricsConfig.js';
 
 const Particle = ({ x, y, size, delay }) => {
   return (
