@@ -7,37 +7,26 @@ import {
   BarChart2, 
   ChevronDown, 
   Sparkles, 
-  Clock, 
-  Battery, 
-  Calendar, 
-  Scale, 
   Info 
 } from 'lucide-react';
 import WalkthroughStep from './WalkthroughStep';
+import { METRICS_CONFIG, getCoreMetrics, getAdditionalMetrics } from '../../constants/metricsConfig';
 
 const WalkthroughSection = ({ walkthroughSteps }) => {
   const [hoveredMetric, setHoveredMetric] = useState(null);
-
-  const metricDescriptions = {
-    'Resource Utilization': 'Measures how effectively your server resources (CPU, memory, storage) are being used across all hosts',
-    'Response Time': 'Average time taken to complete tasks from submission to final response',
-    'Energy Efficiency': 'Evaluates power consumption relative to computational work performed',
-    'Makespan': 'Total time taken to complete all tasks in the workload',
-    'Imbalance Degree': 'Quantifies how unevenly the workload is distributed across available hosts'
-  };
-
-  const coreMetrics = [
-    { icon: <BarChart2 size={24} />, label: 'Resource Utilization' },
-    { icon: <Clock size={24} />, label: 'Response Time' },
-    { icon: <Battery size={24} />, label: 'Energy Efficiency' }
-  ];
-  
-  const additionalMetrics = [
-    { icon: <Calendar size={24} />, label: 'Makespan' },
-    { icon: <Scale size={24} />, label: 'Imbalance Degree' }
-  ];
-  
   const [showAllMetrics, setShowAllMetrics] = useState(false);
+  
+  // Use shared metrics configuration
+  const coreMetrics = getCoreMetrics().map(metric => ({
+    ...metric,
+    icon: <metric.icon size={24} />
+  }));
+  
+  const additionalMetrics = getAdditionalMetrics().map(metric => ({
+    ...metric,
+    icon: <metric.icon size={24} />
+  }));
+  
   const displayedMetrics = showAllMetrics ? [...coreMetrics, ...additionalMetrics] : coreMetrics;
 
   return (
@@ -166,7 +155,7 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
                         {metric.label}
                       </h5>
                       <p className="text-sm text-gray-700 leading-relaxed">
-                        {metricDescriptions[metric.label]}
+                        {METRICS_CONFIG[metric.label]?.description}
                       </p>
                     </div>
                     
