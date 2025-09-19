@@ -61,11 +61,11 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "Enhanced Ant Colony Optimization (EACO)",
-          content: "Adaptive ACO with two key enhancements: (1) Adaptive pheromone evaporation: p(t) = p_min + (p_max - p_min) × ((f_avg - f_best) / f_best), (2) Heuristic load-based reinforcement: Δτ_ij = 1 / (1 + L_j). Pheromone update: τ_ij(t+1) = (1 - p(t)) × τ_ij(t) + Δτ_ij(t). Balances exploration vs exploitation based on convergence and current system load."
+          content: "Advanced ACO algorithm with smart adaptations for cloud scheduling. Features adaptive pheromone evaporation that adjusts based on solution quality, load-aware reinforcement that considers VM workloads, and early stopping when solutions converge. Each ant builds complete task-to-VM assignments probabilistically, with successful paths reinforced through pheromone deposits."
         },
         {
-          title: "Enhanced PSO (EPSO)",
-          content: "PSO with nonlinear inertia weight reduction: w = w_max - (w_max - w_min) × (iteration/maxIterations)², and adaptive velocity clamping: V_max decreases quadratically over iterations. No VM migration required. Uses standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients."
+          title: "Enhanced Particle Swarm Optimization (EPSO)",
+          content: "Improved PSO algorithm optimized for cloud task scheduling. Uses quadratic inertia weight decay for better exploration-to-exploitation transition, adaptive velocity limits that decrease over time, and early stopping detection. Particles represent complete scheduling solutions, evolving toward optimal task assignments through swarm intelligence."
         },
         {
           title: "Algorithm References",

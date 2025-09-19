@@ -58,7 +58,7 @@ const WorkloadHelp = () => {
         <h3 className="text-xl font-semibold text-gray-800">Workload Configuration</h3>
       </div>
       <p className="text-gray-600 mb-6">
-        The simulation supports two CSV schemas from the manuscript specification. Each schema addresses different workload data sources with specific preprocessing requirements:
+        This system processes task workloads to simulate cloud scheduling scenarios. You can upload your own CSV file or select from pre-configured Google cluster datasets. The system automatically recognizes the data format and converts it appropriately - no manual configuration needed.
       </p>
       
       <div className="space-y-8">
@@ -72,38 +72,38 @@ const WorkloadHelp = () => {
             <Database className="text-[#319694]" size={18} />
             Supported CSV Schemas
           </h4>
-          <p className="text-gray-600 mb-4 text-sm">Choose the appropriate schema based on your data source and preprocessing needs</p>
+          <p className="text-gray-600 mb-4 text-sm">The system automatically recognizes these common data formats - no manual configuration needed</p>
           <ul className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {[
               {
                 icon: "Columns",
-                text: "Normalized Schema: length (MI), pes (integer), file_size (0-1), output_size (0-1)",
-                note: "Ideal for custom datasets or academic benchmarks"
+                text: "Simple Format: Contains task length (Million Instructions), CPU cores needed, and data file sizes",
+                note: "Perfect for custom workloads - system expects: length, pes, file_size, output_size"
               },
               {
                 icon: "Database",
-                text: "Google Cluster Schema: arrival_ts (μs), cpu_request (0.0-1.0), memory_request (0.0-1.0), pes_number (integer)",
-                note: "Based on Google Cluster Traces dataset format with time-based submission"
+                text: "Google Cluster Format: Real datacenter traces with arrival times and resource requests",
+                note: "Uses actual Google usage patterns - system detects: arrival_ts, cpu_request, pes_number columns"
               },
               {
                 icon: "Clock",
-                text: "arrival_ts: Task arrival timestamp normalized using t := (arrival_ts - min(arrival_ts)) / 1e6",
-                note: "Timestamp conversion from microseconds to seconds"
+                text: "Arrival Times: When each task starts (converted from microseconds to simulation seconds)",
+                note: "Enables realistic temporal patterns - system normalizes timestamps automatically"
               },
               {
                 icon: "Gauge",
-                text: "Resource fractions: CPU and memory requests as fractions (0.0-1.0) of total host capacity",
-                note: "Normalized resource demand representation"
+                text: "Resource Requests: CPU and memory needs as fractions (0.0 to 1.0 of server capacity)",
+                note: "System scales these values to actual resource allocations during simulation"
               },
               {
                 icon: "HardDrive",
-                text: "File sizes: Input/output data sizes normalized to 0-1 range, scaled to bytes during simulation",
-                note: "Consistent data size representation across schemas"
+                text: "Data Sizes: Input and output file sizes (normalized 0-1 values scaled to bytes)",
+                note: "System converts small decimal values to realistic byte amounts (up to 1GB max)"
               },
               {
                 icon: "Settings",
-                text: "time_window (optional): Combined with cpu_request to derive computational MI for Google schema",
-                note: "Enhanced computational workload calculation"
+                text: "Processing Work: Task complexity calculated from CPU request and optional time window",
+                note: "System computes Million Instructions automatically based on resource demands"
               }
             ].map((item, index) => {
               const IconComponent = {
@@ -151,18 +151,18 @@ const WorkloadHelp = () => {
             {[
               {
                 icon: "List",
-                text: "Batch (default): All tasks submitted at t=0 for controlled algorithm comparison",
-                note: "Ensures fair comparison between scheduling algorithms"
+                text: "Batch Mode (default): All tasks start at the same time for fair algorithm testing",
+                note: "Used when no arrival times are present - ensures controlled comparison conditions"
               },
               {
                 icon: "CalendarClock",
-                text: "Staged (optional): Tasks submitted according to normalized arrival times from arrival_ts",
-                note: "Simulates real-world temporal workload patterns"
+                text: "Staged Mode (automatic): Tasks arrive over time based on their timestamps",
+                note: "Activated when arrival_ts column is detected - creates realistic workload patterns"
               },
               {
                 icon: "Filter",
-                text: "Missing arrival_ts handling: Tasks with missing timestamps default to t=0 (batch mode)",
-                note: "Automatic fallback for incomplete temporal data"
+                text: "Smart Fallback: Tasks without timestamps automatically use batch mode (time=0)",
+                note: "System handles mixed data gracefully - no manual configuration needed"
               }
             ].map((item, index) => {
               const IconComponent = {
@@ -207,33 +207,33 @@ const WorkloadHelp = () => {
             {[
               {
                 icon: "CheckCircle",
-                text: "Ensure it includes task time, CPU request, and duration data",
-                details: "arrival_ts (microseconds), cpu_request (0.0-1.0), memory_request (0.0-1.0), pes_number (integer)"
+                text: "Choose your data format: Simple (length, pes, file_size, output_size) or Google-style",
+                details: "Simple format is easier - just specify task size, CPU cores needed, and data amounts"
               },
               {
                 icon: "Columns",
-                text: "Rename columns to match the required format",
-                details: "Map your column names to schema requirements: timestamp → arrival_ts, cpu_usage → cpu_request"
+                text: "Use recognizable column names - the system detects formats automatically",
+                details: "Examples: 'length' or 'task_length' for work amount, 'pes' or 'pes_number' for CPU cores"
               },
               {
                 icon: "Filter",
-                text: "Handle missing values appropriately",
-                details: "Fill with reasonable defaults, remove incomplete rows, or use batch mode for missing timestamps"
+                text: "Clean up missing values or leave them blank - the system provides sensible defaults",
+                details: "Missing data gets reasonable fallback values: length=1000MI, pes=1, file_size=300bytes"
               },
               {
                 icon: "Save",
-                text: "Save as a CSV with the correct structure",
-                details: "Normalize values to proper ranges, ensure correct data types, save as UTF-8 encoded CSV"
+                text: "Save as standard CSV with headers - UTF-8 encoding recommended",
+                details: "First row should contain column names, subsequent rows contain your task data"
               },
               {
                 icon: "Gauge",
-                text: "Validate resource fractions are between 0.0-1.0",
-                details: "CPU and memory requests must represent fractions of total host capacity"
+                text: "For resource values, use fractions (0.1 = 10%) or small decimals work best",
+                details: "System automatically scales: 0.1 becomes 10% of server capacity, 0.5 becomes 50%"
               },
               {
                 icon: "HardDrive",
-                text: "Normalize file sizes to 0-1 range",
-                details: "Input and output file sizes should be normalized fractions, scaled during simulation"
+                text: "File sizes can be small decimals (0.001 to 1.0) - system scales them to realistic bytes",
+                details: "Values like 0.1 become ~100MB, 0.5 becomes ~500MB, 1.0 becomes ~1GB"
               }
             ].map((item, index) => {
               const IconComponent = {

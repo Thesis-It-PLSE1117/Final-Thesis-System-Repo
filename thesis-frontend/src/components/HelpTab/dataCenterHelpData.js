@@ -1,67 +1,67 @@
 export const dataCenterHelpContent = {
   title: "Data Center Configuration",
-  description: "Configure your virtual data center environment with hosts and virtual machines. These settings determine the computing resources available for your cloud simulation. Based on CloudSim concepts, hosts represent physical servers while VMs are virtualized instances that run on these hosts.",
+  description: "Set up your simulated cloud infrastructure using CloudSim components. Hosts represent physical servers with CPU cores (Processing Elements), memory, and storage. Virtual Machines run on these hosts and execute the scheduled tasks (cloudlets). All components use time-shared scheduling for realistic resource sharing.",
   icon: "Server",
   sections: {
     hostConfig: {
       title: "Host Configuration",
-      description: "Hosts represent the physical servers in your data center that will run virtual machines. In CloudSim terminology, hosts are characterized by their processing elements (PEs), memory, storage, and bandwidth capabilities.",
+      description: "Hosts are simulated physical servers that provide resources to Virtual Machines. Each host has Processing Elements (CPU cores), RAM, storage, and network bandwidth. The system uses time-shared scheduling to allocate host resources among VMs fairly.",
       icon: "HardDriveUpload",
       items: [
         { 
           icon: "Server", 
-          text: "Number of Hosts: Defines how many physical servers are available in your data center. Each host can run multiple VMs depending on its capacity and the VM requirements." 
+          text: "Number of Hosts: How many simulated physical servers to create. Each host will be allocated VMs automatically based on available resources and scheduling policies." 
         },
         { 
           icon: "Cpu", 
-          text: "PEs per Host: Specifies the number of Processing Elements (CPU cores) available on each host. Each PE has a defined capacity measured in MIPS (Million Instructions Per Second)." 
+          text: "PEs per Host: Number of CPU cores (Processing Elements) each server has. More cores allow a host to run more VMs simultaneously with better performance." 
         },
         { 
           icon: "Gauge", 
-          text: "PE MIPS: Sets the computing power of each Processing Element in Million Instructions Per Second. This determines how quickly a host can execute computational tasks." 
+          text: "PE MIPS: Computing speed of each CPU core in Million Instructions Per Second. Higher MIPS means tasks complete faster. Typical values: 1000-3000 MIPS." 
         },
         { 
           icon: "MemoryStick", 
-          text: "RAM per Host: Allocates memory (in MB) available on each physical host. This memory is shared among all VMs running on the host." 
+          text: "RAM per Host: Total memory in MB that each host provides to its VMs. VMs share this memory pool through the RamProvisionerSimple allocation policy." 
         },
         { 
           icon: "Network", 
-          text: "Bandwidth per Host: Defines the network bandwidth capacity (in Mbps) for each host. This affects data transfer rates between VMs and external networks." 
+          text: "Bandwidth per Host: Network capacity in Mbps for data transfers. Managed by BwProvisionerSimple to fairly distribute bandwidth among VMs on the host." 
         },
         { 
           icon: "Disc", 
-          text: "Storage per Host: Sets the storage capacity (in MB) available on each host. This storage is used for VM images and other persistent data." 
+          text: "Storage per Host: Disk space in MB available for VMs. Used for VM images and data storage. Each host provides this capacity to all its VMs." 
         }
       ]
     },
     vmConfig: {
       title: "Virtual Machine Configuration",
-      description: "Virtual Machines are the virtualized computing instances that will be deployed on your physical hosts. In CloudSim, VMs have specific resource requirements and can run cloudlets (computational tasks).",
+      description: "Virtual Machines are created on hosts and execute cloudlets (tasks). Each VM requests specific amounts of CPU, memory, storage, and bandwidth from its host. The system uses Xen virtualization model with time-shared cloudlet scheduling for realistic task execution.",
       icon: "HardDriveDownload",
       items: [
         { 
           icon: "HardDrive", 
-          text: "Number of VMs: Determines how many virtual machines will be created and deployed across hosts. VMs are allocated to hosts based on available resources." 
+          text: "Number of VMs: How many virtual machines to create. The system automatically assigns them to hosts using VmAllocationPolicySimple based on resource availability." 
         },
         { 
           icon: "Gauge", 
-          text: "VM MIPS: Sets the computing power (in MIPS) that each virtual machine can utilize. This determines the VM's processing capability for executing tasks." 
+          text: "VM MIPS: Processing speed each VM requests from its host. Should not exceed the host's PE MIPS capacity. Used to calculate task execution times." 
         },
         { 
           icon: "Cpu", 
-          text: "VM PEs: Defines the number of virtual Processing Elements (vCPUs) allocated to each VM. Each vCPU can process instructions concurrently." 
+          text: "VM PEs: How many CPU cores (vCPUs) each VM needs from its host. Must not exceed the host's available PEs for successful VM creation." 
         },
         { 
           icon: "MemoryStick", 
-          text: "VM RAM: Allocates memory (in MB) available to each virtual machine. This memory is dedicated to the VM and not shared with others." 
+          text: "VM RAM: Memory in MB that each VM requests from its host. Total VM memory on a host cannot exceed the host's available RAM." 
         },
         { 
           icon: "Network", 
-          text: "VM Bandwidth: Sets the network bandwidth (in Mbps) allocated to each virtual machine. This affects the VM's communication capabilities." 
+          text: "VM Bandwidth: Network capacity in Mbps each VM needs. Used for task data transfers and communication between VMs and the network." 
         },
         { 
           icon: "Database", 
-          text: "VM Size: Defines the storage space (in MB) allocated to each virtual machine. This storage is used for the VM's operating system and applications." 
+          text: "VM Size: Storage space in MB each VM requires. Used for the VM image and temporary task data during cloudlet execution." 
         }
       ]
     },

@@ -235,7 +235,10 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
             <div className="p-2 bg-[#319694]/10 rounded-lg mr-3">
               <Server className="text-[#319694]" size={20} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">Data Center Configuration</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Cloud Simulation Infrastructure</h3>
+              <p className="text-xs text-gray-600 mt-1">Configure hosts and VMs for EPSO/EACO load balancing evaluation</p>
+            </div>
           </div>
           
           {/* Host Configuration Panel */}

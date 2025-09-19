@@ -56,16 +56,19 @@ const WorkloadConfigCard = ({
         <div className="p-2 bg-[#319694]/10 rounded-lg">
           <Zap className="text-[#319694]" size={20} />
         </div>
-        <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-          Workload Configuration
-        </h3>
+        <div>
+          <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
+            Simulation Workload Setup
+          </h3>
+          <p className="text-xs text-gray-600 mt-1">Configure cloudlets (tasks) for algorithm evaluation using Google cluster traces</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div variants={itemVariants}>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             <Server size={18} className="text-[#319694]" />
-            Number of Cloudlets
+            Cloudlets (Tasks) to Schedule
           </label>
           <input
             type="number"
@@ -112,7 +115,8 @@ const WorkloadConfigCard = ({
         <motion.div variants={itemVariants}>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             <FileText size={18} className="text-[#319694]" />
-            Use Preset Workload
+            Research Benchmark Dataset
+            <span className="text-xs text-gray-500 font-normal">(Google cluster workload traces)</span>
           </label>
           <select
             className="w-full px-4 py-2 border border-[#319694]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#319694]/30 focus:border-[#319694]/50 transition-all appearance-none bg-white"

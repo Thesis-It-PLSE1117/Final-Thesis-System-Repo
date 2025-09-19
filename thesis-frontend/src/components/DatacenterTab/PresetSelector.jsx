@@ -27,26 +27,26 @@ const PresetSelector = ({
   const getPresetInfo = (presetKey) => {
     const presetData = {
       '1k-tasks': {
-        title: windowWidth < 768 ? '1K' : 'Small (1K)',
-        description: windowWidth < 500 ? 'Testing' : 'Initial testing',
+        title: windowWidth < 768 ? '1K' : 'Small Scale (1K)',
+        description: windowWidth < 500 ? 'Algorithm testing' : 'Basic algorithm validation',
         taskCount: '1,000',
         icon: '🔬'
       },
       '5k-tasks': {
-        title: windowWidth < 768 ? '5K' : 'Medium (5K)',
-        description: windowWidth < 500 ? 'Evaluation' : 'Workload evaluation',
+        title: windowWidth < 768 ? '5K' : 'Medium Scale (5K)',
+        description: windowWidth < 500 ? 'Performance eval' : 'Performance comparison',
         taskCount: '5,000',
         icon: '⚖️'
       },
       '10k-tasks': {
-        title: windowWidth < 768 ? '10K' : 'Large (10K)',
-        description: windowWidth < 500 ? 'Cloud workloads' : 'Cloud workloads',
+        title: windowWidth < 768 ? '10K' : 'Large Scale (10K)',
+        description: windowWidth < 500 ? 'Real-world sim' : 'Real-world simulation',
         taskCount: '10,000',
         icon: '🏢'
       },
       '20k-tasks': {
         title: windowWidth < 768 ? '20K' : 'Enterprise (20K)',
-        description: windowWidth < 500 ? 'Stress testing' : 'Stress testing',
+        description: windowWidth < 500 ? 'Stress analysis' : 'Scalability analysis',
         taskCount: '20,000',
         icon: '🌐'
       }
@@ -142,7 +142,7 @@ const PresetSelector = ({
                       key={presetKey}
                       className={`w-full p-2.5 text-left transition-colors duration-100 border-b border-gray-100 last:border-b-0 text-sm ${
                         selectedPreset === presetKey
-                          ? 'bg-blue-50 text-blue-800 border-blue-100'
+                          ? 'bg-[#319694]/10 text-[#319694] border-[#319694]/20'
                           : 'hover:bg-gray-50'
                       }`}
                       onClick={() => {
@@ -154,7 +154,7 @@ const PresetSelector = ({
                         <span className="text-base mr-2">{info.icon}</span>
                         <div className="font-medium truncate">{info.title}</div>
                       </div>
-                      <div className={`text-xs mt-0.5 ${selectedPreset === presetKey ? 'text-blue-600' : 'text-gray-600'} truncate`}>
+                      <div className={`text-xs mt-0.5 ${selectedPreset === presetKey ? 'text-[#267b79]' : 'text-gray-600'} truncate`}>
                         {info.description}
                       </div>
                     </button>
@@ -184,7 +184,7 @@ const PresetSelector = ({
         <motion.div
           className={`mb-4 rounded-xl p-4 border-2 shadow-sm ${
             selectedPreset
-              ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'
+              ? 'bg-gradient-to-br from-[#319694]/5 to-[#319694]/15 border-[#319694]/25'
               : 'bg-gradient-to-br from-[#319694]/10 to-[#319694]/20 border-[#319694]/30'
           }`}
           initial={{ opacity: 0, scale: 0.95 }}
@@ -193,29 +193,19 @@ const PresetSelector = ({
         >
           <div className="flex items-center mb-3">
             <div className={`p-2 rounded-lg mr-3 ${
-              selectedPreset ? 'bg-blue-100' : 'bg-[#319694]/20'
+              selectedPreset ? 'bg-[#319694]/15' : 'bg-[#319694]/20'
             }`}>
-              <Server className={`${
-                selectedPreset ? 'text-blue-600' : 'text-[#319694]'
-              }`} size={16} />
+              <Server className="text-[#319694]" size={16} />
             </div>
-            <h4 className={`text-sm font-bold ${
-              selectedPreset ? 'text-blue-800' : 'text-[#319694]'
-            }`}>
+            <h4 className="text-sm font-bold text-[#319694]">
               {selectedPreset ? `${getPresetInfo(selectedPreset).title} Active` : 'Default Active'}
             </h4>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {/* Infrastructure Column */}
-            <div className={`p-3 rounded-lg border ${
-              selectedPreset
-                ? 'bg-white/60 border-blue-200'
-                : 'bg-white/70 border-[#319694]/20'
-            }`}>
-              <div className={`flex items-center mb-2 ${
-                selectedPreset ? 'text-blue-700' : 'text-[#319694]'
-              }`}>
+            <div className="p-3 rounded-lg border bg-white/70 border-[#319694]/20">
+              <div className="flex items-center mb-2 text-[#319694]">
                 <Server size={14} className="mr-1.5" />
                 <span className="text-xs font-semibold">Infrastructure</span>
               </div>
@@ -230,18 +220,14 @@ const PresetSelector = ({
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">VMs:</span>
-                  <span className={`font-bold ${
-                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
-                  }`}>
+                  <span className="font-bold text-[#319694]">
                     {currentConfig.numVMs}
                   </span>
                 </div>
                 {windowWidth > 420 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Ratio:</span>
-                    <span className={`font-bold ${
-                      selectedPreset ? 'text-blue-800' : 'text-[#319694]'
-                    }`}>
+                    <span className="font-bold text-[#319694]">
                       {configSummary?.hostToVMRatio}:1
                     </span>
                   </div>
@@ -250,14 +236,8 @@ const PresetSelector = ({
             </div>
 
             {/* Resources Column */}
-            <div className={`p-3 rounded-lg border ${
-              selectedPreset
-                ? 'bg-white/60 border-blue-200'
-                : 'bg-white/70 border-[#319694]/20'
-            }`}>
-              <div className={`flex items-center mb-2 ${
-                selectedPreset ? 'text-blue-700' : 'text-[#319694]'
-              }`}>
+            <div className="p-3 rounded-lg border bg-white/70 border-[#319694]/20">
+              <div className="flex items-center mb-2 text-[#319694]">
                 <Settings size={14} className="mr-1.5" />
                 <span className="text-xs font-semibold">Resources</span>
               </div>
@@ -272,18 +252,14 @@ const PresetSelector = ({
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">RAM:</span>
-                  <span className={`font-bold ${
-                    selectedPreset ? 'text-blue-800' : 'text-[#319694]'
-                  }`}>
+                  <span className="font-bold text-[#319694]">
                     {configSummary?.totalRAM}G
                   </span>
                 </div>
                 {windowWidth > 420 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Storage:</span>
-                    <span className={`font-bold ${
-                      selectedPreset ? 'text-blue-800' : 'text-[#319694]'
-                    }`}>
+                    <span className="font-bold text-[#319694]">
                       {configSummary?.totalStorage}T
                     </span>
                   </div>

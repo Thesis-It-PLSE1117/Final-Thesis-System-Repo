@@ -91,16 +91,6 @@ const WorkloadTab = ({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex border-b border-[#319694]/20 mb-8">
-        <motion.button
-          className={`py-3 px-6 font-medium flex items-center gap-2 transition-all text-[#319694] border-b-2 border-[#319694]`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Upload size={18} />
-          Upload Workload
-        </motion.button>
-      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
