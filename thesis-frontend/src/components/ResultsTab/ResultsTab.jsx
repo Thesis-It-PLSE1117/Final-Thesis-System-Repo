@@ -74,7 +74,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       label: 'Visualizations',
       icon: <FiActivity className="w-4 h-4" />,
       description: matlabPlotsExpected ? 'MATLAB plots and charts' : 'MATLAB plots not available for this simulation',
-      enabled: true
+      enabled: matlabPlotsExpected
     },
     {
       id: 'logs',
@@ -92,7 +92,12 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && activeTab === 'metadata') {
       setActiveTab('analysis');
     }
-  }, [eacoResults, epsoResults]);
+    
+    // if in visualization, switch to analysis
+    if (activeTab === 'visualizations' && !matlabPlotsExpected) {
+      setActiveTab('analysis');
+    }
+  }, [eacoResults, epsoResults, activeTab, matlabPlotsExpected]);
 
   useEffect(() => {
     try {
