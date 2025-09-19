@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Settings, ChevronDown, Server, Cpu, Zap, Clock, Scale, Layers, TrendingUp, Award } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { RESEARCH_STATISTICS } from '../../constants/metricsConfig';
 
 const Particle = ({ x, y, size, delay }) => {
   return (
@@ -109,13 +110,25 @@ const HeroSection = ({ onStartSimulation }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <motion.div
-            className="px-6 py-3 bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 rounded-full text-[#319694] font-medium text-sm inline-flex items-center gap-2 border border-[#319694]/20"
-            whileHover={{ scale: 1.05 }}
-          >
-            <Award size={16} className="animate-pulse" />
-            Cloud Load Balancing Algorithm Comparison
-          </motion.div>
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+            <motion.div
+              className="px-6 py-3 bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 rounded-full text-[#319694] font-medium text-sm inline-flex items-center gap-2 border border-[#319694]/20"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Award size={16} className="animate-pulse" />
+              Cloud Load Balancing Algorithm Comparison
+            </motion.div>
+            <motion.div
+              className="px-6 py-3 bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 rounded-full text-[#319694] font-medium text-sm inline-flex items-center gap-2 border border-[#319694]/20"
+              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Server size={16} className="animate-pulse" />
+              Powered by CloudSim Framework
+            </motion.div>
+          </div>
         </motion.div>
         
         <motion.h1
@@ -148,10 +161,10 @@ const HeroSection = ({ onStartSimulation }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          <StatHighlight value="5" label="Metrics Compared" />
-          <StatHighlight value="5K+" label="Simulations Tested" />
-          <StatHighlight value="30" label="Test Runs" />
-          <StatHighlight value="95%" label="Statistical Confidence" />
+          <StatHighlight value={RESEARCH_STATISTICS.metricsCompared} label="Metrics Compared" />
+          <StatHighlight value={RESEARCH_STATISTICS.simulationsTested} label="Simulations Tested" />
+          <StatHighlight value={RESEARCH_STATISTICS.testRuns} label="Test Runs" />
+          <StatHighlight value={RESEARCH_STATISTICS.statisticalConfidence} label="Statistical Confidence" />
         </motion.div>
         
         <motion.div

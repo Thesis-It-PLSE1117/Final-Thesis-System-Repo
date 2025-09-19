@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { History, Search } from 'lucide-react';
 import { 
   getHistory, 
   clearHistory, 
@@ -244,10 +245,16 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       className="p-6"
     >
       {/* Header with Stats and Actions */}
-      <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-sm border border-[#319694]/15">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-col">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Simulation History</h2>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-[#319694]/10 rounded-lg">
+                <History className="text-[#319694]" size={20} />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Simulation History</h2>
+            </div>
+            <p className="text-xs text-gray-600 mb-2">Track and analyze EPSO/EACO algorithm performance over time</p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">{historyStats.simulationRuns || 0}</span> simulation runs • 
               <span className="font-medium text-[#319694] ml-1">{historyStats.totalEntries || 0}</span> total entries
@@ -325,8 +332,16 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       ) : (
         <>
           {/* Search and Filter Controls */}
-          <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Filter Simulations</h3>
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-sm border border-[#319694]/15">
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-1.5 bg-[#319694]/10 rounded-lg">
+                  <Search className="text-[#319694]" size={16} />
+                </div>
+                <h3 className="text-lg font-medium text-gray-800">Filter Simulations</h3>
+              </div>
+              <p className="text-xs text-gray-600">Search and filter your simulation history</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm text-gray-700 mb-2 font-medium">Search</label>
@@ -384,7 +399,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-[#319694]/15">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">Simulation Runs</h3>
                 <HistoryDropdown 
                   history={filteredHistory} 
@@ -395,7 +410,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </div>
             </div>
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl p-6 shadow-sm h-full">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm h-full border border-[#319694]/15">
                 <HistoryDetails 
                   result={selectedResult || filteredHistory[0]} 
                   onViewResults={onViewResults}

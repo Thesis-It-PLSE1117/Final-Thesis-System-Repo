@@ -1,6 +1,8 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Server, Cpu, Zap, Clock, Gauge, RefreshCw, BarChart3, TrendingUp, BookText, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { formatMetricValue, getMetricIcon, getMetricDisplayName, RESEARCH_STATISTICS } from '../../constants/metricsConfig';
 
 const DemoSection = ({ isPlaying, setIsPlaying }) => {
   // Real data from your JSON files
@@ -123,38 +125,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
     }
   };
 
-  const formatMetricValue = (metric, value) => {
-    switch(metric) {
-      case "makespan": return `${value.toFixed(1)}s`;
-      case "energyConsumption": return value.toFixed(3);
-      case "responseTime": return `${value.toFixed(1)}ms`;
-      case "resourceUtilization": return `${value.toFixed(1)}%`;
-      case "loadBalance": return value.toFixed(3);
-      default: return value;
-    }
-  };
-
-  const getMetricIcon = (metric) => {
-    switch(metric) {
-      case "makespan": return <Clock className="w-4 h-4" />;
-      case "energyConsumption": return <Zap className="w-4 h-4" />;
-      case "responseTime": return <Gauge className="w-4 h-4" />;
-      case "resourceUtilization": return <Server className="w-4 h-4" />;
-      case "loadBalance": return <BarChart3 className="w-4 h-4" />;
-      default: return <TrendingUp className="w-4 h-4" />;
-    }
-  };
-
-  const getMetricName = (metric) => {
-    switch(metric) {
-      case "makespan": return "Makespan";
-      case "energyConsumption": return "Energy";
-      case "responseTime": return "Response Time";
-      case "resourceUtilization": return "Utilization";
-      case "loadBalance": return "Load Balance";
-      default: return metric;
-    }
-  };
+  // Removed redundant formatting functions - now using shared utilities from metricsConfig
 
   return (
     <motion.section 
@@ -344,8 +315,8 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
                 whileHover={{ y: -3 }}
               >
                 <div className="flex items-center gap-2 text-[#319694] mb-2">
-                  {getMetricIcon(metric)}
-                  <span className="text-sm font-medium">{getMetricName(metric)}</span>
+                  {React.createElement(getMetricIcon(metric), { className: "w-4 h-4" })}
+                  <span className="text-sm font-medium">{getMetricDisplayName(metric)}</span>
                 </div>
                 <div className="flex justify-between items-end">
                   <div>
@@ -404,8 +375,8 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
               <div>
                 <h4 className="font-medium text-blue-800">Statistical Significance</h4>
                 <p className="text-sm text-blue-600 mt-1">
-                  Based on 30 simulation runs, EACO shows statistically significant improvements 
-                  (p &lt; 0.05) across all metrics with large effect sizes.
+                  Based on {RESEARCH_STATISTICS.testRuns} simulation runs, EACO shows statistically significant improvements 
+                  ({RESEARCH_STATISTICS.significanceLevel}) across all metrics with large effect sizes.
                 </p>
               </div>
             </div>
@@ -423,101 +394,6 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
           </motion.div>
         </div>
       </div>
-      <motion.div
-        className="max-w-6xl mx-auto mt-16 px-6"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-      >
-        <motion.div
-          className="p-8 bg-gradient-to-r from-[#e0f7f6] to-[#c4f1ef] rounded-2xl shadow-xl border-2 border-[#319694]/20 relative overflow-visible"
-        >
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 rounded-2xl" />
-          
-          <div className="relative z-10 text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-4 shadow-inner border border-[#319694]/20">
-              <TrendingUp className="w-5 h-5 text-[#319694]" />
-              <span className="text-sm font-semibold text-[#267b79]">Research Findings</span>
-            </div>
-            
-            <h4 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#319694] mb-4">
-              Objective Analysis
-            </h4>
-            <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">
-              Key observations from our comparative study of cloud load balancing algorithms.
-            </p>
-          </div>
-          
-    
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-20 mb-8">
-            <motion.div 
-              className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl border border-[#319694]/10 transition-all duration-300 hover:-translate-y-2"
-              whileHover={{ y: -4 }}
-            >
-              <div className="bg-gradient-to-br from-[#f0fdfa] to-[#e0f7f6] p-4 rounded-full mb-4 text-[#319694] w-fit shadow-inner">
-                <Cpu size={24} />
-              </div>
-              <h3 className="font-bold text-[#319694] mb-3 text-lg">EACO Algorithm</h3>
-              <ul className="text-sm text-gray-700 space-y-2">
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#319694] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Demonstrated stronger performance in load balancing</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#319694] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Showed improved resource utilization metrics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#319694] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Achieved better energy efficiency in most scenarios</span>
-                </li>
-              </ul>
-            </motion.div>
-            
-            <motion.div 
-              className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl border border-[#319694]/10 transition-all duration-300 hover:-translate-y-2"
-              whileHover={{ y: -4 }}
-            >
-              <div className="bg-gradient-to-br from-[#f0fdfa] to-[#e0f7f6] p-4 rounded-full mb-4 text-[#4fd1c5] w-fit shadow-inner">
-                <Zap size={24} />
-              </div>
-              <h3 className="font-bold text-[#4fd1c5] mb-3 text-lg">EPSO Algorithm</h3>
-              <ul className="text-sm text-gray-700 space-y-2">
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#4fd1c5] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Performed consistently across test conditions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#4fd1c5] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Showed competitive results in specific metrics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#4fd1c5] rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Provided stable performance baseline</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
-          
-          {/* Research context - styled like metrics description */}
-          <div className="relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-4 shadow-inner border border-[#319694]/20">
-              <BookText className="w-5 h-5 text-[#319694]" />
-              <span className="text-sm font-semibold text-[#267b79]">Research Context</span>
-            </div>
-            <p className="text-gray-700 text-base leading-relaxed max-w-3xl mx-auto">
-              These findings contribute to ongoing research in cloud load balancing optimization. 
-              Algorithm performance can vary based on specific workload characteristics and infrastructure configurations.
-            </p>
-          </div>
-          
-          {/* Decorative element */}
-          <div className="absolute top-4 right-4 text-[#319694]/20">
-            <Sparkles size={24} />
-          </div>
-        </motion.div>
-      </motion.div>
     </motion.section>
   );
 };

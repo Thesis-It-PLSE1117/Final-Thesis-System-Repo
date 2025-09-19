@@ -3,8 +3,16 @@ import { ChevronDown, ChevronRight, HardDriveUpload, HardDriveDownload } from 'l
 
 const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, toggleSection }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Visualization</h3>
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm p-5 border border-[#319694]/15">
+      <div className="flex items-center mb-4">
+        <div className="p-2 bg-[#319694]/10 rounded-lg mr-3">
+          <HardDriveUpload className="text-[#319694]" size={20} />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">Load Balancing Visualization</h3>
+          <p className="text-xs text-gray-600 mt-1">Preview task distribution across infrastructure</p>
+        </div>
+      </div>
       
       {/* Host-VM Distribution */}
       <div className="mb-6">
@@ -18,7 +26,10 @@ const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, tog
             <ChevronRight className="mr-2" size={20} />
           )}
           <HardDriveUpload className="mr-2" size={20} />
-          <span className="font-medium">Host-VM Distribution</span>
+          <div>
+            <span className="font-medium">Task-to-VM Assignment</span>
+            <p className="text-xs text-gray-500 mt-1">How cloudlets are distributed across virtual machines</p>
+          </div>
         </button>
         
         <AnimatePresence>
@@ -52,7 +63,10 @@ const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, tog
             <ChevronRight className="mr-2" size={20} />
           )}
           <HardDriveDownload className="mr-2" size={20} />
-          <span className="font-medium">Virtual Machines Preview</span>
+          <div>
+            <span className="font-medium">VM Resource Overview</span>
+            <p className="text-xs text-gray-500 mt-1">Individual VM specifications and capacity</p>
+          </div>
         </button>
         
         <AnimatePresence>

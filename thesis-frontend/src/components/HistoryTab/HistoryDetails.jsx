@@ -19,7 +19,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
 
   if (!result) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-[#319694]/15 p-8">
         <div className="text-center text-gray-500">
           <Database size={48} className="mx-auto mb-4 text-gray-300" />
           <p className="text-lg font-medium">No Simulation Selected</p>
@@ -151,17 +151,17 @@ const HistoryDetails = ({ result, onViewResults }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-100"
+      className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-[#319694]/15"
     >
       {/* Header */}
-      <div className="border-b border-gray-100 p-6">
+        <div className="border-b border-[#319694]/15 p-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
               <BarChart2 size={24} className="text-[#319694]" />
-              Simulation Details
+              Simulation Analysis
             </h3>
-            <p className="text-sm text-gray-600 mt-1">{result.algorithm} Algorithm Results</p>
+            <p className="text-sm text-gray-600 mt-1">{result.algorithm} algorithm performance metrics</p>
           </div>
           <div className="text-right text-sm text-gray-500">
             <div className="flex items-center gap-1">
@@ -174,7 +174,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
 
       <div className="p-6 space-y-6">
         {/* Performance Metrics - Collapsible Section */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-[#319694]/20 rounded-lg overflow-hidden">
           <button 
             className="w-full p-4 bg-gray-50 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
             onClick={() => toggleSection('performance')}
@@ -209,7 +209,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
         </div>
 
         {/* Configuration - Collapsible Section */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-[#319694]/20 rounded-lg overflow-hidden">
           <button 
             className="w-full p-4 bg-gray-50 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
             onClick={() => toggleSection('configuration')}
@@ -257,7 +257,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
 
         {/* Plot Analysis - Collapsible Section */}
         {result.plotAnalysis && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="border border-[#319694]/20 rounded-lg overflow-hidden">
             <button 
               className="w-full p-4 bg-gray-50 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
               onClick={() => toggleSection('visualization')}
@@ -321,7 +321,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
         
         {/* Statistical Analysis - Collapsible Section */}
         {statisticalSummary && statisticalSummary.length > 0 && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="border border-[#319694]/20 rounded-lg overflow-hidden">
             <button 
               className="w-full p-4 bg-gray-50 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
               onClick={() => toggleSection('statistical')}

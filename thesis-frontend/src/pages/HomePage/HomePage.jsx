@@ -57,57 +57,58 @@ const HomePage = () => {
   const walkthroughSteps = [
     {
       icon: <Settings className="w-8 h-8" />,
-      title: "Configure Data Center",
+      title: "Configure Datacenter",
       content: [
-        "Define your data center infrastructure specifications including hosts, VMs, and their capabilities.",
-        "Set up the initial configuration for your simulation environment."
+        "Set up your datacenter infrastructure with hosts and virtual machines.",
+        "Configure processing capabilities, memory, storage, and bandwidth specifications."
       ],
       list: [
-        "Number of physical hosts and their specifications",
-        "Virtual machine configurations (CPU, RAM, Storage)",
-        "Network bandwidth allocation",
-        "Power consumption parameters"
-      ]
-    },
-    {
-      icon: <Cpu className="w-8 h-8" />,
-      title: "Set Iteration Parameters",
-      content: [
-        "Configure the simulation runtime parameters to control the experiment duration and granularity.",
-        "Specify the number of iterations for consistent performance evaluation."
-      ],
-      list: [
-        "Number of simulation iterations",
-        "Workload intensity levels",
+        "Number of hosts and their MIPS capacity",
+        "Virtual machine configurations (MIPS, RAM, Bandwidth)",
+        "Host specifications (PEs, RAM, Storage)",
+        "Apply preset configurations or customize settings"
       ]
     },
     {
       icon: <Upload className="w-8 h-8" />,
-      title: "Define Workload",
+      title: "Load Workload Dataset",
       content: [
-        "Upload your workload with its traffic model or select from predefined templates.",
-        "Configure task characteristics and arrival patterns."
+        "Upload CSV files with task specifications or select from Google Cluster presets.",
+        "Configure task parameters and enable MATLAB visualization if needed."
       ],
       list: [
-        "Upload CSV with task specifications",
-        "Set task arrival distribution",
-        "Define computational requirements",
-        "Configure priority levels if needed"
+        "Upload custom CSV files with cloudlet specifications",
+        "Select from 30 Google Cluster subset presets",
+        "Configure cloudlet count and task parameters",
+        "Enable MATLAB plots for advanced visualization (optional, used more by the researchers)"
+      ]
+    },
+    {
+      icon: <Cpu className="w-8 h-8" />,
+      title: "Set Iterations & Run",
+      content: [
+        "Configure simulation iterations for statistical analysis.",
+        "Run EACO vs EPSO comparison with real-time animation."
+      ],
+      list: [
+        "Set iteration count (30+ recommended for t-tests)",
+        "Choose between EACO and EPSO algorithms",
+        "Watch real-time task scheduling animation",
+        "Monitor progress across multiple iterations"
       ]
     },
     {
       icon: <LineChart className="w-8 h-8" />,
-      title: "View Results",
+      title: "Analyze Results & History",
       content: [
-        "Analyze comprehensive performance metrics across all iterations.",
-        "Compare results and identify optimization opportunities."
+        "View detailed performance analysis with statistical comparisons.",
+        "Access saved simulation history and export results."
       ],
       list: [
-        "Resource utilization across hosts",
-        "Average task response time",
-        "Energy efficiency metrics",
-        "Makespan (total completion time)",
-        "Degree of imbalance in load distribution"
+        "Metadata, analysis, visualizations, and execution logs",
+        "Paired t-test statistical significance results",
+        "MATLAB-generated performance plots and charts",
+        "Browse simulation history and export capabilities"
       ]
     }
   ];

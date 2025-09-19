@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import HistoryCard from './HistoryCard';
-import { Info } from 'lucide-react';
+import { Info, BarChart3 } from 'lucide-react';
 
 const HistoryDropdown = ({ history, onSelect, selectedId }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,10 +23,15 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
   return (
     <div className="relative">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-sm font-medium text-gray-700">Result History</h3>
+        <div className="flex items-center gap-2">
+          <div className="p-1 bg-[#319694]/10 rounded">
+            <BarChart3 className="text-[#319694]" size={14} />
+          </div>
+          <h3 className="text-sm font-medium text-gray-700">Simulation Results</h3>
+        </div>
         <button 
           onClick={() => setShowLegend(!showLegend)}
-          className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          className="text-xs text-[#319694] hover:text-[#267b79] flex items-center gap-1"
         >
           <Info size={14} />
           {showLegend ? 'Hide Legend' : 'Show Legend'}
@@ -35,7 +40,7 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
       
       {/* Legend */}
       {showLegend && (
-        <div className="mb-3 p-3 bg-blue-50 rounded-lg text-xs text-gray-600">
+        <div className="mb-3 p-3 bg-[#319694]/10 rounded-lg text-xs text-gray-600">
           <div className="font-medium mb-1 flex items-center gap-1">
             <Info size={14} />
             Analysis Indicators:
