@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import './App.css';
 import { NotificationManager } from './components/common/ErrorNotification';
+import { useBackendHealth } from './hooks/useBackendHealth';
 
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
@@ -11,6 +12,8 @@ const preloadComponents = () => {
 };
 
 function App() {
+  useBackendHealth();
+  
   useEffect(() => {
     const timer = setTimeout(preloadComponents, 100);
     return () => clearTimeout(timer);
