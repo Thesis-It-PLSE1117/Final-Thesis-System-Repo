@@ -417,9 +417,11 @@ const SimulationPage = ({ onBack }) => {
         title={confirmDialog.title}
         message={confirmDialog.message}
         type={confirmDialog.type}
-        confirmText="Continue"
+        confirmText={confirmDialog.confirmText || "Continue"}
         cancelText="Cancel"
-      />
+      >
+        {confirmDialog.children}
+      </ConfirmationDialog>
       
       {isSaving && (
         <div className="fixed bottom-4 left-4 bg-white shadow-lg px-4 py-2 rounded-lg">
