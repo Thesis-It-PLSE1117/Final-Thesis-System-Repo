@@ -7,12 +7,16 @@ const IterationBadge = ({ iterationData }) => {
   }
 
   const formatTime = (ms) => {
+    if (!ms || ms === 0) return 'N/A';
     const seconds = Math.floor(ms / 1000);
     if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
   };
+  
+  const successRate = iterationData.successRate ?? 100; 
+  const totalExecutionTime = iterationData.totalExecutionTime ?? 0;
 
   return (
     <motion.div
@@ -39,14 +43,14 @@ const IterationBadge = ({ iterationData }) => {
           <div className="flex items-center gap-2">
             <CheckCircle className="text-green-600" size={16} />
             <span className="text-gray-700">
-              <span className="font-semibold">{iterationData.successRate?.toFixed(1)}%</span> Success Rate
+              <span className="font-semibold">{successRate.toFixed(1)}%</span> Success Rate
             </span>
           </div>
           
           <div className="flex items-center gap-2">
             <Clock className="text-blue-600" size={16} />
             <span className="text-gray-700">
-              <span className="font-semibold">{formatTime(iterationData.totalExecutionTime)}</span> Simulation Runtime
+              <span className="font-semibold">{formatTime(totalExecutionTime)}</span> Simulation Runtime
             </span>
           </div>
         </div>

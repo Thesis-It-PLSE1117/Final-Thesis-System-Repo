@@ -24,7 +24,7 @@ const CloudLoadingModal = ({
   const isMultipleIterations = iterations > 1;
   const effectiveTaskCount = totalTasks || numCloudlets;
   
-  const actualCurrentIteration = currentIteration || (isMultipleIterations ? Math.max(1, Math.ceil((progress / 100) * iterations)) : 1);
+  const actualCurrentIteration = currentIteration || (isMultipleIterations ? 1 : 1);
   const displayStage = iterationStage || (currentIteration ? 'Processing...' : null);
   
   React.useEffect(() => {

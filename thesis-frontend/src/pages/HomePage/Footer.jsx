@@ -30,12 +30,14 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
+          viewport={{ once: true }}
         >
           <div className="flex items-center gap-2 mb-4">
             <Cloud className="w-8 h-8" />
@@ -52,6 +54,7 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + i * 0.1 }}
+            viewport={{ once: true }}
           >
             <h5 className="font-semibold mb-4">{column.title}</h5>
             <ul className="space-y-2">
@@ -78,6 +81,7 @@ const Footer = ({ footerLinks, onOpenAboutUs }) => {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
+        viewport={{ once: true }}
       >
         <p className="text-white/70 text-sm">
           &copy; {new Date().getFullYear()} Cloud Load Balancer Simulator. All rights reserved.

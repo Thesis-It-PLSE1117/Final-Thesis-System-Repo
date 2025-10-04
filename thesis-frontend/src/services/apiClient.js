@@ -263,14 +263,6 @@ export const runWithPlots = async (algorithm, config, abortSignal = null) => {
   
   const result = await response.json();
   
-  // Log the raw response from backend
-  console.log('Backend Response (runWithPlots):', {
-    result,
-    plotData: result.plotData,
-    plotMetadata: result.plotMetadata,
-    rawResults: result.rawResults
-  });
-
   return result;
 };
 
@@ -283,7 +275,7 @@ export const runWithPlotsAsync = async (algorithm, config, abortSignal = null) =
     optimizationAlgorithm: algorithm
   };
   
-  console.log('Starting async simulation for algorithm:', algorithm, 'with config:', algorithmConfig);
+  // Starting async simulation
   
   const fetchOptions = {
     method: 'POST',
@@ -305,11 +297,6 @@ export const runWithPlotsAsync = async (algorithm, config, abortSignal = null) =
   }
   
   const result = await response.json();
-  console.log('Async Simulation Started:', {
-    trackingId: result.trackingId,
-    status: result.status,
-    result
-  });
   
   return result;
 };
@@ -326,12 +313,6 @@ export const getPlotStatus = async (trackingId) => {
   }
   
   const status = await response.json();
-  console.log('Plot Generation Status:', {
-    trackingId,
-    status,
-    isComplete: status.isComplete,
-    progress: status.progress
-  });
   
   return status;
 };
@@ -389,14 +370,14 @@ const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
       keepAliveInterval = setInterval(() => {
         fetch(`${API_BASE}/api/health`, { method: 'GET' }).catch(() => {
         });
-        console.log(`[${new Date().toLocaleTimeString()}] Keep-alive ping sent to prevent timeout`);
+        // Keep-alive ping sent
       }, 600000); // 10 minutes
     }
     
     // Show warning after 5 minutes
     const warningTimeout = setTimeout(() => {
       timeoutWarningShown = true;
-      console.warn('Simulation is taking longer than expected. Large simulations can take 30+ minutes. Please keep this tab open.');
+      // Simulation taking longer than expected
     }, 300000); // 5 minutes
     
     try {
@@ -404,7 +385,7 @@ const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
       clearTimeout(warningTimeout);
       if (keepAliveInterval) {
         clearInterval(keepAliveInterval);
-        console.log('Keep-alive pings stopped - request completed');
+        // Keep-alive pings stopped
       }
       resolve(response);
     } catch (error) {
