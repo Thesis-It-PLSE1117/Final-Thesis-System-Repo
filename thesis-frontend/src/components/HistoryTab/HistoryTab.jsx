@@ -254,13 +254,13 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </div>
               <h2 className="text-xl font-semibold text-gray-800">Simulation History</h2>
             </div>
-            <p className="text-xs text-gray-600 mb-2">Track and analyze EPSO/EACO algorithm performance over time</p>
+            <p className="text-sm text-gray-600 mb-2">Track and analyze EPSO/EACO algorithm performance over time</p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">{historyStats.simulationRuns || 0}</span> simulation runs • 
               <span className="font-medium text-[#319694] ml-1">{historyStats.totalEntries || 0}</span> total entries
             </div>
             {historyStats.totalEntries > 0 && (
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-sm text-gray-500 mt-1">
                 Storage: {historyStats.totalEntries}/{historyStats.maxEntries} entries
               </div>
             )}
@@ -340,7 +340,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-800">Filter Simulations</h3>
               </div>
-              <p className="text-xs text-gray-600">Search and filter your simulation history</p>
+              <p className="text-sm text-gray-600">Search and filter your simulation history</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
