@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Repeat, Info, TrendingUp, BarChart3, Circle } from 'lucide-react';
+import { Repeat, Info, TrendingUp, BarChart3, Circle, Zap, FlaskConical, GraduationCap, CheckCircle2 } from 'lucide-react';
 
 const IterationTab = ({ config, onChange }) => {
   const handleIterationChange = (value) => {
@@ -31,6 +31,52 @@ const IterationTab = ({ config, onChange }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Number of Iterations
             </label>
+            
+            {/* Quick Select Presets */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleIterationChange(1)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  (config.iterations || 1) === 1
+                    ? 'bg-[#319694] text-white shadow-md'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5'
+                }`}
+              >
+                <Zap size={14} />
+                <span>Single (1)</span>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleIterationChange(30)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  (config.iterations || 1) === 30
+                    ? 'bg-[#319694] text-white shadow-md'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5'
+                }`}
+              >
+                <FlaskConical size={14} />
+                <span>Testing (30)</span>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleIterationChange(50)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  (config.iterations || 1) === 50
+                    ? 'bg-[#319694] text-white shadow-md'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5'
+                }`}
+              >
+                <GraduationCap size={14} />
+                <span>Research (50)</span>
+              </motion.button>
+            </div>
+            
             <input
               type="number"
               min="1"
@@ -46,10 +92,22 @@ const IterationTab = ({ config, onChange }) => {
           </div>
 
           <div className="flex items-center">
-            <div className="bg-[#f0fdf4] border border-[#86efac] rounded-lg p-4 w-full">
-              <p className="text-xs text-[#15803d]">
-                {(config.iterations || 30) > 1 ? 'Multiple iterations enabled' : 'Single iteration'}
-              </p>
+            <div className="bg-[#319694]/5 border border-[#319694]/20 rounded-lg p-4 w-full">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="text-[#319694]" size={16} />
+                <div>
+                  <p className="text-sm font-medium text-gray-800">
+                    {(config.iterations || 30) > 1 ? 'Multiple Iterations' : 'Single Iteration'}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    {(config.iterations || 30) === 1 
+                      ? 'Quick test mode' 
+                      : (config.iterations || 30) >= 30 
+                        ? 'Statistical analysis enabled' 
+                        : `${config.iterations} runs configured`}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
