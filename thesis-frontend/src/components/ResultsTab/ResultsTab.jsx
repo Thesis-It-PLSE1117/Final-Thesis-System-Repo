@@ -744,30 +744,34 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 px-6">
-        <nav className="flex space-x-8" aria-label="Tabs">
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6">
+        <nav 
+          className="flex overflow-x-auto no-scrollbar sm:overflow-visible sm:space-x-8"
+          aria-label="Tabs"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => tab.enabled && setActiveTab(tab.id)}
               disabled={!tab.enabled}
-                             className={`
-                 group relative py-4 px-1 flex items-center gap-2 text-sm font-medium border-b-2 transition-colors
-                 ${!tab.enabled 
-                   ? 'border-transparent text-gray-300 cursor-not-allowed'
-                   : activeTab === tab.id
-                     ? 'border-[#319694] text-[#319694]'
-                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                 }
-               `}
+              className={`
+                group relative flex-shrink-0 py-3 px-2 sm:py-4 sm:px-1 flex items-center gap-1 sm:gap-2 
+                text-xs sm:text-sm font-medium border-b-2 transition-colors
+                ${!tab.enabled 
+                  ? 'border-transparent text-gray-300 cursor-not-allowed'
+                  : activeTab === tab.id
+                    ? 'border-[#319694] text-[#319694]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }
+              `}
             >
               <div className={!tab.enabled ? 'opacity-50' : ''}>
                 {tab.icon}
               </div>
-              <span className={!tab.enabled ? 'opacity-50' : ''}>{tab.label}</span>
-              
+              <span className={`truncate ${!tab.enabled ? 'opacity-50' : ''}`}>
+                {tab.label}
+              </span>
 
-              
               {/* Badge for T-Test Results on Analysis Tab */}
               {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
                 <span className="absolute -top-1 -right-2 flex h-3 w-3">
@@ -775,9 +779,9 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-[#319694]"></span>
                 </span>
               )}
-              
-              {/* Tooltip on hover */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+
+              {/* Tooltip on hover (hidden on mobile) */}
+              <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                 {tab.description}
                 {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
                   <span className="block text-[#319694] font-medium mt-1">T-Test results available</span>
@@ -787,6 +791,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           ))}
         </nav>
       </div>
+
 
       {/* Tab Content */}
       <div className="flex-grow overflow-y-auto p-6">

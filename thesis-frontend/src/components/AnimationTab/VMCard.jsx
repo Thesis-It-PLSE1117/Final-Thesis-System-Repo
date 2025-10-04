@@ -6,7 +6,7 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
 
   return (
     <div 
-      className={`p-4 rounded-lg shadow-sm border transition-all duration-300 ${
+      className={`p-2 sm:p-3 rounded-lg shadow-sm border transition-all duration-300 ${
         isActive 
           ? status === 'Overloaded' 
             ? 'bg-red-50 border-red-200' 
@@ -18,27 +18,34 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
           : 'bg-gray-50 border-gray-200'
       }`}
       style={{
-        transform: isActive ? 'scale(1.02)' : 'scale(1)',
+        transform: isActive ? 'scale(1.01)' : 'scale(1)',
       }}
     >
-      <div className="flex items-center mb-2">
-        <HardDrive className={`${isActive ? 'text-gray-800' : 'text-gray-500'} mr-2`} size={18} />
-        <h4 className={`font-semibold ${isActive ? 'text-gray-800' : 'text-gray-700'}`}>
-          VM {vmId + 1}
-        </h4>
-        <span className={`ml-auto text-xs px-2 py-1 rounded-full ${getStatusColor(status)}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center min-w-0 flex-1">
+          <HardDrive className={`${isActive ? 'text-gray-800' : 'text-gray-500'} mr-1.5 flex-shrink-0`} size={16} />
+          <h4 className={`font-semibold text-sm sm:text-base ${isActive ? 'text-gray-800' : 'text-gray-700'} truncate`}>
+            VM {vmId + 1}
+          </h4>
+        </div>
+        <span className={`text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap ml-2 ${getStatusColor(status)}`}>
           {status}
         </span>
       </div>
 
+      {/* CPU Load Bar */}
       <div className="mb-2">
         <div className="flex justify-between text-xs text-gray-600 mb-1">
-          <span>CPU Load</span>
-          <span>{cpuPercentage.toFixed(1)}% ({(cpuLoad * vmCapacity).toFixed(1)}/{vmCapacity})</span>
+          <span className="truncate">CPU</span>
+          <span className="ml-1 whitespace-nowrap">
+            {cpuPercentage.toFixed(0)}%
+            <span className="hidden sm:inline"> ({(cpuLoad * vmCapacity).toFixed(0)}/{vmCapacity})</span>
+          </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 rounded-full h-1.5">
           <div 
-            className={`h-2 rounded-full ${
+            className={`h-1.5 rounded-full transition-all duration-300 ${
               cpuPercentage > 90 ? 'bg-red-500' :
               cpuPercentage > 70 ? 'bg-yellow-500' : 
               cpuPercentage > 40 ? 'bg-orange-500' : 'bg-green-500'
@@ -48,19 +55,49 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <InfoRow icon={<Cpu size={16} />} text={`${taskCount} tasks`} />
-        <InfoRow icon={<MemoryStick size={16} />} text={`${dataCenterConfig.vmRam} MB`} />
-        <InfoRow icon={<Database size={16} />} text={`${dataCenterConfig.vmSize} MB`} />
-        <InfoRow icon={<Network size={16} />} text={`${dataCenterConfig.vmBw} MBps`} />
+      {/* Info Grid */}
+      <div className="grid grid-cols-2 gap-1 sm:gap-2">
+        <InfoRow 
+          icon={<Cpu size={14} />} 
+          text={`${taskCount}`}
+          label="tasks"
+          mobile
+        />
+        <InfoRow 
+          icon={<MemoryStick size={14} />} 
+          text={`${dataCenterConfig.vmRam}`}
+          label="MB"
+          mobile
+        />
+        <InfoRow 
+          icon={<Database size={14} />} 
+          text={`${dataCenterConfig.vmSize}`}
+          label="MB"
+          mobile
+        />
+        <InfoRow 
+          icon={<Network size={14} />} 
+          text={`${dataCenterConfig.vmBw}`}
+          label="MBps"
+          mobile
+        />
       </div>
     </div>
   );
 };
 
-const InfoRow = ({ icon, text }) => (
-  <div className="flex items-center text-sm text-gray-600">
-    <span className="text-gray-500 mr-1">{icon}</span>{text}
+const InfoRow = ({ icon, text, label, mobile }) => (
+  <div className="flex items-center text-xs sm:text-sm text-gray-600 min-w-0">
+    <span className="text-gray-500 mr-1 flex-shrink-0">{icon}</span>
+    <span className="truncate">
+      {text}
+      {mobile && (
+        <>
+          <span className="hidden sm:inline"> {label}</span>
+          <span className="sm:hidden">{label.charAt(0)}</span>
+        </>
+      )}
+    </span>
   </div>
 );
 

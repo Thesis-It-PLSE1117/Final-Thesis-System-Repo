@@ -18,6 +18,12 @@
 
 <h1></h1>
 
+#Visit in Railway:
+```bash
+server: https://researchsim-production.up.railway.app/
+client: https://final-thesis-system-repo-production.up.railway.app/
+```
+
 ## About
 
 A modern web interface for the Cloud Load Balancer Simulator, built with React + Vite. It lets you configure data centers and workloads, run EPSO/EACO simulations via the backend, and visualize results with interactive charts and animations.
