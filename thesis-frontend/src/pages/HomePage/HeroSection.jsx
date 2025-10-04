@@ -3,6 +3,16 @@ import { motion } from 'framer-motion';
 import { Play, Settings, ChevronDown, Server, Cpu, Zap, Clock, Scale, Layers, TrendingUp, Award } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { RESEARCH_STATISTICS } from '../../constants/metricsConfig.js';
+import {
+  SPACING_SCALE,
+  TYPOGRAPHY_SCALE,
+  COLOR_SYSTEM,
+  ANIMATION_TIMING,
+  SHADOW_SCALE,
+  BORDER_RADIUS,
+  INTERACTION_STATES,
+  VIEWPORT_CONFIG
+} from '../../constants/designSystem.js';
 
 const Particle = ({ x, y, size, delay }) => {
   return (
@@ -32,11 +42,11 @@ const Particle = ({ x, y, size, delay }) => {
 
 const StatHighlight = ({ value, label, trend, isPositive = true }) => {
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-white/20">
-      <div className="text-2xl font-bold text-[#319694] mb-1">{value}</div>
-      <div className="text-sm text-gray-600">{label}</div>
+    <div className={`bg-white/80 backdrop-blur-sm ${BORDER_RADIUS.default} ${SPACING_SCALE.padding.md} ${SHADOW_SCALE.medium} ${COLOR_SYSTEM.borders.light}`}>
+      <div className={`text-2xl ${TYPOGRAPHY_SCALE.weights.bold} ${COLOR_SYSTEM.text.secondary} mb-1`}>{value}</div>
+      <div className={`text-sm ${TYPOGRAPHY_SCALE.weights.medium} ${COLOR_SYSTEM.text.muted}`}>{label}</div>
       {trend && (
-        <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-amber-600'} font-medium mt-1`}>
+        <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-amber-600'} ${TYPOGRAPHY_SCALE.weights.medium} mt-1`}>
           {trend}
         </div>
       )}
@@ -60,11 +70,10 @@ const HeroSection = ({ onStartSimulation }) => {
 
   return (
     <motion.main
-      className="flex-grow flex flex-col justify-center items-center text-center px-6 pt-28 pb-16 md:pt-32 md:pb-24 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100"
+      className={`flex-grow flex flex-col justify-center items-center text-center ${SPACING_SCALE.section.horizontal} ${SPACING_SCALE.section.vertical} relative overflow-hidden ${COLOR_SYSTEM.backgrounds.gradient.hero}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      style={{ marginTop: '-80px', paddingTop: 'calc(80px + 2rem)' }}
+      transition={{ duration: ANIMATION_TIMING.durations.slow / 1000 }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {particles.map((particle) => (
@@ -105,25 +114,25 @@ const HeroSection = ({ onStartSimulation }) => {
 
       <div className="max-w-7xl relative z-10 w-full">
         <motion.div
-          className="inline-block mb-6"
+          className={`inline-block ${SPACING_SCALE.margin.lg}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: ANIMATION_TIMING.delays.long }}
         >
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+          <div className={`flex flex-col sm:flex-row ${SPACING_SCALE.gap.sm} items-center justify-center`}>
             <motion.div
-              className="px-6 py-3 bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 rounded-full text-[#319694] font-medium text-sm inline-flex items-center gap-2 border border-[#319694]/20"
-              whileHover={{ scale: 1.05 }}
+              className={`${SPACING_SCALE.padding.button.md} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-sm inline-flex items-center gap-2 ${COLOR_SYSTEM.borders.primary}`}
+              whileHover={INTERACTION_STATES.scale.hover}
             >
               <Award size={16} className="animate-pulse" />
               Cloud Load Balancing Algorithm Comparison
             </motion.div>
             <motion.div
-              className="px-6 py-3 bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 rounded-full text-[#319694] font-medium text-sm inline-flex items-center gap-2 border border-[#319694]/20"
-              whileHover={{ scale: 1.05 }}
+              className={`${SPACING_SCALE.padding.button.md} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-sm inline-flex items-center gap-2 ${COLOR_SYSTEM.borders.primary}`}
+              whileHover={INTERACTION_STATES.scale.hover}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: ANIMATION_TIMING.delays.long }}
             >
               <Server size={16} className="animate-pulse" />
               Powered by CloudSim Framework
@@ -132,23 +141,23 @@ const HeroSection = ({ onStartSimulation }) => {
         </motion.div>
         
         <motion.h1
-          className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+          className={`${TYPOGRAPHY_SCALE.desktop.h1} ${COLOR_SYSTEM.text.dark} ${SPACING_SCALE.margin.lg}`}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
+          transition={{ delay: ANIMATION_TIMING.delays.long, duration: ANIMATION_TIMING.durations.slow / 1000 }}
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
             COMPARING CLOUD LOAD BALANCING ALGORITHMS
           </span>
           <br />
-          <span className="text-3xl md:text-4xl text-gray-700">EACO vs EPSO Performance Analysis</span>
+          <span className={`${TYPOGRAPHY_SCALE.desktop.h2} ${COLOR_SYSTEM.text.body}`}>EACO vs EPSO Performance Analysis</span>
         </motion.h1>
         
         <motion.p
-          className="text-lg md:text-xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed"
+          className={`${TYPOGRAPHY_SCALE.desktop.bodyLarge} ${COLOR_SYSTEM.text.body} ${SPACING_SCALE.margin.md} max-w-4xl mx-auto`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+          transition={{ delay: ANIMATION_TIMING.delays.extraLong, duration: ANIMATION_TIMING.durations.slow / 1000 }}
         >
           Research-focused comparison of <span className="font-semibold text-[#319694]">Enhanced ACO vs Enhanced PSO</span> algorithms for 
           <span className="font-semibold text-[#4fd1c5]">virtual machine task scheduling</span> with statistical validation
@@ -156,10 +165,10 @@ const HeroSection = ({ onStartSimulation }) => {
 
         {/* Key Statistics */}
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto"
+          className={`grid grid-cols-2 md:grid-cols-4 ${SPACING_SCALE.gap.lg} ${SPACING_SCALE.margin.xl} max-w-4xl mx-auto`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: ANIMATION_TIMING.delays.extraLong + ANIMATION_TIMING.delays.short }}
         >
           <StatHighlight value={RESEARCH_STATISTICS.metricsCompared} label="Metrics Compared" />
           <StatHighlight value={RESEARCH_STATISTICS.simulationsTested} label="Simulations Tested" />
@@ -168,19 +177,19 @@ const HeroSection = ({ onStartSimulation }) => {
         </motion.div>
         
         <motion.div
-          className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
+          className={`flex flex-col sm:flex-row ${SPACING_SCALE.gap.lg} justify-center mb-16`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: ANIMATION_TIMING.delays.extraLong + ANIMATION_TIMING.delays.medium }}
         >
           <motion.button
             onClick={onStartSimulation}
-            className="flex items-center justify-center gap-3 bg-gradient-to-r from-[#319694] to-[#4fd1c5] text-white px-8 py-4 rounded-xl text-lg font-medium shadow-xl hover:shadow-2xl transition-all"
+            className={`flex items-center justify-center ${SPACING_SCALE.gap.sm} ${COLOR_SYSTEM.backgrounds.gradient.primary} ${COLOR_SYSTEM.text.white} ${SPACING_SCALE.padding.button.lg} ${BORDER_RADIUS.default} text-lg ${TYPOGRAPHY_SCALE.weights.medium} ${SHADOW_SCALE.xl} ${SHADOW_SCALE.hover.xl} transition-all`}
             whileHover={{ 
-              scale: 1.05,
-              boxShadow: "0 20px 40px -10px rgba(49, 150, 148, 0.4)"
+              ...INTERACTION_STATES.scale.hover,
+              boxShadow: INTERACTION_STATES.boxShadow.primary
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={INTERACTION_STATES.scale.tap}
           >
             <span>Start Simulation</span>
             <Play className="w-5 h-5" />
@@ -188,12 +197,12 @@ const HeroSection = ({ onStartSimulation }) => {
           
           <motion.button
             onClick={() => document.getElementById('walkthrough').scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center justify-center gap-3 bg-white text-[#267b79] px-8 py-4 rounded-xl text-lg font-medium shadow-lg hover:shadow-xl transition-all border-2 border-[#267b79]/20"
+            className={`flex items-center justify-center ${SPACING_SCALE.gap.sm} ${COLOR_SYSTEM.backgrounds.solid.white} ${COLOR_SYSTEM.text.primary} ${SPACING_SCALE.padding.button.lg} ${BORDER_RADIUS.default} text-lg ${TYPOGRAPHY_SCALE.weights.medium} ${SHADOW_SCALE.large} ${SHADOW_SCALE.hover.xl} transition-all ${COLOR_SYSTEM.borders.primaryStrong}`}
             whileHover={{ 
-              scale: 1.05,
-              boxShadow: "0 20px 40px -10px rgba(49, 150, 148, 0.2)"
+              ...INTERACTION_STATES.scale.hover,
+              boxShadow: INTERACTION_STATES.boxShadow.secondary
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={INTERACTION_STATES.scale.tap}
           >
             <span>Simulation Guide</span>
             <Settings className="w-5 h-5" />

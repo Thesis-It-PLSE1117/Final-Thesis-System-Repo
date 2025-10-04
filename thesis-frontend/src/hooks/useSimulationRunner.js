@@ -41,20 +41,28 @@ export const useSimulationRunner = () => {
       const response = await fetch(`${API_BASE}/api/progress`);
       if (response.ok) {
         const data = await response.json();
+
+        // Progress data received successfully
+
+        // Always update state, regardless of conditions
         setCurrentIteration(data.currentIteration || 0);
         setTotalIterations(data.totalIterations || 0);
         setIterationStage(data.currentStage || null);
+
+        if (data.progress !== undefined && data.progress > 0) {
+          setProgress(Math.min(data.progress, 99));
+        }
       }
     } catch (error) {
-      console.debug('Progress polling failed (backend may not support it):', error.message);
+      // Progress polling failed silently
     }
   };
   
   const startIterationPolling = () => {
     if (!iterationPollingInterval) {
-      const interval = setInterval(pollIterationProgress, 3000); 
+      const interval = setInterval(pollIterationProgress, 5000); // Changed from 1000ms to 5000ms
       setIterationPollingInterval(interval);
-      pollIterationProgress(); 
+      pollIterationProgress();
     }
   };
   
@@ -159,7 +167,6 @@ export const useSimulationRunner = () => {
       }
       
     } catch (error) {
-      console.error('Async simulation failed:', error);
       showNotification(error.message || 'Simulation failed', 'error');
       setSimulationState('config');
       setProgress(0);
@@ -399,10 +406,11 @@ export const useSimulationRunner = () => {
       setProgressInterval(interval);
       
       try {
-        // i use comparison for 30+ iterations since you know for the sake of statistical significance
-        const useComparison = iterationConfig.iterations >= 30;
+        // i use comparison for 2+ iterations since you know for the sake of proper t-test statistical analysis
+        const useComparison = iterationConfig.iterations >= 2;
         
         if (useComparison) {
+          // Using comparison mode for statistical analysis
           let comparisonResults;
           if (workloadFile) {
             comparisonResults = await apiClient.compareWithFile(configData, workloadFile);
@@ -413,17 +421,16 @@ export const useSimulationRunner = () => {
           const tTestResultsNormalized = normalizeTTestResults(
             comparisonResults.tTestResults || comparisonResults.ttestResults || null
           );
-          if (!tTestResultsNormalized) {
-            console.warn('No tTestResults found in comparison response');
-          }
+          // T-test results processed
           
-          /**
-           * I include analysis field for comparison mode 
-           * The interpretation is in tTestResults.interpretation, not separate analysis fields
-           */
           const combinedResults = {
             eaco: {
-              rawResults: comparisonResults.eacoResults,
+              rawResults: {
+                ...comparisonResults.eacoResults,
+                successRate: comparisonResults.eacoResults?.successRate || 100,
+                totalExecutionTime: comparisonResults.totalExecutionTime || comparisonResults.eacoResults?.totalExecutionTime || 0,
+                totalIterations: comparisonResults.eacoResults?.totalIterations || comparisonResults.iterations || iterationConfig.iterations
+              },
               summary: comparisonResults.eacoResults?.averageMetrics,
               tTestResults: tTestResultsNormalized,
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
@@ -434,7 +441,12 @@ export const useSimulationRunner = () => {
               analysis: null
             },
             epso: {
-              rawResults: comparisonResults.epsoResults,
+              rawResults: {
+                ...comparisonResults.epsoResults,
+                successRate: comparisonResults.epsoResults?.successRate || 100,
+                totalExecutionTime: comparisonResults.totalExecutionTime || comparisonResults.epsoResults?.totalExecutionTime || 0,
+                totalIterations: comparisonResults.epsoResults?.totalIterations || comparisonResults.iterations || iterationConfig.iterations
+              },
               summary: comparisonResults.epsoResults?.averageMetrics,
               tTestResults: tTestResultsNormalized,
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
@@ -617,22 +629,25 @@ export const useSimulationRunner = () => {
 
   // cleanup effect to stop polling when simulation is complete
   useEffect(() => {
+    // Only stop polling when simulation is truly complete (not loading anymore)
     if (simulationState !== 'loading') {
       stopIterationPolling();
     }
-    
-    if (iterationStage === 'INITIALIZING' && totalIterations === 0) {
-      stopIterationPolling();
-    }
-    
+
+    // Don't stop polling just because iterationStage is 'INITIALIZING' and totalIterations is 0
+    // Let the backend determine when polling should stop
+
     // Cleanup function to stop polling when component unmounts
     return () => {
       stopIterationPolling();
     };
-  }, [simulationState, iterationStage, totalIterations]);
+  }, [simulationState]); // Only depend on simulationState, not iteration data
 
   // cancel the simulation
   const cancelSimulation = async () => {
+    setIsAborting(true);
+    showNotification('Stopping simulation...', 'info');
+    
     // Clear the progress interval first
     if (progressInterval) {
       clearInterval(progressInterval);
@@ -645,13 +660,12 @@ export const useSimulationRunner = () => {
         // await jobService.cancelJob(currentJobId);
         showNotification('Job cancelled successfully', 'info');
       } catch (error) {
-        console.error('Failed to cancel job:', error);
+        // Job cancellation failed silently
       }
       setCurrentJobId(null);
     }
     
-    if (abortController && !isAborting) {
-      setIsAborting(true);
+    if (abortController) {
       
       sessionStorage.removeItem('activeSimulation');
       

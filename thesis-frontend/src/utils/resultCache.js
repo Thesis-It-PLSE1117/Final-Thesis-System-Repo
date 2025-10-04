@@ -1,3 +1,5 @@
+import { logger } from './security';
+
 /*
 hirap pag sunod sunod na sim haha
 */
@@ -64,7 +66,7 @@ export const getCachedResult = (config, simulationType = 'raw') => {
     const cached = localStorage.getItem(cacheKey);
 
     if (!cached) {
-      console.log('[Cache] No cached result found');
+      logger.log('[Cache] No cached result found');
       return null;
     }
 
@@ -74,12 +76,12 @@ export const getCachedResult = (config, simulationType = 'raw') => {
 
     //cache has expired
     if (now - parsedCache.timestamp > expiryTime) {
-      console.log('[Cache] Cached result expired, removing...');
+      logger.log('[Cache] Cached result expired, removing...');
       localStorage.removeItem(cacheKey);
       return null;
     }
 
-    console.log(`[Cache] HIT! Using cached result from ${new Date(parsedCache.timestamp).toLocaleString()}`);
+    logger.log(`[Cache] HIT! Using cached result from ${new Date(parsedCache.timestamp).toLocaleString()}`);
 
     //cached results with metadata
     return {
@@ -89,7 +91,7 @@ export const getCachedResult = (config, simulationType = 'raw') => {
       cacheKey: cacheKey
     };
   } catch (error) {
-    console.error('[Cache] Error reading cache:', error);
+    logger.error('[Cache] Error reading cache:', error);
     return null;
   }
 };
@@ -126,16 +128,16 @@ export const cacheResult = (config, results) => {
     };
     
     localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
-    console.log('[Cache] Results cached successfully');
+    logger.log('[Cache] Results cached successfully');
     
     // clean up old cache entries
     cleanupOldCache();
     
     return true;
   } catch (error) {
-    console.error('[Cache] Error caching results:', error);
+    logger.error('[Cache] Error caching results:', error);
     if (error.name === 'QuotaExceededError') {
-      console.log('[Cache] Storage quota exceeded, clearing old cache...');
+      logger.log('[Cache] Storage quota exceeded, clearing old cache...');
       clearAllCache();
     }
     return false;
@@ -174,11 +176,11 @@ const cleanupOldCache = () => {
       const oldest = cacheEntries.shift();
       if (oldest) {
         localStorage.removeItem(oldest.key);
-        console.log('[Cache] Removed old cache entry:', oldest.key);
+        logger.log('[Cache] Removed old cache entry:', oldest.key);
       }
     }
   } catch (error) {
-    console.error('[Cache] Error during cleanup:', error);
+    logger.error('[Cache] Error during cleanup:', error);
   }
 };
 
@@ -196,7 +198,7 @@ export const clearAllCache = () => {
   }
   
   keysToRemove.forEach(key => localStorage.removeItem(key));
-  console.log(`[Cache] Cleared ${keysToRemove.length} cached results`);
+  logger.log(`[Cache] Cleared ${keysToRemove.length} cached results`);
   
   return keysToRemove.length;
 };

@@ -129,18 +129,19 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
 
   return (
     <motion.section 
-      className="px-6 py-12 bg-white relative"
+      className="px-6 py-20 bg-white relative"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      style={{ marginTop: '-40px' }}
+      viewport={{ once: true }}
     >
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          viewport={{ once: true }}
         >
           <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
@@ -151,7 +152,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
             See how our algorithms compare in real cloud scenarios:
           </p>
           <p className="text-base text-gray-600 max-w-3xl mx-auto">
-            Real data comparison between <span className="font-semibold text-[#1a5654]">Enhanced ACO</span> and <span className="font-semibold text-[#2c8b84]">Enhanced PSO</span> algorithms
+            Real data comparison between <span className="font-semibold text-[#267b79]">Enhanced ACO</span> and <span className="font-semibold text-[#319694]">Enhanced PSO</span> algorithms
           </p>
           <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-500">
             <span>Cluster #{demoData.currentCluster}</span>
@@ -161,7 +162,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
         <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-[#319694]/10">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <div>
-              <h4 className="text-lg font-semibold text-[#1a5654]">Server Load Distribution</h4>
+              <h4 className="text-lg font-semibold text-[#267b79]">Server Load Distribution</h4>
               <p className="text-sm text-gray-600 mt-1">
                 {isPlaying ? "Live simulation running" : "Simulation paused"}
               </p>
@@ -169,7 +170,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
             <div className="flex gap-3">
               <motion.button 
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="flex items-center gap-2 text-white bg-gradient-to-r from-[#319694] to-[#4fd1c5] hover:from-[#267b79] hover:to-[#319694] px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition-all"
+                className="flex items-center gap-2 text-white bg-gradient-to-r from-[#319694] to-[#4fd1c5] hover:from-[#267b79] hover:to-[#319694] px-6 py-3 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -194,7 +195,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
                     currentCluster: newData.currentCluster
                   }));
                 }}
-                className="flex items-center gap-2 text-[#1a5654] bg-white hover:bg-gray-50 px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition-all border border-[#319694]/20"
+                className="flex items-center gap-2 text-[#267b79] bg-white hover:bg-gray-50 px-6 py-3 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all border-2 border-[#267b79]/20"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -363,20 +364,34 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
           </div>
 
           <motion.div 
-            className="bg-blue-50 p-4 rounded-xl border border-blue-200"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            className="bg-gradient-to-br from-[#f0fdfa] to-[#e0f7f6] p-6 rounded-xl border-2 border-[#319694]/20 shadow-md relative overflow-hidden"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
+            viewport={{ once: true }}
           >
-            <div className="flex items-start gap-3">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <h4 className="font-medium text-blue-800">Statistical Significance</h4>
-                <p className="text-sm text-blue-600 mt-1">
-                  Based on {RESEARCH_STATISTICS.testRuns} simulation runs, EACO shows statistically significant improvements 
-                  ({RESEARCH_STATISTICS.significanceLevel}) across all metrics with large effect sizes.
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#319694]/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#4fd1c5]/5 rounded-full blur-2xl"></div>
+            
+            <div className="flex items-start gap-4 relative z-10">
+              <motion.div 
+                className="bg-gradient-to-br from-[#319694] to-[#4fd1c5] p-3 rounded-xl shadow-lg"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <TrendingUp className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </motion.div>
+              <div className="flex-1">
+                <h4 className="text-lg font-bold text-[#267b79] mb-2 flex items-center gap-2">
+                  Statistical Significance
+                  <span className="text-xs font-semibold bg-[#319694] text-white px-2 py-1 rounded-full">
+                    {RESEARCH_STATISTICS.significanceLevel}
+                  </span>
+                </h4>
+                <p className="text-base text-gray-700 leading-relaxed">
+                  Based on <span className="font-bold text-[#319694]">{RESEARCH_STATISTICS.testRuns} simulation runs</span>, 
+                  EACO demonstrates <span className="font-semibold text-[#267b79]">statistically significant improvements</span> across 
+                  all performance metrics with <span className="font-semibold text-[#319694]">large effect sizes</span>.
                 </p>
               </div>
             </div>

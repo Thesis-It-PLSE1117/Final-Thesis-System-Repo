@@ -19,7 +19,7 @@ const initDB = async () => {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db, oldVersion, newVersion, transaction) {
-        console.log(`Upgrading database from version ${oldVersion} to ${newVersion}`);
+        // Upgrading database schema
         
         // Handle different upgrade paths
         if (oldVersion < 1) {
@@ -63,11 +63,10 @@ const initDB = async () => {
         }
       },
       blocked() {
-        console.log('Database upgrade blocked. Please close other tabs using this application.');
+        // Database upgrade blocked by other tabs
       },
       blocking() {
-        console.log('Database is blocking a future version. Closing connection.');
-        // Close the database connection to allow the upgrade
+        // Database blocking future version, closing connection
         if (dbPromise) {
           dbPromise.then(db => db.close());
           dbPromise = null;
@@ -86,21 +85,21 @@ const getDB = async (retries = 3) => {
     try {
       return await initDB();
     } catch (error) {
-      console.error(`Failed to initialize database (attempt ${i + 1}):`, error);
+      // Failed to initialize database
       
       if (error.name === 'VersionError') {
-        console.log('Version error detected, clearing database promise and retrying...');
+        // Version error detected, clearing database promise and retrying
         dbPromise = null;
         
         // If it's the last retry, try to delete and recreate the database
         if (i === retries - 1) {
           try {
-            console.log('Attempting to delete existing database...');
+            // Attempting to delete existing database
             await deleteDB(DB_NAME);
             dbPromise = null;
             return await initDB();
           } catch (deleteError) {
-            console.error('Failed to delete database:', deleteError);
+            // Failed to delete database
           }
         }
       } else if (i === retries - 1) {
@@ -127,7 +126,7 @@ export const getHistory = async () => {
     const entries = await index.getAll();
     return entries.reverse(); // Reverse to get newest first
   } catch (error) {
-    console.error('Failed to load history:', error);
+    // Failed to load history
     return [];
   }
 };
@@ -219,11 +218,11 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
     // Clean up old entries if we exceed the limit
     await cleanupOldEntries();
     
-    console.log(`Saved simulation results for ${baseId} (EACO & EPSO)`);
+    // Saved simulation results successfully
     return true;
     
   } catch (error) {
-    console.error('Failed to save to history:', error);
+    // Failed to save to history
     return false;
   }
 };
@@ -251,12 +250,12 @@ const cleanupOldEntries = async () => {
         entriesToRemove.map(entry => store.delete(entry.id))
       );
       
-      console.log(`Cleaned up ${excessCount} old history entries`);
+      // Cleaned up old history entries
     }
     
     await tx.done;
   } catch (error) {
-    console.error('Failed to cleanup old entries:', error);
+    // Failed to cleanup old entries
   }
 };
 
@@ -272,24 +271,24 @@ export const clearHistory = async () => {
     await store.clear();
     await tx.done;
     
-    console.log('History cleared successfully');
+    // History cleared successfully
     return true;
   } catch (error) {
-    console.error('Failed to clear history:', error);
+    // Failed to clear history
     
     // If clearing fails, try to delete and recreate the entire database
     try {
-      console.log('Attempting to reset database...');
+      // Attempting to reset database
       if (dbPromise) {
         const db = await dbPromise;
         db.close();
       }
       dbPromise = null;
       await deleteDB(DB_NAME);
-      console.log('Database reset successfully');
+      // Database reset successfully
       return true;
     } catch (resetError) {
-      console.error('Failed to reset database:', resetError);
+      // Failed to reset database
       return false;
     }
   }
@@ -325,7 +324,7 @@ export const getPairedHistoryResults = async (resultId) => {
     
     return null;
   } catch (error) {
-    console.error('Failed to get paired history results:', error);
+    // Failed to get paired history results
     return null;
   }
 };
@@ -352,10 +351,10 @@ export const deleteHistoryEntry = async (resultId) => {
     
     await tx.done;
     
-    console.log(`Deleted history entries for simulation ${baseId}`);
+    // Deleted history entries successfully
     return true;
   } catch (error) {
-    console.error('Failed to delete history entry:', error);
+    // Failed to delete history entry
     return false;
   }
 };

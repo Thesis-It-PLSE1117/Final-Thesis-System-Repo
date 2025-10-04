@@ -32,8 +32,8 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
   return (
     <motion.section 
       id="walkthrough"
-      className="px-6 py-30 bg-white/90 backdrop-blur-sm relative overflow-hidden"
-      initial={{ opacity: 0.8 }}
+      className="px-6 py-20 bg-white/90 backdrop-blur-sm relative overflow-hidden"
+      initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
@@ -75,11 +75,11 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           </motion.div>
           
           <motion.h3
-            className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
+            className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
             initial={{ y: 10 }}
             whileInView={{ y: 0 }}
             transition={{ delay: 0.3 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
               Simulation  Guide
@@ -87,11 +87,11 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
           </motion.h3>
           
           <motion.p
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0.5 }}
+            className="text-lg text-gray-700 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
           >
             Configure your data center and analyze performance metrics across multiple iterations
           </motion.p>

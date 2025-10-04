@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, ChevronDown, ChevronUp, X, Info, Server } from 'lucide-react';
+import { Settings, ChevronDown, ChevronUp, X, Info, Server, Microscope, Scale, Building2, Globe, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const PresetSelector = ({
@@ -30,25 +30,29 @@ const PresetSelector = ({
         title: windowWidth < 768 ? '1K' : 'Small Scale (1K)',
         description: windowWidth < 500 ? 'Algorithm testing' : 'Basic algorithm validation',
         taskCount: '1,000',
-        icon: '🔬'
+        icon: Microscope,
+        iconColor: 'text-blue-600'
       },
       '5k-tasks': {
         title: windowWidth < 768 ? '5K' : 'Medium Scale (5K)',
         description: windowWidth < 500 ? 'Performance eval' : 'Performance comparison',
         taskCount: '5,000',
-        icon: '⚖️'
+        icon: Scale,
+        iconColor: 'text-purple-600'
       },
       '10k-tasks': {
         title: windowWidth < 768 ? '10K' : 'Large Scale (10K)',
         description: windowWidth < 500 ? 'Real-world sim' : 'Real-world simulation',
         taskCount: '10,000',
-        icon: '🏢'
+        icon: Building2,
+        iconColor: 'text-orange-600'
       },
       '20k-tasks': {
         title: windowWidth < 768 ? '20K' : 'Enterprise (20K)',
         description: windowWidth < 500 ? 'Stress analysis' : 'Scalability analysis',
         taskCount: '20,000',
-        icon: '🌐'
+        icon: Globe,
+        iconColor: 'text-green-600'
       }
     };
     return presetData[presetKey] || {};
@@ -100,7 +104,11 @@ const PresetSelector = ({
               {selectedPreset ? (
                 <>
                   <div className="flex items-center">
-                    <span className="text-base mr-1.5">{getPresetInfo(selectedPreset).icon}</span>
+                    {(() => {
+                      const info = getPresetInfo(selectedPreset);
+                      const IconComponent = info.icon;
+                      return IconComponent ? <IconComponent size={16} className={`mr-1.5 ${info.iconColor}`} /> : null;
+                    })()}
                     <span className="font-medium text-gray-800 truncate">
                       {getPresetInfo(selectedPreset).title}
                     </span>
@@ -112,7 +120,7 @@ const PresetSelector = ({
               ) : (
                 <>
                   <div className="flex items-center">
-                    <span className="text-base mr-1.5">⚡</span>
+                    <Zap size={16} className="mr-1.5 text-yellow-500" />
                     <span className="font-medium text-gray-800">Default</span>
                   </div>
                   <span className="text-xs text-gray-600 block">
@@ -137,6 +145,7 @@ const PresetSelector = ({
               >
                 {displayPresets.map(presetKey => {
                   const info = getPresetInfo(presetKey);
+                  const IconComponent = info.icon;
                   return (
                     <button
                       key={presetKey}
@@ -151,7 +160,7 @@ const PresetSelector = ({
                       }}
                     >
                       <div className="flex items-center">
-                        <span className="text-base mr-2">{info.icon}</span>
+                        {IconComponent && <IconComponent size={16} className={`mr-2 ${info.iconColor}`} />}
                         <div className="font-medium truncate">{info.title}</div>
                       </div>
                       <div className={`text-xs mt-0.5 ${selectedPreset === presetKey ? 'text-[#267b79]' : 'text-gray-600'} truncate`}>

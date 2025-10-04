@@ -47,7 +47,10 @@ const SimulationPage = ({ onBack }) => {
     runSimulation,
     cancelSimulation,
     isAborting,
-    canAbort
+    canAbort,
+    currentIteration,
+    totalIterations,
+    iterationStage
   } = useSimulationRunner();
   
   // ui states
@@ -256,12 +259,15 @@ const SimulationPage = ({ onBack }) => {
         return (
           <>
             {renderConfigContent()}
-            <CloudLoadingModal 
+            <CloudLoadingModal
               numCloudlets={effectiveCloudletCount}
               numHosts={config.dataCenterConfig.numHosts}
               numVMs={config.dataCenterConfig.numVMs}
               progress={progress}
               iterations={config.iterationConfig.iterations}
+              currentIteration={currentIteration}
+              iterationStage={iterationStage}
+              totalTasks={totalIterations}
               onAbort={() => {
                 setUserCancelledSession(true);
                 cancelSimulation();
