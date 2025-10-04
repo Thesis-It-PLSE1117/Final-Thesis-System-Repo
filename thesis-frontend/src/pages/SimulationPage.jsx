@@ -267,7 +267,7 @@ const SimulationPage = ({ onBack }) => {
               iterations={config.iterationConfig.iterations}
               currentIteration={currentIteration}
               iterationStage={iterationStage}
-              totalTasks={totalIterations}
+              totalTasks={effectiveCloudletCount}
               onAbort={() => {
                 setUserCancelledSession(true);
                 cancelSimulation();
