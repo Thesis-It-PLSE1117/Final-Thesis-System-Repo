@@ -160,7 +160,7 @@ const HeroSection = ({ onStartSimulation }) => {
           transition={{ delay: ANIMATION_TIMING.delays.extraLong, duration: ANIMATION_TIMING.durations.slow / 1000 }}
         >
           Research-focused comparison of <span className="font-semibold text-[#319694]">Enhanced ACO vs Enhanced PSO</span> algorithms for 
-          <span className="font-semibold text-[#4fd1c5]">virtual machine task scheduling</span> with statistical validation
+          <span className="font-semibold text-[#4fd1c5]"> virtual machine task scheduling</span> with statistical validation
         </motion.p>
 
         {/* Key Statistics */}
