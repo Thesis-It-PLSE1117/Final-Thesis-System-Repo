@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { showNotification } from '../components/common/ErrorNotification';
 import { useAutoSave } from '../hooks/useAutoSave';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
 // components
 import Header from '../components/SimulationPage/Header';
@@ -164,7 +165,71 @@ const SimulationPage = ({ onBack }) => {
     if (isCoolingDown) return;
     
     try {
+      const isDeployedEnvironment = !window.location.hostname.includes('localhost');
       const totalOperations = config.dataCenterConfig.numVMs * effectiveCloudletCount * config.iterationConfig.iterations;
+      
+      if (isDeployedEnvironment && effectiveCloudletCount >= 5000) {
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Large Simulation Detected',
+          message: `This simulation contains ${effectiveCloudletCount.toLocaleString()} tasks, which may exceed the deployment platform's timeout limits.`,
+          type: 'warning',
+          confirmText: 'Continue Anyway',
+          onConfirm: async () => {
+            setConfirmDialog({ isOpen: false });
+            setIsCoolingDown(true);
+            setUserCancelledSession(false); 
+            await runSimulation({
+              dataCenterConfig: config.dataCenterConfig,
+              cloudletConfig: config.cloudletConfig,
+              iterationConfig: config.iterationConfig,
+              enableMatlabPlots: config.enableMatlabPlots,
+              workloadFile: config.workloadFile
+            });
+            setTimeout(() => setIsCoolingDown(false), 1000);
+          },
+          children: (
+            <div className="space-y-4 mt-2">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Clock className="text-amber-600 mt-0.5" size={18} />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-amber-900 text-sm mb-1">Timeout Risk</h4>
+                    <p className="text-amber-800 text-xs leading-relaxed">
+                      Online deployment has a 5-minute timeout limit. Large simulations may not complete in time.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-[#319694]/5 border border-[#319694]/20 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="text-[#319694] mt-0.5" size={18} />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Recommended Options</h4>
+                    <ul className="space-y-1.5 text-xs text-gray-700">
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#319694] font-bold">•</span>
+                        <span>Use the <strong>1k-tasks preset</strong> for optimal performance online</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#319694] font-bold">•</span>
+                        <span>Run <strong>single iteration</strong> instead of comparison mode for faster results</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#319694] font-bold">•</span>
+                        <span>For large-scale testing, <strong>clone the repository</strong> and run locally</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        });
+        return;
+      }
+      
       if (totalOperations > 100000) {
         setConfirmDialog({
           isOpen: true,
