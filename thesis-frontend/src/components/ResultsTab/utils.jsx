@@ -45,8 +45,12 @@ export const normalizeData = (results) => {
       },
 
       plotData: results.plotData,
-
-      iterationData: results.rawResults
+      iterationData: results.rawResults,
+      schedulingLog: results.rawResults.schedulingLog || results.schedulingLog || bestResult.schedulingLog || [],
+      runId: results.runId || null,
+      seed: results.seed || null,
+      configSnapshot: results.configSnapshot || null,
+      datasetId: results.datasetId || null
     };
     
     return normalized;
@@ -76,7 +80,12 @@ export const normalizeData = (results) => {
         responseTime: s.responseTime || s.averageResponseTime || 0
       };
     })(),
-    plotData: results.plotData || data.plotData
+    plotData: results.plotData || data.plotData,
+    schedulingLog: results.schedulingLog || data.schedulingLog || [],
+    runId: results.runId || null,
+    seed: results.seed || null,
+    configSnapshot: results.configSnapshot || null,
+    datasetId: results.datasetId || null
   };
   
   return normalized;
