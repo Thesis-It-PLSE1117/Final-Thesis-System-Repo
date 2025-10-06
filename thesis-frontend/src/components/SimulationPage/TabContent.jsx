@@ -47,76 +47,95 @@ export const TabContent = ({
   clearPreset
 }) => {
   const handleViewResults = async (result) => {
-    console.log('onViewResults called with:', result);
-    
     try {
-      const pairedResults = await historyService.getPairedHistoryResults(result.id);
-      console.log('pairedResults:', pairedResults);
-      
-      if (pairedResults && (pairedResults.eaco || pairedResults.epso)) {
-        console.log('pairedResults.eaco:', pairedResults.eaco);
-        console.log('pairedResults.epso:', pairedResults.epso);
-        
-        // Add safety checks for eaco and epso existence
-        const convertedResults = {
-          eaco: pairedResults.eaco ? {
-            ...pairedResults.eaco,
-            plotData: pairedResults.eaco.plotAnalysis ? {
-              algorithm: pairedResults.eaco.plotAnalysis.algorithm,
-              simulationId: pairedResults.eaco.plotAnalysis.simulationId,
-              metrics: pairedResults.eaco.plotAnalysis.metrics,
-              plotMetadata: pairedResults.eaco.plotAnalysis.plotMetadata,
-              plotPaths: [] 
-            } : null,
-            plotMetadata: pairedResults.eaco.plotAnalysis?.plotMetadata || [],
-            analysis: pairedResults.eaco.plotAnalysis?.analysis
-          } : null,
-          epso: pairedResults.epso ? {
-            ...pairedResults.epso,
-            plotData: pairedResults.epso.plotAnalysis ? {
-              algorithm: pairedResults.epso.plotAnalysis.algorithm,
-              simulationId: pairedResults.epso.plotAnalysis.simulationId,
-              metrics: pairedResults.epso.plotAnalysis.metrics,
-              plotMetadata: pairedResults.epso.plotAnalysis.plotMetadata,
-              plotPaths: [] 
-            } : null,
-            plotMetadata: pairedResults.epso.plotAnalysis?.plotMetadata || [],
-            analysis: pairedResults.epso.plotAnalysis?.analysis
-          } : null
-        };
-        
-        console.log('convertedResults:', convertedResults);
-        
-        setSimulationResults(convertedResults);
-        setSimulationState('results');
-      } else {
-        console.log('No paired results found, trying single result');
-        
-        // Fall back to using the single result
-        const singleResult = {
-          eaco: result.algorithm === 'EACO' ? {
-            ...result,
-            plotData: null,
-            plotMetadata: [],
-            analysis: result.analysis
-          } : null,
-          epso: result.algorithm === 'EPSO' ? {
-            ...result,
-            plotData: null,
-            plotMetadata: [],
-            analysis: result.analysis
-          } : null
-        };
-        
-        console.log('singleResult:', singleResult);
-        
-        setSimulationResults(singleResult);
-        setSimulationState('results');
-        showNotification('Viewing single algorithm result', 'info');
+      if (!result || !result.id) {
+        throw new Error('Invalid result object: missing required data');
       }
+
+      console.log('Result object:', {
+        id: result.id,
+        baseId: result.baseId,
+        algorithm: result.algorithm,
+        hasRawResults: !!result.rawResults,
+        hasSummary: !!result.summary
+      });
+
+      const pairedResults = await historyService.getPairedHistoryResults(result.id);
+      
+      if (!pairedResults || (!pairedResults.eaco && !pairedResults.epso)) {
+        throw new Error('Failed to load paired results from history');
+      }
+
+      const reconstructResult = (algorithmResult) => {
+        if (!algorithmResult) return null;
+
+        const rawResults = algorithmResult.rawResults || {};
+        const summary = algorithmResult.summary || rawResults.summary || {};
+        
+        const schedulingLog = algorithmResult.schedulingLog || 
+                              rawResults.schedulingLog || 
+                              (rawResults.individualResults && rawResults.individualResults[0]?.schedulingLog) ||
+                              (rawResults.bestResult?.schedulingLog) ||
+                              [];
+        
+        const energyConsumption = algorithmResult.energyConsumption || 
+                                  rawResults.energyConsumption || 
+                                  (rawResults.individualResults && rawResults.individualResults[0]?.energyConsumption) ||
+                                  [];
+        
+        const vmUtilization = algorithmResult.vmUtilization || 
+                             rawResults.vmUtilization || 
+                             (rawResults.individualResults && rawResults.individualResults[0]?.vmUtilization) ||
+                             [];
+        
+        return {
+          ...algorithmResult,
+          summary,
+          schedulingLog,
+          energyConsumption,
+          vmUtilization,
+          rawResults: {
+            summary,
+            averageMetrics: summary.averageMetrics || summary,
+            individualResults: rawResults.individualResults || [],
+            energyConsumption,
+            vmUtilization,
+            schedulingLog
+          },
+          plotData: algorithmResult.plotAnalysis ? {
+            algorithm: algorithmResult.plotAnalysis.algorithm || algorithmResult.algorithm,
+            simulationId: algorithmResult.plotAnalysis.simulationId || algorithmResult.simulationId,
+            metrics: algorithmResult.plotAnalysis.metrics || summary,
+            plotMetadata: algorithmResult.plotAnalysis.plotMetadata || [],
+            plotPaths: [],
+            hasPlots: algorithmResult.plotAnalysis.hasPlots || false
+          } : null,
+          plotMetadata: algorithmResult.plotAnalysis?.plotMetadata || [],
+          analysis: algorithmResult.plotAnalysis?.analysis || null,
+          tTestResults: algorithmResult.tTestResults || null,
+          runId: algorithmResult.runId || null,
+          seed: algorithmResult.seed || null,
+          configSnapshot: algorithmResult.configSnapshot || algorithmResult.config || null,
+          datasetId: algorithmResult.datasetId || null
+        };
+      };
+
+      const convertedResults = {
+        eaco: reconstructResult(pairedResults.eaco),
+        epso: reconstructResult(pairedResults.epso)
+      };
+
+      if (!convertedResults.eaco && !convertedResults.epso) {
+        throw new Error('Failed to reconstruct results from history data');
+      }
+
+      setSimulationResults(convertedResults);
+      setSimulationState('results');
+      showNotification('Results loaded successfully', 'success');
+      
     } catch (error) {
       console.error('Error loading results:', error);
-      showNotification('Error loading results: ' + error.message, 'error');
+      showNotification(`Failed to load results: ${error.message}`, 'error');
     }
   };
 

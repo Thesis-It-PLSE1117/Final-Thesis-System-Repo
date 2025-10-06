@@ -100,7 +100,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
           <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
             <div className="flex items-center gap-2">
               <GitCompare className="text-blue-600" size={16} />
-              <span className="font-medium text-blue-800">Backend Processing Time</span>
+              <span className="font-medium text-blue-800">Total Simulation Time</span>
             </div>
             <span className="text-lg font-bold text-blue-700">
               {formatDuration(eacoInfo.duration)}

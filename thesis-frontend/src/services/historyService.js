@@ -6,9 +6,9 @@
 import { openDB, deleteDB } from 'idb';
 
 const DB_NAME = 'SimulationHistoryDB';
-const DB_VERSION = 1; // Increased version to handle existing database
+const DB_VERSION = 2;
 const STORE_NAME = 'history';
-const MAX_HISTORY_ENTRIES = 200; // Increased limit due to better storage capacity
+const MAX_HISTORY_ENTRIES = 200;
 
 let dbPromise = null;
 
@@ -19,62 +19,77 @@ const initDB = async () => {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db, oldVersion, newVersion, transaction) {
-        // Upgrading database schema
+        console.log(`Upgrading database from version ${oldVersion} to ${newVersion}`);
         
-        // Handle different upgrade paths
-        if (oldVersion < 1) {
-          // Create the history store if it doesn't exist
-          if (!db.objectStoreNames.contains(STORE_NAME)) {
-            const store = db.createObjectStore(STORE_NAME, { 
-              keyPath: 'id' 
-            });
-            
-            // Create indices for efficient querying
-            store.createIndex('timestamp', 'timestamp', { unique: false });
-            store.createIndex('algorithm', 'algorithm', { unique: false });
-            store.createIndex('baseId', 'baseId', { unique: false }); // For paired entries
-          }
-        }
+        let store;
         
-        // Handle upgrades from any version to current
-        if (db.objectStoreNames.contains(STORE_NAME)) {
-          const store = transaction.objectStore(STORE_NAME);
-          
-          // Ensure all required indices exist
-          if (!store.indexNames.contains('timestamp')) {
-            store.createIndex('timestamp', 'timestamp', { unique: false });
-          }
-          if (!store.indexNames.contains('algorithm')) {
-            store.createIndex('algorithm', 'algorithm', { unique: false });
-          }
-          if (!store.indexNames.contains('baseId')) {
-            store.createIndex('baseId', 'baseId', { unique: false });
-          }
-        } else {
-          // Create the store if it somehow doesn't exist
-          const store = db.createObjectStore(STORE_NAME, { 
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          console.log('Creating history object store');
+          store = db.createObjectStore(STORE_NAME, { 
             keyPath: 'id' 
           });
-          
-          // Create all indices
+        } else {
+          store = transaction.objectStore(STORE_NAME);
+        }
+        
+        if (!store.indexNames.contains('timestamp')) {
+          console.log('Creating timestamp index');
           store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+        
+        if (!store.indexNames.contains('algorithm')) {
+          console.log('Creating algorithm index');
           store.createIndex('algorithm', 'algorithm', { unique: false });
+        }
+        
+        if (!store.indexNames.contains('baseId')) {
+          console.log('Creating baseId index');
           store.createIndex('baseId', 'baseId', { unique: false });
         }
+        
+        console.log('Database upgrade complete');
       },
       blocked() {
         // Database upgrade blocked by other tabs
       },
       blocking() {
-        // Database blocking future version, closing connection
         if (dbPromise) {
           dbPromise.then(db => db.close());
           dbPromise = null;
         }
       }
     });
+    
+    const db = await dbPromise;
+    await migrateExistingEntries(db);
   }
   return dbPromise;
+};
+
+const migrateExistingEntries = async (db) => {
+  try {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const allEntries = await store.getAll();
+    
+    let migrationCount = 0;
+    for (const entry of allEntries) {
+      if (!entry.baseId && entry.id) {
+        const baseId = entry.id.split('-')[0];
+        entry.baseId = baseId;
+        await store.put(entry);
+        migrationCount++;
+      }
+    }
+    
+    if (migrationCount > 0) {
+      console.log(`Migrated ${migrationCount} entries with missing baseId`);
+    }
+    
+    await tx.done;
+  } catch (error) {
+    console.warn('Migration of existing entries failed:', error);
+  }
 };
 
 /**
@@ -172,17 +187,18 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
         timestamp,
         algorithm: 'EACO',
         config: fullConfig,
-        // Store full rawResults if present so results view can reconstruct exactly
         rawResults: results.eaco.rawResults || null,
         summary: results.eaco.rawResults?.summary || results.eaco.summary,
         energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
         vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
         schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
-        // OPTIMIZED: Store only analysis and metadata, not large image data
         plotAnalysis: extractPlotAnalysis(results.eaco),
-        // Store t-test results for statistical analysis display
         tTestResults: results.eaco.tTestResults || null,
-        simulationId: results.eaco.simulationId
+        simulationId: results.eaco.simulationId,
+        runId: results.eaco.runId || null,
+        seed: results.eaco.seed || null,
+        configSnapshot: results.eaco.configSnapshot || fullConfig,
+        datasetId: results.eaco.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
       },
       {
         id: `${id}-epso`,
@@ -195,11 +211,13 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
         energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
         vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
         schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
-        // OPTIMIZED: Store only analysis and metadata, not large image data
         plotAnalysis: extractPlotAnalysis(results.epso),
-        // Store t-test results for statistical analysis display
         tTestResults: results.epso.tTestResults || null,
-        simulationId: results.epso.simulationId
+        simulationId: results.epso.simulationId,
+        runId: results.epso.runId || null,
+        seed: results.epso.seed || null,
+        configSnapshot: results.epso.configSnapshot || fullConfig,
+        datasetId: results.epso.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
       }
     ];
     
@@ -295,36 +313,58 @@ export const clearHistory = async () => {
 };
 
 /**
- * Get paired history results
- * Returns both EACO and EPSO results from the same simulation run
- */
+| * Get paired history results
+| * Returns both EACO and EPSO results from the same simulation run
+| */
 export const getPairedHistoryResults = async (resultId) => {
   try {
+    if (!resultId) {
+      console.error('getPairedHistoryResults: resultId is required');
+      return null;
+    }
+
     const baseId = resultId.split('-')[0];
+    console.log(`Fetching paired results for baseId: ${baseId}`);
     
     const db = await getDB();
     const tx = db.transaction(STORE_NAME, 'readonly');
     const store = tx.objectStore(STORE_NAME);
     const index = store.index('baseId');
     
-    // Get both entries with the same baseId
     const pairedEntries = await index.getAll(baseId);
+    console.log(`Found ${pairedEntries.length} entries for baseId ${baseId}`);
     
-    if (pairedEntries.length >= 2) {
-      const eacoResult = pairedEntries.find(entry => entry.algorithm === 'EACO');
-      const epsoResult = pairedEntries.find(entry => entry.algorithm === 'EPSO');
-      
-      if (eacoResult && epsoResult) {
-        return {
-          eaco: eacoResult,
-          epso: epsoResult
-        };
-      }
+    if (pairedEntries.length === 0) {
+      console.error(`No history entries found for baseId: ${baseId}`);
+      return null;
     }
     
-    return null;
+    const eacoResult = pairedEntries.find(entry => entry.algorithm === 'EACO');
+    const epsoResult = pairedEntries.find(entry => entry.algorithm === 'EPSO');
+    
+    if (!eacoResult && !epsoResult) {
+      console.error(`No EACO or EPSO results found in paired entries`);
+      return null;
+    }
+    
+    if (!eacoResult) {
+      console.warn(`EACO result missing for baseId: ${baseId}, returning EPSO only`);
+    }
+    
+    if (!epsoResult) {
+      console.warn(`EPSO result missing for baseId: ${baseId}, returning EACO only`);
+    }
+    
+    const result = {
+      eaco: eacoResult || null,
+      epso: epsoResult || null
+    };
+    
+    console.log('Successfully retrieved paired results');
+    return result;
+    
   } catch (error) {
-    // Failed to get paired history results
+    console.error('Failed to get paired history results:', error);
     return null;
   }
 };
@@ -455,14 +495,23 @@ export const importHistory = async (backupData) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     
-    // Import entries
+    const entriesToImport = backupData.entries.map(entry => {
+      if (!entry.baseId && entry.id) {
+        return {
+          ...entry,
+          baseId: entry.id.split('-')[0]
+        };
+      }
+      return entry;
+    });
+    
     await Promise.all(
-      backupData.entries.map(entry => store.add(entry))
+      entriesToImport.map(entry => store.add(entry))
     );
     
     await tx.done;
     
-    console.log(`Imported ${backupData.entries.length} history entries`);
+    console.log(`Imported ${entriesToImport.length} history entries`);
     return true;
   } catch (error) {
     console.error('Failed to import history:', error);

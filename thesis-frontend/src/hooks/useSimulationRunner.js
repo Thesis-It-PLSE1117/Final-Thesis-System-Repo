@@ -438,7 +438,12 @@ export const useSimulationRunner = () => {
               adjustmentMessage: comparisonResults.adjustmentMessage,
               iterations: comparisonResults.iterations,
               totalExecutionTime: comparisonResults.totalExecutionTime, 
-              analysis: null
+              analysis: null,
+              configSnapshot: {
+                ...configData,
+                algorithm: 'EACO',
+                iterations: comparisonResults.iterations || iterationConfig.iterations
+              }
             },
             epso: {
               rawResults: {
@@ -454,7 +459,12 @@ export const useSimulationRunner = () => {
               adjustmentMessage: comparisonResults.adjustmentMessage,
               iterations: comparisonResults.iterations,
               totalExecutionTime: comparisonResults.totalExecutionTime, 
-              analysis: null
+              analysis: null,
+              configSnapshot: {
+                ...configData,
+                algorithm: 'EPSO',
+                iterations: comparisonResults.iterations || iterationConfig.iterations
+              }
             }
           };
           
