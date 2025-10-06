@@ -504,14 +504,30 @@ export const useSimulationRunner = () => {
                 summary: eacoResponse.simulationResults?.summary || eacoResponse.summary,
                 analysis: eacoResponse.analysis,
                 plotMetadata: eacoResponse.plotMetadata,
-                executionTimeMs: eacoResponse.executionTimeMs 
+                executionTimeMs: eacoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'EACO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: eacoResponse.runId || eacoResponse.simulationResults?.runId,
+                seed: eacoResponse.seed || eacoResponse.simulationResults?.seed,
+                datasetId: eacoResponse.datasetId || eacoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse,
                 summary: epsoResponse.simulationResults?.summary || epsoResponse.summary,
                 analysis: epsoResponse.analysis,
                 plotMetadata: epsoResponse.plotMetadata,
-                executionTimeMs: epsoResponse.executionTimeMs 
+                executionTimeMs: epsoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'EPSO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: epsoResponse.runId || epsoResponse.simulationResults?.runId,
+                seed: epsoResponse.seed || epsoResponse.simulationResults?.seed,
+                datasetId: epsoResponse.datasetId || epsoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
               },
               plotsGenerating: true
             };
@@ -562,7 +578,15 @@ export const useSimulationRunner = () => {
                 plotData: eacoResponse.plotData,
                 analysis: eacoResponse.analysis,
                 plotMetadata: eacoResponse.plotMetadata,
-                executionTimeMs: eacoResponse.executionTimeMs 
+                executionTimeMs: eacoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'EACO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: eacoResponse.runId || eacoResponse.simulationResults?.runId,
+                seed: eacoResponse.seed || eacoResponse.simulationResults?.seed,
+                datasetId: eacoResponse.datasetId || eacoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
               },
               epso: {
                 rawResults: epsoResponse.simulationResults || epsoResponse.rawResults || epsoResponse,
@@ -570,7 +594,15 @@ export const useSimulationRunner = () => {
                 plotData: epsoResponse.plotData,
                 analysis: epsoResponse.analysis,
                 plotMetadata: epsoResponse.plotMetadata,
-                executionTimeMs: epsoResponse.executionTimeMs 
+                executionTimeMs: epsoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'EPSO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: epsoResponse.runId || epsoResponse.simulationResults?.runId,
+                seed: epsoResponse.seed || epsoResponse.simulationResults?.seed,
+                datasetId: epsoResponse.datasetId || epsoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
               }
             };
             setSimulationResults(combinedResults);
