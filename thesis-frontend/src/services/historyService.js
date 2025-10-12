@@ -165,19 +165,31 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
     
     // Helper function to extract plot metadata and analysis without large image data
     const extractPlotAnalysis = (algorithmResults) => {
+      if (!algorithmResults) return null;
+
       const plotData = algorithmResults.plotData;
-      if (!plotData) return null;
-      
-      return {
-        algorithm: plotData.algorithm,
-        simulationId: plotData.simulationId,
-        metrics: plotData.metrics, // Performance metrics are small
-        plotCount: plotData.plotPaths ? plotData.plotPaths.length : 0,
-        plotTypes: plotData.plotMetadata ? plotData.plotMetadata.map(p => p.type) : [],
-        plotMetadata: algorithmResults.plotMetadata || plotData.plotMetadata,
-        analysis: algorithmResults.analysis,
-        hasPlots: !!(plotData.plotPaths && plotData.plotPaths.length > 0)
+      const analysis = algorithmResults.analysis;
+
+      if (!plotData && !analysis) return null;
+
+      const result = {
+        analysis: analysis || null,
+        plotMetadata: algorithmResults.plotMetadata || null,
       };
+
+      if (plotData) {
+        result.algorithm = plotData.algorithm;
+        result.simulationId = plotData.simulationId;
+        result.metrics = plotData.metrics;
+        result.plotCount = plotData.plotPaths ? plotData.plotPaths.length : 0;
+        result.plotTypes = plotData.plotMetadata ? plotData.plotMetadata.map(p => p.type) : [];
+        result.hasPlots = !!(plotData.plotPaths && plotData.plotPaths.length > 0);
+        if (plotData.plotMetadata) {
+          result.plotMetadata = plotData.plotMetadata;
+        }
+      }
+      
+      return result;
     };
     
     const historyEntries = [
@@ -192,6 +204,8 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
         energyConsumption: results.eaco.rawResults?.energyConsumption || results.eaco.energyConsumption,
         vmUtilization: results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
         schedulingLog: results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
+        analysis: results.eaco.analysis || null,
+        analysis: results.eaco.analysis || null,
         plotAnalysis: extractPlotAnalysis(results.eaco),
         tTestResults: results.eaco.tTestResults || null,
         simulationId: results.eaco.simulationId,
@@ -211,6 +225,8 @@ export const saveToHistory = async (results, dataCenterConfig, cloudletConfig, w
         energyConsumption: results.epso.rawResults?.energyConsumption || results.epso.energyConsumption,
         vmUtilization: results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
         schedulingLog: results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
+        analysis: results.epso.analysis || null,
+        analysis: results.epso.analysis || null,
         plotAnalysis: extractPlotAnalysis(results.epso),
         tTestResults: results.epso.tTestResults || null,
         simulationId: results.epso.simulationId,

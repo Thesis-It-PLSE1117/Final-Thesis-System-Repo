@@ -3,6 +3,10 @@ import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Activity, BarChart3, DollarSign, Zap, Clock, PieChart } from 'lucide-react';
 
 const StatisticsDisplay = ({ average, min, max, stdDev }) => {
+  // If statistical data is not available (e.g., for a single run), don't render the component.
+  if (!average || !min || !max || !stdDev) {
+    return null;
+  }
   const formatMetricName = (metric) => {
     const nameMap = {
       makespan: 'Makespan',
