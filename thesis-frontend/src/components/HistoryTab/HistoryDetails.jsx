@@ -17,6 +17,54 @@ const HistoryDetails = ({ result, onViewResults }) => {
     }));
   };
 
+  const handleViewResults = (result) => {
+    console.log('=== SIMULATION DETAILED RESULTS ===');
+    console.log('Full Result Object:', result);
+    
+    // Log basic information
+    console.log('--- Basic Information ---');
+    console.log('Algorithm:', result.algorithm);
+    console.log('Timestamp:', result.timestamp);
+    console.log('Is Single Iteration:', isSingleIteration);
+    
+    // Log configuration
+    console.log('--- Configuration ---');
+    console.log('Config:', result.config);
+    
+    // Log summary metrics
+    console.log('--- Summary Metrics ---');
+    console.log('Summary:', summary);
+    
+    // Log raw results
+    console.log('--- Raw Results ---');
+    console.log('Raw Results:', result.rawResults);
+    
+    // Log individual metrics
+    console.log('--- Calculated Metrics ---');
+    metrics.forEach(metric => {
+      console.log(`${metric.title}: ${metric.value}${metric.unit}`);
+    });
+    
+    // Log statistical analysis if available
+    if (!isSingleIteration && result.tTestResults) {
+      console.log('--- Statistical Analysis ---');
+      console.log('T-Test Results:', result.tTestResults);
+    }
+    
+    // Log plot analysis if available
+    if (result.plotAnalysis) {
+      console.log('--- Plot Analysis ---');
+      console.log('Plot Analysis:', result.plotAnalysis);
+    }
+    
+    console.log('=== END OF SIMULATION RESULTS ===');
+    
+    // Call the original onViewResults function if it exists
+    if (onViewResults) {
+      onViewResults(result);
+    }
+  };
+
   if (!result) {
     return (
       <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-[#319694]/15 p-8">
@@ -41,7 +89,12 @@ const HistoryDetails = ({ result, onViewResults }) => {
   }
   const config = result.config || {};
   
-  // Calculate metrics from individualResults since averageMetrics is null
+  // Check if this is a single iteration run
+  const isSingleIteration = result.rawResults?.totalIterations === 1 || 
+                           !result.rawResults?.individualResults || 
+                           result.rawResults?.individualResults?.length === 1;
+  
+  // Calculate metrics from individualResults (for multi-iteration runs)
   const calculateMetricFromIndividual = (metricName) => {
     const individualResults = result.rawResults?.individualResults;
     if (!individualResults || !Array.isArray(individualResults) || individualResults.length === 0) {
@@ -59,14 +112,44 @@ const HistoryDetails = ({ result, onViewResults }) => {
     return values.reduce((sum, val) => sum + val, 0) / values.length;
   };
   
+  // Enhanced getMetric function to handle both single and multi-iteration runs
   const getMetric = (metricName) => {
-    return summary[metricName] || 
-           summary.averageMetrics?.[metricName] || 
-           result.rawResults?.summary?.[metricName] || 
-           result.rawResults?.averageMetrics?.[metricName] || 
-           result[metricName] || 
-           calculateMetricFromIndividual(metricName) ||
-           0;
+    // Priority 1: Direct summary values (for single iteration or direct storage)
+    if (summary[metricName] !== undefined && summary[metricName] !== null) {
+      return summary[metricName];
+    }
+    
+    // Priority 2: Summary's averageMetrics
+    if (summary.averageMetrics?.[metricName] !== undefined) {
+      return summary.averageMetrics[metricName];
+    }
+    
+    // Priority 3: RawResults summary (single iteration case)
+    if (result.rawResults?.summary?.[metricName] !== undefined) {
+      return result.rawResults.summary[metricName];
+    }
+    
+    // Priority 4: RawResults averageMetrics
+    if (result.rawResults?.averageMetrics?.[metricName] !== undefined) {
+      return result.rawResults.averageMetrics[metricName];
+    }
+    
+    // Priority 5: Direct on result object
+    if (result[metricName] !== undefined) {
+      return result[metricName];
+    }
+    
+    // Priority 6: Calculate from individual results (multi-iteration)
+    if (!isSingleIteration) {
+      return calculateMetricFromIndividual(metricName);
+    }
+    
+    // Priority 7: For single iteration, check the first individual result
+    if (isSingleIteration && result.rawResults?.individualResults?.[0]?.summary?.[metricName]) {
+      return result.rawResults.individualResults[0].summary[metricName];
+    }
+    
+    return 0;
   };
   
   const metrics = [
@@ -154,14 +237,21 @@ const HistoryDetails = ({ result, onViewResults }) => {
       className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-[#319694]/15"
     >
       {/* Header */}
-        <div className="border-b border-[#319694]/15 p-6">
+      <div className="border-b border-[#319694]/15 p-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
               <BarChart2 size={24} className="text-[#319694]" />
               Simulation Analysis
             </h3>
-            <p className="text-sm text-gray-600 mt-1">{result.algorithm} algorithm performance metrics</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm text-gray-600">{result.algorithm} algorithm performance metrics</p>
+              {isSingleIteration && (
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                  Single Iteration
+                </span>
+              )}
+            </div>
           </div>
           <div className="text-right text-sm text-gray-500">
             <div className="flex items-center gap-1">
@@ -319,8 +409,8 @@ const HistoryDetails = ({ result, onViewResults }) => {
           </div>
         )}
         
-        {/* Statistical Analysis - Collapsible Section */}
-        {statisticalSummary && statisticalSummary.length > 0 && (
+        {/* Statistical Analysis - Collapsible Section - Only show for multi-iteration */}
+        {!isSingleIteration && statisticalSummary && statisticalSummary.length > 0 && (
           <div className="border border-[#319694]/20 rounded-lg overflow-hidden">
             <button 
               className="w-full p-4 bg-gray-50 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
@@ -350,10 +440,25 @@ const HistoryDetails = ({ result, onViewResults }) => {
           </div>
         )}
         
+        {/* Single Iteration Notice */}
+        {isSingleIteration && (
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+            <div className="flex items-start">
+              <Info size={20} className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <p className="text-blue-800 font-medium">Single Iteration Run</p>
+                <p className="text-blue-700 text-sm mt-1">
+                  This simulation was run with a single iteration. Statistical analysis requires multiple iterations for comparison.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Action Button */}
         <div className="pt-4">
           <button
-            onClick={() => onViewResults(result)}
+            onClick={() => handleViewResults(result)}
             className="w-full bg-[#319694] text-white px-6 py-4 rounded-lg hover:bg-[#267b79] transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
           >
             <BarChart2 size={18} />

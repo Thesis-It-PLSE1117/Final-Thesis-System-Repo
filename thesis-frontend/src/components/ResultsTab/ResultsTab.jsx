@@ -40,6 +40,20 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     epso: {}
   });
   
+  // Check if this is a single iteration run
+  const isSingleIteration = React.useMemo(() => {
+    // Check both EACO and EPSO results for single iteration
+    const eacoIsSingle = eacoResults?.rawResults?.totalIterations === 1 || 
+                        !eacoResults?.rawResults?.individualResults || 
+                        eacoResults?.rawResults?.individualResults?.length === 1;
+    
+    const epsoIsSingle = epsoResults?.rawResults?.totalIterations === 1 || 
+                        !epsoResults?.rawResults?.individualResults || 
+                        epsoResults?.rawResults?.individualResults?.length === 1;
+    
+    return eacoIsSingle && epsoIsSingle;
+  }, [eacoResults, epsoResults]);
+  
   /**
    * I check if MATLAB plots are available or being generated
    * This determines if Visualizations tab should be enabled
@@ -48,7 +62,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   const hasMatlabPlots = plotData && Object.keys(plotData).length > 0 && 
     (plotData.eaco?.plotPaths?.length > 0 || plotData.epso?.plotPaths?.length > 0);
   const matlabPlotsExpected = plotsGenerating === true || hasMatlabPlots;
-  
   
   /**
    * I define tabs following UI/UX best practices for progressive disclosure
@@ -66,7 +79,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       id: 'analysis',
       label: 'Analysis',
       icon: <FiBarChart2 className="w-4 h-4" />,
-      description: 'Statistical analysis and interpretations',
+      description: isSingleIteration ? 'Single iteration analysis and comparison' : 'Statistical analysis and interpretations',
       enabled: true
     },
     {
@@ -88,10 +101,14 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
   useEffect(() => {
     const hasAutoSwitched = sessionStorage.getItem('results-tab-auto-switched');
     
-    
-    if ((eacoResults?.tTestResults || epsoResults?.tTestResults) && 
-        activeTab === 'metadata' && 
-        !hasAutoSwitched) {
+    // For single iteration runs, always show analysis tab first
+    if (isSingleIteration && activeTab === 'metadata' && !hasAutoSwitched) {
+      setActiveTab('analysis');
+      sessionStorage.setItem('results-tab-auto-switched', 'true');
+    }
+    // For multi-iteration runs with T-test results, show analysis tab
+    else if (!isSingleIteration && (eacoResults?.tTestResults || epsoResults?.tTestResults) && 
+        activeTab === 'metadata' && !hasAutoSwitched) {
       setActiveTab('analysis');
       sessionStorage.setItem('results-tab-auto-switched', 'true');
     }
@@ -100,7 +117,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     if (activeTab === 'visualizations' && !matlabPlotsExpected) {
       setActiveTab('analysis');
     }
-  }, [eacoResults, epsoResults, activeTab, matlabPlotsExpected]);
+  }, [eacoResults, epsoResults, activeTab, matlabPlotsExpected, isSingleIteration]);
 
   useEffect(() => {
     try {
@@ -127,7 +144,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
       setLoading(false);
     }
   }, [eacoResults, epsoResults]);
-
 
   const handleBackToAnimation = () => {
     setIsExiting(true);
@@ -367,37 +383,8 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* T-Test Results if Available */}
-            {hasTTest && (
-              <>
-                <PairedTTestDisplay 
-                  tTestResults={eacoResults?.tTestResults || epsoResults?.tTestResults}
-                  comparisonResults={eacoResults || epsoResults}
-                  isLoading={false}
-                />
-                
-                {/* Individual Iteration Details */}
-                {hasTTest && eacoResults?.rawResults && epsoResults?.rawResults && (
-                  <IterationDetailsDisplay 
-                    eacoResults={eacoResults?.rawResults} 
-                    epsoResults={epsoResults?.rawResults}
-                  />
-                )}
-              </>
-            )}
-            
-            {/* Statistics Display */}
-            {!hasTTest && eacoResults?.rawResults?.averageMetrics && (
-              <StatisticsDisplay
-                average={eacoResults.rawResults.averageMetrics}
-                min={eacoResults.rawResults.minMetrics}
-                max={eacoResults.rawResults.maxMetrics}
-                stdDev={eacoResults.rawResults.stdDevMetrics}
-              />
-            )}
-            
-            {/* Analysis Comparison Display */}
-            {(eacoResults?.analysis || epsoResults?.analysis) ? (
+            {/* For single iteration runs, show AnalysisComparison */}
+            {isSingleIteration ? (
               <AnalysisComparison 
                 eacoAnalysis={eacoResults?.analysis} 
                 epsoAnalysis={epsoResults?.analysis}
@@ -405,24 +392,65 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                 epsoResults={epsoResults}
               />
             ) : (
-              // Show fallback ONLY when there are no interpretations, no t-test results,
-              // and no descriptive statistics available
-              !(eacoResults?.tTestResults || epsoResults?.tTestResults ||
-                eacoResults?.rawResults?.averageMetrics || epsoResults?.rawResults?.averageMetrics) ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-center h-64"
-                >
-                  <div className="text-center">
-                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <p className="text-gray-600 font-medium">Interpretations Not Available</p>
-                    <p className="text-gray-500 text-sm mt-2">Backend interpretation data was not provided for this run. Paired t-test and descriptive statistics (if present) are shown above.</p>
-                  </div>
-                </motion.div>
-              ) : null
+              <>
+                {/* T-Test Results if Available */}
+                {hasTTest && (
+                  <>
+                    <PairedTTestDisplay 
+                      tTestResults={eacoResults?.tTestResults || epsoResults?.tTestResults}
+                      comparisonResults={eacoResults || epsoResults}
+                      isLoading={false}
+                    />
+                    
+                    {/* Individual Iteration Details */}
+                    {hasTTest && eacoResults?.rawResults && epsoResults?.rawResults && (
+                      <IterationDetailsDisplay 
+                        eacoResults={eacoResults?.rawResults} 
+                        epsoResults={epsoResults?.rawResults}
+                      />
+                    )}
+                  </>
+                )}
+                
+                {/* Statistics Display */}
+                {!hasTTest && eacoResults?.rawResults?.averageMetrics && (
+                  <StatisticsDisplay
+                    average={eacoResults.rawResults.averageMetrics}
+                    min={eacoResults.rawResults.minMetrics}
+                    max={eacoResults.rawResults.maxMetrics}
+                    stdDev={eacoResults.rawResults.stdDevMetrics}
+                  />
+                )}
+                
+                {/* Analysis Display for multi-iteration */}
+                {(eacoResults?.analysis || epsoResults?.analysis) ? (
+                  <AnalysisComparison 
+                    eacoAnalysis={eacoResults?.analysis} 
+                    epsoAnalysis={epsoResults?.analysis}
+                    eacoResults={eacoResults}
+                    epsoResults={epsoResults}
+                  />
+                ) : (
+                  // Show fallback ONLY when there are no interpretations, no t-test results,
+                  // and no descriptive statistics available
+                  !(eacoResults?.tTestResults || epsoResults?.tTestResults ||
+                    eacoResults?.rawResults?.averageMetrics || epsoResults?.rawResults?.averageMetrics) ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-center h-64"
+                    >
+                      <div className="text-center">
+                        <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <p className="text-gray-600 font-medium">Interpretations Not Available</p>
+                        <p className="text-gray-500 text-sm mt-2">Backend interpretation data was not provided for this run. Paired t-test and descriptive statistics (if present) are shown above.</p>
+                      </div>
+                    </motion.div>
+                  ) : null
+                )}
+              </>
             )}
           </motion.div>
         );
@@ -474,17 +502,16 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
             <div className="flex justify-between items-center">
               <h4 className="font-semibold text-gray-700 text-lg">Scheduling Logs</h4>
               <div className="relative w-64">
- 
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiSearch className="text-gray-400" />
                 </div>
-                                 <input
-                   type="text"
-                   placeholder="Search logs..."
-                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent"
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                 />
+                <input
+                  type="text"
+                  placeholder="Search logs..."
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#319694] focus:border-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
             </div>
             
@@ -620,13 +647,9 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
     const plotTypes = ['metrics', 'detailed', 'vm_utilization', 'energy', 'timeline', 'radar'];
     
     // Get plot metadata/interpretations from results
-    // Based on the network response, plotMetadata is in plotData.plotMetadata
     const eacoPlotMetadata = plotData?.eaco?.plotMetadata || [];
     const epsoPlotMetadata = plotData?.epso?.plotMetadata || [];
 
-    
-
-    
     return (
       <div className="space-y-8">
         {plotTypes.map((type) => {
@@ -719,6 +742,11 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-[#319694]">
             Simulation Results
+            {isSingleIteration && (
+              <span className="ml-2 bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-full font-medium">
+                Single Iteration
+              </span>
+            )}
           </h2>
           <div className="flex space-x-3">
             <motion.button
@@ -772,8 +800,8 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
                 {tab.label}
               </span>
 
-              {/* Badge for T-Test Results on Analysis Tab */}
-              {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+              {/* Badge for T-Test Results on Analysis Tab - Only for multi-iteration */}
+              {tab.id === 'analysis' && !isSingleIteration && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
                 <span className="absolute -top-1 -right-2 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#319694] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-[#319694]"></span>
@@ -783,7 +811,7 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               {/* Tooltip on hover (hidden on mobile) */}
               <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                 {tab.description}
-                {tab.id === 'analysis' && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+                {tab.id === 'analysis' && !isSingleIteration && (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
                   <span className="block text-[#319694] font-medium mt-1">T-Test results available</span>
                 )}
               </div>
@@ -791,7 +819,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
           ))}
         </nav>
       </div>
-
 
       {/* Tab Content */}
       <div className="flex-grow overflow-y-auto p-6">
@@ -803,7 +830,6 @@ const ResultsTab = ({ onBackToAnimation, onNewSimulation, eacoResults, epsoResul
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              
             >
               {renderTabContent()}
             </motion.div>

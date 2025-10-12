@@ -316,6 +316,10 @@ export const clearHistory = async () => {
 | * Get paired history results
 | * Returns both EACO and EPSO results from the same simulation run
 | */
+/**
+ * Get paired history results
+ * Returns both EACO and EPSO results from the same simulation run
+ */
 export const getPairedHistoryResults = async (resultId) => {
   try {
     if (!resultId) {
@@ -324,35 +328,63 @@ export const getPairedHistoryResults = async (resultId) => {
     }
 
     const baseId = resultId.split('-')[0];
-    console.log(`Fetching paired results for baseId: ${baseId}`);
+    console.log(`🔍 getPairedHistoryResults called with:`, {
+      resultId,
+      baseId
+    });
     
     const db = await getDB();
+    console.log('📊 Database connection established');
+    
     const tx = db.transaction(STORE_NAME, 'readonly');
     const store = tx.objectStore(STORE_NAME);
     const index = store.index('baseId');
     
+    console.log(`🔎 Querying for baseId: "${baseId}"`);
     const pairedEntries = await index.getAll(baseId);
-    console.log(`Found ${pairedEntries.length} entries for baseId ${baseId}`);
+    console.log(`📦 Found ${pairedEntries.length} entries for baseId "${baseId}":`, 
+      pairedEntries.map(entry => ({
+        id: entry.id,
+        algorithm: entry.algorithm,
+        timestamp: entry.timestamp
+      }))
+    );
     
     if (pairedEntries.length === 0) {
-      console.error(`No history entries found for baseId: ${baseId}`);
+      console.error(`❌ No history entries found for baseId: "${baseId}"`);
+      
+      // Let's check what baseIds actually exist in the database
+      const allEntries = await store.getAll();
+      const uniqueBaseIds = [...new Set(allEntries.map(entry => entry.baseId).filter(Boolean))];
+      console.log(`📋 Available baseIds in database:`, uniqueBaseIds);
+      
       return null;
     }
     
     const eacoResult = pairedEntries.find(entry => entry.algorithm === 'EACO');
     const epsoResult = pairedEntries.find(entry => entry.algorithm === 'EPSO');
     
+    console.log(`🔍 Algorithm breakdown:`, {
+      eacoFound: !!eacoResult,
+      epsoFound: !!epsoResult,
+      eacoId: eacoResult?.id,
+      epsoId: epsoResult?.id
+    });
+    
     if (!eacoResult && !epsoResult) {
-      console.error(`No EACO or EPSO results found in paired entries`);
+      console.error(`❌ No EACO or EPSO results found in paired entries`);
+      console.log(`📋 Actual algorithms found:`, 
+        pairedEntries.map(entry => entry.algorithm)
+      );
       return null;
     }
     
     if (!eacoResult) {
-      console.warn(`EACO result missing for baseId: ${baseId}, returning EPSO only`);
+      console.warn(`⚠️ EACO result missing for baseId: "${baseId}"`);
     }
     
     if (!epsoResult) {
-      console.warn(`EPSO result missing for baseId: ${baseId}, returning EACO only`);
+      console.warn(`⚠️ EPSO result missing for baseId: "${baseId}"`);
     }
     
     const result = {
@@ -360,11 +392,22 @@ export const getPairedHistoryResults = async (resultId) => {
       epso: epsoResult || null
     };
     
-    console.log('Successfully retrieved paired results');
+    console.log(`✅ Successfully retrieved paired results:`, {
+      hasEaco: !!result.eaco,
+      hasEpso: !!result.epso,
+      eacoSummary: result.eaco?.summary ? 'Available' : 'Missing',
+      epsoSummary: result.epso?.summary ? 'Available' : 'Missing'
+    });
+    
     return result;
     
   } catch (error) {
-    console.error('Failed to get paired history results:', error);
+    console.error('❌ Failed to get paired history results:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     return null;
   }
 };
