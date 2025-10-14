@@ -1,11 +1,20 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Upload } from 'lucide-react';
-import WorkloadConfigCard from './WorkloadConfigCard';
-import WorkloadUploadCard from './WorkloadUploadCard';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
-import MatlabToggle from './MatlabToggle';
-import CloudletToggle from './CloudletToggle';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import WorkloadConfigCard from "./WorkloadConfigCard";
+import CSVFormatGuide from "./CSVFormatGuide";
+import WorkloadUploadCard from "./WorkloadUploadCard";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import MatlabToggle from "./MatlabToggle";
+import CloudletToggle from "./CloudletToggle";
+import {
+  SPACING_SCALE,
+  TYPOGRAPHY_SCALE,
+  COLOR_SYSTEM,
+  SHADOW_SCALE,
+  BORDER_RADIUS,
+  INTERACTION_STATES,
+  ICON_SIZES,
+} from "../../constants/designSystem";
 
 const WorkloadTab = ({
   config,
@@ -22,17 +31,17 @@ const WorkloadTab = ({
   onCloudletToggleChange,
   defaultCloudletCount,
   fileInputRef,
-  clearWorkloadFile
+  clearWorkloadFile,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const presetOptions = [
-    { label: 'Select a preset workload...', value: '' },
+    { label: "Select a preset workload...", value: "" },
     ...Array.from({ length: 30 }, (_, i) => ({
       label: `Google Cluster Subset ${i + 1}`,
-      value: `final_cluster_${i + 1}.csv`
-    }))
+      value: `final_cluster_${i + 1}.csv`,
+    })),
   ];
 
   const handleClearWorkload = () => {
@@ -46,11 +55,11 @@ const WorkloadTab = ({
     } else {
       // Fallback to direct calls
       onFileUpload({ target: { files: [] } });
-      onPresetSelect('');
-      
+      onPresetSelect("");
+
       // Clear the file input if ref is available
       if (fileInputRef?.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
     setShowDeleteModal(false);
@@ -64,10 +73,10 @@ const WorkloadTab = ({
   const handleFileUpload = (event) => {
     // Call the original handler
     onFileUpload(event);
-    
+
     // If we have files and a preset was selected, clear the preset
     if (event.target.files && event.target.files.length > 0 && selectedPreset) {
-      onPresetSelect('');
+      onPresetSelect("");
     }
   };
 
@@ -75,23 +84,24 @@ const WorkloadTab = ({
   const handlePresetSelect = (presetValue) => {
     // If selecting a preset and we have an uploaded file, clear it
     if (presetValue && workloadFile && fileInputRef?.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
-    
+
     onPresetSelect(presetValue);
   };
-  
+
   // In the WorkloadTab component, update the hasWorkload calculation:
   const hasWorkload = !!(workloadFile || selectedPreset) && csvRowCount > 0;
 
+  // Component removed as it's replaced by CSVFormatGuide
+
   return (
-    <motion.div 
+    <motion.div
       className="max-w-4xl mx-auto relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -99,14 +109,14 @@ const WorkloadTab = ({
       >
         <div className="space-y-6">
           {/* Cloudlet Configuration Control */}
-          <CloudletToggle 
+          <CloudletToggle
             enabled={cloudletToggleEnabled}
             onChange={onCloudletToggleChange}
             defaultValue={defaultCloudletCount}
             hasWorkload={hasWorkload}
           />
-          
-          <WorkloadConfigCard 
+
+          <WorkloadConfigCard
             config={config}
             onChange={onChange}
             csvRowCount={csvRowCount}
@@ -116,7 +126,10 @@ const WorkloadTab = ({
             cloudletToggleEnabled={cloudletToggleEnabled}
             defaultCloudletCount={defaultCloudletCount} // Make sure this is passed
           />
-          
+
+          {/* Show CSV Format Guide when no workload is selected */}
+          {!workloadFile && !selectedPreset && <CSVFormatGuide />}
+
           <WorkloadUploadCard
             isDragging={isDragging}
             setIsDragging={setIsDragging}
@@ -134,8 +147,8 @@ const WorkloadTab = ({
 
       {/* MATLAB Visualization Toggle */}
       <div className="mt-6 mb-6">
-        <MatlabToggle 
-          enabled={enableMatlabPlots} 
+        <MatlabToggle
+          enabled={enableMatlabPlots}
           onChange={onMatlabToggle}
           disabled={iterations > 1}
         />
@@ -146,7 +159,7 @@ const WorkloadTab = ({
         <DeleteConfirmationModal
           onConfirm={confirmClearWorkload}
           onCancel={cancelClearWorkload}
-          fileType={workloadFile ? 'uploaded file' : 'selected preset'}
+          fileType={workloadFile ? "uploaded file" : "selected preset"}
         />
       )}
     </motion.div>
