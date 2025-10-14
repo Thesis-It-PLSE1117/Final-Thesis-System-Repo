@@ -1,271 +1,335 @@
 import { motion } from "framer-motion";
-import { 
-  Columns,
-  Binary,
-  ListOrdered,
-  CalendarClock,
-  ClipboardCheck,
-  Cpu,
-  Disc,
-  HardDrive,
-  Clock,
-  Settings,
+import {
+  Upload,
   FileText,
+  Clock,
+  Zap,
   Database,
-  Filter,
-  GitMerge,
-  Clipboard,
-  List,
-  Save,
-  Download,
-  Server,
+  AlertCircle,
+  BookOpen,
   CheckCircle,
-  Gauge
+  Code,
 } from "lucide-react";
-
-const cardHover = {
-  y: -2,
-  boxShadow: "0 6px 16px -4px rgba(49, 150, 148, 0.15)",
-  transition: { duration: 0.2, ease: "easeOut" }
-};
-
-const listItemHover = {
-  backgroundColor: "#f5f9f9",
-  transform: "translateX(4px)",
-  transition: { duration: 0.15, ease: "easeOut" }
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.3 }
-  }
-};
 
 const WorkloadHelp = () => {
   return (
-    <motion.section
-      className="bg-white p-6 rounded-xl shadow-sm border border-[#319694]/10"
-      initial={{ y: 0, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" }}
-      whileHover={cardHover}
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-[#319694]/10 rounded-lg">
-          <Columns className="text-xl text-[#319694]" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 pb-4 border-b border-gray-200"
+      >
+        <Upload className="text-[#319694]" size={28} />
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Workload Configuration
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Upload task data or use pre-configured datasets to simulate cloud
+            scheduling
+          </p>
         </div>
-        <h3 className="text-xl font-semibold text-gray-800">Workload Configuration</h3>
-      </div>
-      <p className="text-gray-600 mb-6">
-        This system processes task workloads to simulate cloud scheduling scenarios. You can upload your own CSV file or select from pre-configured Google cluster datasets. The system automatically recognizes the data format and converts it appropriately - no manual configuration needed.
-      </p>
-      
-      <div className="space-y-8">
-        {/* Schema Configuration */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            <Database className="text-[#319694]" size={18} />
-            Supported CSV Schemas
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">The system automatically recognizes these common data formats - no manual configuration needed</p>
-          <ul className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {[
-              {
-                icon: "Columns",
-                text: "Simple Format: Contains task length (Million Instructions), CPU cores needed, and data file sizes",
-                note: "Perfect for custom workloads - system expects: length, pes, file_size, output_size"
-              },
-              {
-                icon: "Database",
-                text: "Google Cluster Format: Real datacenter traces with arrival times and resource requests",
-                note: "Uses actual Google usage patterns - system detects: arrival_ts, cpu_request, pes_number columns"
-              },
-              {
-                icon: "Clock",
-                text: "Arrival Times: When each task starts (converted from microseconds to simulation seconds)",
-                note: "Enables realistic temporal patterns - system normalizes timestamps automatically"
-              },
-              {
-                icon: "Gauge",
-                text: "Resource Requests: CPU and memory needs as fractions (0.0 to 1.0 of server capacity)",
-                note: "System scales these values to actual resource allocations during simulation"
-              },
-              {
-                icon: "HardDrive",
-                text: "Data Sizes: Input and output file sizes (normalized 0-1 values scaled to bytes)",
-                note: "System converts small decimal values to realistic byte amounts (up to 1GB max)"
-              },
-              {
-                icon: "Settings",
-                text: "Processing Work: Task complexity calculated from CPU request and optional time window",
-                note: "System computes Million Instructions automatically based on resource demands"
-              }
-            ].map((item, index) => {
-              const IconComponent = {
-                Columns: <Columns size={18} />,
-                Database: <Database size={18} />,
-                Clock: <Clock size={18} />,
-                Gauge: <Gauge size={18} />,
-                HardDrive: <HardDrive size={18} />,
-                Settings: <Settings size={18} />
-              }[item.icon] || <Columns size={18} />;
-              
-              return (
-                <motion.li 
-                  key={`schema-${index}`}
-                  className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                  initial={{ backgroundColor: "#ffffff" }}
-                  whileHover={listItemHover}
-                >
-                  <span className="text-[#319694] mt-0.5">
-                    {IconComponent}
-                  </span>
-                  <div>
-                    <span className="text-gray-700 text-sm block">{item.text}</span>
-                    <span className="text-xs text-gray-500 mt-1 block italic">{item.note}</span>
-                  </div>
-                </motion.li>
-              );
-            })}
-          </ul>
-        </motion.div>
+      </motion.div>
 
-        {/* Submission Modes */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.1 }}
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            <Settings className="text-[#319694]" size={18} />
-            Task Submission Modes
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">Control how tasks are submitted to the simulation environment</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[
-              {
-                icon: "List",
-                text: "Batch Mode (default): All tasks start at the same time for fair algorithm testing",
-                note: "Used when no arrival times are present - ensures controlled comparison conditions"
-              },
-              {
-                icon: "CalendarClock",
-                text: "Staged Mode (automatic): Tasks arrive over time based on their timestamps",
-                note: "Activated when arrival_ts column is detected - creates realistic workload patterns"
-              },
-              {
-                icon: "Filter",
-                text: "Smart Fallback: Tasks without timestamps automatically use batch mode (time=0)",
-                note: "System handles mixed data gracefully - no manual configuration needed"
-              }
-            ].map((item, index) => {
-              const IconComponent = {
-                List: <List size={18} />,
-                CalendarClock: <CalendarClock size={18} />,
-                Filter: <Filter size={18} />
-              }[item.icon] || <List size={18} />;
-              
-              return (
-                <motion.li 
-                  key={`mode-${index}`}
-                  className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                  initial={{ backgroundColor: "#ffffff" }}
-                  whileHover={listItemHover}
-                >
-                  <span className="text-[#319694] mt-0.5">
-                    {IconComponent}
-                  </span>
-                  <div>
-                    <span className="text-gray-700 text-sm block">{item.text}</span>
-                    <span className="text-xs text-gray-500 mt-1 block italic">{item.note}</span>
-                  </div>
-                </motion.li>
-              );
-            })}
-          </ul>
-        </motion.div>
+      {/* Quick Start */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="text-teal-600" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">Quick Start</h3>
+        </div>
+        <ol className="space-y-2 text-sm text-gray-700">
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-teal-600">1.</span>
+            <span>
+              Choose a pre-configured dataset or upload your CSV file or you may
+              just toggle the cloudlet config to use a default synthetic
+              dataset.
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-teal-600">2.</span>
+            <span>
+              Set how many tasks you want to simulate, We advice to use less
+              than equal to 10k if favors a valid simulation.{" "}
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-teal-600">3.</span>
+            <span>Click "Run Simulation" to run your simulation.</span>
+          </li>
+        </ol>
+      </motion.div>
 
-        {/* Using Your Own Dataset */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.2 }}
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            <Server className="text-[#319694]" size={18} />
-            Using Your Own Dataset
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">Prepare your custom workload data following these essential steps</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[
-              {
-                icon: "CheckCircle",
-                text: "Choose your data format: Simple (length, pes, file_size, output_size) or Google-style",
-                details: "Simple format is easier - just specify task size, CPU cores needed, and data amounts"
-              },
-              {
-                icon: "Columns",
-                text: "Use recognizable column names - the system detects formats automatically",
-                details: "Examples: 'length' or 'task_length' for work amount, 'pes' or 'pes_number' for CPU cores"
-              },
-              {
-                icon: "Filter",
-                text: "Clean up missing values or leave them blank - the system provides sensible defaults",
-                details: "Missing data gets reasonable fallback values: length=1000MI, pes=1, file_size=300bytes"
-              },
-              {
-                icon: "Save",
-                text: "Save as standard CSV with headers - UTF-8 encoding recommended",
-                details: "First row should contain column names, subsequent rows contain your task data"
-              },
-              {
-                icon: "Gauge",
-                text: "For resource values, use fractions (0.1 = 10%) or small decimals work best",
-                details: "System automatically scales: 0.1 becomes 10% of server capacity, 0.5 becomes 50%"
-              },
-              {
-                icon: "HardDrive",
-                text: "File sizes can be small decimals (0.001 to 1.0) - system scales them to realistic bytes",
-                details: "Values like 0.1 become ~100MB, 0.5 becomes ~500MB, 1.0 becomes ~1GB"
-              }
-            ].map((item, index) => {
-              const IconComponent = {
-                CheckCircle: <CheckCircle size={18} />,
-                Columns: <Columns size={18} />,
-                Filter: <Filter size={18} />,
-                Save: <Save size={18} />,
-                Gauge: <Gauge size={18} />,
-                HardDrive: <HardDrive size={18} />
-              }[item.icon] || <CheckCircle size={18} />;
-              
-              return (
-                <motion.li 
-                  key={`dataset-${index}`}
-                  className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                  initial={{ backgroundColor: "#ffffff" }}
-                  whileHover={listItemHover}
-                >
-                  <span className="text-[#319694] mt-0.5">
-                    {IconComponent}
-                  </span>
-                  <div>
-                    <span className="text-gray-700 text-sm block">{item.text}</span>
-                    <span className="text-xs text-gray-500 mt-1 block italic">{item.details}</span>
-                  </div>
-                </motion.li>
-              );
-            })}
-          </ul>
-        </motion.div>
-      </div>
-    </motion.section>
+      {/* File Format Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <FileText className="text-[#319694]" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">
+            Supported File Formats
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          The system auto-detects these common formats—no manual configuration
+          needed:
+        </p>
+
+        <div className="space-y-4">
+          {/* Google Format */}
+          <div className="bg-blue-50 border border-blue-200 rounded p-4">
+            <p className="text-sm font-semibold text-gray-800 mb-2">
+              Google Cluster Format
+            </p>
+            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+              <div className="text-gray-600">
+                timestamp,task_id,cpu,memory,priority
+              </div>
+              <div className="text-gray-800">
+                1234567890,task_001,0.5,1024,1
+              </div>
+              <div className="text-gray-800">
+                1234567895,task_002,0.8,2048,2
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> timestamp (seconds),
+              task_id (string), cpu (0-1), memory (MB), priority (1-10)
+            </p>
+          </div>
+
+          {/* Standard Format */}
+          <div className="bg-green-50 border border-green-200 rounded p-4">
+            <p className="text-sm font-semibold text-gray-800 mb-2">
+              Standard CloudSim Format
+            </p>
+            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+              <div className="text-gray-600">
+                task_id,length,file_size,output_size,pes
+              </div>
+              <div className="text-gray-800">1,10000,300,300,1</div>
+              <div className="text-gray-800">2,15000,500,400,2</div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> task_id (number),
+              length (MI), file_size (bytes), output_size (bytes), pes (cores
+              needed)
+            </p>
+          </div>
+
+          {/* Simple Format */}
+          <div className="bg-purple-50 border border-purple-200 rounded p-4">
+            <p className="text-sm font-semibold text-gray-800 mb-2">
+              Simple Format
+            </p>
+            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+              <div className="text-gray-600">id,length</div>
+              <div className="text-gray-800">1,10000</div>
+              <div className="text-gray-800">2,15000</div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> id (task number),
+              length (MI - Million Instructions)
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Submission Mode */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <Clock className="text-[#319694]" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">
+            Submission Modes
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          The system controls how tasks enter the system:
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded p-4">
+            <p className="text-sm font-semibold text-gray-800 mb-2">
+              Instant Submission
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              All tasks arrive at once (time = 0), noticeable in synthetic
+              workloads.
+            </p>
+            <p className="text-xs text-gray-600 italic">
+              Best for: Testing scheduling algorithms, comparing performance
+            </p>
+          </div>
+
+          <div className="bg-gray-50 rounded p-4">
+            <p className="text-sm font-semibold text-gray-800 mb-2">
+              Gradual Submission
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              Tasks arrive over time based on timestamps, e.g. Google Cluster
+              Dataset.
+            </p>
+            <p className="text-xs text-gray-600 italic">
+              Best for: Realistic scenarios, dynamic workloads
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Pre-configured Datasets */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <Database className="text-[#319694]" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">
+            Pre-configured Datasets
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          Ready-to-use workloads based on real Google cluster data:
+        </p>
+
+        <div className="space-y-2">
+          {[
+            { name: "Small", tasks: "~1000 tasks", use: "Quick testing" },
+            {
+              name: "Medium",
+              tasks: "~5000 tasks",
+              use: "Standard simulations",
+            },
+            {
+              name: "Large",
+              tasks: "~10000 tasks",
+              use: "Performance analysis",
+            },
+          ].map((dataset, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-3 p-3 bg-gray-50 rounded"
+            >
+              <CheckCircle className="text-teal-600" size={16} />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-800">
+                  {dataset.name}:{" "}
+                </span>
+                <span className="text-sm text-gray-600">{dataset.tasks}</span>
+              </div>
+              <span className="text-xs text-gray-500 italic">
+                {dataset.use}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Troubleshooting */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <AlertCircle className="text-[#319694]" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">Common Issues</h3>
+        </div>
+
+        <div className="space-y-3">
+          {[
+            {
+              problem: "File upload fails",
+              solution: "Ensure CSV has headers and no empty rows",
+              example: "Remove blank lines at end of file",
+            },
+            {
+              problem: "Tasks not executing",
+              solution: "Check that task length > 0 and VMs are running",
+              example: "Task length should be at least 100 MI",
+            },
+            {
+              problem: "Format not recognized",
+              solution: "Use supported column names (see formats above)",
+              example: "Use 'length' not 'duration' for task size",
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-red-50 border border-red-200 rounded p-3"
+            >
+              <p className="text-sm font-medium text-gray-800">
+                {item.problem}
+              </p>
+              <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
+              <p className="text-xs text-gray-600 mt-1 italic">
+                Example: {item.example}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Key Terms */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="text-[#319694]" size={20} />
+          <h3 className="text-lg font-semibold text-gray-800">Key Terms</h3>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-3">
+          {[
+            { term: "Cloudlet", def: "A task or job to be executed on a VM" },
+            {
+              term: "MI (Million Instructions)",
+              def: "Measure of computational work required",
+            },
+            {
+              term: "Length",
+              def: "Number of instructions a task needs to complete",
+            },
+            {
+              term: "PEs",
+              def: "Processing Elements (CPU cores) needed by task",
+            },
+            {
+              term: "Timestamp",
+              def: "When a task arrives in the system (seconds)",
+            },
+            {
+              term: "Priority",
+              def: "Task importance level (higher = more urgent)",
+            },
+          ].map((item, idx) => (
+            <div key={idx} className="bg-gray-50 rounded p-3">
+              <p className="text-sm font-semibold text-gray-800">{item.term}</p>
+              <p className="text-sm text-gray-600 mt-1">{item.def}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

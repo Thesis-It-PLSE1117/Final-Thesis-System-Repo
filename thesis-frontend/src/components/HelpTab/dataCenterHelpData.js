@@ -1,92 +1,182 @@
 export const dataCenterHelpContent = {
   title: "Data Center Configuration",
-  description: "Set up your simulated cloud infrastructure using CloudSim components. Hosts represent physical servers with CPU cores (Processing Elements), memory, and storage. Virtual Machines run on these hosts and execute the scheduled tasks (cloudlets). All components use time-shared scheduling for realistic resource sharing.",
+  description:
+    "Configure your cloud infrastructure with hosts (physical servers) and VMs (virtual machines). Hosts provide CPU, memory, and storage resources that VMs use to execute tasks.",
   icon: "Server",
+
+  quickStart: {
+    title: "Quick Start Example",
+    description: "Try this basic configuration for your first simulation:",
+    example: {
+      hosts: "2 hosts",
+      pesPerHost: "4 cores",
+      peMips: "2000 MIPS",
+      hostRam: "8000 MB",
+      vms: "4 VMs",
+      vmPes: "2 cores per VM",
+    },
+    note: "This creates 2 physical servers with 4 VMs that can run multiple tasks simultaneously.",
+  },
+
   sections: {
     hostConfig: {
       title: "Host Configuration",
-      description: "Hosts are simulated physical servers that provide resources to Virtual Machines. Each host has Processing Elements (CPU cores), RAM, storage, and network bandwidth. The system uses time-shared scheduling to allocate host resources among VMs fairly.",
+      description: "Hosts are physical servers that provide resources to VMs.",
       icon: "HardDriveUpload",
       items: [
-        { 
-          icon: "Server", 
-          text: "Number of Hosts: How many simulated physical servers to create. Each host will be allocated VMs automatically based on available resources and scheduling policies." 
+        {
+          icon: "Server",
+          label: "Number of Hosts",
+          explanation: "How many physical servers to create",
+          example: "Typical: 2-10 hosts",
+          tip: "More hosts = better load distribution",
         },
-        { 
-          icon: "Cpu", 
-          text: "PEs per Host: Number of CPU cores (Processing Elements) each server has. More cores allow a host to run more VMs simultaneously with better performance." 
+        {
+          icon: "Cpu",
+          label: "PEs per Host",
+          explanation: "CPU cores each server has",
+          example: "Typical: 2-8 cores",
+          tip: "Must be ≥ total VM PEs per host",
         },
-        { 
-          icon: "Gauge", 
-          text: "PE MIPS: Computing speed of each CPU core in Million Instructions Per Second. Higher MIPS means tasks complete faster. Typical values: 1000-3000 MIPS." 
+        {
+          icon: "Gauge",
+          label: "PE MIPS",
+          explanation: "CPU speed in Million Instructions Per Second",
+          example: "Typical: 1000-3000 MIPS",
+          tip: "Higher = faster task completion",
         },
-        { 
-          icon: "MemoryStick", 
-          text: "RAM per Host: Total memory in MB that each host provides to its VMs. VMs share this memory pool through the RamProvisionerSimple allocation policy." 
+        {
+          icon: "MemoryStick",
+          label: "RAM per Host",
+          explanation: "Memory in MB for all VMs on this host",
+          example: "Typical: 4000-16000 MB",
+          tip: "Must be ≥ total VM RAM per host",
         },
-        { 
-          icon: "Network", 
-          text: "Bandwidth per Host: Network capacity in Mbps for data transfers. Managed by BwProvisionerSimple to fairly distribute bandwidth among VMs on the host." 
+        {
+          icon: "Network",
+          label: "Bandwidth",
+          explanation: "Network speed in Mbps",
+          example: "Typical: 1000-10000 Mbps",
+          tip: "Shared among all VMs on host",
         },
-        { 
-          icon: "Disc", 
-          text: "Storage per Host: Disk space in MB available for VMs. Used for VM images and data storage. Each host provides this capacity to all its VMs." 
-        }
-      ]
+        {
+          icon: "Disc",
+          label: "Storage",
+          explanation: "Disk space in MB",
+          example: "Typical: 10000-100000 MB",
+          tip: "Must be ≥ total VM storage per host",
+        },
+      ],
     },
+
     vmConfig: {
       title: "Virtual Machine Configuration",
-      description: "Virtual Machines are created on hosts and execute cloudlets (tasks). Each VM requests specific amounts of CPU, memory, storage, and bandwidth from its host. The system uses Xen virtualization model with time-shared cloudlet scheduling for realistic task execution.",
+      description:
+        "VMs run on hosts and execute your tasks using allocated resources.",
       icon: "HardDriveDownload",
       items: [
-        { 
-          icon: "HardDrive", 
-          text: "Number of VMs: How many virtual machines to create. The system automatically assigns them to hosts using VmAllocationPolicySimple based on resource availability." 
+        {
+          icon: "HardDrive",
+          label: "Number of VMs",
+          explanation: "How many virtual machines to create",
+          example: "Typical: 2-20 VMs",
+          tip: "System auto-assigns VMs to hosts",
         },
-        { 
-          icon: "Gauge", 
-          text: "VM MIPS: Processing speed each VM requests from its host. Should not exceed the host's PE MIPS capacity. Used to calculate task execution times." 
+        {
+          icon: "Gauge",
+          label: "VM MIPS",
+          explanation: "CPU speed each VM requests",
+          example: "Typical: 500-2000 MIPS",
+          tip: "Should not exceed host PE MIPS",
         },
-        { 
-          icon: "Cpu", 
-          text: "VM PEs: How many CPU cores (vCPUs) each VM needs from its host. Must not exceed the host's available PEs for successful VM creation." 
+        {
+          icon: "Cpu",
+          label: "VM PEs",
+          explanation: "CPU cores each VM needs",
+          example: "Typical: 1-4 cores",
+          tip: "Total VM PEs ≤ host PEs",
         },
-        { 
-          icon: "MemoryStick", 
-          text: "VM RAM: Memory in MB that each VM requests from its host. Total VM memory on a host cannot exceed the host's available RAM." 
+        {
+          icon: "MemoryStick",
+          label: "VM RAM",
+          explanation: "Memory each VM requests in MB",
+          example: "Typical: 512-4000 MB",
+          tip: "Total VM RAM ≤ host RAM",
         },
-        { 
-          icon: "Network", 
-          text: "VM Bandwidth: Network capacity in Mbps each VM needs. Used for task data transfers and communication between VMs and the network." 
+        {
+          icon: "Network",
+          label: "VM Bandwidth",
+          explanation: "Network speed each VM needs in Mbps",
+          example: "Typical: 100-1000 Mbps",
+          tip: "Used for task data transfers",
         },
-        { 
-          icon: "Database", 
-          text: "VM Size: Storage space in MB each VM requires. Used for the VM image and temporary task data during cloudlet execution." 
-        }
-      ]
+        {
+          icon: "Database",
+          label: "VM Size",
+          explanation: "Storage space each VM needs in MB",
+          example: "Typical: 1000-10000 MB",
+          tip: "Used for VM image and task data",
+        },
+      ],
     },
-    visualization: {
-      title: "Visualization Features",
-      description: "The interface provides visual feedback to help you understand resource allocation and distribution based on CloudSim's modeling approach.",
-      icon: "Columns",
+
+    troubleshooting: {
+      title: "Common Issues",
+      description: "Solutions to frequent configuration problems:",
+      icon: "Settings",
       items: [
-        { 
-          icon: "Server", 
-          text: "Host cards display resource utilization metrics including CPU, memory, storage, and bandwidth usage percentages, and show which VMs are running on each host" 
+        {
+          icon: "AlertCircle",
+          problem: "VMs fail to start",
+          solution: "Check that total VM resources don't exceed host capacity",
+          example: "If host has 4 cores, don't create 5 VMs with 1 core each",
         },
-        { 
-          icon: "HardDrive", 
-          text: "VM cards show detailed configuration and current status (running, paused, completed) of each virtual machine along with resource consumption" 
+        {
+          icon: "AlertCircle",
+          problem: "Slow simulation",
+          solution: "Reduce number of hosts/VMs or increase MIPS values",
+          example: "Try 2 hosts with 4 VMs instead of 10 hosts with 20 VMs",
         },
-        { 
-          icon: "List", 
-          text: "Click on any VM in the distribution view to see its detailed specifications, current tasks, and resource usage statistics" 
+        {
+          icon: "AlertCircle",
+          problem: "Resource allocation error",
+          solution: "Ensure VM requirements are less than host capacity",
+          example: "VM RAM (2000 MB) must be < Host RAM (8000 MB)",
         },
-        { 
-          icon: "Settings", 
-          text: "All sections can be collapsed or expanded to customize your view and focus on relevant information. Configuration panels allow real-time parameter adjustment" 
-        }
-      ]
-    }
-  }
+      ],
+    },
+
+    glossary: {
+      title: "Key Terms",
+      description: "Important concepts explained simply:",
+      icon: "BookOpen",
+      terms: [
+        {
+          term: "Host",
+          definition: "A physical server that provides resources to VMs",
+        },
+        {
+          term: "VM (Virtual Machine)",
+          definition:
+            "A virtualized computer that runs on a host and executes tasks",
+        },
+        {
+          term: "PE (Processing Element)",
+          definition: "A CPU core that processes instructions",
+        },
+        {
+          term: "MIPS",
+          definition: "Million Instructions Per Second - measures CPU speed",
+        },
+        {
+          term: "Cloudlet",
+          definition: "A task or job that VMs execute",
+        },
+        {
+          term: "Time-shared scheduling",
+          definition: "Multiple tasks share CPU time fairly",
+        },
+      ],
+    },
+  },
 };

@@ -12,8 +12,9 @@ import {
   HelpCircle,
   Dot,
   AlertCircle,
-  Download,
   Info,
+  CheckCircle,
+  Package,
 } from "lucide-react";
 import Papa from "papaparse";
 
@@ -33,8 +34,6 @@ const WorkloadUploadCard = ({
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [validationError, setValidationError] = useState(null);
 
-  // Check if we should show the upload section
-  // In the WorkloadUploadCard component, update the shouldShowUploadSection logic:
   const shouldShowUploadSection =
     (!workloadFile && !selectedPreset) || csvRowCount === 0;
 
@@ -42,21 +41,17 @@ const WorkloadUploadCard = ({
   const validateCSV = (file, callback) => {
     Papa.parse(file, {
       header: true,
-      preview: 5, // Check first 5 rows for validation
+      preview: 5,
       skipEmptyLines: true,
       complete: (results) => {
-        // Basic validation - check if it has headers and at least one data row
         if (!results.meta.fields || results.meta.fields.length === 0) {
           callback("CSV file must have headers");
           return;
         }
-
         if (results.data.length === 0) {
           callback("CSV file must contain data rows");
           return;
         }
-
-        // If validation passes
         callback(null, results);
       },
       error: (error) => {
@@ -72,7 +67,6 @@ const WorkloadUploadCard = ({
         setIsLoadingPreview(true);
         setValidationError(null);
 
-        // Validate the file first
         validateCSV(workloadFile, (error, results) => {
           if (error) {
             setValidationError(error);
@@ -81,7 +75,6 @@ const WorkloadUploadCard = ({
             return;
           }
 
-          // If validation passed, load full preview
           Papa.parse(workloadFile, {
             header: true,
             preview: 10,
@@ -172,6 +165,12 @@ const WorkloadUploadCard = ({
     return preset?.label || selectedPreset;
   };
 
+  const getPresetDescription = () => {
+    if (!selectedPreset) return "";
+    const preset = presetOptions.find((opt) => opt.value === selectedPreset);
+    return preset?.description || "";
+  };
+
   return (
     <motion.div
       className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-md border border-[#319694]/10"
@@ -182,68 +181,90 @@ const WorkloadUploadCard = ({
       {/* Upload area - shown when no file is selected or CSV has 0 rows */}
       {shouldShowUploadSection && (
         <>
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-[#319694]/10 rounded-lg">
               <Cloud className="text-[#319694]" size={20} />
             </div>
             <div>
               <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
-                Upload Your Own CSV
+                Upload Custom Workload
               </h3>
-              <div className="flex items-center gap-1 mt-1">
-                <p className="text-sm text-gray-500">
-                  It should contain the workload and its traffic model
-                </p>
-                <div className="group relative">
-                  <HelpCircle
-                    className="text-gray-400 hover:text-[#319694] cursor-pointer"
-                    size={16}
-                  />
-                  <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg">
-                    Check the Help tab for detailed preprocessing steps and file
-                    format requirements
-                  </div>
-                </div>
-              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Upload your own CSV file with custom task workloads
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-center w-full">
-            <motion.label
-              className="flex items-center justify-center w-full"
-              whileTap={{ scale: 0.98 }}
-            >
-              <div
-                className="flex flex-col items-center justify-center w-full p-4 border-2 border-[#319694]/30 border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f0fdfa] transition-all"
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <motion.button
-                  className="px-6 py-3 bg-[#319694] text-white rounded-lg font-medium flex items-center gap-2 mb-3"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("file-input").click();
-                  }}
-                >
-                  <Upload size={18} />
-                  Select CSV File
-                </motion.button>
-                <p className="text-sm text-gray-600 mb-1">
-                  or drag and drop your file here
-                </p>
-                <p className="text-xs text-gray-500">CSV files only</p>
+          {/* Upload Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Upload className="text-[#319694]" size={18} />
+              <h4 className="text-sm font-semibold text-gray-700">
+                Select CSV File
+              </h4>
+              <div className="group relative">
+                <HelpCircle
+                  className="text-gray-400 hover:text-[#319694] cursor-pointer transition-colors"
+                  size={16}
+                />
+                <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg left-0">
+                  Check the Help tab for detailed preprocessing steps and file
+                  format requirements
+                </div>
               </div>
-              <input
-                id="file-input"
-                type="file"
-                className="hidden"
-                accept=".csv"
-                onChange={handleFileInputChange}
-              />
-            </motion.label>
+            </div>
+
+            <div className="flex items-center justify-center w-full">
+              <motion.label
+                className="flex items-center justify-center w-full"
+                whileTap={{ scale: 0.98 }}
+              >
+                <div
+                  className="flex flex-col items-center justify-center w-full p-6 border-2 border-[#319694]/30 border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-[#f5f9f9] transition-all"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <motion.button
+                    className="px-6 py-3 bg-gradient-to-r from-[#319694] to-[#4fd1c5] hover:from-[#267b79] hover:to-[#319694] text-white rounded-lg font-medium flex items-center gap-2 mb-3 shadow-sm transition-all"
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: "0 6px 16px -4px rgba(49, 150, 148, 0.3)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("file-input").click();
+                    }}
+                  >
+                    <Upload size={18} />
+                    Select CSV File
+                  </motion.button>
+                  <p className="text-sm text-gray-600 mb-1">
+                    or drag and drop your file here
+                  </p>
+                  <p className="text-xs text-gray-500">CSV files only</p>
+                </div>
+                <input
+                  id="file-input"
+                  type="file"
+                  className="hidden"
+                  accept=".csv"
+                  onChange={handleFileInputChange}
+                />
+              </motion.label>
+            </div>
+
+            {/* Info about benchmark datasets */}
+            <div className="flex items-start gap-2 p-3 bg-[#319694]/5 border border-[#319694]/20 rounded-lg mt-4">
+              <Info className="text-[#319694] mt-0.5 flex-shrink-0" size={16} />
+              <p className="text-xs text-gray-700">
+                <strong className="text-[#319694]">Tip:</strong> For benchmark
+                datasets (Google cluster traces), use the{" "}
+                <strong>Research Benchmark Dataset</strong> dropdown in the
+                Simulation Workload Setup section above.
+              </p>
+            </div>
           </div>
 
           {/* Show error message if CSV has 0 rows */}
@@ -267,22 +288,69 @@ const WorkloadUploadCard = ({
         </>
       )}
 
-      {/* File info and preview - only shown when file is selected and has rows */}
+      {/* File info and preview - IMPROVED VISIBILITY WITH SYSTEM COLORS */}
       {!shouldShowUploadSection && csvRowCount > 0 && (
         <div className="space-y-3">
+          {/* Success indicator for preset selection */}
+          {selectedPreset && (
+            <motion.div
+              className="p-3 bg-gradient-to-r from-[#f0fdfa] to-[#e0f2f1] border-2 border-[#319694]/30 rounded-lg flex items-center gap-3"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <div className="p-2 bg-[#319694]/10 rounded-full">
+                <CheckCircle className="text-[#319694]" size={20} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-[#267b79]">
+                  Preset Loaded Successfully!
+                </p>
+                <p className="text-xs text-gray-700 mt-0.5">
+                  {getPresetDisplayName()} is ready to use
+                </p>
+              </div>
+            </motion.div>
+          )}
+
           <motion.div
-            className="p-4 bg-[#f0fdfa] rounded-lg border border-[#319694]/20"
+            className={`p-4 rounded-lg border-2 ${
+              selectedPreset
+                ? "bg-[#f0fdfa] border-[#319694]/30"
+                : "bg-[#f0fdfa] border-[#319694]/20"
+            }`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-white rounded-lg mr-4 border border-[#319694]/10">
-                <FileText className="text-[#319694]" size={20} />
+              <div
+                className={`p-2 rounded-lg mr-4 border ${
+                  selectedPreset
+                    ? "bg-white border-[#319694]/20"
+                    : "bg-white border-[#319694]/10"
+                }`}
+              >
+                {selectedPreset ? (
+                  <Package className="text-[#319694]" size={20} />
+                ) : (
+                  <FileText className="text-[#319694]" size={20} />
+                )}
               </div>
               <div className="flex-grow">
-                <p className="text-sm font-medium text-gray-800">
-                  {workloadFile ? workloadFile.name : getPresetDisplayName()}
-                </p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-bold text-gray-800">
+                    {workloadFile ? workloadFile.name : getPresetDisplayName()}
+                  </p>
+                  {selectedPreset && (
+                    <span className="text-xs px-2 py-0.5 bg-[#319694] text-white rounded-full font-semibold">
+                      PRESET
+                    </span>
+                  )}
+                </div>
+                {selectedPreset && getPresetDescription() && (
+                  <p className="text-xs text-gray-600 mb-2">
+                    {getPresetDescription()}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-3 mt-2 items-center">
                   {workloadFile && (
                     <span className="text-xs text-gray-600 flex items-center gap-1">
@@ -290,39 +358,40 @@ const WorkloadUploadCard = ({
                       {(workloadFile.size / 1024).toFixed(2)} KB
                     </span>
                   )}
-                  <span className="text-xs text-gray-600 flex items-center gap-1">
-                    <Zap size={14} className="text-[#319694]" />
-                    {csvRowCount} tasks
+                  <span className="text-xs font-semibold text-[#319694] flex items-center gap-1">
+                    <Zap size={14} />
+                    {csvRowCount} tasks loaded
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-2">
                 {csvPreview && !validationError && (
                   <motion.button
                     onClick={togglePreview}
-                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg border border-[#319694]/20 hover:bg-[#319694]/10 text-[#319694] transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-white border-2 border-[#319694]/30 hover:bg-[#319694]/10 hover:border-[#319694] text-[#319694] transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     {showPreview ? (
                       <>
                         <ChevronUp size={14} />
-                        Hide Preview
+                        Hide
                       </>
                     ) : (
                       <>
                         <Table size={14} />
-                        Show Preview
+                        Preview
                       </>
                     )}
                   </motion.button>
                 )}
                 <motion.button
-                  className="p-1 text-gray-400 hover:text-[#319694] rounded-full"
+                  className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-sm transition-colors"
                   onClick={onClearWorkload}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  title="Remove workload"
                 >
                   <X size={18} />
                 </motion.button>
@@ -382,7 +451,10 @@ const WorkloadUploadCard = ({
                       </thead>
                       <tbody className="divide-y divide-[#319694]/10">
                         {csvPreview.rows.map((row, i) => (
-                          <tr key={i}>
+                          <tr
+                            key={i}
+                            className="hover:bg-[#f5f9f9] transition-colors"
+                          >
                             {csvPreview.headers.map((header, j) => (
                               <td
                                 key={j}
