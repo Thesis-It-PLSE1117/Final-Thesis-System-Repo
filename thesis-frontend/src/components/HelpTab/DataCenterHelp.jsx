@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { 
+import {
   Server,
   HardDriveUpload,
   HardDriveDownload,
-  Columns,
   Settings,
   HardDrive,
   Cpu,
@@ -11,159 +10,192 @@ import {
   MemoryStick,
   Network,
   Disc,
-  List,
-  Database
+  AlertCircle,
+  BookOpen,
+  Zap,
 } from "lucide-react";
 import { dataCenterHelpContent } from "./dataCenterHelpData";
 
-const cardHover = {
-  y: -2,
-  boxShadow: "0 6px 16px -4px rgba(49, 150, 148, 0.15)",
-  transition: { duration: 0.2, ease: "easeOut" }
+const iconMap = {
+  Server,
+  HardDriveUpload,
+  HardDriveDownload,
+  Settings,
+  HardDrive,
+  Cpu,
+  Gauge,
+  MemoryStick,
+  Network,
+  Disc,
+  AlertCircle,
+  BookOpen,
+  Zap,
 };
 
-const listItemHover = {
-  backgroundColor: "#f5f9f9",
-  transform: "translateX(4px)",
-  transition: { duration: 0.15, ease: "easeOut" }
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.3 }
-  }
-};
-
-// Helper function to get the appropriate icon component
-const getIconComponent = (iconName, props = {}) => {
-  const iconMap = {
-    Server: <Server {...props} />,
-    HardDriveUpload: <HardDriveUpload {...props} />,
-    HardDriveDownload: <HardDriveDownload {...props} />,
-    Columns: <Columns {...props} />,
-    Settings: <Settings {...props} />,
-    HardDrive: <HardDrive {...props} />,
-    Cpu: <Cpu {...props} />,
-    Gauge: <Gauge {...props} />,
-    MemoryStick: <MemoryStick {...props} />,
-    Network: <Network {...props} />,
-    Disc: <Disc {...props} />,
-    List: <List {...props} />,
-    Database: <Database {...props} />
-  };
-  
-  return iconMap[iconName] || <Server {...props} />; // Default to Server if icon not found
+const getIcon = (name, props = {}) => {
+  const Icon = iconMap[name] || Server;
+  return <Icon {...props} />;
 };
 
 const DataCenterHelp = () => {
-  const { title, description, icon, sections } = dataCenterHelpContent;
+  const { title, description, quickStart, sections } = dataCenterHelpContent;
 
   return (
-    <motion.section
-      className="bg-white p-6 rounded-xl shadow-sm border border-[#319694]/10"
-      initial={{ y: 0, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" }}
-      whileHover={cardHover}
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-[#319694]/10 rounded-lg">
-          {getIconComponent(icon, { className: "text-xl text-[#319694]" })}
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 pb-4 border-b border-gray-200"
+      >
+        {getIcon("Server", { className: "text-[#319694]", size: 28 })}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+          <p className="text-sm text-gray-600 mt-1">{description}</p>
         </div>
-        <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
-      </div>
-      <p className="text-gray-600 mb-6">{description}</p>
-      
-      <div className="space-y-8">
-        {/* Host Configuration */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            {getIconComponent(sections.hostConfig.icon, { className: "text-[#319694]", size: 18 })}
-            {sections.hostConfig.title}
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">{sections.hostConfig.description}</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {sections.hostConfig.items.map((item, index) => (
-              <motion.li 
-                key={`host-${index}`}
-                className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                initial={{ backgroundColor: "#ffffff" }}
-                whileHover={listItemHover}
-              >
-                <span className="text-[#319694] mt-0.5">
-                  {getIconComponent(item.icon, { size: 18 })}
-                </span>
-                <span className="text-gray-700 text-sm">{item.text}</span>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
+      </motion.div>
 
-        {/* VM Configuration */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.1 }}
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            {getIconComponent(sections.vmConfig.icon, { className: "text-[#319694]", size: 18 })}
-            {sections.vmConfig.title}
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">{sections.vmConfig.description}</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {sections.vmConfig.items.map((item, index) => (
-              <motion.li 
-                key={`vm-${index}`}
-                className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                initial={{ backgroundColor: "#ffffff" }}
-                whileHover={listItemHover}
-              >
-                <span className="text-[#319694] mt-0.5">
-                  {getIconComponent(item.icon, { size: 18 })}
-                </span>
-                <span className="text-gray-700 text-sm">{item.text}</span>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
+      {/* Quick Start */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          {getIcon("Zap", { className: "text-teal-600", size: 20 })}
+          <h3 className="text-lg font-semibold text-gray-800">
+            {quickStart.title}
+          </h3>
+        </div>
+        <p className="text-sm text-gray-700 mb-3">{quickStart.description}</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-white/60 rounded p-3">
+          {Object.entries(quickStart.example).map(([key, value]) => (
+            <div key={key} className="text-sm">
+              <span className="font-medium text-gray-700">{value}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-600 mt-3 italic">{quickStart.note}</p>
+      </motion.div>
 
-        {/* Visualization */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.2 }}
-        >
-          <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-            {getIconComponent(sections.visualization.icon, { className: "text-[#319694]", size: 18 })}
-            {sections.visualization.title}
-          </h4>
-          <p className="text-gray-600 mb-4 text-sm">{sections.visualization.description}</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {sections.visualization.items.map((item, index) => (
-              <motion.li 
-                key={`vis-${index}`}
-                className="flex items-start gap-3 text-gray-700 p-3 bg-white rounded-lg border border-[#319694]/10"
-                initial={{ backgroundColor: "#ffffff" }}
-                whileHover={listItemHover}
-              >
-                <span className="text-[#319694] mt-0.5">
-                  {getIconComponent(item.icon, { size: 18 })}
-                </span>
-                <span className="text-gray-700 text-sm">{item.text}</span>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
-      </div>
-    </motion.section>
+      {/* Host Configuration */}
+      <ConfigSection section={sections.hostConfig} delay={0.2} />
+
+      {/* VM Configuration */}
+      <ConfigSection section={sections.vmConfig} delay={0.3} />
+
+      {/* Troubleshooting */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          {getIcon(sections.troubleshooting.icon, {
+            className: "text-[#319694]",
+            size: 20,
+          })}
+          <h3 className="text-lg font-semibold text-gray-800">
+            {sections.troubleshooting.title}
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          {sections.troubleshooting.description}
+        </p>
+        <div className="space-y-3">
+          {sections.troubleshooting.items.map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-red-50 border border-red-200 rounded p-3"
+            >
+              <div className="flex items-start gap-2">
+                {getIcon(item.icon, {
+                  className: "text-red-600 mt-0.5",
+                  size: 16,
+                })}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">
+                    {item.problem}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
+                  <p className="text-xs text-gray-600 mt-1 italic">
+                    Example: {item.example}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Glossary */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="bg-white rounded-lg border border-gray-200 p-5"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          {getIcon(sections.glossary.icon, {
+            className: "text-[#319694]",
+            size: 20,
+          })}
+          <h3 className="text-lg font-semibold text-gray-800">
+            {sections.glossary.title}
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          {sections.glossary.description}
+        </p>
+        <div className="grid md:grid-cols-2 gap-3">
+          {sections.glossary.terms.map((item, idx) => (
+            <div key={idx} className="bg-gray-50 rounded p-3">
+              <p className="text-sm font-semibold text-gray-800">{item.term}</p>
+              <p className="text-sm text-gray-600 mt-1">{item.definition}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 };
+
+// Reusable section component (DRY principle)
+const ConfigSection = ({ section, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="bg-white rounded-lg border border-gray-200 p-5"
+  >
+    <div className="flex items-center gap-2 mb-3">
+      {getIcon(section.icon, { className: "text-[#319694]", size: 20 })}
+      <h3 className="text-lg font-semibold text-gray-800">{section.title}</h3>
+    </div>
+    <p className="text-sm text-gray-600 mb-4">{section.description}</p>
+    <div className="space-y-2">
+      {section.items.map((item, idx) => (
+        <div
+          key={idx}
+          className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition-colors"
+        >
+          {getIcon(item.icon, { className: "text-gray-500 mt-0.5", size: 18 })}
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-800">{item.label}</p>
+            <p className="text-sm text-gray-600">{item.explanation}</p>
+            <div className="flex flex-wrap gap-3 mt-1">
+              <span className="text-xs text-teal-600 font-medium">
+                {item.example}
+              </span>
+              <span className="text-xs text-gray-500 italic">{item.tip}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </motion.div>
+);
 
 export default DataCenterHelp;
