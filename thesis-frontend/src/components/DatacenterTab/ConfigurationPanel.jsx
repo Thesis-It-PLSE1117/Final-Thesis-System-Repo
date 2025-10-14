@@ -1,11 +1,17 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
-const ConfigurationPanel = ({ title, icon: Icon, expanded, toggleSection, children }) => {
+const ConfigurationPanel = ({
+  title,
+  icon: Icon,
+  expanded,
+  toggleSection,
+  children,
+}) => {
   return (
     <div className="mb-6">
-      <button 
-        className="flex items-center w-full text-left mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+      <button
+        className="flex items-center w-full text-left mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
         onClick={toggleSection}
       >
         {expanded ? (
@@ -16,15 +22,15 @@ const ConfigurationPanel = ({ title, icon: Icon, expanded, toggleSection, childr
         <Icon className="mr-2" size={20} />
         <span className="font-medium">{title}</span>
       </button>
-      
+
       <AnimatePresence>
         {expanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden"
+            className="overflow-hidden pb-4"
           >
             {children}
           </motion.div>

@@ -1,19 +1,40 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; 
-import { 
-  Cpu, MemoryStick, Database, Network, HardDrive, Server, Gauge, 
-  HardDriveDownload, HardDriveUpload, Disc, Play, MoreHorizontal, 
-  ChevronDown, ChevronRight, Settings, ChevronUp, X
-} from 'lucide-react';
-import ConfigSection from './ConfigurationPanel';
-import InputField from './InputField';
-import VMCard from './VMCard';
-import HostCard from './HostCard';
-import PresetSelector from './PresetSelector';
-import ConfigurationPanel from './ConfigurationPanel';
-import VisualizationSection from './VisualizationSection';
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Cpu,
+  MemoryStick,
+  Database,
+  Network,
+  HardDrive,
+  Server,
+  Gauge,
+  HardDriveDownload,
+  HardDriveUpload,
+  Disc,
+  Play,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronRight,
+  Settings,
+  ChevronUp,
+  X,
+} from "lucide-react";
+import ConfigSection from "./ConfigurationPanel";
+import InputField from "./InputField";
+import VMCard from "./VMCard";
+import HostCard from "./HostCard";
+import PresetSelector from "./PresetSelector";
+import ConfigurationPanel from "./ConfigurationPanel";
+import VisualizationSection from "./VisualizationSection";
 
-const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearPreset, applyPreset }) => {
+const DataCenterTab = ({
+  config,
+  onChange,
+  presetConfigs,
+  selectedPreset,
+  clearPreset,
+  applyPreset,
+}) => {
   const [vmCards, setVmCards] = useState([]);
   const [hostVisualization, setHostVisualization] = useState([]);
   const [expandedHost, setExpandedHost] = useState(null);
@@ -22,7 +43,7 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
     hostConfig: true,
     vmConfig: true,
     distribution: false,
-    preview: false
+    preview: false,
   });
 
   // Limit the number of displayed hosts and VMs
@@ -30,21 +51,21 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
   const MAX_DISPLAY_VMS = 20;
 
   const toggleSection = (section) => {
-    setExpandedSection(prev => ({
+    setExpandedSection((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     // Convert empty string to 0 or keep the numeric value
-    const numericValue = value === '' ? 0 : Number(value);
+    const numericValue = value === "" ? 0 : Number(value);
     onChange({
       target: {
         name,
-        value: numericValue
-      }
+        value: numericValue,
+      },
     });
   };
 
@@ -56,9 +77,9 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
     } else {
       onChange({
         target: {
-          name: 'applyPreset',
-          value: presetName
-        }
+          name: "applyPreset",
+          value: presetName,
+        },
       });
     }
   };
@@ -71,9 +92,9 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
     } else {
       onChange({
         target: {
-          name: 'applyPreset',
-          value: null
-        }
+          name: "applyPreset",
+          value: null,
+        },
       });
     }
   };
@@ -82,10 +103,10 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
   useEffect(() => {
     const cards = [];
     const displayVmCount = Math.min(config.numVMs, MAX_DISPLAY_VMS);
-    
+
     for (let i = 0; i < displayVmCount; i++) {
       cards.push(
-        <VMCard 
+        <VMCard
           key={i}
           vmId={i}
           vmMips={config.vmMips}
@@ -94,53 +115,65 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
           vmBw={config.vmBw}
           vmPes={config.vmPes}
           isCompact={true}
-        />
+        />,
       );
     }
-    
+
     // Add indicator if there are more VMs than displayed
     if (config.numVMs > MAX_DISPLAY_VMS) {
       cards.push(
-        <div key="more-vms" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500">
+        <div
+          key="more-vms"
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500"
+        >
           <MoreHorizontal size={24} className="mb-1" />
-          <p className="text-xs font-medium">{config.numVMs - MAX_DISPLAY_VMS} more VMs</p>
+          <p className="text-xs font-medium">
+            {config.numVMs - MAX_DISPLAY_VMS} more VMs
+          </p>
           <p className="text-xs">Total: {config.numVMs} VMs</p>
-        </div>
+        </div>,
       );
     }
-    
+
     setVmCards(cards);
-  }, [config.numVMs, config.vmMips, config.vmRam, config.vmSize, config.vmBw, config.vmPes]);
+  }, [
+    config.numVMs,
+    config.vmMips,
+    config.vmRam,
+    config.vmSize,
+    config.vmBw,
+    config.vmPes,
+  ]);
 
   // Generate host visualization with limitation - FIXED DISTRIBUTION
   useEffect(() => {
     const hosts = [];
     const displayHostCount = Math.min(config.numHosts, MAX_DISPLAY_HOSTS);
-    
+
     // Calculate VMs per host using CloudSim-like distribution
     const vmsPerHost = Math.floor(config.numVMs / config.numHosts);
     const remainingVMs = config.numVMs % config.numHosts;
-    
+
     for (let hostId = 0; hostId < displayHostCount; hostId++) {
       // Distribute VMs - first 'remainingVMs' hosts get one extra VM
       const vmsInThisHost = hostId < remainingVMs ? vmsPerHost + 1 : vmsPerHost;
-      
+
       const hostVMs = [];
       // Calculate starting VM ID for this host
       let startVM = 0;
       for (let i = 0; i < hostId; i++) {
-        startVM += (i < remainingVMs) ? vmsPerHost + 1 : vmsPerHost;
+        startVM += i < remainingVMs ? vmsPerHost + 1 : vmsPerHost;
       }
-      
+
       // Limit VMs per host for display
       const maxVmsPerHostDisplay = 6;
       const displayVmsCount = Math.min(vmsInThisHost, maxVmsPerHostDisplay);
-      
+
       for (let i = 0; i < displayVmsCount; i++) {
         const vmId = startVM + i;
         hostVMs.push(
-          <motion.div 
-            key={vmId} 
+          <motion.div
+            key={vmId}
             className="bg-[#f0fdfa] p-1 rounded border border-[#319694]/10 text-xs cursor-pointer hover:bg-[#e0f8f6] transition-colors"
             whileHover={{ scale: 1.03 }}
             onClick={() => setExpandedHost(expandedHost === vmId ? null : vmId)}
@@ -153,7 +186,7 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
               {expandedHost === vmId && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                   className="mt-1 text-xs text-gray-600 overflow-hidden"
@@ -169,19 +202,22 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </motion.div>,
         );
       }
-      
+
       // Add indicator if there are more VMs in this host than displayed
       if (vmsInThisHost > maxVmsPerHostDisplay) {
         hostVMs.push(
-          <div key={`more-${hostId}`} className="text-center p-1 bg-gray-100 rounded border border-gray-200 text-xs text-gray-500">
+          <div
+            key={`more-${hostId}`}
+            className="text-center p-1 bg-gray-100 rounded border border-gray-200 text-xs text-gray-500"
+          >
             +{vmsInThisHost - maxVmsPerHostDisplay} more
-          </div>
+          </div>,
         );
       }
-      
+
       hosts.push(
         <HostCard
           key={hostId}
@@ -194,25 +230,41 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
           vms={hostVMs}
           totalVms={vmsInThisHost}
           isCompact={true}
-        />
+        />,
       );
     }
-    
+
     // Add indicator if there are more hosts than displayed
     if (config.numHosts > MAX_DISPLAY_HOSTS) {
       hosts.push(
-        <div key="more-hosts" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500">
+        <div
+          key="more-hosts"
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500"
+        >
           <MoreHorizontal size={24} className="mb-1" />
-          <p className="text-xs font-medium">{config.numHosts - MAX_DISPLAY_HOSTS} more hosts</p>
+          <p className="text-xs font-medium">
+            {config.numHosts - MAX_DISPLAY_HOSTS} more hosts
+          </p>
           <p className="text-xs">Total: {config.numHosts} hosts</p>
-        </div>
+        </div>,
       );
     }
-    
+
     setHostVisualization(hosts);
-  }, [config.numHosts, config.numVMs, config.numPesPerHost, config.ramPerHost, 
-      config.peMips, config.bwPerHost, config.storagePerHost, expandedHost, 
-      config.vmMips, config.vmRam, config.vmPes, config.vmBw]);
+  }, [
+    config.numHosts,
+    config.numVMs,
+    config.numPesPerHost,
+    config.ramPerHost,
+    config.peMips,
+    config.bwPerHost,
+    config.storagePerHost,
+    expandedHost,
+    config.vmMips,
+    config.vmRam,
+    config.vmPes,
+    config.vmBw,
+  ]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
@@ -230,77 +282,81 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
 
       {/* Main Content Area */}
       <div className="lg:w-3/4">
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 mb-6">
+        <div className="bg-white rounded-xl shadow-sm p-5 pb-6 border border-gray-200 mb-6">
           <div className="flex items-center mb-4">
             <div className="p-2 bg-[#319694]/10 rounded-lg mr-3">
               <Server className="text-[#319694]" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">Cloud Simulation Infrastructure</h3>
-              <p className="text-sm text-gray-600">Configure hosts and VMs for EPSO/EACO load balancing evaluation</p>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Cloud Simulation Infrastructure
+              </h3>
+              <p className="text-sm text-gray-600">
+                Configure hosts and VMs for EPSO/EACO load balancing evaluation
+              </p>
             </div>
           </div>
-          
+
           {/* Host Configuration Panel */}
           <ConfigurationPanel
             title="Host Configuration"
             icon={Server}
             expanded={expandedSection.hostConfig}
-            toggleSection={() => toggleSection('hostConfig')}
+            toggleSection={() => toggleSection("hostConfig")}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-8">
-              <InputField 
-                label="Number of Hosts" 
-                name="numHosts" 
-                value={config.numHosts} 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-6 pl-8 pb-3">
+              <InputField
+                label="Number of Hosts"
+                name="numHosts"
+                value={config.numHosts}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Server}
               />
-              <InputField 
-                label="PEs per Host" 
-                name="numPesPerHost" 
-                value={config.numPesPerHost} 
+              <InputField
+                label="PEs per Host"
+                name="numPesPerHost"
+                value={config.numPesPerHost}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Cpu}
               />
-              <InputField 
-                label="PE MIPS" 
-                name="peMips" 
-                value={config.peMips} 
+              <InputField
+                label="PE MIPS"
+                name="peMips"
+                value={config.peMips}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Gauge}
                 unit="MIPS"
               />
-              <InputField 
-                label="RAM per Host" 
-                name="ramPerHost" 
-                value={config.ramPerHost} 
+              <InputField
+                label="RAM per Host"
+                name="ramPerHost"
+                value={config.ramPerHost}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={MemoryStick}
                 unit="MB"
               />
-              <InputField 
-                label="Bandwidth per Host" 
-                name="bwPerHost" 
-                value={config.bwPerHost} 
+              <InputField
+                label="Bandwidth per Host"
+                name="bwPerHost"
+                value={config.bwPerHost}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Network}
                 unit="MBps"
               />
-              <InputField 
-                label="Storage per Host" 
-                name="storagePerHost" 
-                value={config.storagePerHost} 
+              <InputField
+                label="Storage per Host"
+                name="storagePerHost"
+                value={config.storagePerHost}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
@@ -315,61 +371,61 @@ const DataCenterTab = ({ config, onChange, presetConfigs, selectedPreset, clearP
             title="VM Configuration"
             icon={HardDrive}
             expanded={expandedSection.vmConfig}
-            toggleSection={() => toggleSection('vmConfig')}
+            toggleSection={() => toggleSection("vmConfig")}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-8">
-              <InputField 
-                label="Number of VMs" 
-                name="numVMs" 
-                value={config.numVMs} 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-6 pl-8 pb-3">
+              <InputField
+                label="Number of VMs"
+                name="numVMs"
+                value={config.numVMs}
                 onChange={handleInputChange}
                 type="number"
                 min="0"
                 icon={HardDrive}
               />
-              <InputField 
-                label="VM MIPS" 
-                name="vmMips" 
-                value={config.vmMips} 
+              <InputField
+                label="VM MIPS"
+                name="vmMips"
+                value={config.vmMips}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Gauge}
                 unit="MIPS"
               />
-              <InputField 
-                label="VM PEs" 
-                name="vmPes" 
-                value={config.vmPes} 
+              <InputField
+                label="VM PEs"
+                name="vmPes"
+                value={config.vmPes}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Cpu}
               />
-              <InputField 
-                label="VM RAM" 
-                name="vmRam" 
-                value={config.vmRam} 
+              <InputField
+                label="VM RAM"
+                name="vmRam"
+                value={config.vmRam}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={MemoryStick}
                 unit="MB"
               />
-              <InputField 
-                label="VM Bandwidth" 
-                name="vmBw" 
-                value={config.vmBw} 
+              <InputField
+                label="VM Bandwidth"
+                name="vmBw"
+                value={config.vmBw}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
                 icon={Network}
                 unit="MBps"
               />
-              <InputField 
-                label="VM Size" 
-                name="vmSize" 
-                value={config.vmSize} 
+              <InputField
+                label="VM Size"
+                name="vmSize"
+                value={config.vmSize}
                 onChange={handleInputChange}
                 type="number"
                 min="1"
