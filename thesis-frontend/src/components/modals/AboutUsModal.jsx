@@ -67,21 +67,21 @@ const AboutUsModal = ({ isOpen, onClose }) => {
   const teamMembers = [
     {
       name: "John Danmel C. Laranga",
-      role: "Team Leader",
+      role: "Thesis Leader/Project Manager",
       image: danmelImage,
-      description: "Oversaw project development and coordination"
+      description: "Oversaw project development and coordination."
     },
     {
       name: "Kier Christian F. Reyes",
-      role: "Backend Developer",
+      role: "Backend Dev Lead",
       image: kierImage,
-      description: "Implemented load balancing algorithms and server logic"
+      description: "Implemented load balancing algorithms and server logic."
     },
     {
       name: "Jan Alfred G. Violanta",
-      role: "Frontend Developer",
+      role: "Frontend Dev Lead",
       image: alfredImage,
-      description: "Designed and developed the user interface"
+      description: "Designed and developed the user interface."
     }
   ];
 
@@ -133,7 +133,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
               </motion.h2>
 
               <motion.p variants={itemVariants} className="mb-6 text-base md:text-lg">
-                This thesis project was developed by passionate Computer Science students:
+                This project was developed by passionate University of Cabuyao CS students:
               </motion.p>
 
               <motion.div 
@@ -185,34 +185,34 @@ const AboutUsModal = ({ isOpen, onClose }) => {
 
               <motion.div 
                 variants={itemVariants}
-                className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4"
+                className="bg-[#319694]/10 rounded-xl p-4 mb-4"
               >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <svg className="w-4 h-4 md:w-5 md:h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2m-2 6h2a2 2 0 012 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2v-6a2 2 0 012-2z" />
                   </svg>
-                  <h4 className="font-semibold text-gray-800 text-sm md:text-base">Research Methodology</h4>
+                  <h4 className="font-semibold text-[#319694] text-sm md:text-base">Research Methodology</h4>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm">
-                  <div className="space-y-1">
-                    <p><span className="font-medium text-gray-700">Participants:</span> 30 total</p>
-                    <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
-                      <li>• 15 IT Experts (5+ years experience)</li>
-                      <li>• 15 Cloud Specialists (certified)</li>
-                    </ul>
+                <div className="text-xs md:text-sm text-gray-700 text-center space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
+                    <div className="space-y-1">
+                      <p><span className="font-medium">Participants:</span> 30 total</p>
+                      <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
+                        <li>• 15 IT Experts </li>
+                        <li>• 15 End Users</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-1">
+                      <p><span className="font-medium">Analysis:</span> Statistical comparison</p>
+                      <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
+                        <li>• Paired t-test (α = 0.05)</li>
+                        <li>• Likert scale evaluation</li>
+                        <li>• Purposive sampling</li>
+                      </ul>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <p><span className="font-medium text-gray-700">Analysis:</span> Statistical comparison</p>
-                    <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
-                      <li>• Paired t-test (α = 0.05)</li>
-                      <li>• Likert scale evaluation</li>
-                      <li>• Purposive sampling</li>
-                    </ul>
-                  </div>
+                  
                 </div>
-                <p className="text-xs text-gray-600 text-center mt-2">
-                  Evaluating Enhanced PSO (EPSO) vs Enhanced ACO (EACO) using CloudSim simulation with Google Cluster Dataset
-                </p>
               </motion.div>
 
               <motion.div 

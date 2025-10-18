@@ -303,49 +303,129 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </div>
             )}
 
-            {history.length > 0 && selectedResult && (
-              <button
-                onClick={() => {
-                  const baseId = selectedResult.id.split("-")[0];
-                  const pairedRuns = history.filter((item) =>
-                    item.id.startsWith(baseId),
-                  );
+            {history.length > 0 && !selectedResult && (
+              <div className="bg-green-50 text-green-600 text-sm px-3 py-2 rounded-lg border border-green-100">
+                Select a simulation run to export
+              </div>
+            )}
 
-                  if (pairedRuns.length === 2) {
-                    const runId =
-                      selectedResult.simulationId?.split("#")[1] || baseId;
-                    exportSimulationHistory(
-                      pairedRuns,
-                      "json",
-                      false,
-                      `Run_${runId}`,
-                    );
-                  } else {
-                    alert(
-                      "Could not find complete EACO/EPSO pair for this run",
-                    );
-                  }
-                }}
-                className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
-                title="Export run data"
-              >
-                <svg
-                  className="w-4 h-4 mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {history.length > 0 && selectedResult && (
+              <div className="relative group">
+                <button
+                  className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
+                  title="Export run data"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                Export Run #
-                {selectedResult.simulationId?.split("#")[1] ||
-                  selectedResult.id.split("-")[0]}
-              </button>
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Export Run #
+                  {selectedResult.simulationId?.split("#")[1] ||
+                    selectedResult.id.split("-")[0]}
+                  <svg
+                    className="w-4 h-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <div className="hidden group-hover:block absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <button
+                    onClick={() => {
+                      const baseId = selectedResult.id.split("-")[0];
+                      const pairedRuns = history.filter((item) =>
+                        item.id.startsWith(baseId),
+                      );
+
+                      if (pairedRuns.length === 2) {
+                        const runId =
+                          selectedResult.simulationId?.split("#")[1] || baseId;
+                        exportSimulationHistory(
+                          pairedRuns,
+                          "json",
+                          false,
+                          `Run_${runId}`,
+                        );
+                      } else {
+                        alert(
+                          "Could not find complete EACO/EPSO pair for this run",
+                        );
+                      }
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center rounded-t-lg"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Export as JSON
+                  </button>
+                  <button
+                    onClick={() => {
+                      const baseId = selectedResult.id.split("-")[0];
+                      const pairedRuns = history.filter((item) =>
+                        item.id.startsWith(baseId),
+                      );
+
+                      if (pairedRuns.length === 2) {
+                        const runId =
+                          selectedResult.simulationId?.split("#")[1] || baseId;
+                        exportSimulationHistory(
+                          pairedRuns,
+                          "csv",
+                          false,
+                          `Run_${runId}`,
+                        );
+                      } else {
+                        alert(
+                          "Could not find complete EACO/EPSO pair for this run",
+                        );
+                      }
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center rounded-b-lg border-t border-gray-100"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Export CSV (Iterations)
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Import - always available */}

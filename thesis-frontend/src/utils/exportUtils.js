@@ -93,7 +93,81 @@ export const flattenObject = (obj, prefix = "") => {
   return flattened;
 };
 
-//history of data
+const exportIterationsAsCSV = (history, timestamp) => {
+  const eacoData = history.find((sim) => sim.algorithm === "EACO");
+  const epsoData = history.find((sim) => sim.algorithm === "EPSO");
+  
+  const eacoIterations = eacoData?.rawResults?.individualResults || [];
+  const epsoIterations = epsoData?.rawResults?.individualResults || [];
+  
+  if (eacoIterations.length === 0 && epsoIterations.length === 0) {
+    const hasSingleRunData = eacoData?.summary || epsoData?.summary;
+    if (hasSingleRunData) {
+      alert("This simulation was a single run without iterations. Use Export as JSON to get the data.");
+    } else {
+      alert("No iteration data available for export.");
+    }
+    return;
+  }
+  
+  const maxIterations = Math.max(eacoIterations.length, epsoIterations.length);
+  const csvRows = [];
+  
+  const headerRow = [
+    "Iteration",
+    "EACO_Makespan",
+    "EACO_ResourceUtilization",
+    "EACO_LoadBalance",
+    "EACO_EnergyConsumption",
+    "EACO_ResponseTime",
+    "EACO_Fitness",
+    "EACO_TotalCost",
+    "EACO_CostEfficiency",
+    "EPSO_Makespan",
+    "EPSO_ResourceUtilization",
+    "EPSO_LoadBalance",
+    "EPSO_EnergyConsumption",
+    "EPSO_ResponseTime",
+    "EPSO_Fitness",
+    "EPSO_TotalCost",
+    "EPSO_CostEfficiency",
+  ];
+  csvRows.push(headerRow.join(","));
+  
+  for (let i = 0; i < maxIterations; i++) {
+    const eacoIter = eacoIterations[i] || {};
+    const epsoIter = epsoIterations[i] || {};
+    
+    const eacoSummary = eacoIter.summary || {};
+    const epsoSummary = epsoIter.summary || {};
+    
+    const row = [
+      i + 1,
+      eacoSummary.makespan?.toFixed(2) || "N/A",
+      eacoSummary.resourceUtilization?.toFixed(2) || "N/A",
+      eacoSummary.loadBalance?.toFixed(4) || "N/A",
+      (eacoSummary.energyConsumption || eacoIter.energyConsumption)?.toFixed(2) || "N/A",
+      eacoSummary.responseTime?.toFixed(2) || "N/A",
+      eacoSummary.fitness?.toFixed(4) || "N/A",
+      eacoSummary.totalCost?.toFixed(2) || "N/A",
+      eacoSummary.costEfficiency?.toFixed(4) || "N/A",
+      epsoSummary.makespan?.toFixed(2) || "N/A",
+      epsoSummary.resourceUtilization?.toFixed(2) || "N/A",
+      epsoSummary.loadBalance?.toFixed(4) || "N/A",
+      (epsoSummary.energyConsumption || epsoIter.energyConsumption)?.toFixed(2) || "N/A",
+      epsoSummary.responseTime?.toFixed(2) || "N/A",
+      epsoSummary.fitness?.toFixed(4) || "N/A",
+      epsoSummary.totalCost?.toFixed(2) || "N/A",
+      epsoSummary.costEfficiency?.toFixed(4) || "N/A",
+    ];
+    csvRows.push(row.join(","));
+  }
+  
+  const csvContent = csvRows.join("\n");
+  const runId = history[0]?.id?.split("-")[0];
+  downloadCSV(csvContent, `Run_${runId}_Iterations_${timestamp}.csv`);
+};
+
 export const exportSimulationHistory = (
   history,
   format = "json",
@@ -114,7 +188,8 @@ export const exportSimulationHistory = (
   }
 
   if (format === "csv") {
-    // Define the field structure with sections
+    exportIterationsAsCSV(history, timestamp);
+  } else if (format === "csv-summary") {
     const fieldDefinitions = [
       {
         section: "IDENTIFICATION",
@@ -553,12 +628,49 @@ export const exportSimulationHistory = (
     downloadCSV(csvContent, `simulation_history_vertical_${timestamp}.csv`);
   } else {
     const runId = history[0]?.id?.split("-")[0];
+    const eacoData = history.find((sim) => sim.algorithm === "EACO");
+    const epsoData = history.find((sim) => sim.algorithm === "EPSO");
+    
+    const hasIterations = eacoData?.rawResults?.individualResults?.length > 0 || 
+                          epsoData?.rawResults?.individualResults?.length > 0;
+    
     const pairedData = {
-      runId,
-      exportDate: new Date().toISOString(),
-      algorithms: {
-        EACO: history.find((sim) => sim.algorithm === "EACO"),
-        EPSO: history.find((sim) => sim.algorithm === "EPSO"),
+      eacoResults: eacoData?.rawResults || eacoData?.summary || null,
+      epsoResults: epsoData?.rawResults || epsoData?.summary || null,
+      workloadName: eacoData?.config?.workloadType || epsoData?.config?.workloadType || null,
+      iterations: eacoData?.iterations || epsoData?.iterations || (hasIterations ? eacoData?.rawResults?.totalIterations : 1),
+      totalExecutionTime: eacoData?.totalExecutionTime || epsoData?.totalExecutionTime || null,
+      iterationsAdjusted: eacoData?.iterationsAdjusted || epsoData?.iterationsAdjusted || false,
+      originalIterations: eacoData?.originalIterations || epsoData?.originalIterations || null,
+      adjustmentMessage: eacoData?.adjustmentMessage || epsoData?.adjustmentMessage || null,
+      runId: eacoData?.runId || epsoData?.runId || runId,
+      seed: eacoData?.seed || epsoData?.seed || null,
+      configSnapshot: eacoData?.configSnapshot || epsoData?.configSnapshot || eacoData?.config || epsoData?.config || null,
+      datasetId: eacoData?.datasetId || epsoData?.datasetId || null,
+      ttestResults: eacoData?.tTestResults || epsoData?.tTestResults || null,
+      summaryMessage: null,
+      metadata: {
+        exportDate: new Date().toISOString(),
+        exportedBy: "User",
+        simulationType: hasIterations ? "multi-iteration" : "single-run",
+        algorithms: {
+          EACO: {
+            summary: eacoData?.summary || null,
+            energyConsumption: eacoData?.energyConsumption || null,
+            vmUtilization: eacoData?.vmUtilization || null,
+            schedulingLog: eacoData?.schedulingLog || null,
+            analysis: eacoData?.analysis || null,
+            plotAnalysis: eacoData?.plotAnalysis || null,
+          },
+          EPSO: {
+            summary: epsoData?.summary || null,
+            energyConsumption: epsoData?.energyConsumption || null,
+            vmUtilization: epsoData?.vmUtilization || null,
+            schedulingLog: epsoData?.schedulingLog || null,
+            analysis: epsoData?.analysis || null,
+            plotAnalysis: epsoData?.plotAnalysis || null,
+          },
+        },
       },
     };
 
