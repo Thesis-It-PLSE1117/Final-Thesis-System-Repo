@@ -160,6 +160,16 @@ export const saveToHistory = async (
       workloadType: workloadFile ? "CSV" : "Random",
     };
 
+    // Ensure we have all required data before saving
+    if (!results.eaco || !results.epso) {
+      console.error("Missing algorithm results:", {
+        eaco: !!results.eaco,
+        epso: !!results.epso,
+      });
+      return false;
+    }
+
+
     // Helper function to extract plot metadata and analysis without large image data
     const extractPlotAnalysis = (algorithmResults) => {
       if (!algorithmResults) return null;
@@ -200,7 +210,47 @@ export const saveToHistory = async (
         timestamp,
         algorithm: "EACO",
         config: fullConfig,
-        rawResults: results.eaco.rawResults || null,
+        rawResults: {
+          ...results.eaco.rawResults,
+          individualResults: (
+            results.eaco.rawResults?.individualResults ||
+            results.eaco.individualResults ||
+            []
+          ).map((result) => ({
+            ...result,
+            summary: result.summary || {},
+            vmUtilization: result.vmUtilization || [],
+            schedulingLog: result.schedulingLog || [],
+            energyConsumption: result.energyConsumption || 0,
+            configSnapshot: result.configSnapshot || {},
+          })),
+          totalIterations:
+            results.eaco.rawResults?.totalIterations ||
+            results.eaco.totalIterations ||
+            results.eaco.rawResults?.individualResults?.length ||
+            results.eaco.individualResults?.length ||
+            0,
+          averageMetrics:
+            results.eaco.rawResults?.averageMetrics ||
+            results.eaco.averageMetrics ||
+            {},
+          minMetrics:
+            results.eaco.rawResults?.minMetrics ||
+            results.eaco.minMetrics ||
+            {},
+          maxMetrics:
+            results.eaco.rawResults?.maxMetrics ||
+            results.eaco.maxMetrics ||
+            {},
+          stdDevMetrics:
+            results.eaco.rawResults?.stdDevMetrics ||
+            results.eaco.stdDevMetrics ||
+            {},
+          bestResult:
+            results.eaco.rawResults?.bestResult ||
+            results.eaco.bestResult ||
+            null,
+        },
         summary: results.eaco.rawResults?.summary || results.eaco.summary,
         energyConsumption:
           results.eaco.rawResults?.energyConsumption ||
@@ -227,7 +277,47 @@ export const saveToHistory = async (
         timestamp,
         algorithm: "EPSO",
         config: fullConfig,
-        rawResults: results.epso.rawResults || null,
+        rawResults: {
+          ...results.epso.rawResults,
+          individualResults: (
+            results.epso.rawResults?.individualResults ||
+            results.epso.individualResults ||
+            []
+          ).map((result) => ({
+            ...result,
+            summary: result.summary || {},
+            vmUtilization: result.vmUtilization || [],
+            schedulingLog: result.schedulingLog || [],
+            energyConsumption: result.energyConsumption || 0,
+            configSnapshot: result.configSnapshot || {},
+          })),
+          totalIterations:
+            results.epso.rawResults?.totalIterations ||
+            results.epso.totalIterations ||
+            results.epso.rawResults?.individualResults?.length ||
+            results.epso.individualResults?.length ||
+            0,
+          averageMetrics:
+            results.epso.rawResults?.averageMetrics ||
+            results.epso.averageMetrics ||
+            {},
+          minMetrics:
+            results.epso.rawResults?.minMetrics ||
+            results.epso.minMetrics ||
+            {},
+          maxMetrics:
+            results.epso.rawResults?.maxMetrics ||
+            results.epso.maxMetrics ||
+            {},
+          stdDevMetrics:
+            results.epso.rawResults?.stdDevMetrics ||
+            results.epso.stdDevMetrics ||
+            {},
+          bestResult:
+            results.epso.rawResults?.bestResult ||
+            results.epso.bestResult ||
+            null,
+        },
         summary: results.epso.rawResults?.summary || results.epso.summary,
         energyConsumption:
           results.epso.rawResults?.energyConsumption ||

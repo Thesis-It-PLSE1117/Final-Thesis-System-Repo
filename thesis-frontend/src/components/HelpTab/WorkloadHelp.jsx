@@ -9,6 +9,7 @@ import {
   BookOpen,
   CheckCircle,
   Code,
+  Info,
 } from "lucide-react";
 
 const WorkloadHelp = () => {
@@ -200,43 +201,54 @@ const WorkloadHelp = () => {
         <div className="flex items-center gap-2 mb-3">
           <Database className="text-[#319694]" size={20} />
           <h3 className="text-lg font-semibold text-gray-800">
-            Pre-configured Datasets
+            Google Cluster Workload Presets
           </h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          Ready-to-use workloads based on real Google cluster data:
+          30 pre-configured benchmark datasets derived from real Google cluster traces.
+          Select from "Research Benchmark Dataset" dropdown in Workload Setup.
         </p>
 
-        <div className="space-y-2">
-          {[
-            { name: "Small", tasks: "~1000 tasks", use: "Quick testing" },
-            {
-              name: "Medium",
-              tasks: "~5000 tasks",
-              use: "Standard simulations",
-            },
-            {
-              name: "Large",
-              tasks: "~10000 tasks",
-              use: "Performance analysis",
-            },
-          ].map((dataset, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 p-3 bg-gray-50 rounded"
-            >
-              <CheckCircle className="text-teal-600" size={16} />
-              <div className="flex-1">
-                <span className="text-sm font-medium text-gray-800">
-                  {dataset.name}:{" "}
-                </span>
-                <span className="text-sm text-gray-600">{dataset.tasks}</span>
-              </div>
-              <span className="text-xs text-gray-500 italic">
-                {dataset.use}
+        <div className="space-y-3">
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Database className="text-blue-600" size={18} />
+              <span className="text-sm font-semibold text-blue-800">
+                Google Cluster Subsets 1-30
               </span>
             </div>
-          ))}
+            <p className="text-xs text-gray-700 mb-2">
+              Each preset contains clustered task workloads with real-world characteristics:
+            </p>
+            <ul className="text-xs text-gray-600 space-y-1 ml-4">
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>CPU and memory resource requirements</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Task arrival timestamps for realistic scheduling</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Priority levels and scheduling classes</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Varying task counts suitable for different scales</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Info className="text-teal-600 mt-0.5 flex-shrink-0" size={16} />
+              <div className="text-xs text-gray-700">
+                <strong className="text-teal-700">How to use:</strong> Select any preset from 1-30 in the dropdown above.
+                Each subset provides a different mix of task characteristics for testing your scheduling algorithms.
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
 
