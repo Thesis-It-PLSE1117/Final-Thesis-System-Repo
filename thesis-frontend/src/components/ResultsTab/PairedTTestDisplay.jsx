@@ -16,11 +16,12 @@ import {
   Gauge,
   Timer,
   Scale,
-  Activity
+  Activity,
+  Target,
+  LineChart
 } from 'lucide-react';
 
 const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false }) => {
-
   const [expandedMetric, setExpandedMetric] = useState(null);
   const [showMethodology, setShowMethodology] = useState(false);
   const [showInterpretation, setShowInterpretation] = useState(true);
@@ -41,7 +42,6 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
   }
 
   const { metricTests, overallWinner, significantDifferences, sampleSize, alpha } = tTestResults;
-  
   const eacoWins = Object.values(metricTests || {}).filter(
     (t) => t && t.significant && t.betterAlgorithm === 'EACO'
   ).length;
@@ -292,6 +292,28 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
           Individual Metric Analysis
         </h4>
         
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-orange-50 to-amber-50 border-l-4 border-orange-400 rounded-lg p-4 mb-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-orange-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h5 className="text-sm sm:text-base font-semibold text-orange-700 mb-1">
+                Metric Details
+              </h5>
+              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                Click on any metric card below to expand and view detailed statistical information, including confidence intervals, effect sizes, and algorithm stability analysis.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+        
         {Object.entries(metricTests || {}).map(([metricName, test]) => (
           <motion.div
             key={metricName}
@@ -392,6 +414,101 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                     </div>
                   </div>
                   
+                  {/* stat for sd */}
+                  {(test?.eacoStd !== undefined || test?.epsoStd !== undefined) && (
+                    <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+                      <div className="bg-gradient-to-r from-[#319694]/5 to-[#4fd1c5]/5 rounded-lg p-4 border border-[#319694]/20">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="text-[#319694]" size={18} />
+                          <h6 className="font-semibold text-gray-800 text-sm">Algorithm Stability Analysis</h6>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                          <div className="bg-white rounded-lg p-3 border border-blue-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <LineChart className="text-blue-600" size={16} />
+                                <span className="text-sm font-medium text-gray-700">EACO Consistency</span>
+                              </div>
+                            </div>
+                            <p className="text-lg font-bold text-blue-600">
+                              σ = {typeof test?.eacoStd === 'number' ? test.eacoStd.toFixed(4) : '—'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">Standard Deviation</p>
+                          </div>
+                          
+                          <div className="bg-white rounded-lg p-3 border border-orange-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <LineChart className="text-orange-600" size={16} />
+                                <span className="text-sm font-medium text-gray-700">EPSO Consistency</span>
+                              </div>
+                            </div>
+                            <p className="text-lg font-bold text-orange-600">
+                              σ = {typeof test?.epsoStd === 'number' ? test.epsoStd.toFixed(4) : '—'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">Standard Deviation</p>
+                          </div>
+                        </div>
+                        
+                        {test?.stdInterpretation && (() => {
+                          const parts = test.stdInterpretation.split(/\. (?=[A-Z])/);
+                          const eacoLine = parts.find(p => p.startsWith('EACO:'));
+                          const epsoLine = parts.find(p => p.startsWith('EPSO:'));
+                          const comparisonLine = parts.find(p => p.includes('Both algorithms') || p.includes('demonstrate similar'));
+                          const stabilityLine = parts.find(p => p.includes('results are') && p.includes('stable'));
+                          const implicationLine = parts.find(p => p.includes('indicates') || p.includes('suitable'));
+                          
+                          return (
+                            <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Info className="text-[#319694]" size={16} />
+                                <h6 className="font-semibold text-gray-800 text-sm">Interpretation</h6>
+                              </div>
+                              
+                              <div className="space-y-2 text-sm text-gray-700">
+                                {eacoLine && (
+                                  <div className="flex items-start gap-2">
+                                    <span className="text-blue-600 font-medium mt-0.5">•</span>
+                                    <p className="leading-relaxed">{eacoLine.trim()}{!eacoLine.trim().endsWith('.') && '.'}</p>
+                                  </div>
+                                )}
+                                
+                                {epsoLine && (
+                                  <div className="flex items-start gap-2">
+                                    <span className="text-orange-600 font-medium mt-0.5">•</span>
+                                    <p className="leading-relaxed">{epsoLine.trim()}{!epsoLine.trim().endsWith('.') && '.'}</p>
+                                  </div>
+                                )}
+                                
+                                {comparisonLine && (
+                                  <div className="mt-2 pt-2 border-t border-gray-200">
+                                    <p className="leading-relaxed font-medium text-gray-800">{comparisonLine.trim()}{!comparisonLine.trim().endsWith('.') && '.'}</p>
+                                  </div>
+                                )}
+                                
+                                {(stabilityLine || implicationLine) && (
+                                  <div className="mt-2 pt-2 border-t border-gray-200 bg-[#319694]/5 -mx-4 -mb-4 p-3 rounded-b-lg">
+                                    {stabilityLine && (
+                                      <p className="leading-relaxed text-gray-700 mb-2">
+                                        <span className="font-semibold text-[#319694]">Assessment:</span> {stabilityLine.trim().replace(/^The results are /, '').replace(/\.$/, '')}.
+                                      </p>
+                                    )}
+                                    {implicationLine && (
+                                      <p className="leading-relaxed text-gray-700">
+                                        <span className="font-semibold text-[#319694]">Impact:</span> {implicationLine.trim().replace(/^This indicates /, '').replace(/\.$/, '')}.
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Visual representation */}
                   <div className="px-4 pb-4">
                     <div className="bg-white rounded-lg p-3">
@@ -456,7 +573,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                     Overall Conclusion
                   </h4>
                   <p className="text-base text-gray-700 leading-relaxed">
-                    {tTestResults.interpretation.conclusion}
+                    {tTestResults.interpretation.conclusion}{tTestResults.interpretation.conclusion && !tTestResults.interpretation.conclusion.trim().endsWith('.') && '.'}
                   </p>
                 </div>
                 
@@ -466,7 +583,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                     Practical Significance
                   </h4>
                   <p className="text-base text-gray-700 leading-relaxed">
-                    {tTestResults.interpretation.effectSizeExplanation}
+                    {tTestResults.interpretation.effectSizeExplanation}{tTestResults.interpretation.effectSizeExplanation && !tTestResults.interpretation.effectSizeExplanation.trim().endsWith('.') && '.'}
                   </p>
                 </div>
                 
@@ -476,7 +593,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                     Confidence Level
                   </h4>
                   <p className="text-base text-gray-700 leading-relaxed">
-                    {tTestResults.interpretation.confidenceExplanation}
+                    {tTestResults.interpretation.confidenceExplanation}{tTestResults.interpretation.confidenceExplanation && !tTestResults.interpretation.confidenceExplanation.trim().endsWith('.') && '.'}
                   </p>
                 </div>
                 
@@ -484,7 +601,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                       <BarChart3 className="text-[#319694]" size={18} />
-                      Detailed Metric Analysis
+                      Metric Analysis
                     </h4>
                     <div className="space-y-2">
                       {Object.entries(tTestResults.interpretation.metricAnalysis).map(([metric, analysis]) => {
@@ -501,7 +618,7 @@ const PairedTTestDisplay = ({ tTestResults, comparisonResults, isLoading = false
                                 <span className="ml-2 text-sm text-amber-700">(note: text vs t-test mismatch)</span>
                               )}
                             </h5>
-                            <p className="text-base text-gray-600 leading-relaxed">{analysis}</p>
+                            <p className="text-base text-gray-600 leading-relaxed">{analysis}{analysis && !analysis.trim().endsWith('.') && '.'}</p>
                           </div>
                         );
                       })}

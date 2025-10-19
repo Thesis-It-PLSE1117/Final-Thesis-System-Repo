@@ -129,7 +129,8 @@ const ResultsTab = ({
     // For multi-iteration runs with T-test results, show analysis tab
     else if (
       !isSingleIteration &&
-      (eacoResults?.tTestResults || epsoResults?.tTestResults) &&
+      (eacoResults?.tTestResults || eacoResults?.ttestResults || 
+       epsoResults?.tTestResults || epsoResults?.ttestResults) &&
       activeTab === "metadata" &&
       !hasAutoSwitched
     ) {
@@ -317,7 +318,10 @@ const ResultsTab = ({
 
   const rrSummary = getSummaryData(resultsRR);
   const epsoSummary = getSummaryData(resultsEPSO);
-  const hasTTest = !!(eacoResults?.tTestResults || epsoResults?.tTestResults);
+  const hasTTest = !!(
+    eacoResults?.tTestResults || eacoResults?.ttestResults || 
+    epsoResults?.tTestResults || epsoResults?.ttestResults
+  );
 
   if (loading)
     return (
@@ -465,7 +469,8 @@ const ResultsTab = ({
                   <>
                     <PairedTTestDisplay
                       tTestResults={
-                        eacoResults?.tTestResults || epsoResults?.tTestResults
+                        eacoResults?.tTestResults || eacoResults?.ttestResults || 
+                        epsoResults?.tTestResults || epsoResults?.ttestResults
                       }
                       comparisonResults={eacoResults || epsoResults}
                       isLoading={false}
@@ -504,8 +509,8 @@ const ResultsTab = ({
                 ) : // Show fallback ONLY when there are no interpretations, no t-test results,
                 // and no descriptive statistics available
                 !(
-                    eacoResults?.tTestResults ||
-                    epsoResults?.tTestResults ||
+                    eacoResults?.tTestResults || eacoResults?.ttestResults ||
+                    epsoResults?.tTestResults || epsoResults?.ttestResults ||
                     eacoResults?.rawResults?.averageMetrics ||
                     epsoResults?.rawResults?.averageMetrics
                   ) ? (
@@ -955,7 +960,8 @@ const ResultsTab = ({
               {/* Badge for T-Test Results on Analysis Tab - Only for multi-iteration */}
               {tab.id === "analysis" &&
                 !isSingleIteration &&
-                (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+                (eacoResults?.tTestResults || eacoResults?.ttestResults || 
+                 epsoResults?.tTestResults || epsoResults?.ttestResults) && (
                   <span className="absolute -top-1 -right-2 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#319694] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-[#319694]"></span>
@@ -967,7 +973,8 @@ const ResultsTab = ({
                 {tab.description}
                 {tab.id === "analysis" &&
                   !isSingleIteration &&
-                  (eacoResults?.tTestResults || epsoResults?.tTestResults) && (
+                  (eacoResults?.tTestResults || eacoResults?.ttestResults || 
+                   epsoResults?.tTestResults || epsoResults?.ttestResults) && (
                     <span className="block text-[#319694] font-medium mt-1">
                       T-Test results available
                     </span>
