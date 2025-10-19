@@ -24,6 +24,8 @@ import ExecutionTimeDisplay from "./ExecutionTimeDisplay";
 import { normalizeData, getSummaryData } from "./utils";
 import ImageModal from "../modals/ImageModal";
 import PlotWithInterpretation from "./PlotWithInterpretation";
+import EChartsVisualization from "../ECharts/EChartsVisualization";
+import { validateEChartsData, logDataStructure } from "../../utils/echartsDataValidator";
 
 const ResultsTab = ({
   onBackToAnimation,
@@ -78,6 +80,12 @@ const ResultsTab = ({
     (plotData.eaco?.plotPaths?.length > 0 ||
       plotData.epso?.plotPaths?.length > 0);
   const matlabPlotsExpected = plotsGenerating === true || hasMatlabPlots;
+  
+  const hasRawResultsForECharts = 
+    eacoResults?.rawResults?.summary && 
+    epsoResults?.rawResults?.summary && 
+    isSingleIteration;
+  const shouldUseECharts = !matlabPlotsExpected && hasRawResultsForECharts;
 
   /**
    * I define tabs following UI/UX best practices for progressive disclosure
@@ -106,8 +114,10 @@ const ResultsTab = ({
       icon: <FiActivity className="w-4 h-4" />,
       description: matlabPlotsExpected
         ? "MATLAB plots and charts"
-        : "MATLAB plots not available for this simulation",
-      enabled: matlabPlotsExpected,
+        : shouldUseECharts
+        ? "Interactive ECharts visualizations"
+        : "Visualizations not available for this simulation",
+      enabled: matlabPlotsExpected || shouldUseECharts,
     },
     {
       id: "logs",
@@ -138,8 +148,7 @@ const ResultsTab = ({
       sessionStorage.setItem("results-tab-auto-switched", "true");
     }
 
-    // if in visualization, switch to analysis
-    if (activeTab === "visualizations" && !matlabPlotsExpected) {
+    if (activeTab === "visualizations" && !matlabPlotsExpected && !shouldUseECharts) {
       setActiveTab("analysis");
     }
   }, [
@@ -147,6 +156,7 @@ const ResultsTab = ({
     epsoResults,
     activeTab,
     matlabPlotsExpected,
+    shouldUseECharts,
     isSingleIteration,
   ]);
 
@@ -575,6 +585,8 @@ const ResultsTab = ({
             {/* Show plots if available, otherwise show fallback message */}
             {matlabPlotsExpected ? (
               renderPlots()
+            ) : shouldUseECharts ? (
+              renderEChartsPlots()
             ) : (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
@@ -730,6 +742,95 @@ const ResultsTab = ({
       performanceGrade: interpretation?.performanceGrade || null,
       dataPoints: meta.dataPoints || null,
     };
+  };
+
+  /**
+   * Render ECharts visualizations when MATLAB is disabled
+   */
+  const renderEChartsPlots = () => {
+    if (!hasRawResultsForECharts) return null;
+
+    if (import.meta.env.DEV) {
+      const eacoValidation = validateEChartsData(eacoResults.rawResults, 'EACO');
+      const epsoValidation = validateEChartsData(epsoResults.rawResults, 'EPSO');
+      
+      if (!eacoValidation.valid || !epsoValidation.valid) {
+        console.error('❌ ECharts data validation failed. Check console for details.');
+      }
+      
+      logDataStructure(eacoResults.rawResults, 'EACO');
+      logDataStructure(epsoResults.rawResults, 'EPSO');
+    }
+
+    const plotTypes = [
+      { type: 'metrics', title: 'Performance Metrics Overview' },
+      { type: 'detailed', title: 'Detailed Performance Analysis' },
+      { type: 'vm_utilization', title: 'VM Resource Utilization' },
+      { type: 'energy', title: 'Energy Consumption Analysis' },
+      { type: 'radar', title: 'Multi-Metric Radar Analysis' }
+    ];
+
+    const eacoPlotMetadata = eacoResults?.plotMetadata || [];
+    const epsoPlotMetadata = epsoResults?.plotMetadata || [];
+
+    return (
+      <div className="space-y-8">
+        <div className="bg-gradient-to-r from-green-50 to-pink-50 border border-purple-200 rounded-lg p-4 mb-6 shadow-sm">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <div>
+              <p className="text-green-900 font-semibold text-md">
+                Visualizations using Apache ECharts
+              </p>
+              <p className="text-green-700 text-sm mt-1">
+                Export options available for each chart.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {plotTypes.map(({ type, title }, index) => {
+          const shouldSkipVMUtil = type === 'vm_utilization' && 
+            (!eacoResults?.rawResults?.vmUtilization || eacoResults.rawResults.vmUtilization.length === 0) &&
+            (!epsoResults?.rawResults?.vmUtilization || epsoResults.rawResults.vmUtilization.length === 0);
+
+          if (shouldSkipVMUtil) return null;
+
+          return (
+            <motion.div
+              key={type}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="space-y-4"
+            >
+              <h5 className="text-lg font-semibold text-gray-800 text-center">
+                {title}
+              </h5>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                <EChartsVisualization
+                  plotType={type}
+                  plotTitle={title}
+                  algorithm="EACO"
+                  rawResults={eacoResults.rawResults}
+                  interpretation={findPlotInterpretation(eacoPlotMetadata, type)}
+                />
+                <EChartsVisualization
+                  plotType={type}
+                  plotTitle={title}
+                  algorithm="EPSO"
+                  rawResults={epsoResults.rawResults}
+                  interpretation={findPlotInterpretation(epsoPlotMetadata, type)}
+                />
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    );
   };
 
   /**

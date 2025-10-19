@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Info } from "lucide-react";
 import WorkloadConfigCard from "./WorkloadConfigCard";
 import CSVFormatGuide from "./CSVFormatGuide";
 import WorkloadUploadCard from "./WorkloadUploadCard";
@@ -108,6 +109,30 @@ const WorkloadTab = ({
         transition={{ duration: 0.3 }}
       >
         <div className="space-y-6">
+          {!enableMatlabPlots && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="bg-gradient-to-r from-pink-80 to-red-30 rounded-lg p-4 shadow-sm border border-pink-200"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <Info className="text-rose-600" size={20} />
+                </div>
+                <div>
+                  <h4 className="text-md font-semibold text-gray-900 mb-1">
+                    For Visualizations (Single iteration)
+                  </h4>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Results will display as charts using Apache ECharts with export options, toggle below to switch on Matlab.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Cloudlet Configuration Control */}
           <CloudletToggle
             enabled={cloudletToggleEnabled}
