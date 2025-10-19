@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaUniversity } from 'react-icons/fa';
+import { FaUniversity } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { Hand } from 'lucide-react';
 import danmelImage from '../../assets/2x2-laranga.png';
@@ -213,26 +213,6 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   </div>
                   
                 </div>
-              </motion.div>
-
-              <motion.div 
-                variants={itemVariants}
-                className="flex justify-center gap-4 pt-2"
-              >
-                <motion.a 
-                  whileHover={{ y: -2 }}
-                  href="#"
-                  className="text-gray-500 hover:text-[#319694] transition-colors"
-                >
-                  <FaGithub className="text-xl" />
-                </motion.a>
-                <motion.a 
-                  whileHover={{ y: -2 }}
-                  href="#"
-                  className="text-gray-500 hover:text-[#319694] transition-colors"
-                >
-                  <FaLinkedin className="text-xl" />
-                </motion.a>
               </motion.div>
             </motion.div>
           </motion.div>
