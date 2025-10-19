@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Settings, Upload, Cpu, LineChart, BookText, GitCompare, FileText, Mail } from 'lucide-react'; 
+import { Settings, Upload, Cpu, LineChart, BookOpen, Users } from 'lucide-react'; 
+import { FaGithub } from 'react-icons/fa';
 import { lazy, Suspense } from 'react';
 const AboutUsModal = lazy(() => import('../../components/modals/AboutUsModal'));
-const DocumentationModal = lazy(() => import('../../components/modals/DocumentationModal'));
-const AlgorithmModal = lazy(() => import('../../components/modals/AlgorithmModal'));
-const ComparisonModal = lazy(() => import('../../components/modals/ComparisonModal'));
 const SimulationPage = lazy(() => import('../SimulationPage'));
 import AnimatedBackground from './AnimatedBackground';
 import Header from './Header';
@@ -14,11 +12,12 @@ import DemoSection from './DemoSection';
 import WalkthroughSection from './WalkthroughSection';
 import CtaSection from './CtaSection';
 import Footer from './Footer';
+import ScrollToTop from '../../components/ScrollToTop';
 
 const HomePage = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState(null);
   const [showSimulation, setShowSimulation] = useState(false);
+    const [simulationInitialTab, setSimulationInitialTab] = useState("dataCenter");
   const [isPlaying, setIsPlaying] = useState(false);
   const controls = useAnimation();
 
@@ -41,18 +40,17 @@ const HomePage = () => {
           <div className="animate-spin motion-reduce:animate-none rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
         </div>
       }>
-        <SimulationPage onBack={() => setShowSimulation(false)} />
+        <SimulationPage 
+          onBack={() => {
+            setShowSimulation(false);
+            setSimulationInitialTab("dataCenter");
+          }} 
+          initialTab={simulationInitialTab}
+        />
       </Suspense>
     );
   }
 
-  const openModal = (modalName) => {
-    setActiveModal(modalName);
-  };
-
-  const closeModal = () => {
-    setActiveModal(null);
-  };
 
   const walkthroughSteps = [
     {
@@ -114,27 +112,25 @@ const HomePage = () => {
   ];
 
   const footerLinks = [
-    {
-      title: "Resources",
-      links: [
-        { text: "Documentation", href: "#", icon: <BookText size={16} />, onClick: () => openModal('documentation') },
-        { text: "Research Paper", href: "https://docs.google.com/document/d/1NYjfhNk7LM67LDS1SdULkZ0WgZGMHuDq/edit", icon: <FileText size={16} /> },
-        { text: "GitHub Repository", href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git", icon: <GitCompare size={16} /> }
-      ]
+    { 
+      text: "GitHub", 
+      href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git", 
+      icon: <FaGithub size={20} /> 
     },
-    {
-      title: "Algorithms",
-      links: [
-        { text: "EACO Algorithm", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('aco') },
-        { text: "EPSO Algorithm", href: "#", icon: <Cpu size={16} />, onClick: () => openModal('pso') },
-        { text: "Comparison", href: "#", icon: <GitCompare size={16} />, onClick: () => openModal('comparison') }
-      ]
+    { 
+      text: "Documentation", 
+      href: "#", 
+      icon: <BookOpen size={18} />,
+      onClick: () => {
+        setSimulationInitialTab("help");
+        setShowSimulation(true);
+      }
     },
-    {
-      title: "Contact",
-      links: [
-        { text: "csa7-2025@gmail.com", href: "mailto:csa7-2025@gmail.com", icon: <Mail size={16} /> },
-      ]
+    { 
+      text: "Team", 
+      href: "#", 
+      icon: <Users size={18} />,
+      onClick: () => setIsAboutModalOpen(true)
     }
   ];
 
@@ -162,8 +158,7 @@ const HomePage = () => {
       <CtaSection onStartSimulation={() => setShowSimulation(true)} />
       
       <Footer 
-        footerLinks={footerLinks} 
-        onOpenAboutUs={() => setIsAboutModalOpen(true)} 
+        footerLinks={footerLinks}
       />
 
       <Suspense fallback={null}>
@@ -172,149 +167,8 @@ const HomePage = () => {
           onClose={() => setIsAboutModalOpen(false)} 
         />
       </Suspense>
-      
-      <Suspense fallback={null}>
-        <DocumentationModal
-        isOpen={activeModal === 'documentation'} 
-        onClose={closeModal}
-        content={{
-          title: "System Documentation",
-          sections: [
-            {
-              title: "Overview",
-              content: "This cloud load balancing simulation system allows you to compare enhanced versions of Ant Colony Optimization (ACO) and Particle Swarm Optimization (PSO) algorithms for virtual machine task scheduling.",
-              icon: <BookText className="text-[#319694]" />
-            },
-            {
-              title: "System Architecture",
-              content: "CloudSim-based simulation framework with Spring Boot backend and React.js frontend. CustomBroker class inherits from CloudSim's DatacenterBroker and implements ISchedulingAlgorithm interface. MATLAB integration provides advanced visualization and statistical analysis of results.",
-              icon: <Settings className="text-[#4fd1c5]" />,
-              list: [
-                "CustomBroker governs task and VM assignment",
-                "EnhancedACO and EnhancedPSO implement ISchedulingAlgorithm interface",
-                "DataCenterConfigurator manages simulation setup",
-                "MATLAB Engine integration for advanced analytics",
-                "Spring Boot + CloudSim core backend",
-                "React.js frontend with Chart.js visualization"
-              ]
-            },
-            {
-              title: "Key Features",
-              content: "",
-              list: [
-                "Interactive configuration of data center parameters",
-                "Real-time simulation visualization",
-                "Detailed performance metrics comparison",
-                "Support for custom workload datasets",
-                "Historical results saving and comparison"
-              ],
-              icon: <Cpu className="text-[#267b79]" />
-            },
-            {
-              title: "Getting Started",
-              content: "To begin, configure your data center specifications, upload or select a workload, choose an algorithm, and run the simulation. Results will be displayed upon completion.",
-              icon: <LineChart className="text-[#319694]" />
-            }
-          ]
-        }}
-      />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <AlgorithmModal
-        isOpen={activeModal === 'aco'} 
-        onClose={closeModal}
-        algorithm={{
-          name: "Enhanced Ant Colony Optimization (EACO)",
-          enhancements: [
-            "Adaptive pheromone evaporation: p(t) = p_min + (p_max - p_min) × ((f_avg - f_best) / f_best)",
-            "Heuristic load-based reinforcement: Δτ_ij = 1 / (1 + L_j)",
-            "Pheromone update rule: τ_ij(t+1) = (1 - p(t)) × τ_ij(t) + Δτ_ij(t)",
-            "Dynamic exploration-exploitation balance based on convergence"
-          ],
-          parameters: [
-            "Dynamic pheromone coefficient (α)",
-            "Heuristic coefficient (β)",
-            "Evaporation rate range (ρ_min to ρ_max)",
-            "Colony size (number of ants)",
-            "Maximum iterations"
-          ],
-          researchFocus: [
-            "Improving convergence in dynamic environments",
-            "Reducing computational overhead",
-            "Optimizing for heterogeneous workloads",
-            "Balancing exploration vs exploitation"
-          ]
-        }}
-      />
-      
-      <AlgorithmModal 
-        isOpen={activeModal === 'pso'} 
-        onClose={closeModal}
-        algorithm={{
-          name: "Enhanced Particle Swarm Optimization (EPSO)",
-          enhancements: [
-            "Nonlinear inertia weight: w = w_max - (w_max - w_min) × (iteration/maxIterations)²",
-            "Adaptive velocity clamping: V_max decreases quadratically over iterations",
-            "Standard PSO velocity/position updates with cognitive (c1) and social (c2) coefficients",
-            "Efficient initial task-to-VM scheduling without requiring VM migration"
-          ],
-          parameters: [
-            "Initial inertia weight (w_initial)",
-            "Final inertia weight (w_final)",
-            "Cognitive coefficient (c1)",
-            "Social coefficient (c2)",
-            "Swarm size"
-          ],
-          researchFocus: [
-            "Improving initial convergence speed",
-            "Preventing premature convergence",
-            "Adapting to varying workload sizes",
-            "Optimizing for homogeneous environments"
-          ]
-        }}
-      />
-      
-      <ComparisonModal 
-        isOpen={activeModal === 'comparison'} 
-        onClose={closeModal}
-        comparison={{
-          title: "Algorithm Comparison Framework",
-          metrics: [
-            {
-              name: "Approach",
-              aco: "Pheromone-based path optimization",
-              pso: "Swarm intelligence with velocity vectors",
-              description: "Fundamentally different bio-inspired approaches"
-            },
-            {
-              name: "Enhancement Focus",
-              aco: "Dynamic parameter adaptation",
-              pso: "Convergence optimization",
-              description: "Different optimization targets for cloud environments"
-            },
-            {
-              name: "Expected Strengths",
-              aco: "Better for dynamic, heterogeneous workloads",
-              pso: "Faster initial convergence",
-              description: "Theoretical advantages being tested"
-            },
-            {
-              name: "Research Variables",
-              aco: "Pheromone decay rates, heuristic weights",
-              pso: "Inertia coefficients, velocity limits",
-              description: "Key parameters under investigation"
-            }
-          ],
-          recommendations: [
-            "Run simulations with both algorithms for comprehensive comparison",
-            "Test with realistic workloads from Google Cluster Traces",
-            "Compare performance across different data center sizes",
-            "Evaluate energy efficiency alongside performance metrics",
-          ]
-        }}
-      />
-      </Suspense>
+
+      <ScrollToTop />
     </motion.div>
   );
 };
