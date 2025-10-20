@@ -88,7 +88,7 @@ const IterationTab = ({ config, onChange }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#319694] focus:border-transparent bg-gray-100 cursor-not-allowed"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Between 1 and 100 iterations (30+ recommended for academic research)
+              Between 1 and 50 iterations (30+ recommended for academic research)
             </p>
           </div>
 
