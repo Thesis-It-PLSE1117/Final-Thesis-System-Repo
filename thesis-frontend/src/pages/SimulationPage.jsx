@@ -45,7 +45,7 @@ const pageVariants = {
   },
 };
 
-const SimulationPage = ({ onBack }) => {
+const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
   const config = useSimulationConfig();
   const {
     simulationResults,
@@ -64,7 +64,7 @@ const SimulationPage = ({ onBack }) => {
   } = useSimulationRunner();
 
   // ui states
-  const [activeTab, setActiveTab] = useState("dataCenter");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [userCancelledSession, setUserCancelledSession] = useState(false);
   const [direction, setDirection] = useState(0);
