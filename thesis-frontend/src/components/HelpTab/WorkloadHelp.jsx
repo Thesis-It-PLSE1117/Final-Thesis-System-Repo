@@ -93,53 +93,56 @@ const WorkloadHelp = () => {
             </p>
             <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
               <div className="text-gray-600">
-                timestamp,task_id,cpu,memory,priority
+                cpu_request,pes_number,file_size,output_size,arrival_ts
               </div>
               <div className="text-gray-800">
-                1234567890,task_001,0.5,1024,1
+                0.5,1,0.1,0.1,1234567890000
               </div>
               <div className="text-gray-800">
-                1234567895,task_002,0.8,2048,2
+                0.8,2,0.3,0.2,1234567895000
               </div>
             </div>
             <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> timestamp (seconds),
-              task_id (string), cpu (0-1), memory (MB), priority (1-10)
+              <span className="font-medium">Fields:</span> cpu_request (0-1 fraction),
+              pes_number (cores 1-8), file_size (0-1 normalized), output_size (0-1 normalized),
+              arrival_ts (microseconds - optional)
             </p>
           </div>
 
           {/* Standard Format */}
           <div className="bg-green-50 border border-green-200 rounded p-4">
             <p className="text-sm font-semibold text-gray-800 mb-2">
-              Standard CloudSim Format
+              Standard CloudSim Format (Normalized)
             </p>
             <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
               <div className="text-gray-600">
-                task_id,length,file_size,output_size,pes
+                length,pes,file_size,output_size
               </div>
-              <div className="text-gray-800">1,10000,300,300,1</div>
-              <div className="text-gray-800">2,15000,500,400,2</div>
+              <div className="text-gray-800">10000,1,0.1,0.1</div>
+              <div className="text-gray-800">15000,2,0.3,0.2</div>
+              <div className="text-gray-800">20000,1,0.5,0.4</div>
             </div>
             <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> task_id (number),
-              length (MI), file_size (bytes), output_size (bytes), pes (cores
-              needed)
+              <span className="font-medium">Fields:</span> length (MI, min 1000),
+              pes (cores 1-8), file_size (0-1 normalized or actual bytes),
+              output_size (0-1 normalized or actual bytes)
             </p>
           </div>
 
           {/* Simple Format */}
           <div className="bg-purple-50 border border-purple-200 rounded p-4">
             <p className="text-sm font-semibold text-gray-800 mb-2">
-              Simple Format
+              Minimal Format (Auto-filled defaults)
             </p>
             <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
-              <div className="text-gray-600">id,length</div>
-              <div className="text-gray-800">1,10000</div>
-              <div className="text-gray-800">2,15000</div>
+              <div className="text-gray-600">length</div>
+              <div className="text-gray-800">10000</div>
+              <div className="text-gray-800">15000</div>
+              <div className="text-gray-800">20000</div>
             </div>
             <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> id (task number),
-              length (MI - Million Instructions)
+              <span className="font-medium">Fields:</span> length (MI, min 1000).
+              System auto-fills: pes=1, file_size=0.1, output_size=0.1
             </p>
           </div>
         </div>
