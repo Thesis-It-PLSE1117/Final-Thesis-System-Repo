@@ -75,10 +75,11 @@ const HomePage = () => {
         "Configure task parameters and enable MATLAB visualization if needed."
       ],
       list: [
-        "Upload custom CSV files with cloudlet specifications",
-        "Select from 30 Google Cluster subset presets",
-        "Configure cloudlet count and task parameters",
-        "Enable MATLAB plots for advanced visualization (optional, used more by the researchers)"
+        "Upload custom CSV files with cloudlet specifications.",
+        "Select from 30 Google Cluster subset presets.",
+        "Configure cloudlet count.",
+        "Enable MATLAB plots for visualization (optional, used more by the researchers).",
+        "Default plots will be rendered if Matlab not toggled."
       ]
     },
     {
@@ -86,13 +87,13 @@ const HomePage = () => {
       title: "Set Iterations & Run",
       content: [
         "Configure simulation iterations for statistical analysis.",
-        "Run EACO vs EPSO comparison with real-time animation."
+        "Run EACO vs EPSO comparison with real-time animation (available in single iterations)."
       ],
       list: [
-        "Set iteration count (30+ recommended for t-tests)",
-        "Choose between EACO and EPSO algorithms",
-        "Watch real-time task scheduling animation",
-        "Monitor progress across multiple iterations"
+        "Set iteration count (30+ recommended for t-tests).",
+        "Simulation will run both EACO and EPSO algorithms.",
+        "Watch task scheduling animation (works in single iteration).",
+        "Monitor progress across multiple iterations."
       ]
     },
     {
