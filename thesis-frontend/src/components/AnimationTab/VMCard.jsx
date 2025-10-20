@@ -46,9 +46,10 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
         <div className="w-full bg-gray-200 rounded-full h-1.5">
           <div 
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              cpuPercentage > 90 ? 'bg-red-500' :
-              cpuPercentage > 70 ? 'bg-yellow-500' : 
-              cpuPercentage > 40 ? 'bg-orange-500' : 'bg-green-500'
+              status === 'Overloaded' ? 'bg-red-500' :
+              status === 'High Load' ? 'bg-yellow-500' : 
+              status === 'Medium Load' ? 'bg-orange-500' : 
+              status === 'Normal' ? 'bg-green-500' : 'bg-gray-400'
             }`} 
             style={{ width: `${cpuPercentage}%` }}
           ></div>

@@ -352,10 +352,20 @@ const AnimationTab = ({ dataCenterConfig, cloudletConfig, workloadFile, onBack, 
   const getVmStatus = (vmId, algorithm) => {
     const cpuLoad = cpuLoads[algorithm][vmId] || 0;
     const cpuPercentage = Math.min(100, cpuLoad * 100); // Convert to percentage
+    const vmTaskCount = taskCounts[algorithm][vmId] || 0;
 
-    if (cpuPercentage > 90) return 'Overloaded';
+    // calc the avg task per vm 
+    const totalTasks = Object.values(taskCounts[algorithm]).reduce((sum, count) => sum + count, 0);
+    const avgTasksPerVm = totalTasks / dataCenterConfig.numVMs;
+    const taskOverloadThreshold = avgTasksPerVm * 1.5; // Backend uses 1.5x average
+
+    // cpuUtilization > 90.0 OR taskCount > avgTasksPerVm * 1.5 which is determinant for overhead
+    const isCpuOverloaded = cpuPercentage > 90;
+    const isTaskOverloaded = vmTaskCount > taskOverloadThreshold;
+
+    if (isCpuOverloaded || isTaskOverloaded) return 'Overloaded';
     if (cpuPercentage > 70) return 'High Load';
-    if (cpuPercentage > 30) return 'Medium Load';
+    if (cpuPercentage > 40) return 'Medium Load';
     if (cpuPercentage > 0) return 'Normal';
     return 'Idle';
   };
