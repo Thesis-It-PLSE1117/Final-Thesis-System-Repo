@@ -27,9 +27,9 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
   
 const MetricCard = ({ title, value, subtitle, colorClass }) => (
   <div className="bg-gray-50 p-3 sm:p-4 md:p-5 rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-    <h4 className={`text-xs sm:text-sm font-medium ${colorClass} mb-1 sm:mb-2`}>{title}</h4>
+    <h4 className={`text-sm sm:text-sm font-medium ${colorClass} mb-1 sm:mb-2`}>{title}</h4>
     <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">{value}</div>
-    <div className="text-xs text-gray-500 mt-auto leading-tight">{subtitle}</div>
+    <div className="text-sm text-gray-500 mt-auto leading-tight">{subtitle}</div>
   </div>
 );
   

@@ -166,7 +166,7 @@ const EChartsVisualization = ({
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-sm font-medium">Chart Error</p>
-          <p className="text-xs mt-1 text-gray-400">{chartError}</p>
+          <p className="text-sm mt-1 text-gray-400">{chartError}</p>
         </div>
       </div>
     );

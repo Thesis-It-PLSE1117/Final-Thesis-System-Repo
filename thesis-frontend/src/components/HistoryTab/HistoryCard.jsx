@@ -32,7 +32,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
       onClick={onClick}
       className={`cursor-pointer transition-colors ${
         isSelected ? 'bg-[#e0f7f6] border-l-2 border-l-[#319694]' : 'hover:bg-gray-50'
-      } ${compact ? 'p-2 text-xs' : 'p-4 border-b border-gray-100 last:border-b-0'}`}
+      } ${compact ? 'p-2 text-sm' : 'p-4 border-b border-gray-100 last:border-b-0'}`}
     >
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
             </div>
           )}
         </div>
-        <span className={`text-gray-500 ${compact ? 'text-xs' : ''}`}>{formattedDate}</span>
+        <span className={`text-gray-500 ${compact ? 'text-sm' : ''}`}>{formattedDate}</span>
       </div>
       
       <div className={`flex justify-between ${compact ? 'mt-1' : 'mt-2 text-sm'}`}>
@@ -72,7 +72,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
       
       {!compact && (
         <div className="mt-2 pt-2 border-t border-gray-200">
-          <div className="flex flex-wrap gap-2 text-xs">
+          <div className="flex flex-wrap gap-2 text-sm">
             {hasPlotAnalysis && (
               <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center gap-1">
                 <TrendingUp size={12} /> Plot Analysis

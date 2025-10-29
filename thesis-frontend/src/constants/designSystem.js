@@ -52,8 +52,8 @@ export const TYPOGRAPHY_SCALE = {
     h6: "text-base md:text-lg font-semibold leading-normal", // Reduced from text-lg
     body: "text-sm md:text-base font-normal leading-relaxed",
     bodyLarge: "text-base md:text-lg font-normal leading-relaxed",
-    caption: "text-xs md:text-sm font-medium leading-normal",
-    small: "text-xs font-normal leading-normal",
+    caption: "text-sm md:text-sm font-medium leading-normal",
+    small: "text-sm font-normal leading-normal",
   },
 
   mobile: {
@@ -65,8 +65,8 @@ export const TYPOGRAPHY_SCALE = {
     h6: "text-sm font-semibold leading-normal", // Reduced from text-base
     body: "text-sm font-normal leading-relaxed",
     bodyLarge: "text-base font-normal leading-relaxed",
-    caption: "text-xs font-medium leading-normal",
-    small: "text-xs font-normal leading-normal",
+    caption: "text-sm font-medium leading-normal",
+    small: "text-sm font-normal leading-normal",
   },
 
   weights: {

@@ -67,7 +67,7 @@ const DocumentationModal = ({ isOpen, onClose, content }) => {
                   <ul className="pl-8 sm:pl-10 space-y-1 sm:space-y-2">
                     {section.list.map((item, idx) => (
                       <li key={idx} className="flex items-start">
-                        <span className="flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 mt-0.5 mr-2 rounded-full bg-[#319694]/10 text-[#319694] text-xs flex-shrink-0">
+                        <span className="flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 mt-0.5 mr-2 rounded-full bg-[#319694]/10 text-[#319694] text-sm flex-shrink-0">
                           {idx + 1}
                         </span>
                         <span className="text-gray-700 text-sm sm:text-base">{item}</span>

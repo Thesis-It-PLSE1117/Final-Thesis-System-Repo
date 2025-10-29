@@ -237,5 +237,10 @@ export const normalizeTTestResults = (raw) => {
      * This contains the statistical analysis explanation
      */
     interpretation: raw.interpretation ?? null,
+    /**
+     * I preserve the normalityTests field from the backend
+     * This contains Anderson-Darling test results for each metric
+     */
+    normalityTests: raw.normalityTests ?? null,
   };
 };

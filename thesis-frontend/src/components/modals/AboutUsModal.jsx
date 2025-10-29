@@ -159,8 +159,8 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                       />
                     </motion.div>
                     <h3 className="font-bold text-gray-800 text-sm md:text-base">{member.name}</h3>
-                    <p className="text-xs md:text-sm text-[#319694] font-medium mb-1">{member.role}</p>
-                    <p className="text-xs text-gray-500">{member.description}</p>
+                    <p className="text-sm md:text-sm text-[#319694] font-medium mb-1">{member.role}</p>
+                    <p className="text-sm text-gray-500">{member.description}</p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -173,11 +173,11 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   <FaUniversity className="text-[#319694]" />
                   <h4 className="font-semibold text-[#319694] text-sm md:text-base">University of Cabuyao</h4>
                 </div>
-                <div className="text-xs md:text-sm text-gray-700 text-center space-y-2">
+                <div className="text-sm md:text-sm text-gray-700 text-center space-y-2">
                   <p>
                     <span className="font-medium">Thesis Title:</span> Enhanced PSO and ACO for Cloud Load Balancing: A Comparative Study
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-sm text-gray-600">
                     <span className="font-medium">Research Design:</span> Quantitative, simulation-based methodology using CloudSim framework
                   </p>
                 </div>
@@ -193,18 +193,18 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   </svg>
                   <h4 className="font-semibold text-[#319694] text-sm md:text-base">Research Methodology</h4>
                 </div>
-                <div className="text-xs md:text-sm text-gray-700 text-center space-y-2">
+                <div className="text-sm md:text-sm text-gray-700 text-center space-y-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
                     <div className="space-y-1">
                       <p><span className="font-medium">Participants:</span> 30 total</p>
-                      <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
+                      <ul className="text-sm text-gray-600 ml-3 space-y-0.5">
                         <li>• 15 IT Experts </li>
                         <li>• 15 End Users</li>
                       </ul>
                     </div>
                     <div className="space-y-1">
                       <p><span className="font-medium">Analysis:</span> Statistical comparison</p>
-                      <ul className="text-xs text-gray-600 ml-3 space-y-0.5">
+                      <ul className="text-sm text-gray-600 ml-3 space-y-0.5">
                         <li>• Paired t-test (α = 0.05)</li>
                         <li>• Likert scale evaluation</li>
                         <li>• Purposive sampling</li>

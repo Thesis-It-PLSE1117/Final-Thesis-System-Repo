@@ -197,7 +197,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
               <h3 className={`font-bold text-base sm:text-lg ${showDetails ? 'text-white' : 'text-gray-800'} leading-tight`}>
                 Individual Iteration Results
               </h3>
-              <p className={`text-xs sm:text-sm mt-0.5 ${showDetails ? 'text-white/80' : 'text-gray-600'} leading-relaxed`}>
+              <p className={`text-sm sm:text-sm mt-0.5 ${showDetails ? 'text-white/80' : 'text-gray-600'} leading-relaxed`}>
                 <span className="block sm:inline">Detailed analysis of {Math.max(eacoIterations.length, epsoIterations.length)} iterations</span>
                 <span className="hidden sm:inline"> <Dot className="inline mx-1" size={12} /> </span>
                 <span className="block sm:inline">Raw paired data used in t-test</span>
@@ -241,7 +241,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                       <button
                         key={tab.id}
                         onClick={() => setSelectedAlgorithm(tab.id)}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0
+                        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-sm transition-all whitespace-nowrap flex-shrink-0
                           ${selectedAlgorithm === tab.id 
                             ? 'bg-[#319694] text-white shadow-md' 
                             : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
@@ -262,7 +262,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                     <select
                       value={selectedMetric}
                       onChange={(e) => setSelectedMetric(e.target.value)}
-                      className="flex-1 xs:flex-initial px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#319694] bg-white min-w-0"
+                      className="flex-1 xs:flex-initial px-2 sm:px-3 py-1.5 text-sm sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#319694] bg-white min-w-0"
                     >
                       <option value="all">All Metrics</option>
                       {availableMetrics.map(m => (
@@ -276,7 +276,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                   {/* Export Button */}
                   <button
                     onClick={exportToCSV}
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium text-xs sm:text-sm"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium text-sm sm:text-sm"
                   >
                     <Download size={14} className="sm:w-4 sm:h-4" />
                     <span>Export CSV</span>
@@ -306,7 +306,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                             <h4 className="font-semibold text-gray-800 text-sm sm:text-base truncate">{metric.label}</h4>
                           </div>
                           {stats.winner !== 'Tie' && (
-                            <span className={`px-2 py-1 text-xs font-bold rounded-full whitespace-nowrap flex-shrink-0 ${
+                            <span className={`px-2 py-1 text-sm font-bold rounded-full whitespace-nowrap flex-shrink-0 ${
                               stats.winner === 'EACO' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                             }`}>
                               {stats.winner} <ArrowUp size={10} className="inline" />{stats.improvement.toFixed(1)}%
@@ -316,14 +316,14 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                         
                         <div className="space-y-2 sm:space-y-3">
                           <div className="flex justify-between items-center">
-                            <span className="text-xs sm:text-sm text-gray-600">EACO Avg:</span>
-                            <span className="font-mono font-medium text-gray-800 text-xs sm:text-sm">
+                            <span className="text-sm sm:text-sm text-gray-600">EACO Avg:</span>
+                            <span className="font-mono font-medium text-gray-800 text-sm sm:text-sm">
                               {metric.format(stats.eacoAvg)} {metric.unit}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-xs sm:text-sm text-gray-600">EPSO Avg:</span>
-                            <span className="font-mono font-medium text-gray-800 text-xs sm:text-sm">
+                            <span className="text-sm sm:text-sm text-gray-600">EPSO Avg:</span>
+                            <span className="font-mono font-medium text-gray-800 text-sm sm:text-sm">
                               {metric.format(stats.epsoAvg)} {metric.unit}
                             </span>
                           </div>
@@ -346,14 +346,14 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                   <table className="w-full min-w-max">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <tr>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 text-xs sm:text-sm">
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 text-sm sm:text-sm">
                           Iteration
                         </th>
                         {selectedAlgorithm !== 'paired' && (
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 text-xs sm:text-sm">Algorithm</th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 text-sm sm:text-sm">Algorithm</th>
                         )}
                         {displayMetrics.map(metric => (
-                          <th key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-700 text-xs sm:text-sm">
+                          <th key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-700 text-sm sm:text-sm">
                             <div className="flex items-center justify-end gap-1">
                               <span className="truncate">{metric.label}</span>
                               {metric.unit && <span className="font-normal text-gray-500 hidden sm:inline">({metric.unit})</span>}
@@ -379,7 +379,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                               onMouseEnter={() => setHoveredRow(idx)}
                               onMouseLeave={() => setHoveredRow(null)}
                             >
-                              <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-xs sm:text-sm">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">
                                 {idx + 1}
                               </td>
                               {displayMetrics.map(metric => {
@@ -413,14 +413,14 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                                       </div>
                                       
                                       <div className="text-right">
-                                        <span className={`font-mono font-medium text-xs sm:text-sm ${
+                                        <span className={`font-mono font-medium text-sm sm:text-sm ${
                                           trend === 'better' ? 'text-green-700' :
                                           trend === 'worse' ? 'text-red-700' :
                                           'text-gray-600'
                                         }`}>
                                           {diff > 0 ? '+' : ''}{metric.format(diff)}
                                         </span>
-                                        <div className="text-xs text-gray-500 hidden sm:block">
+                                        <div className="text-sm text-gray-500 hidden sm:block">
                                           {percentDiff !== 0 && `(${percentDiff > 0 ? '+' : ''}${percentDiff.toFixed(1)}%)`}
                                         </div>
                                       </div>
@@ -443,19 +443,19 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                                 transition={{ delay: idx * 0.01 }}
                                 className="hover:bg-blue-50/50 transition-colors"
                               >
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-xs sm:text-sm">{idx + 1}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">{idx + 1}</td>
                                 {selectedAlgorithm !== 'paired' && (
                                   <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                    <span className="px-2 sm:px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full font-semibold">
+                                    <span className="px-2 sm:px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full font-semibold">
                                       EACO
                                     </span>
                                   </td>
                                 )}
                                 {displayMetrics.map(metric => (
-                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-xs sm:text-sm">
+                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
                                     <div className="text-right">
                                       <div>{metric.format(iter.summary[metric.key] || 0)}</div>
-                                      <span className="text-xs text-gray-500 hidden sm:inline">{metric.unit}</span>
+                                      <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
                                     </div>
                                   </td>
                                 ))}
@@ -471,19 +471,19 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                                 transition={{ delay: idx * 0.01 }}
                                 className="hover:bg-orange-50/50 transition-colors"
                               >
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-xs sm:text-sm">{idx + 1}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">{idx + 1}</td>
                                 {selectedAlgorithm !== 'paired' && (
                                   <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                    <span className="px-2 sm:px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-full font-semibold">
+                                    <span className="px-2 sm:px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded-full font-semibold">
                                       EPSO
                                     </span>
                                   </td>
                                 )}
                                 {displayMetrics.map(metric => (
-                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-xs sm:text-sm">
+                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
                                     <div className="text-right">
                                       <div>{metric.format(iter.summary[metric.key] || 0)}</div>
-                                      <span className="text-xs text-gray-500 hidden sm:inline">{metric.unit}</span>
+                                      <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
                                     </div>
                                   </td>
                                 ))}
@@ -504,13 +504,13 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                 <div className="flex flex-col xs:flex-row xs:items-center gap-3 xs:gap-6">
                   <div className="flex items-center gap-2">
                     <Database size={14} className="text-gray-500" />
-                    <span className="text-xs sm:text-sm text-gray-600">
+                    <span className="text-sm sm:text-sm text-gray-600">
                       <span className="font-semibold text-gray-800">{eacoIterations.length}</span> EACO iterations
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Database size={14} className="text-gray-500" />
-                    <span className="text-xs sm:text-sm text-gray-600">
+                    <span className="text-sm sm:text-sm text-gray-600">
                       <span className="font-semibold text-gray-800">{epsoIterations.length}</span> EPSO iterations
                     </span>
                   </div>
@@ -518,7 +518,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                 
                 <div className="flex items-start sm:items-center gap-2 text-gray-500">
                   <Info size={14} className="mt-0.5 sm:mt-0 flex-shrink-0" />
-                  <span className="text-xs leading-relaxed">
+                  <span className="text-sm leading-relaxed">
                     This data represents the paired observations used in the t-test statistical analysis
                   </span>
                 </div>

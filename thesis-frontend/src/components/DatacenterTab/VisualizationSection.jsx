@@ -10,7 +10,7 @@ const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, tog
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-800">Load Balancing Visualization</h3>
-          <p className="text-xs text-gray-600 mt-1">Preview task distribution across infrastructure</p>
+          <p className="text-sm text-gray-600 mt-1">Preview task distribution across infrastructure</p>
         </div>
       </div>
       
@@ -28,7 +28,7 @@ const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, tog
           <HardDriveUpload className="mr-2" size={20} />
           <div>
             <span className="font-medium">Task-to-VM Assignment</span>
-            <p className="text-xs text-gray-500 mt-1">How cloudlets are distributed across virtual machines</p>
+            <p className="text-sm text-gray-500 mt-1">How cloudlets are distributed across virtual machines</p>
           </div>
         </button>
         
@@ -65,7 +65,7 @@ const VisualizationSection = ({ hostVisualization, vmCards, expandedSection, tog
           <HardDriveDownload className="mr-2" size={20} />
           <div>
             <span className="font-medium">VM Resource Overview</span>
-            <p className="text-xs text-gray-500 mt-1">Individual VM specifications and capacity</p>
+            <p className="text-sm text-gray-500 mt-1">Individual VM specifications and capacity</p>
           </div>
         </button>
         

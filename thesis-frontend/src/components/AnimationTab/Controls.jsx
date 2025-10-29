@@ -43,7 +43,7 @@ const Controls = ({ isPlaying, handlePlayPause, handleReset, progress, cloudlets
           style={{ width: `${progress}%` }}
         ></div>
       </div>
-      <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">
+      <span className="text-sm sm:text-sm text-gray-600 whitespace-nowrap">
         {Math.round(progress)}% ({Math.floor(cloudlets * progress / 100)}/{cloudlets} tasks)
       </span>
     </div>

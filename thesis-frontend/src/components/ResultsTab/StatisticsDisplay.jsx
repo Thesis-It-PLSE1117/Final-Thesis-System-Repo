@@ -59,7 +59,7 @@ const StatisticsDisplay = ({ average, min, max, stdDev }) => {
           <BarChart3 className="text-[#319694]" size={20} />
           Statistical Analysis
         </h4>
-        <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
           Across all iterations
         </span>
       </div>
@@ -91,15 +91,15 @@ const StatisticsDisplay = ({ average, min, max, stdDev }) => {
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Average</span>
+                  <span className="text-sm text-gray-500">Average</span>
                   <span className="text-sm font-semibold text-gray-800">
                     {average[metric]?.toFixed(2)}{unit}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Range</span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-500">Range</span>
+                  <span className="text-sm text-gray-600">
                     {min[metric]?.toFixed(2)} - {max[metric]?.toFixed(2)}{unit}
                   </span>
                 </div>
@@ -116,14 +116,14 @@ const StatisticsDisplay = ({ average, min, max, stdDev }) => {
                 </div>
                 
                 <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs text-gray-500">Std Dev</span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-500">Std Dev</span>
+                  <span className="text-sm text-gray-600">
                     ±{stdDev[metric]?.toFixed(3)}{unit}
                   </span>
                 </div>
                 
                 {variability > 10 && (
-                  <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded flex items-center gap-1">
+                  <div className="mt-2 text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded flex items-center gap-1">
                     <Activity size={12} />
                     High variability ({variability.toFixed(1)}%)
                   </div>

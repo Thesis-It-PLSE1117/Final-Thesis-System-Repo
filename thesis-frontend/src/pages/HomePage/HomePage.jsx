@@ -1,23 +1,31 @@
-import { useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import { Settings, Upload, Cpu, LineChart, BookOpen, Users } from 'lucide-react'; 
-import { FaGithub } from 'react-icons/fa';
-import { lazy, Suspense } from 'react';
-const AboutUsModal = lazy(() => import('../../components/modals/AboutUsModal'));
-const SimulationPage = lazy(() => import('../SimulationPage'));
-import AnimatedBackground from './AnimatedBackground';
-import Header from './Header';
-import HeroSection from './HeroSection';
-import DemoSection from './DemoSection';
-import WalkthroughSection from './WalkthroughSection';
-import CtaSection from './CtaSection';
-import Footer from './Footer';
-import ScrollToTop from '../../components/ScrollToTop';
+import { useState, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
+import {
+  Settings,
+  Upload,
+  Cpu,
+  LineChart,
+  BookOpen,
+  Users,
+} from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+import { lazy, Suspense } from "react";
+const AboutUsModal = lazy(() => import("../../components/modals/AboutUsModal"));
+const SimulationPage = lazy(() => import("../SimulationPage"));
+import AnimatedBackground from "./AnimatedBackground";
+import Header from "./Header";
+import HeroSection from "./HeroSection";
+import DemoSection from "./DemoSection";
+import WalkthroughSection from "./WalkthroughSection";
+import CtaSection from "./CtaSection";
+import Footer from "./Footer";
+import ScrollToTop from "../../components/ScrollToTop";
 
 const HomePage = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [showSimulation, setShowSimulation] = useState(false);
-    const [simulationInitialTab, setSimulationInitialTab] = useState("dataCenter");
+  const [simulationInitialTab, setSimulationInitialTab] =
+    useState("dataCenter");
   const [isPlaying, setIsPlaying] = useState(false);
   const controls = useAnimation();
 
@@ -26,7 +34,7 @@ const HomePage = () => {
       const interval = setInterval(() => {
         controls.start({
           x: [0, -500, 0],
-          transition: { duration: 8, ease: "linear" }
+          transition: { duration: 8, ease: "linear" },
         });
       }, 8000);
       return () => clearInterval(interval);
@@ -35,104 +43,105 @@ const HomePage = () => {
 
   if (showSimulation) {
     return (
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin motion-reduce:animate-none rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
-        </div>
-      }>
-        <SimulationPage 
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin motion-reduce:animate-none rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
+          </div>
+        }
+      >
+        <SimulationPage
           onBack={() => {
             setShowSimulation(false);
             setSimulationInitialTab("dataCenter");
-          }} 
+          }}
           initialTab={simulationInitialTab}
         />
       </Suspense>
     );
   }
 
-
   const walkthroughSteps = [
     {
       icon: <Settings className="w-8 h-8" />,
-      title: "Configure Datacenter",
+      title: "Set Up Your Cloud Environment",
       content: [
-        "Set up your datacenter infrastructure with hosts and virtual machines.",
-        "Configure processing capabilities, memory, storage, and bandwidth specifications."
+        "Create your cloud infrastructure with hosts and virtual machines.",
+        "Set processing power, memory, storage, and network settings.",
       ],
       list: [
-        "Number of hosts and their MIPS capacity",
-        "Virtual machine configurations (MIPS, RAM, Bandwidth)",
-        "Host specifications (PEs, RAM, Storage)",
-        "Apply preset configurations or customize settings"
-      ]
+        "Number of hosts and their processing capacity",
+        "Virtual machine settings (CPU, RAM, Bandwidth)",
+        "Host details (Cores, RAM, Storage)",
+        "Use preset configurations or create custom settings",
+      ],
     },
     {
       icon: <Upload className="w-8 h-8" />,
-      title: "Load Workload Dataset",
+      title: "Upload Your Tasks",
       content: [
-        "Upload CSV files with task specifications or select from Google Cluster presets.",
-        "Configure task parameters and enable MATLAB visualization if needed."
+        "Upload CSV files with your tasks or choose from Google Cluster presets.",
+        "Set task parameters and enable charts if needed.",
       ],
       list: [
-        "Upload custom CSV files with cloudlet specifications.",
-        "Select from 30 Google Cluster subset presets.",
-        "Configure cloudlet count.",
-        "Enable MATLAB plots for visualization (optional, used more by the researchers).",
-        "Default plots will be rendered if Matlab not toggled."
-      ]
+        "Upload custom CSV files with task details.",
+        "Choose from 30 Google Cluster preset options.",
+        "Set the number of tasks.",
+        "Enable MATLAB charts for detailed analysis (mainly for researchers).",
+        "Standard charts will show automatically if MATLAB is not selected.",
+      ],
     },
     {
       icon: <Cpu className="w-8 h-8" />,
-      title: "Set Iterations & Run",
+      title: "Run Your Tests",
       content: [
-        "Configure simulation iterations for statistical analysis.",
-        "Run EACO vs EPSO comparison with real-time animation (available in single iterations)."
+        "Set how many times to run the test for reliable results.",
+        "Compare EACO vs EPSO algorithms with real-time animation (single run only).",
       ],
       list: [
-        "Set iteration count (30+ recommended for t-tests).",
-        "Simulation will run both EACO and EPSO algorithms.",
-        "Watch task scheduling animation (works in single iteration).",
-        "Monitor progress across multiple iterations."
-      ]
+        "Choose test runs (50+ recommended for statistical analysis).",
+        "System will test both EACO and EPSO algorithms.",
+        "Watch live task scheduling animation (works with single run).",
+        "Track progress across multiple test runs.",
+      ],
     },
     {
       icon: <LineChart className="w-8 h-8" />,
-      title: "Analyze Results & History",
+      title: "View Results & History",
       content: [
-        "View detailed performance analysis with statistical comparisons.",
-        "Access saved simulation history and export results."
+        "See detailed performance analysis with statistical comparisons.",
+        "Access your saved test history and export results.",
       ],
       list: [
-        "Metadata, analysis, visualizations, and execution logs",
-        "Paired t-test statistical significance results",
-        "MATLAB-generated performance plots and charts",
-        "Browse simulation history and export capabilities"
-      ]
-    }
+        "View test details, analysis, charts, and execution logs",
+        "Get statistical significance results with t-tests",
+        "See MATLAB-generated or Apache E-Charts performance charts and graphs",
+        "Browse your test history and export data",
+      ],
+    },
   ];
 
   const footerLinks = [
-    { 
-      text: "GitHub", 
-      href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git", 
-      icon: <FaGithub size={20} /> 
+    {
+      text: "GitHub",
+      href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git",
+      icon: <FaGithub size={20} />,
     },
-    { 
-      text: "Documentation", 
-      href: "#", 
+    {
+      text: "Documentation",
+      href: "#",
       icon: <BookOpen size={18} />,
       onClick: () => {
         setSimulationInitialTab("help");
         setShowSimulation(true);
-      }
+      },
     },
-    { 
-      text: "Team", 
-      href: "#", 
+    {
+      text: "Team",
+      href: "#",
       icon: <Users size={18} />,
-      onClick: () => setIsAboutModalOpen(true)
-    }
+      onClick: () => setIsAboutModalOpen(true),
+    },
   ];
 
   return (
@@ -143,29 +152,33 @@ const HomePage = () => {
       transition={{ duration: 0.6 }}
     >
       <AnimatedBackground />
-      
+
       <Header onStartSimulation={() => setShowSimulation(true)} />
-      
-      <HeroSection onStartSimulation={() => setShowSimulation(true)} />
-      
-      <DemoSection 
-        isPlaying={isPlaying} 
-        setIsPlaying={setIsPlaying} 
-        controls={controls} 
-      />
-      
-      <WalkthroughSection walkthroughSteps={walkthroughSteps} />
-      
-      <CtaSection onStartSimulation={() => setShowSimulation(true)} />
-      
-      <Footer 
-        footerLinks={footerLinks}
+
+      <HeroSection 
+        onStartSimulation={() => setShowSimulation(true)}
+        onViewDocs={() => {
+          setSimulationInitialTab("help");
+          setShowSimulation(true);
+        }}
       />
 
+      <DemoSection
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        controls={controls}
+      />
+
+      <WalkthroughSection walkthroughSteps={walkthroughSteps} />
+
+      <CtaSection onStartSimulation={() => setShowSimulation(true)} />
+
+      <Footer footerLinks={footerLinks} />
+
       <Suspense fallback={null}>
-        <AboutUsModal 
-          isOpen={isAboutModalOpen} 
-          onClose={() => setIsAboutModalOpen(false)} 
+        <AboutUsModal
+          isOpen={isAboutModalOpen}
+          onClose={() => setIsAboutModalOpen(false)}
         />
       </Suspense>
 

@@ -65,7 +65,7 @@ const WorkloadConfigCard = ({
           <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
             Simulation Workload Setup
           </h3>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Configure cloudlets (tasks) for algorithm evaluation using Google
             cluster traces
           </p>
@@ -90,7 +90,7 @@ const WorkloadConfigCard = ({
           />
           {csvRowCount > 0 ? (
             <motion.p
-              className="text-xs text-gray-500 mt-2 flex items-center gap-2"
+              className="text-sm text-gray-500 mt-2 flex items-center gap-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -101,7 +101,7 @@ const WorkloadConfigCard = ({
           ) : (
             isDisabled && (
               <motion.p
-                className="text-xs text-gray-500 mt-2"
+                className="text-sm text-gray-500 mt-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -113,7 +113,7 @@ const WorkloadConfigCard = ({
           )}
           {!isDisabled && !hasWorkload && (
             <motion.p
-              className="text-xs text-blue-500 mt-2"
+              className="text-sm text-blue-500 mt-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -127,7 +127,7 @@ const WorkloadConfigCard = ({
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             <FileText size={18} className="text-[#319694]" />
             Research Benchmark Dataset
-            <span className="text-xs text-gray-500 font-normal">
+            <span className="text-sm text-gray-500 font-normal">
               (Google cluster workload traces)
             </span>
           </label>

@@ -64,13 +64,13 @@ const StatHighlight = ({ value, label, trend, isPositive = true }) => {
         {value}
       </div>
       <div
-        className={`text-xs ${TYPOGRAPHY_SCALE.weights.medium} ${COLOR_SYSTEM.text.muted}`}
+        className={`text-sm ${TYPOGRAPHY_SCALE.weights.medium} ${COLOR_SYSTEM.text.muted}`}
       >
         {label}
       </div>
       {trend && (
         <div
-          className={`text-xs ${isPositive ? "text-green-600" : "text-amber-600"} ${TYPOGRAPHY_SCALE.weights.medium} mt-0.5`}
+          className={`text-sm ${isPositive ? "text-green-600" : "text-amber-600"} ${TYPOGRAPHY_SCALE.weights.medium} mt-0.5`}
         >
           {trend}
         </div>
@@ -79,7 +79,7 @@ const StatHighlight = ({ value, label, trend, isPositive = true }) => {
   );
 };
 
-const HeroSection = ({ onStartSimulation }) => {
+const HeroSection = ({ onStartSimulation, onViewDocs }) => {
   const [particles, setParticles] = useState([]);
 
   useEffect(() => {
@@ -148,14 +148,14 @@ const HeroSection = ({ onStartSimulation }) => {
             className={`flex flex-col sm:flex-row ${SPACING_SCALE.gap.xs} items-center justify-center`}
           >
             <motion.div
-              className={`${SPACING_SCALE.padding.button.sm} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-xs inline-flex items-center gap-1.5 ${COLOR_SYSTEM.borders.primary}`}
+              className={`${SPACING_SCALE.padding.button.sm} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-sm inline-flex items-center gap-1.5 ${COLOR_SYSTEM.borders.primary}`}
               whileHover={INTERACTION_STATES.scale.subtle}
             >
               <Award size={ICON_SIZES.xs} className="animate-pulse" />
               Cloud Load Balancing Algorithm Comparison
             </motion.div>
             <motion.div
-              className={`${SPACING_SCALE.padding.button.sm} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-xs inline-flex items-center gap-1.5 ${COLOR_SYSTEM.borders.primary}`}
+              className={`${SPACING_SCALE.padding.button.sm} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-sm inline-flex items-center gap-1.5 ${COLOR_SYSTEM.borders.primary}`}
               whileHover={INTERACTION_STATES.scale.subtle}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -194,16 +194,16 @@ const HeroSection = ({ onStartSimulation }) => {
             duration: ANIMATION_TIMING.durations.slow / 1000,
           }}
         >
-          Research-focused comparison of{" "}
+          Compare two cloud algorithms:{" "}
           <span className="font-semibold text-[#319694]">
-            Enhanced ACO vs Enhanced PSO
-          </span>{" "}
-          algorithms for
+            Enhanced ACO and Enhanced PSO
+          </span>.
+          See which schedules
           <span className="font-semibold text-[#4fd1c5]">
             {" "}
-            virtual machine task scheduling
+            virtual machine tasks
           </span>{" "}
-          with statistical validation
+          more efficiently. Backed by real data.
         </motion.p>
 
         {/* Key Statistics */}
@@ -258,11 +258,7 @@ const HeroSection = ({ onStartSimulation }) => {
           </motion.button>
 
           <motion.button
-            onClick={() =>
-              document
-                .getElementById("walkthrough")
-                .scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={onViewDocs}
             className={`flex items-center justify-center ${SPACING_SCALE.gap.sm} ${COLOR_SYSTEM.backgrounds.solid.white} ${COLOR_SYSTEM.text.primary} ${SPACING_SCALE.padding.button.md} ${BORDER_RADIUS.default} text-base ${TYPOGRAPHY_SCALE.weights.medium} ${SHADOW_SCALE.large} ${SHADOW_SCALE.hover.xl} transition-all ${COLOR_SYSTEM.borders.primaryStrong}`}
             whileHover={{
               ...INTERACTION_STATES.scale.hover,
@@ -270,7 +266,7 @@ const HeroSection = ({ onStartSimulation }) => {
             }}
             whileTap={INTERACTION_STATES.scale.tap}
           >
-            <span>Simulation Guide</span>
+            <span>View Docs</span>
             <Settings size={ICON_SIZES.sm} />
           </motion.button>
         </motion.div>

@@ -1,12 +1,12 @@
 export const dataCenterHelpContent = {
   title: "Data Center Configuration",
   description:
-    "Configure your cloud infrastructure with hosts (physical servers) and VMs (virtual machines). Hosts provide CPU, memory, and storage resources that VMs use to execute tasks.",
+    "Set up your cloud with hosts (physical servers) and VMs (virtual machines). Hosts supply CPU, memory, and storage. VMs use these resources to run your tasks.",
   icon: "Server",
 
   quickStart: {
     title: "Quick Start Example",
-    description: "Try this basic configuration for your first simulation:",
+    description: "Use this simple setup to run your first simulation:",
     example: {
       hosts: "20 hosts",
       pesPerHost: "8 cores",
@@ -15,13 +15,13 @@ export const dataCenterHelpContent = {
       vms: "50 VMs",
       vmPes: "2 cores per VM",
     },
-    note: "This is the default configuration with 20 physical servers and 50 VMs for balanced resource distribution.",
+    note: "This default setup has 20 servers and 50 VMs. It balances resources well.",
   },
 
   sections: {
     hostConfig: {
       title: "Host Configuration",
-      description: "Hosts are physical servers that provide resources to VMs.",
+      description: "Hosts are the physical servers that power your VMs.",
       icon: "HardDriveUpload",
       items: [
         {
@@ -72,7 +72,7 @@ export const dataCenterHelpContent = {
     vmConfig: {
       title: "Virtual Machine Configuration",
       description:
-        "VMs run on hosts and execute your tasks using allocated resources.",
+        "VMs run on hosts and execute your tasks using the resources you assign.",
       icon: "HardDriveDownload",
       items: [
         {
@@ -122,7 +122,7 @@ export const dataCenterHelpContent = {
 
     troubleshooting: {
       title: "Common Issues",
-      description: "Solutions to frequent configuration problems:",
+      description: "Here are fixes for common setup problems:",
       icon: "Settings",
       items: [
         {
@@ -148,7 +148,7 @@ export const dataCenterHelpContent = {
 
     glossary: {
       title: "Key Terms",
-      description: "Important concepts explained simply:",
+      description: "Important concepts in simple terms:",
       icon: "BookOpen",
       terms: [
         {

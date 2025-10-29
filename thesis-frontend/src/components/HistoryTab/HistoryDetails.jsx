@@ -258,7 +258,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                 {result.algorithm} algorithm performance metrics
               </p>
               {isSingleIteration && (
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                <span className="bg-blue-100 text-blue-800 text-sm px-2 py-0.5 rounded-full font-medium">
                   Single Iteration
                 </span>
               )}
@@ -413,7 +413,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                       <div className="text-2xl font-bold text-[#319694]">
                         {result.plotAnalysis.plotCount || 0}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 mt-1">
                         Plots Generated
                       </div>
                     </div>
@@ -423,7 +423,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                           ? result.plotAnalysis.plotTypes.length
                           : 0}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 mt-1">
                         Chart Types
                       </div>
                     </div>
@@ -436,7 +436,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                           ? "✓"
                           : "✗"}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 mt-1">
                         Interpretations
                       </div>
                     </div>
@@ -444,7 +444,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                       <div className="text-2xl font-bold text-[#319694]">
                         {result.plotAnalysis.analysis ? "✓" : "✗"}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">Analysis</div>
+                      <div className="text-sm text-gray-600 mt-1">Analysis</div>
                     </div>
                   </div>
 
@@ -459,7 +459,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
                           {result.plotAnalysis.plotTypes.map((type, index) => (
                             <span
                               key={index}
-                              className="bg-white px-3 py-1 rounded-full text-xs text-gray-700 border shadow-sm"
+                              className="bg-white px-3 py-1 rounded-full text-sm text-gray-700 border shadow-sm"
                             >
                               {type
                                 .replace(/_/g, " ")

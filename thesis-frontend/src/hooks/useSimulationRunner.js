@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { showNotification } from '../components/common/ErrorNotification';
 import { validateSimulationConfig } from '../utils/validation';
 import { normalizeTTestResults } from '../utils/ttestNormalizer';
+import { normalizeWilcoxonResults } from '../utils/wilcoxonNormalizer';
 import * as apiClient from '../services/apiClient';
 import { API_BASE } from '../services/apiClient';
 import * as historyService from '../services/historyService';
@@ -417,11 +418,47 @@ export const useSimulationRunner = () => {
           } else {
             comparisonResults = await apiClient.compare(configData);
           }
-          // i normalize t-test results since you know for the sake of handling different backend formats
-          const tTestResultsNormalized = normalizeTTestResults(
-            comparisonResults.tTestResults || comparisonResults.ttestResults || null
+          console.log('[DEBUG] ===== BACKEND RESPONSE INSPECTION =====');
+          console.log('[DEBUG] All top-level keys:', Object.keys(comparisonResults));
+          const ttestData = comparisonResults.tTestResults || comparisonResults.ttestResults;
+          console.log('[DEBUG] T-Test data found:', !!ttestData);
+          if (ttestData) {
+            console.log('[DEBUG] Keys inside ttestResults:', Object.keys(ttestData));
+            console.log('[DEBUG] Wilcoxon nested inside ttestResults:', !!ttestData.wilcoxonTests);
+            if (ttestData.wilcoxonTests) {
+              console.log('[DEBUG] Wilcoxon test metrics:', Object.keys(ttestData.wilcoxonTests));
+            }
+          }
+          console.log('[DEBUG] ==========================================');
+          
+          const tTestResultsNormalized = normalizeTTestResults(ttestData);
+          
+          const wilcoxonResultsNormalized = normalizeWilcoxonResults(
+            ttestData ? {
+              metricTests: ttestData.wilcoxonTests,
+              interpretation: ttestData.interpretation,
+              overallWinner: ttestData.overallWinner,
+              significantDifferences: ttestData.significantDifferences
+            } : (
+              comparisonResults.wilcoxonTestResults || 
+              comparisonResults.wilcoxonResults || 
+              comparisonResults.wilcoxonTests || 
+              null
+            )
           );
-          // T-test results processed
+          
+          console.log('[DEBUG] After normalization:', {
+            tTest: tTestResultsNormalized ? 'PRESENT' : 'NULL',
+            wilcoxon: wilcoxonResultsNormalized ? 'PRESENT' : 'NULL'
+          });
+          
+          if (wilcoxonResultsNormalized) {
+            console.log('[DEBUG] Wilcoxon normalized data:', {
+              metricsCount: Object.keys(wilcoxonResultsNormalized.metricTests || {}).length,
+              overallWinner: wilcoxonResultsNormalized.overallWinner,
+              sampleSize: wilcoxonResultsNormalized.sampleSize
+            });
+          }
           
           const combinedResults = {
             eaco: {
@@ -433,6 +470,7 @@ export const useSimulationRunner = () => {
               },
               summary: comparisonResults.eacoResults?.averageMetrics,
               tTestResults: tTestResultsNormalized,
+              wilcoxonTestResults: wilcoxonResultsNormalized,
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,
@@ -454,6 +492,7 @@ export const useSimulationRunner = () => {
               },
               summary: comparisonResults.epsoResults?.averageMetrics,
               tTestResults: tTestResultsNormalized,
+              wilcoxonTestResults: wilcoxonResultsNormalized,
               iterationsAdjusted: comparisonResults.iterationsAdjusted,
               originalIterations: comparisonResults.originalIterations,
               adjustmentMessage: comparisonResults.adjustmentMessage,

@@ -27,8 +27,7 @@ const WorkloadHelp = () => {
             Workload Configuration
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Upload task data or use pre-configured datasets to simulate cloud
-            scheduling
+            Upload your task data or choose a ready-made dataset to test cloud scheduling.
           </p>
         </div>
       </motion.div>
@@ -48,21 +47,18 @@ const WorkloadHelp = () => {
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">1.</span>
             <span>
-              Choose a pre-configured dataset or upload your CSV file or you may
-              just toggle the cloudlet config to use a default synthetic
-              dataset.
+              Pick a dataset from our library, upload your own CSV file, or use the default synthetic dataset.
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">2.</span>
             <span>
-              Set how many tasks you want to simulate, We advice to use less
-              than equal to 10k if favors a valid simulation.{" "}
+              Set how many tasks to simulate. We recommend 10,000 or fewer for accurate results.
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">3.</span>
-            <span>Click "Run Simulation" to run your simulation.</span>
+            <span>Click "Run Simulation" to start.</span>
           </li>
         </ol>
       </motion.div>
@@ -81,8 +77,7 @@ const WorkloadHelp = () => {
           </h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          The system auto-detects these common formats—no manual configuration
-          needed:
+          The system detects these formats automatically. No setup needed.
         </p>
 
         <div className="space-y-4">
@@ -91,7 +86,7 @@ const WorkloadHelp = () => {
             <p className="text-sm font-semibold text-gray-800 mb-2">
               Google Cluster Format
             </p>
-            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+            <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">
                 cpu_request,pes_number,file_size,output_size,arrival_ts
               </div>
@@ -102,10 +97,8 @@ const WorkloadHelp = () => {
                 0.8,2,0.3,0.2,1234567895000
               </div>
             </div>
-            <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> cpu_request (0-1 fraction),
-              pes_number (cores 1-8), file_size (0-1 normalized), output_size (0-1 normalized),
-              arrival_ts (microseconds - optional)
+            <p className="text-sm text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> CPU usage (0 to 1), cores needed (1-8), file size, output size, and arrival time (optional).
             </p>
           </div>
 
@@ -114,7 +107,7 @@ const WorkloadHelp = () => {
             <p className="text-sm font-semibold text-gray-800 mb-2">
               Standard CloudSim Format (Normalized)
             </p>
-            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+            <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">
                 length,pes,file_size,output_size
               </div>
@@ -122,10 +115,8 @@ const WorkloadHelp = () => {
               <div className="text-gray-800">15000,2,0.3,0.2</div>
               <div className="text-gray-800">20000,1,0.5,0.4</div>
             </div>
-            <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> length (MI, min 1000),
-              pes (cores 1-8), file_size (0-1 normalized or actual bytes),
-              output_size (0-1 normalized or actual bytes)
+            <p className="text-sm text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> task length in MI (minimum 1000), cores needed (1-8), file size, and output size.
             </p>
           </div>
 
@@ -134,15 +125,14 @@ const WorkloadHelp = () => {
             <p className="text-sm font-semibold text-gray-800 mb-2">
               Minimal Format (Auto-filled defaults)
             </p>
-            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
+            <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">length</div>
               <div className="text-gray-800">10000</div>
               <div className="text-gray-800">15000</div>
               <div className="text-gray-800">20000</div>
             </div>
-            <p className="text-xs text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> length (MI, min 1000).
-              System auto-fills: pes=1, file_size=0.1, output_size=0.1
+            <p className="text-sm text-gray-600 mt-2">
+              <span className="font-medium">Fields:</span> only task length needed (minimum 1000 MI). We auto-fill the rest.
             </p>
           </div>
         </div>
@@ -162,7 +152,7 @@ const WorkloadHelp = () => {
           </h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          The system controls how tasks enter the system:
+          Choose when tasks enter the system:
         </p>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -171,11 +161,10 @@ const WorkloadHelp = () => {
               Instant Submission
             </p>
             <p className="text-sm text-gray-600 mb-2">
-              All tasks arrive at once (time = 0), noticeable in synthetic
-              workloads.
+              All tasks arrive at time zero. This works well for testing.
             </p>
-            <p className="text-xs text-gray-600 italic">
-              Best for: Testing scheduling algorithms, comparing performance
+            <p className="text-sm text-gray-600 italic">
+              Best for: Comparing how algorithms perform.
             </p>
           </div>
 
@@ -184,11 +173,10 @@ const WorkloadHelp = () => {
               Gradual Submission
             </p>
             <p className="text-sm text-gray-600 mb-2">
-              Tasks arrive over time based on timestamps, e.g. Google Cluster
-              Dataset.
+              Tasks arrive at different times using your timestamps. More realistic.
             </p>
-            <p className="text-xs text-gray-600 italic">
-              Best for: Realistic scenarios, dynamic workloads
+            <p className="text-sm text-gray-600 italic">
+              Best for: Real-world testing with changing workloads.
             </p>
           </div>
         </div>
@@ -208,8 +196,7 @@ const WorkloadHelp = () => {
           </h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          30 pre-configured benchmark datasets derived from real Google cluster traces.
-          Select from "Research Benchmark Dataset" dropdown in Workload Setup.
+          We provide 30 ready-made datasets from real Google servers. Pick one from the "Research Benchmark Dataset" dropdown.
         </p>
 
         <div className="space-y-3">
@@ -220,10 +207,10 @@ const WorkloadHelp = () => {
                 Google Cluster Subsets 1-30
               </span>
             </div>
-            <p className="text-xs text-gray-700 mb-2">
+            <p className="text-sm text-gray-700 mb-2">
               Each preset contains clustered task workloads with real-world characteristics:
             </p>
-            <ul className="text-xs text-gray-600 space-y-1 ml-4">
+            <ul className="text-sm text-gray-600 space-y-1 ml-4">
               <li className="flex items-start">
                 <span className="mr-2">•</span>
                 <span>CPU and memory resource requirements</span>
@@ -246,7 +233,7 @@ const WorkloadHelp = () => {
           <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg">
             <div className="flex items-start gap-2">
               <Info className="text-teal-600 mt-0.5 flex-shrink-0" size={16} />
-              <div className="text-xs text-gray-700">
+              <div className="text-sm text-gray-700">
                 <strong className="text-teal-700">How to use:</strong> Select any preset from 1-30 in the dropdown above.
                 Each subset provides a different mix of task characteristics for testing your scheduling algorithms.
               </div>
@@ -293,7 +280,7 @@ const WorkloadHelp = () => {
                 {item.problem}
               </p>
               <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
-              <p className="text-xs text-gray-600 mt-1 italic">
+              <p className="text-sm text-gray-600 mt-1 italic">
                 Example: {item.example}
               </p>
             </div>

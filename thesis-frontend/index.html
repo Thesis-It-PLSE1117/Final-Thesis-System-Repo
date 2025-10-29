@@ -1,41 +1,93 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- Primary favicon reference -->
-    <link rel="icon" href="/logo/cloud.png" type="image/png">
-    <!-- Fallback for older browsers -->
-    <link rel="shortcut icon" href="/logo/cloud.png" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cloud Load Balancing Simulation - EACO & EPSO Comparison</title>
-    <meta name="description" content="Interactive cloud computing simulation tool for comparing Enhanced ACO and PSO load balancing algorithms. Analyze performance metrics, resource utilization, and energy efficiency.">
-    <meta name="keywords" content="cloud computing, load balancing, ACO, PSO, simulation, resource optimization">
-    <meta name="author" content="CSA-7">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Critical CSS for immediate render -->
-    <style>
-      body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-      #root { min-height: 100vh; }
-    </style>
-  </head>
-  <body>
-    <div id="root">
-      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(to bottom, #ffffff, #e0f7fa);">
-        <div style="text-align: center;">
-          <div style="width: 64px; height: 64px; margin: 0 auto 16px; border: 3px solid #e0f7fa; border-top-color: #319694; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-          <p style="color: #319694; font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 16px; margin: 0;">Loading application...</p>
+    <head>
+        <meta charset="UTF-8" />
+        <!-- Primary favicon reference -->
+        <link rel="icon" href="/logo/cloud.png" type="image/png" />
+        <!-- Fallback for older browsers -->
+        <link rel="shortcut icon" href="/logo/cloud.png" type="image/png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cloud Load Balancing Simulation - EACO & EPSO Comparison</title>
+        <meta
+            name="description"
+            content="Interactive cloud computing simulation tool for comparing Enhanced ACO and PSO load balancing algorithms. Analyze performance metrics, resource utilization, and energy efficiency."
+        />
+        <meta
+            name="keywords"
+            content="cloud computing, load balancing, ACO, PSO, simulation, resource optimization"
+        />
+        <meta name="author" content="CSA-7" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Critical CSS for immediate render -->
+        <style>
+            body {
+                margin: 0;
+                font-family:
+                    "Inter",
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+            }
+            #root {
+                min-height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root">
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    background: linear-gradient(to bottom, #ffffff, #e0f7fa);
+                "
+            >
+                <div style="text-align: center">
+                    <div
+                        style="
+                            width: 64px;
+                            height: 64px;
+                            margin: 0 auto 16px;
+                            border: 3px solid #e0f7fa;
+                            border-top-color: #319694;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                        "
+                    ></div>
+                    <p
+                        style="
+                            color: #319694;
+                            font-family:
+                                &quot;Inter&quot;,
+                                system-ui,
+                                -apple-system,
+                                sans-serif;
+                            font-size: 16px;
+                            font-weight: semibold;
+                            margin: 0;
+                        "
+                    >
+                        Loading...
+                    </p>
+                </div>
+            </div>
+            <style>
+                @keyframes spin {
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>
         </div>
-      </div>
-      <style>
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      </style>
-    </div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+        <script type="module" src="/src/main.jsx"></script>
+    </body>
 </html>

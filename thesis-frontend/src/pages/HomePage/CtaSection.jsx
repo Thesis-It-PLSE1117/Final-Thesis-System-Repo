@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Zap } from "lucide-react";
 
 const CtaSection = ({ onStartSimulation }) => {
   return (
@@ -18,7 +18,7 @@ const CtaSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Ready to Compare Load Balancing Algorithms?
+          Find Your Best Algorithm
         </motion.h3>
         <motion.p
           className="text-lg md:text-xl text-white/90 mb-12"
@@ -27,7 +27,8 @@ const CtaSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Start simulating EACO vs EPSO algorithms and discover the optimal task scheduling strategy for your cloud infrastructure.
+          Compare EACO vs EPSO to discover which works better for your simulated
+          cloud infrastructure.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}
@@ -38,13 +39,13 @@ const CtaSection = ({ onStartSimulation }) => {
           <motion.button
             onClick={onStartSimulation}
             className="bg-white text-[#267b79] px-8 py-4 rounded-xl text-lg font-semibold shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all flex items-center gap-3 mx-auto"
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.4)"
+              boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.4)",
             }}
             whileTap={{ scale: 0.98 }}
           >
-            Launch Simulation <Zap className="w-5 h-5" />
+            Start Comparing <Zap className="w-5 h-5" />
           </motion.button>
         </motion.div>
       </div>

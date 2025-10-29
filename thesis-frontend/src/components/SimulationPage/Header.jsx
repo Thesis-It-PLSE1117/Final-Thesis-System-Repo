@@ -123,7 +123,7 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
               <h1 className="text-white text-lg md:text-xl font-bold">
                 {getHeaderTitle()}
               </h1>
-              <p className="text-[#c8f0ef] text-xs">{getHeaderSubtitle()}</p>
+              <p className="text-[#c8f0ef] text-sm">{getHeaderSubtitle()}</p>
             </div>
           </div>
 

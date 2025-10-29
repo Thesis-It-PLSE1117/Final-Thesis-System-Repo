@@ -60,7 +60,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
           {grade}
         </span>
         {isBetter !== null && (
-          <span className={`absolute -top-2 -right-2 text-xs font-bold px-1.5 py-0.5 rounded-full ${
+          <span className={`absolute -top-2 -right-2 text-sm font-bold px-1.5 py-0.5 rounded-full ${
             isBetter ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'
           }`}>
             {isBetter ? <CheckCircle size={10} /> : ''}
@@ -109,7 +109,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setComparisonMode('side-by-side')}
-              className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-sm sm:text-sm font-medium transition-colors ${
                 comparisonMode === 'side-by-side'
                   ? 'bg-[#319694] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -119,7 +119,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
             </button>
             <button
               onClick={() => setComparisonMode('toggle')}
-              className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-sm sm:text-sm font-medium transition-colors ${
                 comparisonMode === 'toggle'
                   ? 'bg-[#319694] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

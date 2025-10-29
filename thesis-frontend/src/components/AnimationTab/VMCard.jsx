@@ -29,14 +29,14 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
             VM {vmId + 1}
           </h4>
         </div>
-        <span className={`text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap ml-2 ${getStatusColor(status)}`}>
+        <span className={`text-sm px-1.5 py-0.5 rounded-full whitespace-nowrap ml-2 ${getStatusColor(status)}`}>
           {status}
         </span>
       </div>
 
       {/* CPU Load Bar */}
       <div className="mb-2">
-        <div className="flex justify-between text-xs text-gray-600 mb-1">
+        <div className="flex justify-between text-sm text-gray-600 mb-1">
           <span className="truncate">CPU</span>
           <span className="ml-1 whitespace-nowrap">
             {cpuPercentage.toFixed(0)}%
@@ -88,7 +88,7 @@ const VMCard = ({ vmId, isActive, taskCount, cpuLoad, dataCenterConfig, status, 
 };
 
 const InfoRow = ({ icon, text, label, mobile }) => (
-  <div className="flex items-center text-xs sm:text-sm text-gray-600 min-w-0">
+  <div className="flex items-center text-sm sm:text-sm text-gray-600 min-w-0">
     <span className="text-gray-500 mr-1 flex-shrink-0">{icon}</span>
     <span className="truncate">
       {text}

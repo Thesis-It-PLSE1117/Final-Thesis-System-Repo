@@ -79,22 +79,22 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
         <h4 className="text-sm font-semibold text-gray-700">
           {algorithm} Simulation Metadata
         </h4>
-        <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${style.badgeColor}`}>
+        <span className={`ml-2 px-2 py-0.5 text-sm rounded-full ${style.badgeColor}`}>
           {configSnapshot?.iterations > 1 ? `${configSnapshot.iterations} iterations` : 'Single run'}
         </span>
       </div>
       
       {/* Primary metadata grid - Always visible */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
         {runId && (
           <div className="bg-white/60 rounded-md p-2 border border-gray-100">
             <div className="flex items-start justify-between">
               <div className="flex items-start min-w-0 flex-1">
                 <FiHash className="text-gray-500 mr-1.5 mt-0.5 flex-shrink-0" />
                 <div className="space-y-0.5 min-w-0 flex-1">
-                  <span className="font-medium text-gray-600 text-xs">Run ID</span>
+                  <span className="font-medium text-gray-600 text-sm">Run ID</span>
                   <div
-                    className="text-gray-800 font-mono text-xs leading-5 truncate whitespace-nowrap overflow-hidden w-full"
+                    className="text-gray-800 font-mono text-sm leading-5 truncate whitespace-nowrap overflow-hidden w-full"
                     title={`Run ID: ${runId}`}
                   >
                     {runId.substring(0, 8)}...
@@ -123,9 +123,9 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
               <div className="flex items-start min-w-0 flex-1">
                 <FiCpu className="text-gray-500 mr-1.5 mt-0.5 flex-shrink-0" />
                 <div className="space-y-0.5 min-w-0 flex-1">
-                  <span className="font-medium text-gray-600 text-xs">Random Seed</span>
+                  <span className="font-medium text-gray-600 text-sm">Random Seed</span>
                   <div
-                    className="text-gray-800 font-mono text-xs leading-5 truncate whitespace-nowrap overflow-hidden w-full"
+                    className="text-gray-800 font-mono text-sm leading-5 truncate whitespace-nowrap overflow-hidden w-full"
                     title={`Full seed: ${seedText} | Used for reproducibility`}
                   >
                     {formattedSeed}
@@ -154,9 +154,9 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
               <div className="flex items-start min-w-0 flex-1">
                 <FiDatabase className="text-gray-500 mr-1.5 mt-0.5 flex-shrink-0" />
                 <div className="space-y-0.5 min-w-0 flex-1">
-                  <span className="font-medium text-gray-600 text-xs">Dataset</span>
+                  <span className="font-medium text-gray-600 text-sm">Dataset</span>
                   <div
-                    className="text-gray-800 font-mono text-xs leading-5 truncate whitespace-nowrap overflow-hidden w-full"
+                    className="text-gray-800 font-mono text-sm leading-5 truncate whitespace-nowrap overflow-hidden w-full"
                     title={datasetId.startsWith('custom') ? 'Custom uploaded workload' : 'Synthetic generated workload'}
                   >
                     {datasetId}
@@ -184,9 +184,9 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
           <div className="flex items-start min-w-0 flex-1">
             <FiClock className="text-gray-500 mr-1.5 mt-0.5 flex-shrink-0" />
             <div className="space-y-0.5 min-w-0 flex-1">
-              <span className="font-medium text-gray-600 text-xs">Timestamp</span>
+              <span className="font-medium text-gray-600 text-sm">Timestamp</span>
               <div
-                className="text-gray-800 text-xs leading-5"
+                className="text-gray-800 text-sm leading-5"
                 title="Simulation execution time"
               >
                 {formattedTime}
@@ -199,25 +199,25 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
       {/* Configuration details section - Always visible */}
       {configSnapshot && (
         <div className="mt-3 pt-3 border-t border-gray-200">
-          <h5 className="text-xs font-semibold text-gray-600 mb-2">Configuration Details</h5>
+          <h5 className="text-sm font-semibold text-gray-600 mb-2">Configuration Details</h5>
           
           {/* Configuration summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
             <div className="bg-white/80 rounded p-2">
               <span className="text-[10px] text-gray-500 block">Algorithm</span>
-              <span className="text-xs font-medium text-gray-700">{configSnapshot.algorithm || 'N/A'}</span>
+              <span className="text-sm font-medium text-gray-700">{configSnapshot.algorithm || 'N/A'}</span>
             </div>
             <div className="bg-white/80 rounded p-2">
               <span className="text-[10px] text-gray-500 block">Hosts</span>
-              <span className="text-xs font-medium text-gray-700">{configSnapshot.numHosts || 0}</span>
+              <span className="text-sm font-medium text-gray-700">{configSnapshot.numHosts || 0}</span>
             </div>
             <div className="bg-white/80 rounded p-2">
               <span className="text-[10px] text-gray-500 block">VMs</span>
-              <span className="text-xs font-medium text-gray-700">{configSnapshot.numVMs || 0}</span>
+              <span className="text-sm font-medium text-gray-700">{configSnapshot.numVMs || 0}</span>
             </div>
             <div className="bg-white/80 rounded p-2">
               <span className="text-[10px] text-gray-500 block">Cloudlets</span>
-              <span className="text-xs font-medium text-gray-700">{configSnapshot.numCloudlets || 0}</span>
+              <span className="text-sm font-medium text-gray-700">{configSnapshot.numCloudlets || 0}</span>
             </div>
           </div>
           

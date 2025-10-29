@@ -45,8 +45,8 @@ const PresetSelector = ({
         title: windowWidth < 768 ? "1K" : "Small Scale (1K)",
         description:
           windowWidth < 500
-            ? "Algorithm testing"
-            : "Basic algorithm validation",
+            ? "Quick test"
+            : "Test algorithms",
         taskCount: "1,000",
         icon: Microscope,
         iconColor: "text-blue-600",
@@ -54,7 +54,7 @@ const PresetSelector = ({
       "5k-tasks": {
         title: windowWidth < 768 ? "5K" : "Medium Scale (5K)",
         description:
-          windowWidth < 500 ? "Performance eval" : "Performance comparison",
+          windowWidth < 500 ? "Compare speed" : "Compare performance",
         taskCount: "5,000",
         icon: Scale,
         iconColor: "text-purple-600",
@@ -62,7 +62,7 @@ const PresetSelector = ({
       "10k-tasks": {
         title: windowWidth < 768 ? "10K" : "Large Scale (10K)",
         description:
-          windowWidth < 500 ? "Real-world sim" : "Real-world simulation",
+          windowWidth < 500 ? "Real scenario" : "Real-world test",
         taskCount: "10,000",
         icon: Building2,
         iconColor: "text-orange-600",
@@ -70,7 +70,7 @@ const PresetSelector = ({
       "20k-tasks": {
         title: windowWidth < 768 ? "20K" : "Enterprise (20K)",
         description:
-          windowWidth < 500 ? "Stress analysis" : "Scalability analysis",
+          windowWidth < 500 ? "Stress test" : "Test at scale",
         taskCount: "20,000",
         icon: Globe,
         iconColor: "text-green-600",
@@ -128,7 +128,7 @@ const PresetSelector = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-              <span className="text-xs font-semibold text-green-700">
+              <span className="text-sm font-semibold text-green-700">
                 PRESET ACTIVE: {getPresetInfo(selectedPreset).title}
               </span>
             </div>
@@ -143,7 +143,7 @@ const PresetSelector = ({
               title="Clear preset and reset to default"
             >
               <X size={14} />
-              <span className="text-xs font-semibold">Clear</span>
+              <span className="text-sm font-semibold">Clear</span>
             </motion.button>
           </div>
         </motion.div>
@@ -179,7 +179,7 @@ const PresetSelector = ({
                         {getPresetInfo(selectedPreset).title}
                       </span>
                     </div>
-                    <span className="text-xs text-[#319694] block mt-0.5">
+                    <span className="text-sm text-[#319694] block mt-0.5">
                       {getPresetInfo(selectedPreset).description}
                     </span>
                   </div>
@@ -191,9 +191,9 @@ const PresetSelector = ({
                         Select a Preset
                       </span>
                     </div>
-                    <span className="text-xs text-gray-600 block">
+                    <span className="text-sm text-gray-600 block">
                       {windowWidth > 400
-                        ? "Choose from optimized configurations"
+                        ? "Pick a ready-made setup"
                         : "Choose preset"}
                     </span>
                   </>
@@ -201,7 +201,7 @@ const PresetSelector = ({
               </div>
               <div className="ml-2 flex items-center gap-2">
                 {selectedPreset && (
-                  <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                  <span className="px-2 py-0.5 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
                     LOADED
                   </span>
                 )}
@@ -251,7 +251,7 @@ const PresetSelector = ({
                         <div className="font-medium truncate">{info.title}</div>
                       </div>
                       <div
-                        className={`text-xs mt-0.5 ${selectedPreset === presetKey ? "text-[#267b79]" : "text-gray-600"} truncate`}
+                        className={`text-sm mt-0.5 ${selectedPreset === presetKey ? "text-[#267b79]" : "text-gray-600"} truncate`}
                       >
                         {info.description}
                       </div>
@@ -301,7 +301,7 @@ const PresetSelector = ({
                     : "Default Configuration"}
                 </h4>
                 {selectedPreset && (
-                  <p className="text-xs text-[#267b79] mt-0.5">
+                  <p className="text-sm text-[#267b79] mt-0.5">
                     Optimized for {getPresetInfo(selectedPreset).taskCount}{" "}
                     tasks
                   </p>
@@ -311,7 +311,7 @@ const PresetSelector = ({
             {selectedPreset && (
               <div className="flex items-center gap-1 px-2 py-1 bg-green-100 rounded-full">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                <span className="text-xs font-semibold text-green-700">
+                <span className="text-sm font-semibold text-green-700">
                   ACTIVE
                 </span>
               </div>
@@ -323,9 +323,9 @@ const PresetSelector = ({
             <div className="p-3 rounded-lg border bg-white/70 border-[#319694]/20">
               <div className="flex items-center mb-2 text-[#319694]">
                 <Server size={14} className="mr-1.5" />
-                <span className="text-xs font-semibold">Infrastructure</span>
+                <span className="text-sm font-semibold">Infrastructure</span>
               </div>
-              <div className="space-y-1.5 text-xs">
+              <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Hosts:</span>
                   <span
@@ -357,9 +357,9 @@ const PresetSelector = ({
             <div className="p-3 rounded-lg border bg-white/70 border-[#319694]/20">
               <div className="flex items-center mb-2 text-[#319694]">
                 <Settings size={14} className="mr-1.5" />
-                <span className="text-xs font-semibold">Resources</span>
+                <span className="text-sm font-semibold">Resources</span>
               </div>
-              <div className="space-y-1.5 text-xs">
+              <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">PEs:</span>
                   <span
