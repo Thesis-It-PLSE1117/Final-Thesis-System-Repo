@@ -186,7 +186,7 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
               {normalityAnalysis?.methodologyNote && (
                 <div className="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <h5 className="font-semibold text-gray-900 mb-2 text-sm">
-                    About Anderson-Darling Test
+                    About Anderson-Darling
                   </h5>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     {normalityAnalysis.methodologyNote}
