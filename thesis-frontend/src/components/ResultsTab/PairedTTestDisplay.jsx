@@ -650,45 +650,54 @@ const PairedTTestDisplay = ({
 
                         {test?.stdInterpretation &&
                           (() => {
-                            const parts =
-                              test.stdInterpretation.split(/\. (?=[A-Z])/);
-                            const eacoLine = parts.find((p) =>
-                              p.startsWith("EACO:"),
-                            );
-                            const epsoLine = parts.find((p) =>
-                              p.startsWith("EPSO:"),
-                            );
+                            const parts = test.stdInterpretation.split(/\. (?=[A-Z])/);
+
+                            // extract structured lines if present
+                            const eacoLine = parts.find((p) => p.startsWith("EACO:"));
+                            const epsoLine = parts.find((p) => p.startsWith("EPSO:"));
                             const comparisonLine = parts.find(
-                              (p) =>
-                                p.includes("Both algorithms") ||
-                                p.includes("demonstrate similar"),
+                              (p) => p.includes("Both algorithms") || p.includes("demonstrate similar"),
                             );
                             const stabilityLine = parts.find(
-                              (p) =>
-                                p.includes("results are") &&
-                                p.includes("stable"),
+                              (p) => p.includes("results are") && p.includes("stable"),
                             );
                             const implicationLine = parts.find(
-                              (p) =>
-                                p.includes("indicates") ||
-                                p.includes("suitable"),
+                              (p) => p.includes("indicates") || p.includes("suitable"),
                             );
+
+                            const overviewLine = parts.find(
+                              (p) => /consistency check/i.test(p) || /varies by/i.test(p) || /variation/i.test(p),
+                            );
+
+                            const used = new Set(
+                              [overviewLine, eacoLine, epsoLine, comparisonLine, stabilityLine, implicationLine]
+                                .filter(Boolean)
+                                .map((s) => s.trim()),
+                            );
+                            const remainingLines = parts
+                              .map((p) => p.trim())
+                              .filter((p) => p.length > 0 && !used.has(p));
 
                             return (
                               <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-3">
                                 <div className="flex items-center gap-2 mb-2">
                                   <Info className="text-[#319694]" size={16} />
-                                  <h6 className="font-semibold text-gray-800 text-sm">
-                                    Interpretation
-                                  </h6>
+                                  <h6 className="font-semibold text-gray-800 text-sm">Interpretation</h6>
                                 </div>
 
                                 <div className="space-y-2 text-sm text-gray-700">
+                                  {overviewLine && (
+                                    <div className="">
+                                      <p className="leading-relaxed font-medium text-gray-800">
+                                        {overviewLine.trim()}
+                                        {!overviewLine.trim().endsWith(".") && "."}
+                                      </p>
+                                    </div>
+                                  )}
+
                                   {eacoLine && (
                                     <div className="flex items-start gap-2">
-                                      <span className="text-blue-600 font-medium mt-0.5">
-                                        •
-                                      </span>
+                                      <span className="text-blue-600 font-medium mt-0.5">•</span>
                                       <p className="leading-relaxed">
                                         {eacoLine.trim()}
                                         {!eacoLine.trim().endsWith(".") && "."}
@@ -698,9 +707,7 @@ const PairedTTestDisplay = ({
 
                                   {epsoLine && (
                                     <div className="flex items-start gap-2">
-                                      <span className="text-orange-600 font-medium mt-0.5">
-                                        •
-                                      </span>
+                                      <span className="text-orange-600 font-medium mt-0.5">•</span>
                                       <p className="leading-relaxed">
                                         {epsoLine.trim()}
                                         {!epsoLine.trim().endsWith(".") && "."}
@@ -712,8 +719,7 @@ const PairedTTestDisplay = ({
                                     <div className="mt-2 pt-2 border-t border-gray-200">
                                       <p className="leading-relaxed font-medium text-gray-800">
                                         {comparisonLine.trim()}
-                                        {!comparisonLine.trim().endsWith(".") &&
-                                          "."}
+                                        {!comparisonLine.trim().endsWith(".") && "."}
                                       </p>
                                     </div>
                                   )}
@@ -722,28 +728,27 @@ const PairedTTestDisplay = ({
                                     <div className="mt-2 pt-2 border-t border-gray-200 bg-[#319694]/5 -mx-4 -mb-4 p-3 rounded-b-lg">
                                       {stabilityLine && (
                                         <p className="leading-relaxed text-gray-700 mb-2">
-                                          <span className="font-semibold text-[#319694]">
-                                            Assessment:
-                                          </span>{" "}
-                                          {stabilityLine
-                                            .trim()
-                                            .replace(/^The results are /, "")
-                                            .replace(/\.$/, "")}
-                                          .
+                                          <span className="font-semibold text-[#319694]">Assessment:</span>{" "}
+                                          {stabilityLine.trim().replace(/^The results are /, "").replace(/\.$/, "")}.
                                         </p>
                                       )}
                                       {implicationLine && (
                                         <p className="leading-relaxed text-gray-700">
-                                          <span className="font-semibold text-[#319694]">
-                                            Impact:
-                                          </span>{" "}
-                                          {implicationLine
-                                            .trim()
-                                            .replace(/^This indicates /, "")
-                                            .replace(/\.$/, "")}
-                                          .
+                                          <span className="font-semibold text-[#319694]">Impact:</span>{" "}
+                                          {implicationLine.trim().replace(/^This indicates /, "").replace(/\.$/, "")}.
                                         </p>
                                       )}
+                                    </div>
+                                  )}
+
+                                  {remainingLines.length > 0 && (
+                                    <div className="mt-2 pt-2 border-t border-gray-200 space-y-1">
+                                      {remainingLines.map((line, idx) => (
+                                        <p key={idx} className="leading-relaxed">
+                                          {line}
+                                          {!line.endsWith(".") && "."}
+                                        </p>
+                                      ))}
                                     </div>
                                   )}
                                 </div>
