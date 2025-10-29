@@ -951,7 +951,7 @@ const PairedTTestDisplay = ({
             <AlertCircle size={14} className="text-gray-400 flex-shrink-0" />
             <span>
               Based on {sampleSize} paired observations (differences: EACO -
-              EPSO)
+              EPSO).
             </span>
           </div>
         </div>
