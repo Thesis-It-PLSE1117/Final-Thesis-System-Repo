@@ -127,10 +127,10 @@ const DataCenterTab = ({
           className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500"
         >
           <MoreHorizontal size={24} className="mb-1" />
-          <p className="text-xs font-medium">
+          <p className="text-sm font-medium">
             {config.numVMs - MAX_DISPLAY_VMS} more VMs
           </p>
-          <p className="text-xs">Total: {config.numVMs} VMs</p>
+          <p className="text-sm">Total: {config.numVMs} VMs</p>
         </div>,
       );
     }
@@ -174,7 +174,7 @@ const DataCenterTab = ({
         hostVMs.push(
           <motion.div
             key={vmId}
-            className="bg-[#f0fdfa] p-1 rounded border border-[#319694]/10 text-xs cursor-pointer hover:bg-[#e0f8f6] transition-colors"
+            className="bg-[#f0fdfa] p-1 rounded border border-[#319694]/10 text-sm cursor-pointer hover:bg-[#e0f8f6] transition-colors"
             whileHover={{ scale: 1.03 }}
             onClick={() => setExpandedHost(expandedHost === vmId ? null : vmId)}
           >
@@ -189,7 +189,7 @@ const DataCenterTab = ({
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="mt-1 text-xs text-gray-600 overflow-hidden"
+                  className="mt-1 text-sm text-gray-600 overflow-hidden"
                 >
                   <div className="flex justify-between">
                     <span>MIPS: {config.vmMips}</span>
@@ -211,7 +211,7 @@ const DataCenterTab = ({
         hostVMs.push(
           <div
             key={`more-${hostId}`}
-            className="text-center p-1 bg-gray-100 rounded border border-gray-200 text-xs text-gray-500"
+            className="text-center p-1 bg-gray-100 rounded border border-gray-200 text-sm text-gray-500"
           >
             +{vmsInThisHost - maxVmsPerHostDisplay} more
           </div>,
@@ -242,10 +242,10 @@ const DataCenterTab = ({
           className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500"
         >
           <MoreHorizontal size={24} className="mb-1" />
-          <p className="text-xs font-medium">
+          <p className="text-sm font-medium">
             {config.numHosts - MAX_DISPLAY_HOSTS} more hosts
           </p>
-          <p className="text-xs">Total: {config.numHosts} hosts</p>
+          <p className="text-sm">Total: {config.numHosts} hosts</p>
         </div>,
       );
     }

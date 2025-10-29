@@ -76,7 +76,7 @@ const DataCenterHelp = () => {
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-600 mt-3 italic">{quickStart.note}</p>
+        <p className="text-sm text-gray-600 mt-3 italic">{quickStart.note}</p>
       </motion.div>
 
       {/* Host Configuration */}
@@ -120,7 +120,7 @@ const DataCenterHelp = () => {
                     {item.problem}
                   </p>
                   <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
-                  <p className="text-xs text-gray-600 mt-1 italic">
+                  <p className="text-sm text-gray-600 mt-1 italic">
                     Example: {item.example}
                   </p>
                 </div>
@@ -186,10 +186,10 @@ const ConfigSection = ({ section, delay }) => (
             <p className="text-sm font-medium text-gray-800">{item.label}</p>
             <p className="text-sm text-gray-600">{item.explanation}</p>
             <div className="flex flex-wrap gap-3 mt-1">
-              <span className="text-xs text-teal-600 font-medium">
+              <span className="text-sm text-teal-600 font-medium">
                 {item.example}
               </span>
-              <span className="text-xs text-gray-500 italic">{item.tip}</span>
+              <span className="text-sm text-gray-500 italic">{item.tip}</span>
             </div>
           </div>
         </div>

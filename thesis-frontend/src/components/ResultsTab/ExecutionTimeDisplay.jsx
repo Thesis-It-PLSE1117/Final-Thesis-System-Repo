@@ -86,7 +86,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
           <Timer size={18} className="text-[#319694]" />
           <h3 className="font-semibold text-gray-800">Execution Time</h3>
           {overallCompletion && (
-            <span className="ml-auto text-xs text-gray-500">
+            <span className="ml-auto text-sm text-gray-500">
               Completed {formatTimestamp(overallCompletion)}
             </span>
           )}

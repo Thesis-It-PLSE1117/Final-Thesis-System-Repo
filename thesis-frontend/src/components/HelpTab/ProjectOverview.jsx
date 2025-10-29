@@ -16,16 +16,16 @@ const ProjectOverview = () => {
     {
       title: "Project Introduction",
       icon: <FileText className="w-5 h-5" />,
-      content: "This cloud load balancing simulation system compares Enhanced Particle Swarm Optimization (EPSO) and Enhanced Ant Colony Optimization (EACO) algorithms using CloudSim framework with realistic Google Cluster Dataset workloads."
+      content: "This system compares two cloud algorithms: EPSO and EACO. It uses the CloudSim framework with real Google Cluster data to test how they balance loads."
     },
     {
       title: "Dataset & Provenance",
       icon: <BookOpen className="w-5 h-5" />,
-      content: "We use preprocessed subsets of the Google Cluster Traces dataset. Timestamps (arrival_ts) are provided in microseconds and normalized to seconds using the formula: t := (arrival_ts - min(arrival_ts)) / 1e6. The file_size and output_size values are interpreted as normalized fractions (0–1) and scaled to bytes for simulation.",
+      content: "We use cleaned Google Cluster data. The timestamps start in microseconds, then we convert them to seconds. File sizes are normalized values between 0 and 1, which we scale to actual bytes for the simulation.",
       subsections: [
         { 
           title: "Two CSV Schemas Supported", 
-          content: "(1) Normalized Schema: length (cloudlet work in MI), pes (processing elements per task), file_size (normalized 0–1, scaled to bytes), output_size (normalized 0–1, scaled to bytes). (2) Google Schema: arrival_ts (μs, converted to seconds), cpu_request (0–1), memory_request (0–1), file_size (0–1, scaled), output_size (0–1, scaled), pes_number (rounded to integer), time_window (optional, used with cpu_request to derive MI)." 
+          content: "We support two data formats. (1) Normalized: task length in MI, processor cores needed, file sizes. (2) Google: arrival times, CPU usage, memory usage, file sizes, and core count. Both formats work automatically."
         }
       ]
     },
@@ -35,23 +35,23 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "1. Response Time",
-          content: "Duration between task submission and completion. Formula: (1/n) × Σ(completion_time - submission_time). Critical for measuring system responsiveness and user satisfaction."
+          content: "How long each task takes from start to finish. Lower response time means faster results. This measures how quickly the system responds to your tasks."
         },
         {
           title: "2. Resource Utilization", 
-          content: "Efficiency of CPU and memory usage across VMs. Formula: (1/m) × Σ(U_j^P) where U_j^P is CPU utilization of host j. Higher utilization indicates better resource usage."
+          content: "How well your virtual machines use CPU and memory. Higher percentages mean you're using resources efficiently. Low utilization wastes available computing power."
         },
         {
           title: "3. Energy Efficiency",
-          content: "Power consumption during task scheduling using Zhang & Li's energy model. Formula: Energy = Σ P_j where P_j considers busy power (215W) and idle power (162W) based on CPU utilization."
+          content: "Total power used while running tasks. The system tracks both active power (215W) and idle power (162W). Lower energy means greener, more cost-effective computing."
         },
         {
           title: "4. Degree of Imbalance (DI)",
-          content: "Measures workload distribution evenness across VMs. Formula: DI = (MaxTime - MinTime) / AverageTime. Lower values indicate better load balancing."
+          content: "Shows how evenly work is spread across your virtual machines. Lower numbers mean better balance. High imbalance means some VMs work harder than others."
         },
         {
           title: "5. Makespan",
-          content: "Total time to complete all tasks in the system. Formula: Makespan = Max(Σ CompletionTime). Determined by the VM that finishes last, indicating overall scheduling efficiency."
+          content: "The total time to finish all your tasks. Think of it as the finish time of the slowest VM. Shorter makespan means your algorithm schedules work more efficiently."
         }
       ]
     },
@@ -61,11 +61,11 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "Enhanced Ant Colony Optimization (EACO)",
-          content: "Advanced ACO algorithm with smart adaptations for cloud scheduling. Features adaptive pheromone evaporation that adjusts based on solution quality, load-aware reinforcement that considers VM workloads, and early stopping when solutions converge. Each ant builds complete task-to-VM assignments probabilistically, with successful paths reinforced through pheromone deposits."
+          content: "An improved ant colony algorithm designed for cloud tasks. It adapts as it learns better solutions. Like real ants, it marks good paths and avoids bad ones. The algorithm stops early when it finds optimal task assignments."
         },
         {
           title: "Enhanced Particle Swarm Optimization (EPSO)",
-          content: "Improved PSO algorithm optimized for cloud task scheduling. Uses quadratic inertia weight decay for better exploration-to-exploitation transition, adaptive velocity limits that decrease over time, and early stopping detection. Particles represent complete scheduling solutions, evolving toward optimal task assignments through swarm intelligence."
+          content: "An improved particle swarm algorithm for cloud scheduling. Each particle is a possible solution that learns from the swarm. The algorithm balances exploring new solutions with refining good ones. It stops when it finds the best task assignment."
         },
         {
           title: "Algorithm References",

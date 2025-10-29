@@ -71,7 +71,7 @@ const PlotInterpretationCard = ({ interpretation, plotTitle }) => {
                 {plotTitle || 'Plot Analysis'}
               </h5>
               {performanceGrade && (
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getGradeColor(performanceGrade)}`}>
+                <span className={`px-2 py-1 rounded-full text-sm font-medium ${getGradeColor(performanceGrade)}`}>
                   {formatGrade(performanceGrade)}
                 </span>
               )}

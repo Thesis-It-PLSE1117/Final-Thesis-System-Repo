@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { HelpCircle, BookOpen } from "lucide-react";
+import { HelpCircle, BookOpen, BarChart3 } from "lucide-react";
 import DataCenterHelp from "./DataCenterHelp";
 import WorkloadHelp from "./WorkloadHelp";
 import ProjectOverview from "./ProjectOverview";
+import StatisticalMethodology from "./StatisticalMethodology";
 
 // Animation variants
 const containerVariants = {
@@ -97,6 +98,17 @@ const HelpTab = () => {
           <BookOpen size={16} />
           Project Overview
         </button>
+        <button
+          className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'methodology' 
+              ? 'text-[#319694] border-b-2 border-[#319694]' 
+              : 'text-gray-500 hover:text-[#319694]'
+          }`}
+          onClick={() => setActiveTab('methodology')}
+        >
+          <BarChart3 size={16} />
+          Statistical Tests
+        </button>
       </motion.nav>
 
       {/* Tab Content with Smooth Transitions */}
@@ -112,6 +124,7 @@ const HelpTab = () => {
         {activeTab === 'datacenter' && <DataCenterHelp />}
         {activeTab === 'workload' && <WorkloadHelp />}
         {activeTab === 'documentation' && <ProjectOverview />}
+        {activeTab === 'methodology' && <StatisticalMethodology />}
       </motion.div>
     </motion.div>
   );

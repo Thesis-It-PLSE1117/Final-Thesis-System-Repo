@@ -16,6 +16,9 @@ import SchedulingLogTable from "./SchedulingLogTable";
 import IterationBadge from "./IterationBadge";
 import StatisticsDisplay from "./StatisticsDisplay";
 import PairedTTestDisplay from "./PairedTTestDisplay";
+import WilcoxonTestDisplay from "./WilcoxonTestDisplay";
+import NormalityTestDisplay from "./NormalityTestDisplay";
+import StatisticalTestSelector from "./StatisticalTestSelector";
 import MetadataDisplay from "./MetadataDisplay";
 import AnalysisDisplay from "./AnalysisDisplay";
 import AnalysisComparison from "./AnalysisComparison";
@@ -35,6 +38,12 @@ const ResultsTab = ({
   plotData,
   plotsGenerating,
 }) => {
+  console.log('[DEBUG] ResultsTab props received:', {
+    eacoHasTTest: !!eacoResults?.ttestResults,
+    epsoHasTTest: !!epsoResults?.ttestResults,
+    eacoNormality: eacoResults?.ttestResults?.normalityTests,
+    epsoNormality: epsoResults?.ttestResults?.normalityTests
+  });
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,6 +61,7 @@ const ResultsTab = ({
     eaco: {},
     epso: {},
   });
+  const [activeStatisticalTest, setActiveStatisticalTest] = useState('ttest');
 
   // Check if this is a single iteration run
   const isSingleIteration = React.useMemo(() => {
@@ -309,7 +319,7 @@ const ResultsTab = ({
         <p className="text-sm font-medium">
           {fallbackMessages[plotType] || `Plot data not available`}
         </p>
-        <p className="text-xs mt-1 text-gray-400">
+        <p className="text-sm mt-1 text-gray-400">
           Try regenerating the simulation results
         </p>
       </div>
@@ -332,6 +342,87 @@ const ResultsTab = ({
     eacoResults?.tTestResults || eacoResults?.ttestResults || 
     epsoResults?.tTestResults || epsoResults?.ttestResults
   );
+  const hasWilcoxon = !!(
+    eacoResults?.wilcoxonTestResults ||
+    epsoResults?.wilcoxonTestResults ||
+    eacoResults?.wilcoxonResults ||
+    epsoResults?.wilcoxonResults ||
+    eacoResults?.wilcoxonTests ||
+    epsoResults?.wilcoxonTests
+  );
+  
+  console.log('[DEBUG] Checking eacoResults structure:', {
+    hasEaco: !!eacoResults,
+    eacoKeys: eacoResults ? Object.keys(eacoResults) : null,
+    hasTTestResults: !!eacoResults?.tTestResults,
+    hasttestResults: !!eacoResults?.ttestResults,
+    ttestResultsKeys: eacoResults?.ttestResults ? Object.keys(eacoResults.ttestResults) : null,
+    hasNormalityInTtest: !!eacoResults?.ttestResults?.normalityTests
+  });
+  
+  const tTestResults = eacoResults?.tTestResults || eacoResults?.ttestResults || 
+                        epsoResults?.tTestResults || epsoResults?.ttestResults;
+  
+  console.log('[DEBUG] tTestResults selected:', {
+    tTestResults,
+    hasNormalityTests: !!tTestResults?.normalityTests,
+    normalityTestsKeys: tTestResults?.normalityTests ? Object.keys(tTestResults.normalityTests) : null
+  });
+  
+  const rawNormalityTests = tTestResults?.normalityTests;
+  
+  const hasNormalityTests = !!(rawNormalityTests && Object.keys(rawNormalityTests).length > 0);
+  
+  const normalityTests = rawNormalityTests ? Object.fromEntries(
+    Object.entries(rawNormalityTests).map(([key, test]) => [
+      key,
+      {
+        ...test,
+        isNormal: test.isNormal ?? test.normal ?? false,
+        pValue: test.pValue ?? test.pvalue
+      }
+    ])
+  ) : null;
+  
+  const normalityAnalysis = tTestResults?.interpretation?.normalityAnalysis;
+  
+  console.log('[DEBUG] Normality tests data:', {
+    hasNormalityTests,
+    rawNormalityTests,
+    normalizedTests: normalityTests,
+    normalityAnalysis,
+    eacoHasNormality: !!eacoResults?.tTestResults?.normalityTests,
+    epsoHasNormality: !!epsoResults?.tTestResults?.normalityTests,
+    tTestResultsKeys: tTestResults ? Object.keys(tTestResults) : null,
+    fullTTestResults: tTestResults,
+    eacoTTestKeys: eacoResults?.tTestResults ? Object.keys(eacoResults.tTestResults) : null,
+    epsoTTestKeys: epsoResults?.tTestResults ? Object.keys(epsoResults.tTestResults) : null
+  });
+  
+  const normalizedWilcoxonResults = 
+    eacoResults?.wilcoxonTestResults ||
+    epsoResults?.wilcoxonTestResults ||
+    eacoResults?.wilcoxonResults ||
+    epsoResults?.wilcoxonResults ||
+    eacoResults?.wilcoxonTests ||
+    epsoResults?.wilcoxonTests;
+  
+  console.log('[DEBUG] Raw Wilcoxon data from props:', {
+    fromEaco: eacoResults?.wilcoxonTests || eacoResults?.wilcoxonTestResults,
+    fromEpso: epsoResults?.wilcoxonTests || epsoResults?.wilcoxonTestResults,
+    normalized: normalizedWilcoxonResults,
+    eacoKeys: eacoResults ? Object.keys(eacoResults).filter(k => k.toLowerCase().includes('wilcoxon')) : [],
+    epsoKeys: epsoResults ? Object.keys(epsoResults).filter(k => k.toLowerCase().includes('wilcoxon')) : []
+  });
+  
+  console.log('[DEBUG] ResultsTab - Test availability check:', {
+    hasTTest,
+    hasWilcoxon,
+    eacoKeys: eacoResults ? Object.keys(eacoResults) : 'no eaco',
+    epsoKeys: epsoResults ? Object.keys(epsoResults) : 'no epso',
+    eacoWilcoxonType: typeof eacoResults?.wilcoxonTestResults,
+    epsoWilcoxonType: typeof epsoResults?.wilcoxonTestResults
+  });
 
   if (loading)
     return (
@@ -474,8 +565,42 @@ const ResultsTab = ({
               />
             ) : (
               <>
-                {/* T-Test Results if Available */}
-                {hasTTest && (
+                {/*shown when both tests available */}
+                {(() => {
+                  console.log('[DEBUG] StatisticalTestSelector render decision:', { 
+                    hasTTest, 
+                    hasWilcoxon, 
+                    willRender: hasTTest || hasWilcoxon,
+                    currentActiveTest: activeStatisticalTest
+                  });
+                  return (hasTTest || hasWilcoxon) && (
+                    <StatisticalTestSelector
+                      activeTest={activeStatisticalTest}
+                      onTestChange={setActiveStatisticalTest}
+                      hasTTest={hasTTest}
+                      hasWilcoxon={hasWilcoxon}
+                    />
+                  );
+                })()}
+
+                {/* normality test */}
+                {(() => {
+                  console.log('[DEBUG] Normality test render check:', {
+                    hasNormalityTests,
+                    normalityTestsKeys: normalityTests ? Object.keys(normalityTests) : null,
+                    normalityTests,
+                    normalityAnalysis
+                  });
+                  return hasNormalityTests && (
+                    <NormalityTestDisplay
+                      normalityTests={normalityTests}
+                      normalityAnalysis={normalityAnalysis}
+                    />
+                  );
+                })()}
+
+                {/* T-Test Results */}
+                {hasTTest && activeStatisticalTest === 'ttest' && (
                   <>
                     <PairedTTestDisplay
                       tTestResults={
@@ -487,8 +612,27 @@ const ResultsTab = ({
                     />
 
                     {/* Individual Iteration Details */}
-                    {hasTTest &&
-                      eacoResults?.rawResults &&
+                    {eacoResults?.rawResults &&
+                      epsoResults?.rawResults && (
+                        <IterationDetailsDisplay
+                          eacoResults={eacoResults?.rawResults}
+                          epsoResults={epsoResults?.rawResults}
+                        />
+                      )}
+                  </>
+                )}
+
+                {/* Wilcoxon Test Results */}
+                {hasWilcoxon && activeStatisticalTest === 'wilcoxon' && (
+                  <>
+                    <WilcoxonTestDisplay
+                      wilcoxonResults={normalizedWilcoxonResults}
+                      comparisonResults={eacoResults || epsoResults}
+                      isLoading={false}
+                    />
+
+                    {/* Individual Iteration Details */}
+                    {eacoResults?.rawResults &&
                       epsoResults?.rawResults && (
                         <IterationDetailsDisplay
                           eacoResults={eacoResults?.rawResults}
@@ -609,7 +753,7 @@ const ResultsTab = ({
                   <p className="text-gray-500 text-sm mt-2">
                     MATLAB plots were not generated for this simulation type.
                   </p>
-                  <p className="text-gray-400 text-xs mt-1">
+                  <p className="text-gray-400 text-sm mt-1">
                     Enable MATLAB plots in simulation configuration to generate
                     visualizations.
                   </p>
@@ -1043,7 +1187,7 @@ const ResultsTab = ({
               disabled={!tab.enabled}
               className={`
                 group relative flex-shrink-0 py-3 px-2 sm:py-4 sm:px-1 flex items-center gap-1 sm:gap-2
-                text-xs sm:text-sm font-medium border-b-2 transition-colors
+                text-sm sm:text-sm font-medium border-b-2 transition-colors
                 ${
                   !tab.enabled
                     ? "border-transparent text-gray-300 cursor-not-allowed"
@@ -1070,7 +1214,7 @@ const ResultsTab = ({
                 )}
 
               {/* Tooltip on hover (hidden on mobile) */}
-              <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+              <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                 {tab.description}
                 {tab.id === "analysis" &&
                   !isSingleIteration &&

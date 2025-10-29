@@ -74,7 +74,7 @@ const InputField = ({
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-2.5">
           {unit && (
-            <span className="text-gray-500 text-xs font-medium mr-1.5">
+            <span className="text-gray-500 text-sm font-medium mr-1.5">
               {unit}
             </span>
           )}
@@ -102,7 +102,7 @@ const InputField = ({
               exit={{ opacity: 0, y: -5 }}
               transition={{ duration: 0.15 }}
             >
-              <div className="p-1.5 bg-white rounded-lg shadow-lg border border-gray-200 text-xs">
+              <div className="p-1.5 bg-white rounded-lg shadow-lg border border-gray-200 text-sm">
                 <div className="flex items-start gap-1.5">
                   <Info
                     className="flex-shrink-0 text-[#319694] mt-0.5"

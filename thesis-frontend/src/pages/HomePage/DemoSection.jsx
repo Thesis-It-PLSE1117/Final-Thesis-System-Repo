@@ -262,7 +262,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
               <div className="flex items-center gap-2 mb-4 text-[#319694]">
                 <Cpu className="w-5 h-5" />
                 <h5 className="font-medium text-lg">Enhanced ACO</h5>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
                   +{demoData.improvementPercentages.loadBalance.toFixed(1)}%
                 </span>
               </div>
@@ -330,7 +330,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
                     >
                       {formatMetricValue(metric, demoData.metrics.EPSO[metric])}
                     </motion.span>
-                    <span className="block text-xs text-gray-500">EPSO</span>
+                    <span className="block text-sm text-gray-500">EPSO</span>
                   </div>
                   <div className="text-right">
                     <motion.span 
@@ -342,7 +342,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
                     >
                       {formatMetricValue(metric, demoData.metrics.EACO[metric])}
                     </motion.span>
-                    <span className="block text-xs text-gray-500">EACO</span>
+                    <span className="block text-sm text-gray-500">EACO</span>
                   </div>
                 </div>
                 <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
@@ -353,7 +353,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
                     transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
                   />
                 </div>
-                <div className="mt-1 text-xs text-gray-500 flex justify-between">
+                <div className="mt-1 text-sm text-gray-500 flex justify-between">
                   <span>Improvement</span>
                   <span className="text-green-600 font-medium">
                     +{demoData.improvementPercentages[metric].toFixed(1)}%
@@ -384,7 +384,7 @@ const DemoSection = ({ isPlaying, setIsPlaying }) => {
               <div className="flex-1">
                 <h4 className="text-lg font-bold text-[#267b79] mb-2 flex items-center gap-2">
                   Statistical Significance
-                  <span className="text-xs font-semibold bg-[#319694] text-white px-2 py-1 rounded-full">
+                  <span className="text-sm font-semibold bg-[#319694] text-white px-2 py-1 rounded-full">
                     {RESEARCH_STATISTICS.significanceLevel}
                   </span>
                 </h4>

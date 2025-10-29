@@ -35,7 +35,7 @@ const VMCard = ({
         <HardDrive className="text-[#319694]" size={isCompact ? 12 : 14} />
       </div>
       <h4
-        className={`font-bold text-gray-800 truncate ${isCompact ? "text-xs" : "text-sm"}`}
+        className={`font-bold text-gray-800 truncate ${isCompact ? "text-sm" : "text-sm"}`}
         title={`VM ${vmId + 1}`}
       >
         VM {vmId + 1}
@@ -45,19 +45,19 @@ const VMCard = ({
     {/* Stats - Compact version */}
     {isCompact ? (
       <div className="space-y-1">
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <Cpu className="text-[#319694] mr-1 flex-shrink-0" size={10} />
           <span className="truncate" title={`${vmPes} Processing Elements`}>
             {vmPes}PEs
           </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <Gauge className="text-[#319694] mr-1 flex-shrink-0" size={10} />
           <span className="truncate" title={`${vmMips} MIPS`}>
             {vmMips}MIPS
           </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <MemoryStick
             className="text-[#319694] mr-1 flex-shrink-0"
             size={10}
@@ -73,7 +73,7 @@ const VMCard = ({
         <div className="bg-white p-1 rounded border border-gray-100">
           <div className="flex items-center text-gray-700">
             <Cpu className="text-[#319694] mr-1" size={12} />
-            <span className="text-xs">PEs</span>
+            <span className="text-sm">PEs</span>
           </div>
           <p
             className="text-sm font-bold text-gray-800 truncate"
@@ -86,7 +86,7 @@ const VMCard = ({
         <div className="bg-white p-1 rounded border border-gray-100">
           <div className="flex items-center text-gray-700">
             <Gauge className="text-[#319694] mr-1" size={12} />
-            <span className="text-xs">MIPS</span>
+            <span className="text-sm">MIPS</span>
           </div>
           <p
             className="text-sm font-bold text-gray-800 truncate"
@@ -99,7 +99,7 @@ const VMCard = ({
         <div className="bg-white p-1 rounded border border-gray-100">
           <div className="flex items-center text-gray-700">
             <MemoryStick className="text-[#319694] mr-1" size={12} />
-            <span className="text-xs">RAM</span>
+            <span className="text-sm">RAM</span>
           </div>
           <p
             className="text-sm font-bold text-gray-800 truncate"
@@ -112,7 +112,7 @@ const VMCard = ({
         <div className="bg-white p-1 rounded border border-gray-100">
           <div className="flex items-center text-gray-700">
             <Network className="text-[#319694] mr-1" size={12} />
-            <span className="text-xs">BW</span>
+            <span className="text-sm">BW</span>
           </div>
           <p
             className="text-sm font-bold text-gray-800 truncate"
@@ -125,7 +125,7 @@ const VMCard = ({
         <div className="bg-white p-1 rounded border border-gray-100 col-span-2">
           <div className="flex items-center text-gray-700">
             <Database className="text-[#319694] mr-1" size={12} />
-            <span className="text-xs">Size</span>
+            <span className="text-sm">Size</span>
           </div>
           <p
             className="text-sm font-bold text-gray-800 truncate"

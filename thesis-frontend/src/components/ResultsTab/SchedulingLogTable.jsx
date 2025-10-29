@@ -136,9 +136,9 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
   if (!logs || logs.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-600 font-medium">No scheduling logs available</p>
+        <p className="text-gray-600 font-medium">No logs available</p>
         <p className="text-gray-500 text-sm mt-1">
-          {algorithm === 'rr' ? 'EACO' : 'EPSO'} algorithm has no events to display
+          {algorithm === 'rr' ? 'EACO' : 'EPSO'} has no events yet.
         </p>
       </div>
     );
@@ -152,29 +152,29 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
           <h4 className="text-sm font-semibold text-gray-700 mb-3">Event Summary</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             <div>
-              <p className="text-xs text-gray-500">Total Events</p>
+              <p className="text-sm text-gray-500">Total Events</p>
               <p className="text-lg font-bold text-gray-800">{statistics.totalEvents}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Assignments</p>
+              <p className="text-sm text-gray-500">Assignments</p>
               <p className="text-lg font-bold text-gray-700">{statistics.assignments}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Completions</p>
+              <p className="text-sm text-gray-500">Completions</p>
               <p className="text-lg font-bold text-[#319694]">{statistics.completions}</p>
             </div>
             {statistics.overloads > 0 && (
               <div>
-                <p className="text-xs text-gray-500">Overloads</p>
+                <p className="text-sm text-gray-500">Overloads</p>
                 <p className="text-lg font-bold text-gray-900">{statistics.overloads}</p>
               </div>
             )}
             <div>
-              <p className="text-xs text-gray-500">Active VMs</p>
+              <p className="text-sm text-gray-500">Active VMs</p>
               <p className="text-lg font-bold text-gray-800">{statistics.uniqueVMs.size}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Total Tasks</p>
+              <p className="text-sm text-gray-500">Total Tasks</p>
               <p className="text-lg font-bold text-gray-800">{statistics.uniqueCloudlets.size}</p>
             </div>
           </div>
@@ -193,7 +193,7 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('virtual')}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'virtual'
                   ? 'bg-[#319694] text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-100'
@@ -203,7 +203,7 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
             </button>
             <button
               onClick={() => setViewMode('paginated')}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'paginated'
                   ? 'bg-[#319694] text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-100'
@@ -221,7 +221,7 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           {/* Header */}
           <div className="bg-gray-50 border-b border-gray-200">
-            <div className="flex items-center px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="flex items-center px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider">
               <div className="w-32">Event</div>
               <div className="w-24">Time (s)</div>
               <div className="w-20">VM ID</div>
@@ -265,11 +265,11 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time (s)</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VM ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Time (s)</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">VM ID</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Task ID</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Description</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">

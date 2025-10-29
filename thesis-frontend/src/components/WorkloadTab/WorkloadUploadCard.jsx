@@ -45,17 +45,17 @@ const WorkloadUploadCard = ({
       skipEmptyLines: true,
       complete: (results) => {
         if (!results.meta.fields || results.meta.fields.length === 0) {
-          callback("CSV file must have headers");
+          callback("Your CSV file needs column headers.");
           return;
         }
         if (results.data.length === 0) {
-          callback("CSV file must contain data rows");
+          callback("Your CSV file has no data rows.");
           return;
         }
         callback(null, results);
       },
       error: (error) => {
-        callback("Failed to parse CSV file");
+        callback("Cannot read your CSV file. Check the format.");
       },
     });
   };
@@ -88,7 +88,7 @@ const WorkloadUploadCard = ({
               setIsLoadingPreview(false);
             },
             error: (error) => {
-              setValidationError("Failed to parse CSV file");
+              setValidationError("Cannot read your CSV file.");
               setIsLoadingPreview(false);
             },
           });
@@ -112,12 +112,12 @@ const WorkloadUploadCard = ({
               setIsLoadingPreview(false);
             },
             error: (error) => {
-              setValidationError("Failed to parse preset CSV");
+              setValidationError("Cannot read preset file.");
               setIsLoadingPreview(false);
             },
           });
         } catch (error) {
-          setValidationError("Failed to load preset");
+          setValidationError("Cannot load preset. Try again.");
           setIsLoadingPreview(false);
         }
       } else {
@@ -190,7 +190,7 @@ const WorkloadUploadCard = ({
                 Upload Custom Workload
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Upload your own CSV file with custom task workloads
+                Upload your CSV file with task data.
               </p>
             </div>
           </div>
@@ -207,7 +207,7 @@ const WorkloadUploadCard = ({
                   className="text-gray-400 hover:text-[#319694] cursor-pointer transition-colors"
                   size={16}
                 />
-                <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg left-0">
+                <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg left-0">
                   Check the Help tab for detailed preprocessing steps and file
                   format requirements
                 </div>
@@ -243,7 +243,7 @@ const WorkloadUploadCard = ({
                   <p className="text-sm text-gray-600 mb-1">
                     or drag and drop your file here
                   </p>
-                  <p className="text-xs text-gray-500">CSV files only</p>
+                  <p className="text-sm text-gray-500">CSV files only</p>
                 </div>
                 <input
                   id="file-input"
@@ -258,7 +258,7 @@ const WorkloadUploadCard = ({
             {/* Info about benchmark datasets */}
             <div className="flex items-start gap-2 p-3 bg-[#319694]/5 border border-[#319694]/20 rounded-lg mt-4">
               <Info className="text-[#319694] mt-0.5 flex-shrink-0" size={16} />
-              <p className="text-xs text-gray-700">
+              <p className="text-sm text-gray-700">
                 <strong className="text-[#319694]">Tip:</strong> For benchmark
                 datasets (Google cluster traces), use the{" "}
                 <strong>Research Benchmark Dataset</strong> dropdown in the
@@ -277,9 +277,9 @@ const WorkloadUploadCard = ({
               <AlertCircle className="text-red-500 mt-0.5" size={16} />
               <div>
                 <p className="text-sm font-medium text-red-800">
-                  Invalid CSV file
+                  File Error
                 </p>
-                <p className="text-xs text-red-600">
+                <p className="text-sm text-red-600">
                   The CSV file contains no data or is improperly formatted.
                 </p>
               </div>
@@ -305,7 +305,7 @@ const WorkloadUploadCard = ({
                 <p className="text-sm font-bold text-[#267b79]">
                   Preset Loaded Successfully!
                 </p>
-                <p className="text-xs text-gray-700 mt-0.5">
+                <p className="text-sm text-gray-700 mt-0.5">
                   {getPresetDisplayName()} is ready to use
                 </p>
               </div>
@@ -341,24 +341,24 @@ const WorkloadUploadCard = ({
                     {workloadFile ? workloadFile.name : getPresetDisplayName()}
                   </p>
                   {selectedPreset && (
-                    <span className="text-xs px-2 py-0.5 bg-[#319694] text-white rounded-full font-semibold">
+                    <span className="text-sm px-2 py-0.5 bg-[#319694] text-white rounded-full font-semibold">
                       PRESET
                     </span>
                   )}
                 </div>
                 {selectedPreset && getPresetDescription() && (
-                  <p className="text-xs text-gray-600 mb-2">
+                  <p className="text-sm text-gray-600 mb-2">
                     {getPresetDescription()}
                   </p>
                 )}
                 <div className="flex flex-wrap gap-3 mt-2 items-center">
                   {workloadFile && (
-                    <span className="text-xs text-gray-600 flex items-center gap-1">
+                    <span className="text-sm text-gray-600 flex items-center gap-1">
                       <Database size={14} className="text-[#319694]" />
                       {(workloadFile.size / 1024).toFixed(2)} KB
                     </span>
                   )}
-                  <span className="text-xs font-semibold text-[#319694] flex items-center gap-1">
+                  <span className="text-sm font-semibold text-[#319694] flex items-center gap-1">
                     <Zap size={14} />
                     {csvRowCount} tasks loaded
                   </span>
@@ -369,7 +369,7 @@ const WorkloadUploadCard = ({
                 {csvPreview && !validationError && (
                   <motion.button
                     onClick={togglePreview}
-                    className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-white border-2 border-[#319694]/30 hover:bg-[#319694]/10 hover:border-[#319694] text-[#319694] transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg bg-white border-2 border-[#319694]/30 hover:bg-[#319694]/10 hover:border-[#319694] text-[#319694] transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -410,7 +410,7 @@ const WorkloadUploadCard = ({
                   <p className="text-sm font-medium text-red-800">
                     Invalid CSV file
                   </p>
-                  <p className="text-xs text-red-600">{validationError}</p>
+                  <p className="text-sm text-red-600">{validationError}</p>
                 </div>
               </motion.div>
             )}
@@ -468,7 +468,7 @@ const WorkloadUploadCard = ({
                       </tbody>
                     </table>
                   </div>
-                  <div className="px-3 py-1.5 text-xs text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10 sticky bottom-0">
+                  <div className="px-3 py-1.5 text-sm text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10 sticky bottom-0">
                     Showing {csvPreview.rows.length} of {csvRowCount} rows{" "}
                     <Dot className="inline mx-1" size={12} />{" "}
                     {csvPreview.type === "preset"

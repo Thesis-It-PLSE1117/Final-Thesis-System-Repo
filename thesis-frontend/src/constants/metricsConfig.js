@@ -2,35 +2,35 @@ import { BarChart2, Clock, Battery, Calendar, Scale, Zap, Gauge, Server, BarChar
 
 export const METRICS_CONFIG = {
   'Resource Utilization': {
-    description: 'Measures how effectively your server resources (CPU, memory, storage) are being used across all hosts',
+    description: 'Shows how well your servers use their CPU, memory, and storage. Higher is better.',
     icon: BarChart2,
     demoKey: 'resourceUtilization',
     unit: '%',
     category: 'core'
   },
   'Response Time': {
-    description: 'Average time taken to complete tasks from submission to final response',
+    description: 'How long tasks take from start to finish. Lower is faster.',
     icon: Clock,
     demoKey: 'responseTime',
     unit: 'ms',
     category: 'core'
   },
   'Energy Efficiency': {
-    description: 'Evaluates power consumption relative to computational work performed',
+    description: 'Power used per task completed. Lower means greener computing.',
     icon: Battery,
     demoKey: 'energyConsumption',
     unit: '',
     category: 'core'
   },
   'Makespan': {
-    description: 'Total time taken to complete all tasks in the workload',
+    description: 'Total time to finish all your tasks. Lower is more efficient.',
     icon: Calendar,
     demoKey: 'makespan',
     unit: 's',
     category: 'additional'
   },
   'Imbalance Degree': {
-    description: 'Quantifies how unevenly the workload is distributed across available hosts',
+    description: 'Shows if work is spread evenly across servers. Lower is better balanced.',
     icon: Scale,
     demoKey: 'loadBalance',
     unit: '',

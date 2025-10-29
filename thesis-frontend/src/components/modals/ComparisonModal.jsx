@@ -41,7 +41,7 @@ const ComparisonModal = ({ isOpen, onClose, comparison }) => {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
               {comparison.title}
             </h2>
-            <div className="inline-flex items-center mt-2 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-600">
+            <div className="inline-flex items-center mt-2 px-2 sm:px-3 py-1 rounded-full text-sm sm:text-sm font-medium bg-gray-100 text-gray-600">
               <AlertTriangle className="mr-1.5 size-3.5" />
               Theoretical Framework
             </div>
@@ -57,19 +57,19 @@ const ComparisonModal = ({ isOpen, onClose, comparison }) => {
             <table className="w-full min-w-[600px]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 w-[25%]">
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm sm:text-sm font-semibold text-gray-700 w-[25%]">
                     <div className="flex items-center gap-2">
                       <ClipboardList className="text-gray-400" size={16} />
                       Aspect
                     </div>
                   </th>
-                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-800 w-[25%]">
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm sm:text-sm font-semibold text-gray-800 w-[25%]">
                     Enhanced ACO
                   </th>
-                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-800 w-[25%]">
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm sm:text-sm font-semibold text-gray-800 w-[25%]">
                     Enhanced PSO
                   </th>
-                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 w-[25%]">
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm sm:text-sm font-semibold text-gray-700 w-[25%]">
                     Research Focus
                   </th>
                 </tr>
@@ -93,7 +93,7 @@ const ComparisonModal = ({ isOpen, onClose, comparison }) => {
                         {metric.pso}
                       </div>
                     </td>
-                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-600 text-xs sm:text-sm leading-relaxed">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-600 text-sm sm:text-sm leading-relaxed">
                       {metric.description}
                     </td>
                   </tr>
@@ -117,7 +117,7 @@ const ComparisonModal = ({ isOpen, onClose, comparison }) => {
           <ul className="space-y-2 sm:space-y-3 pl-1">
             {comparison.recommendations.map((item, index) => (
               <li key={index} className="flex items-start">
-                <div className="flex-shrink-0 mt-1 mr-2 sm:mr-3 w-5 h-5 rounded-full bg-[#319694]/10 text-[#319694] flex items-center justify-center text-xs">
+                <div className="flex-shrink-0 mt-1 mr-2 sm:mr-3 w-5 h-5 rounded-full bg-[#319694]/10 text-[#319694] flex items-center justify-center text-sm">
                   {index + 1}
                 </div>
                 <span className="text-gray-700 text-sm sm:text-base leading-relaxed">

@@ -224,7 +224,7 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
                     <h4 className="font-semibold text-amber-900 text-sm mb-1">
                       Timeout Risk
                     </h4>
-                    <p className="text-amber-800 text-xs leading-relaxed">
+                    <p className="text-amber-800 text-sm leading-relaxed">
                       Online deployment has a 5-minute timeout limit. Large
                       simulations may not complete in time.
                     </p>
@@ -239,7 +239,7 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
                     <h4 className="font-semibold text-gray-900 text-sm mb-2">
                       Recommended Options
                     </h4>
-                    <ul className="space-y-1.5 text-xs text-gray-700">
+                    <ul className="space-y-1.5 text-sm text-gray-700">
                       <li className="flex items-start gap-2">
                         <span className="text-[#319694] font-bold">•</span>
                         <span>
@@ -474,7 +474,7 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
         </div>
       )}
       {lastSaved && !isSaving && simulationState === "config" && (
-        <div className="fixed bottom-3 left-3 bg-white shadow-lg px-3 py-1.5 rounded-lg text-gray-600 text-xs">
+        <div className="fixed bottom-3 left-3 bg-white shadow-lg px-3 py-1.5 rounded-lg text-gray-600 text-sm">
           Last saved: {new Date(lastSaved).toLocaleTimeString()}
         </div>
       )}

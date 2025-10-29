@@ -260,9 +260,9 @@ export const saveToHistory = async (
         schedulingLog:
           results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
         analysis: results.eaco.analysis || null,
-        analysis: results.eaco.analysis || null,
         plotAnalysis: extractPlotAnalysis(results.eaco),
         tTestResults: results.eaco.tTestResults || null,
+        wilcoxonTestResults: results.eaco.wilcoxonTestResults || null,
         simulationId: results.eaco.simulationId,
         runId: results.eaco.runId || null,
         seed: results.eaco.seed || null,
@@ -327,9 +327,9 @@ export const saveToHistory = async (
         schedulingLog:
           results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
         analysis: results.epso.analysis || null,
-        analysis: results.epso.analysis || null,
         plotAnalysis: extractPlotAnalysis(results.epso),
         tTestResults: results.epso.tTestResults || null,
+        wilcoxonTestResults: results.epso.wilcoxonTestResults || null,
         simulationId: results.epso.simulationId,
         runId: results.epso.runId || null,
         seed: results.epso.seed || null,

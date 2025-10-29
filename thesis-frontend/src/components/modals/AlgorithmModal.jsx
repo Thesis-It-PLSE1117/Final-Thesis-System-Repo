@@ -38,7 +38,7 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
           </div>
           <div className="pr-6 sm:pr-0">
             <h2 className={`text-xl sm:text-2xl font-bold ${textColor}`}>{algorithm.name}</h2>
-            <div className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+            <div className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600">
               <FlaskConical className="mr-1 size-3" />
               Research Version
             </div>
@@ -51,7 +51,7 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
               <Zap className={`${textColor} size-4 sm:size-5`} />
               Enhancement Approach
             </h3>
-            <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-xs sm:text-sm">
+            <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-sm sm:text-sm">
               {algorithm.enhancements.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -64,7 +64,7 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
                 <Code className="text-gray-500 size-4 sm:size-5" />
                 Key Parameters
               </h3>
-              <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-xs sm:text-sm">
+              <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-sm sm:text-sm">
                 {algorithm.parameters.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
@@ -76,7 +76,7 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
                 <TestTube2 className="text-gray-500 size-4 sm:size-5" />
                 Research Focus
               </h3>
-              <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-xs sm:text-sm">
+              <ul className="list-disc pl-5 sm:pl-6 space-y-1 text-gray-700 text-sm sm:text-sm">
                 {algorithm.researchFocus.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
@@ -89,7 +89,7 @@ const AlgorithmModal = ({ isOpen, onClose, algorithm }) => {
               <GitCompare className="text-gray-500 size-4 sm:size-5" />
               Expected Benefits
             </h3>
-            <p className="text-gray-700 text-xs sm:text-sm">
+            <p className="text-gray-700 text-sm sm:text-sm">
               This enhanced version is designed to improve {isEACO ? "dynamic workload adaptation" : "convergence speed"} in cloud environments. Actual performance metrics will be determined through simulation.
             </p>
           </div>

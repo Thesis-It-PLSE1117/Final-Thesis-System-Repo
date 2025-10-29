@@ -44,7 +44,7 @@ const HostCard = ({
           Host {hostId + 1}
         </h4>
         {!isCompact && (
-          <p className="text-xs text-gray-500 truncate">
+          <p className="text-sm text-gray-500 truncate">
             ID: DC-{String(hostId + 1).padStart(2, "0")}
           </p>
         )}
@@ -54,7 +54,7 @@ const HostCard = ({
     {/* Stats Grid - Compact version */}
     {isCompact ? (
       <div className="grid grid-cols-2 gap-1 mb-2">
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <Cpu className="text-[#319694] mr-1 flex-shrink-0" size={12} />
           <span
             className="truncate"
@@ -63,7 +63,7 @@ const HostCard = ({
             {numPesPerHost}PEs
           </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <MemoryStick
             className="text-[#319694] mr-1 flex-shrink-0"
             size={12}
@@ -72,7 +72,7 @@ const HostCard = ({
             {ramPerHost}MB
           </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <Gauge className="text-[#319694] mr-1 flex-shrink-0" size={12} />
           <span
             className="truncate"
@@ -81,7 +81,7 @@ const HostCard = ({
             {peMips * numPesPerHost}M
           </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600 overflow-hidden">
+        <div className="flex items-center text-sm text-gray-600 overflow-hidden">
           <Network className="text-[#319694] mr-1 flex-shrink-0" size={12} />
           <span className="truncate" title={`${bwPerHost} MBps Bandwidth`}>
             {bwPerHost}MB
@@ -98,7 +98,7 @@ const HostCard = ({
           </div>
           <p className="text-base font-bold text-gray-800">
             {numPesPerHost}{" "}
-            <span className="text-xs font-normal text-gray-500">PEs</span>
+            <span className="text-sm font-normal text-gray-500">PEs</span>
           </p>
         </div>
 
@@ -109,7 +109,7 @@ const HostCard = ({
           </div>
           <p className="text-base font-bold text-gray-800">
             {ramPerHost}{" "}
-            <span className="text-xs font-normal text-gray-500">MB RAM</span>
+            <span className="text-sm font-normal text-gray-500">MB RAM</span>
           </p>
         </div>
 
@@ -120,7 +120,7 @@ const HostCard = ({
           </div>
           <p className="text-lg font-bold text-gray-800">
             {peMips * numPesPerHost}{" "}
-            <span className="text-xs font-normal text-gray-500">MIPS</span>
+            <span className="text-sm font-normal text-gray-500">MIPS</span>
           </p>
         </div>
 
@@ -131,7 +131,7 @@ const HostCard = ({
           </div>
           <p className="text-lg font-bold text-gray-800">
             {bwPerHost}{" "}
-            <span className="text-xs font-normal text-gray-500">MBps</span>
+            <span className="text-sm font-normal text-gray-500">MBps</span>
           </p>
         </div>
       </div>
@@ -144,7 +144,7 @@ const HostCard = ({
             <Disc className="text-[#319694] mr-1" size={14} />
             <span className="text-sm font-medium">Storage</span>
           </div>
-          <span className="text-xs px-2 py-1 bg-[#319694]/10 text-[#319694] rounded-full">
+          <span className="text-sm px-2 py-1 bg-[#319694]/10 text-[#319694] rounded-full">
             {Math.floor(storagePerHost / 1024)}GB
           </span>
         </div>
@@ -154,7 +154,7 @@ const HostCard = ({
             style={{ width: `${Math.min(100, storagePerHost / 500)}%` }}
           ></div>
         </div>
-        <p className="text-right text-xs text-gray-500 mt-1">
+        <p className="text-right text-sm text-gray-500 mt-1">
           {storagePerHost}MB
         </p>
       </div>
@@ -164,12 +164,12 @@ const HostCard = ({
     <div>
       <div className="flex items-center mb-2 text-gray-700">
         <HardDrive className="text-[#319694] mr-1" size={isCompact ? 14 : 16} />
-        <span className={`font-semibold ${isCompact ? "text-xs" : "text-sm"}`}>
+        <span className={`font-semibold ${isCompact ? "text-sm" : "text-sm"}`}>
           VMs
         </span>
         <span
           className={`ml-auto bg-[#319694] text-white font-bold px-1.5 py-0.5 rounded-full ${
-            isCompact ? "text-xs" : "text-sm"
+            isCompact ? "text-sm" : "text-sm"
           }`}
         >
           {vms.length}

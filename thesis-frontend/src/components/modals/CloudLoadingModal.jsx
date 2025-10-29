@@ -206,13 +206,13 @@ const CloudLoadingModal = ({
         <div className="mb-3">
           {/* time information */}
           <div className="flex justify-center items-center mb-1.5">
-            <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
               <Clock size={ICON_SIZES.xs} />
               <span>{formatTime(elapsedTime)} elapsed</span>
             </div>
           </div>
 
-          <div className="flex justify-between text-xs text-gray-600 mb-1">
+          <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Overall Progress</span>
             <span>{Math.round(Math.min(progress, 99))}%</span>
           </div>
@@ -227,7 +227,7 @@ const CloudLoadingModal = ({
 
           {/* Enhanced ETA Display */}
           <div className="flex justify-center items-center mt-1.5">
-            <div className="text-xs text-gray-600">
+            <div className="text-sm text-gray-600">
               {estimateRemainingTime()}
             </div>
           </div>
@@ -236,12 +236,12 @@ const CloudLoadingModal = ({
         <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center gap-1.5 mb-1">
             <Info className="text-gray-600" size={ICON_SIZES.sm} />
-            <span className="text-gray-700 font-medium text-xs">
+            <span className="text-gray-700 font-medium text-sm">
               Processing Information
             </span>
           </div>
           {message ? (
-            <div className="text-xs text-gray-700 font-medium mb-2">
+            <div className="text-sm text-gray-700 font-medium mb-2">
               {message}
             </div>
           ) : null}
@@ -252,7 +252,7 @@ const CloudLoadingModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.5 }}
-            className="text-xs text-gray-600 leading-relaxed"
+            className="text-sm text-gray-600 leading-relaxed"
           >
             {tips[currentTipIndex]}
           </motion.p>
@@ -262,14 +262,14 @@ const CloudLoadingModal = ({
           <div className="mb-3 p-2.5 bg-[#319694]/5 rounded-lg border border-[#319694]/20">
             <div className="flex items-center gap-1.5 mb-1.5">
               <Repeat className="text-[#319694]" size={ICON_SIZES.sm} />
-              <span className="text-gray-700 font-medium text-xs">
+              <span className="text-gray-700 font-medium text-sm">
                 Multiple Iterations
               </span>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-600">
+                <span className="text-sm text-gray-600">
                   Iteration {actualCurrentIteration} of {iterations}
                 </span>
               </div>
@@ -277,12 +277,12 @@ const CloudLoadingModal = ({
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-2 text-xs">
+        <div className="grid grid-cols-3 gap-2 text-sm">
           <div className="bg-gray-50 p-2 rounded-lg border border-gray-200">
             <div className="flex items-center gap-1.5">
               <Server className="text-[#319694]" size={ICON_SIZES.sm} />
               <div>
-                <div className="font-medium text-gray-700 text-xs">Hosts</div>
+                <div className="font-medium text-gray-700 text-sm">Hosts</div>
                 <div className="text-gray-900 font-semibold text-sm">
                   {numHosts}
                 </div>
@@ -293,11 +293,11 @@ const CloudLoadingModal = ({
             <div className="flex items-center gap-1.5">
               <Database className="text-[#319694]" size={ICON_SIZES.sm} />
               <div>
-                <div className="font-medium text-gray-700 text-xs">Tasks</div>
+                <div className="font-medium text-gray-700 text-sm">Tasks</div>
                 <div className="text-gray-900 font-semibold text-sm">
                   {effectiveTaskCount.toLocaleString()}
                   {isLargeTaskSet && (
-                    <span className="text-xs text-amber-600 ml-1">⚠</span>
+                    <span className="text-sm text-amber-600 ml-1">⚠</span>
                   )}
                 </div>
               </div>
@@ -307,7 +307,7 @@ const CloudLoadingModal = ({
             <div className="flex items-center gap-1.5">
               <HardDrive className="text-[#319694]" size={ICON_SIZES.sm} />
               <div>
-                <div className="font-medium text-gray-700 text-xs">VMs</div>
+                <div className="font-medium text-gray-700 text-sm">VMs</div>
                 <div className="text-gray-900 font-semibold text-sm">
                   {numVMs}
                 </div>

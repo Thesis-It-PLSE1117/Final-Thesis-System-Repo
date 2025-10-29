@@ -33,7 +33,7 @@ const IterationBadge = ({ iterationData }) => {
             <h4 className="text-sm font-semibold text-gray-800">
               Results from {iterationData.totalIterations} Iterations
             </h4>
-            <p className="text-xs text-gray-600">
+            <p className="text-sm text-gray-600">
               Statistical analysis across multiple simulation runs
             </p>
           </div>

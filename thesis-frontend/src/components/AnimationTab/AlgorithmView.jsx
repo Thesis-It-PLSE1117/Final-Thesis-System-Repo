@@ -72,7 +72,7 @@ const AlgorithmView = ({
           </svg>
           {algorithm.label}
         </h5>
-        <span className={`text-xs sm:text-sm bg-${algorithm.color}-600 text-white px-2 sm:px-3 py-1 rounded-full self-start xs:self-auto`}>
+        <span className={`text-sm sm:text-sm bg-${algorithm.color}-600 text-white px-2 sm:px-3 py-1 rounded-full self-start xs:self-auto`}>
           {activeVMs[algorithm.id].length} Active VMs
         </span>
       </div>

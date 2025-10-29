@@ -67,7 +67,7 @@ const CSVFormatGuide = () => {
           <Info className="text-[#319694]" size={20} />
           <div className="text-left">
             <h4 className="text-sm font-semibold text-gray-800">CSV Format Guide</h4>
-            <p className="text-xs text-gray-500">Compatible with Google Cluster Trace format.</p>
+            <p className="text-sm text-gray-500">Compatible with Google Cluster Trace format.</p>
           </div>
         </div>
         {isExpanded ? (
@@ -89,7 +89,7 @@ const CSVFormatGuide = () => {
             <div className="mt-3 p-4 bg-white rounded-lg border border-gray-200">
 
               <div className="relative mb-4">
-                <h5 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
                   <FileDown size={14} className="text-[#319694]" />
                   Download Sample Files:
                 </h5>
@@ -136,11 +136,11 @@ const CSVFormatGuide = () => {
                                 <span className="font-semibold text-sm text-gray-800">
                                   {file.name}
                                 </span>
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[#319694]/10 text-[#319694]">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-sm font-medium bg-[#319694]/10 text-[#319694]">
                                   {file.tasks} tasks
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-600 font-mono">
+                              <p className="text-sm text-gray-600 font-mono">
                                 {file.format}
                               </p>
                             </div>
@@ -154,7 +154,7 @@ const CSVFormatGuide = () => {
                   </AnimatePresence>
                 </div>
                 
-                <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                <p className="mt-2 text-sm text-gray-500 flex items-center gap-1">
                   <Info size={12} className="text-[#319694]" />
                   Click any option to download immediately.
                 </p>
@@ -162,7 +162,7 @@ const CSVFormatGuide = () => {
 
               {/* Required Columns */}
               <div className="mb-4">
-                <h5 className="text-xs font-semibold text-gray-700 mb-2 flex items-center">
+                <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <span className="w-2 h-2 bg-[#319694] rounded-full mr-1.5"></span>
                   REQUIRED COLUMNS
                 </h5>
@@ -171,10 +171,10 @@ const CSVFormatGuide = () => {
                     <div key={col.name} className="flex items-start">
                       <span className="text-gray-400 mr-1 mt-0.5">▸</span>
                       <div>
-                        <code className="inline-block bg-[#f0fdfa] px-2 py-0.5 rounded text-xs font-mono text-gray-700 border border-[#319694]/20">
+                        <code className="inline-block bg-[#f0fdfa] px-2 py-0.5 rounded text-sm font-mono text-gray-700 border border-[#319694]/20">
                           {col.name}
                         </code>
-                        <span className="block text-xs text-gray-500 mt-0.5">
+                        <span className="block text-sm text-gray-500 mt-0.5">
                           {col.desc}
                         </span>
                       </div>
@@ -185,7 +185,7 @@ const CSVFormatGuide = () => {
 
               {/* Optional Columns */}
               <div className="mb-4">
-                <h5 className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
+                <h5 className="text-sm font-semibold text-gray-600 mb-2 flex items-center">
                   <span className="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
                   OPTIONAL COLUMNS
                 </h5>
@@ -193,7 +193,7 @@ const CSVFormatGuide = () => {
                   {optionalColumns.map((col) => (
                     <code
                       key={col}
-                      className="inline-block bg-gray-50 px-1.5 py-0.5 rounded text-xs font-mono text-gray-600 border border-gray-200"
+                      className="inline-block bg-gray-50 px-1.5 py-0.5 rounded text-sm font-mono text-gray-600 border border-gray-200"
                     >
                       {col}
                     </code>

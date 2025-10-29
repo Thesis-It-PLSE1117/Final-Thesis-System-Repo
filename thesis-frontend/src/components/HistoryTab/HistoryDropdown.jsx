@@ -31,7 +31,7 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
         </div>
         <button 
           onClick={() => setShowLegend(!showLegend)}
-          className="text-xs text-[#319694] hover:text-[#267b79] flex items-center gap-1"
+          className="text-sm text-[#319694] hover:text-[#267b79] flex items-center gap-1"
         >
           <Info size={14} />
           {showLegend ? 'Hide Legend' : 'Show Legend'}
@@ -40,7 +40,7 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
       
       {/* Legend */}
       {showLegend && (
-        <div className="mb-3 p-3 bg-[#319694]/10 rounded-lg text-xs text-gray-600">
+        <div className="mb-3 p-3 bg-[#319694]/10 rounded-lg text-sm text-gray-600">
           <div className="font-medium mb-1 flex items-center gap-1">
             <Info size={14} />
             Analysis Indicators:
@@ -83,7 +83,7 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
           {Object.entries(groupedHistory).map(([baseId, results]) => (
             <div key={baseId} className="border-b border-gray-100 last:border-b-0">
-              <div className="px-3 py-1 bg-gray-50 text-xs font-medium text-gray-500 sticky top-0">
+              <div className="px-3 py-1 bg-gray-50 text-sm font-medium text-gray-500 sticky top-0">
                 Run #{baseId}
               </div>
               <div className="divide-y divide-gray-100">

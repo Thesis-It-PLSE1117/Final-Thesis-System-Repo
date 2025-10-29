@@ -36,13 +36,13 @@ const ProgressSteps = ({ steps, currentStep, onStepClick }) => {
                 </motion.button>
 
                 <div className="absolute top-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                  <p className={`text-xs font-medium ${
+                  <p className={`text-sm font-medium ${
                     isActive || isCompleted ? 'text-gray-700' : 'text-gray-400'
                   }`}>
                     {step.label}
                   </p>
                   {step.sublabel && (
-                    <p className="text-xs text-gray-400 text-center mt-0.5">
+                    <p className="text-sm text-gray-400 text-center mt-0.5">
                       {step.sublabel}
                     </p>
                   )}
