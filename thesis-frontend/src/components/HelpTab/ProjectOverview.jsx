@@ -120,12 +120,12 @@ const ProjectOverview = () => {
       content: "Quantitative, simulation-based research design with expert evaluation. 30 participants: 15 IT experts and 15 end users (11 cloud specialists + 4 academic professionals). Purposive sampling method ensures relevant expertise.",
       subsections: [
         {
-          title: "Statistical Analysis",
-          content: "Paired t-test for algorithm comparison: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size. Significance level α = 0.05, two-tailed test."
+          title: "Algorithmic Statistical Analysis",
+          content: "Paired t-test for normally distributed data: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size. Wilcoxon signed-rank test for non-normal data: W = sum of signed ranks, used when normality assumptions are violated. Significance level α = 0.05, two-tailed tests."
         },
         {
-          title: "Evaluation Methodology",
-          content: "Likert scale with four response options: 4 (Strongly Agree, 3.26–4.00), 3 (Agree, 2.51–3.25), 2 (Disagree, 1.76–2.50), 1 (Strongly Disagree, 1.00–1.75). Median scores used for stability with small groups."
+          title: "System Evaluation Methodology",
+          content: "Likert scale with four response options: 4 (Strongly Agree, 3.26–4.00), 3 (Agree, 2.51–3.25), 2 (Disagree, 1.76–2.50), 1 (Strongly Disagree, 1.00–1.75). Median scores used for stability with small groups. Non-parametric tests applied to ordinal Likert data."
         }
       ]
     },
