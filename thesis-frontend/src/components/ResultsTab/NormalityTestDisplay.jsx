@@ -1,15 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-  Info,
-  TrendingUp,
-  Activity,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, TrendingUp, Activity, AlertTriangle } from "lucide-react";
 
 const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
   const [expanded, setExpanded] = useState(false);
@@ -20,7 +11,7 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
 
   const getMetricLabel = (metricName) => {
     const labels = {
-      makespan: "Total Completion Time (Makespan)",
+      makespan: "Total Completion Time",
       energyConsumption: "Energy Consumption",
       resourceUtilization: "Resource Utilization",
       responseTime: "Average Response Time",
@@ -37,156 +28,165 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
 
   const getTestIcon = (preferredTest) => {
     if (preferredTest.includes("T-Test")) {
-      return <TrendingUp className="text-blue-600" size={20} />;
+      return <TrendingUp className="text-blue-600" size={18} />;
     } else if (preferredTest.includes("Wilcoxon")) {
-      return <Activity className="text-purple-600" size={20} />;
+      return <Activity className="text-purple-600" size={18} />;
     } else {
-      return <AlertTriangle className="text-amber-600" size={20} />;
+      return <AlertTriangle className="text-amber-600" size={18} />;
     }
   };
 
   const getTestColor = (preferredTest) => {
     if (preferredTest.includes("T-Test")) {
-      return "from-blue-500 to-blue-600";
+      return "blue";
     } else if (preferredTest.includes("Wilcoxon")) {
-      return "from-purple-500 to-indigo-600";
+      return "purple";
     } else {
-      return "from-amber-500 to-orange-600";
+      return "amber";
     }
   };
+
+  const testColor = getTestColor(preferredTest);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
+      className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100"
     >
-      <div
-        className={`bg-gradient-to-r ${getTestColor(preferredTest)} text-white p-4 sm:p-6`}
-      >
+      {/* Header Section */}
+      <div className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {getTestIcon(preferredTest)}
+            <div className={`p-2 rounded-lg bg-${testColor}-50 border border-${testColor}-200`}>
+              {getTestIcon(preferredTest)}
+            </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-bold">
+              <h3 className="text-lg font-semibold text-gray-900">
                 Normality Assessment
               </h3>
-              <p className="text-sm text-white/90 mt-1">
-               Researchers used Anderson-Darling for test results.
+              <p className="text-sm text-gray-600 mt-1">
+                Anderson-Darling test applied to all metrics
               </p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-gray-900">
               {normalCount}/{totalCount}
             </div>
-            <div className="text-sm text-white/90">Normal</div>
+            <div className="text-sm text-gray-500">Normal metrics</div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6">
-        <div
-          className={`bg-gradient-to-r ${getTestColor(preferredTest).replace("500", "50").replace("600", "100")} rounded-lg p-4 border-2 ${getTestColor(preferredTest).replace("from-", "border-").split(" ")[0].replace("500", "300")}`}
-        >
-          <div className="flex items-start gap-3">
-            {getTestIcon(preferredTest)}
-            <div>
-              <h4 className="font-bold text-gray-900 mb-2">
-                Recommended Test
-              </h4>
-              <p className="text-lg font-semibold text-gray-900 mb-2">
-                {preferredTest}
+      {/* Test Recommendation Section */}
+      <div className="p-6 bg-gray-50/50">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 mt-1">
+            <div className={`w-3 h-3 rounded-full bg-${testColor}-500`} />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-medium text-gray-500 mb-1">
+              RECOMMENDED STATISTICAL TEST
+            </h4>
+            <p className="text-lg font-semibold text-gray-900 mb-2">
+              {preferredTest}
+            </p>
+            {normalityAnalysis?.conclusion && (
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {normalityAnalysis.conclusion}
               </p>
-              {normalityAnalysis?.conclusion && (
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {normalityAnalysis.conclusion}
-                </p>
-              )}
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Practical Guidance Section */}
+      {normalityAnalysis?.practicalGuidance && (
+        <div className="p-6 bg-blue-50/30 border-l-4 border-blue-400">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2" />
+            </div>
+            <div>
+              <h5 className="text-sm font-semibold text-gray-900 mb-1">
+                Practical Guidance
+              </h5>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {normalityAnalysis.practicalGuidance}
+              </p>
             </div>
           </div>
         </div>
+      )}
 
-        {normalityAnalysis?.practicalGuidance && (
-          <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <div className="flex items-start gap-2">
-              <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={18} />
-              <div>
-                <h5 className="font-semibold text-gray-900 mb-1">
-                  Practical Guidance
-                </h5>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {normalityAnalysis.practicalGuidance}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
+      {/* Expandable Details Section */}
+      <div className="p-6">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg flex items-center justify-between transition-colors"
+          className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
         >
-          <span>Per-Metric Normality Results</span>
-          {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-900">Detailed results</span>
+            <span className="text-sm text-gray-500">({totalCount} metrics)</span>
+          </div>
+          {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
 
         <AnimatePresence>
           {expanded && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="mt-4 space-y-3"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 space-y-4"
             >
               {Object.entries(normalityTests).map(([metric, test]) => (
                 <div
                   key={metric}
-                  className={`p-4 rounded-lg border-2 ${test.isNormal ? "bg-green-50 border-green-200" : "bg-amber-50 border-amber-200"}`}
+                  className={`p-4 rounded-lg border-l-4 ${test.isNormal ? "border-green-400 bg-green-50/30" : "border-amber-400 bg-amber-50/30"}`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        {test.isNormal ? (
-                          <CheckCircle className="text-green-600" size={18} />
-                        ) : (
-                          <XCircle className="text-amber-600" size={18} />
-                        )}
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${test.isNormal ? "bg-green-500" : "bg-amber-500"}`}
+                        />
                         <h5 className="font-semibold text-gray-900">
                           {getMetricLabel(metric)}
                         </h5>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
                         {test.interpretation}
                       </p>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex gap-6 text-sm">
                         <div>
-                          <span className="text-gray-500">A² Statistic:</span>
-                          <span className="ml-2 font-semibold text-gray-900">
+                          <span className="text-gray-500 font-medium">A² Statistic: </span>
+                          <span className="font-semibold text-gray-900">
                             {test.testStatistic?.toFixed(4) || "—"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500">P-value:</span>
-                          <span className="ml-2 font-semibold text-gray-900">
+                          <span className="text-gray-500 font-medium">P-value: </span>
+                          <span className="font-semibold text-gray-900">
                             {test.pValue?.toFixed(4) || "—"}
                           </span>
                         </div>
                       </div>
                     </div>
                     <div
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${test.isNormal ? "bg-green-200 text-green-800" : "bg-amber-200 text-amber-800"}`}
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${test.isNormal ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}
                     >
-                      {test.isNormal ? "Normal" : "Non-Normal"}
+                      {test.isNormal ? "Normal" : "Non-normal"}
                     </div>
                   </div>
                 </div>
               ))}
 
               {normalityAnalysis?.methodologyNote && (
-                <div className="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h5 className="font-semibold text-gray-900 mb-2 text-sm">
-                    About Anderson-Darling
+                <div className="p-4 rounded-lg bg-gray-100 border border-gray-200">
+                  <h5 className="text-sm font-semibold text-gray-900 mb-2">
+                    About Anderson-Darling Test
                   </h5>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     {normalityAnalysis.methodologyNote}
