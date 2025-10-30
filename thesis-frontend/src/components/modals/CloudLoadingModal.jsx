@@ -46,6 +46,25 @@ const CloudLoadingModal = ({
   const displayStage =
     iterationStage || (currentIteration ? "Processing..." : null);
 
+  // Calculate overall progress based on iterations
+  const getOverallProgress = () => {
+    if (!isMultipleIterations || iterations <= 1) {
+      return progress;
+    }
+
+    // Calculate progress range for current iteration
+    const progressPerIteration = 100 / iterations;
+    const minProgress = (actualCurrentIteration - 1) * progressPerIteration;
+    const currentIterationProgress = (progress * progressPerIteration) / 100;
+    
+    // Total progress is base from previous iterations + current iteration progress
+    const totalProgress = minProgress + currentIterationProgress;
+    
+    return Math.min(totalProgress, 99);
+  };
+
+  const overallProgress = getOverallProgress();
+
   React.useEffect(() => {
     const timer = setInterval(() => {
       setElapsedTime((prev) => prev + 1);
@@ -55,12 +74,12 @@ const CloudLoadingModal = ({
   }, []);
 
   React.useEffect(() => {
-    if (progress < 10) setCurrentPhase("initializing");
-    else if (progress < 30) setCurrentPhase("scheduling");
-    else if (progress < 60) setCurrentPhase("simulating");
-    else if (progress < 90) setCurrentPhase("analyzing");
+    if (overallProgress < 10) setCurrentPhase("initializing");
+    else if (overallProgress < 30) setCurrentPhase("scheduling");
+    else if (overallProgress < 60) setCurrentPhase("simulating");
+    else if (overallProgress < 90) setCurrentPhase("analyzing");
     else setCurrentPhase("finalizing");
-  }, [progress]);
+  }, [overallProgress]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -74,7 +93,7 @@ const CloudLoadingModal = ({
       return `Approximately ${formatTime(eta)} remaining`;
     }
 
-    if (progress === 0 || elapsedTime === 0) {
+    if (overallProgress === 0 || elapsedTime === 0) {
       if (isLargeTaskSet) {
         const baseTimePerTask = 0.12;
         const iterationMultiplier = isMultipleIterations ? iterations : 1;
@@ -93,7 +112,7 @@ const CloudLoadingModal = ({
       return "Estimating time...";
     }
 
-    const safeProgress = Math.min(progress, 85);
+    const safeProgress = Math.min(overallProgress, 85);
     const estimatedTotal = (elapsedTime / safeProgress) * 100;
     let remaining = Math.max(0, estimatedTotal - elapsedTime);
 
@@ -214,13 +233,13 @@ const CloudLoadingModal = ({
 
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Overall Progress</span>
-            <span>{Math.round(Math.min(progress, 99))}%</span>
+            <span>{Math.round(Math.min(overallProgress, 99))}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <motion.div
               className="h-2 rounded-full bg-gradient-to-r from-[#319694] to-[#4fd1c5]"
               initial={{ width: 0 }}
-              animate={{ width: `${Math.min(progress, 99)}%` }}
+              animate={{ width: `${Math.min(overallProgress, 99)}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
