@@ -14,7 +14,7 @@ import {
   BookOpen,
   Zap,
 } from "lucide-react";
-import { dataCenterHelpContent } from "./dataCenterHelpData";
+import { dataCenterHelpContent } from "./dataCenterHelpData.jsx";
 
 const iconMap = {
   Server,
@@ -48,10 +48,10 @@ const DataCenterHelp = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-3 pb-4 border-b border-gray-200"
       >
-        {getIcon("Server", { className: "text-[#319694]", size: 28 })}
+        {getIcon("Server", { className: "text-gray-700", size: 28 })}
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-          <p className="text-sm text-gray-600 mt-1">{description}</p>
+          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+          <p className="text-sm text-gray-700 mt-1">{description}</p>
         </div>
       </motion.div>
 
@@ -60,23 +60,23 @@ const DataCenterHelp = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-5"
+        className="bg-gray-50 border border-gray-200 rounded-lg p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          {getIcon("Zap", { className: "text-teal-600", size: 20 })}
-          <h3 className="text-lg font-semibold text-gray-800">
+          {getIcon("Zap", { className: "text-gray-700", size: 20 })}
+          <h3 className="text-lg font-medium text-gray-900">
             {quickStart.title}
           </h3>
         </div>
         <p className="text-sm text-gray-700 mb-3">{quickStart.description}</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-white/60 rounded p-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 border border-gray-200 rounded p-3">
           {Object.entries(quickStart.example).map(([key, value]) => (
             <div key={key} className="text-sm">
-              <span className="font-medium text-gray-700">{value}</span>
+              <span className="font-semibold text-gray-700">{value}</span>
             </div>
           ))}
         </div>
-        <p className="text-sm text-gray-600 mt-3 italic">{quickStart.note}</p>
+        <p className="text-sm text-gray-600 mt-3 font-semibold ">{quickStart.note}</p>
       </motion.div>
 
       {/* Host Configuration */}
@@ -94,10 +94,10 @@ const DataCenterHelp = () => {
       >
         <div className="flex items-center gap-2 mb-3">
           {getIcon(sections.troubleshooting.icon, {
-            className: "text-[#319694]",
+            className: "text-gray-700",
             size: 20,
           })}
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-medium text-gray-900">
             {sections.troubleshooting.title}
           </h3>
         </div>
@@ -108,20 +108,20 @@ const DataCenterHelp = () => {
           {sections.troubleshooting.items.map((item, idx) => (
             <div
               key={idx}
-              className="bg-red-50 border border-red-200 rounded p-3"
+              className="border border-gray-200 rounded-lg p-3"
             >
               <div className="flex items-start gap-2">
                 {getIcon(item.icon, {
-                  className: "text-red-600 mt-0.5",
+                  className: "text-gray-700 mt-0.5",
                   size: 16,
                 })}
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-800">
+                  <p className="text-sm font-medium text-gray-900">
                     {item.problem}
                   </p>
                   <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
-                  <p className="text-sm text-gray-600 mt-1 italic">
-                    Example: {item.example}
+                  <p className="text-sm text-gray-600 mt-1">
+                    <strong className="font-medium">Example:</strong> {item.example}
                   </p>
                 </div>
               </div>
@@ -139,10 +139,10 @@ const DataCenterHelp = () => {
       >
         <div className="flex items-center gap-2 mb-3">
           {getIcon(sections.glossary.icon, {
-            className: "text-[#319694]",
+            className: "text-gray-700",
             size: 20,
           })}
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-medium text-gray-900">
             {sections.glossary.title}
           </h3>
         </div>
@@ -151,9 +151,9 @@ const DataCenterHelp = () => {
         </p>
         <div className="grid md:grid-cols-2 gap-3">
           {sections.glossary.terms.map((item, idx) => (
-            <div key={idx} className="bg-gray-50 rounded p-3">
-              <p className="text-sm font-semibold text-gray-800">{item.term}</p>
-              <p className="text-sm text-gray-600 mt-1">{item.definition}</p>
+            <div key={idx} className="border border-gray-200 rounded-lg p-3">
+              <p className="text-sm font-medium text-gray-900">{item.term}</p>
+              <p className="text-sm text-gray-700 mt-1">{item.definition}</p>
             </div>
           ))}
         </div>
@@ -171,25 +171,25 @@ const ConfigSection = ({ section, delay }) => (
     className="bg-white rounded-lg border border-gray-200 p-5"
   >
     <div className="flex items-center gap-2 mb-3">
-      {getIcon(section.icon, { className: "text-[#319694]", size: 20 })}
-      <h3 className="text-lg font-semibold text-gray-800">{section.title}</h3>
+      {getIcon(section.icon, { className: "text-gray-700", size: 20 })}
+      <h3 className="text-lg font-medium text-gray-900">{section.title}</h3>
     </div>
-    <p className="text-sm text-gray-600 mb-4">{section.description}</p>
+    <p className="text-sm text-gray-700 mb-4">{section.description}</p>
     <div className="space-y-2">
       {section.items.map((item, idx) => (
         <div
           key={idx}
           className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition-colors"
         >
-          {getIcon(item.icon, { className: "text-gray-500 mt-0.5", size: 18 })}
+          {getIcon(item.icon, { className: "text-gray-600 mt-0.5", size: 18 })}
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-800">{item.label}</p>
-            <p className="text-sm text-gray-600">{item.explanation}</p>
+            <p className="text-sm font-medium text-gray-900">{item.label}</p>
+            <p className="text-sm text-gray-700">{item.explanation}</p>
             <div className="flex flex-wrap gap-3 mt-1">
-              <span className="text-sm text-teal-600 font-medium">
+              <span className="text-sm text-gray-900 font-medium">
                 {item.example}
               </span>
-              <span className="text-sm text-gray-500 italic">{item.tip}</span>
+              <span className="text-sm text-gray-600">{item.tip}</span>
             </div>
           </div>
         </div>

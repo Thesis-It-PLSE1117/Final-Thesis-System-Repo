@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUniversity } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { Hand } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 import danmelImage from '../../assets/2x2-laranga.png';
 import kierImage from '../../assets/2x2-reyes.png';
 import alfredImage from '../../assets/2x2-violanta.png';
@@ -60,30 +59,33 @@ const AboutUsModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const cardVariants = {
-    hover: { y: -5, scale: 1.03, transition: { duration: 0.2 } }
-  };
-
   const teamMembers = [
-    {
-      name: "John Danmel C. Laranga",
-      role: "Thesis Leader/Project Manager",
-      image: danmelImage,
-      description: "Oversaw project development and coordination."
-    },
-    {
-      name: "Kier Christian F. Reyes",
-      role: "Backend Dev Lead",
-      image: kierImage,
-      description: "Implemented load balancing algorithms and server logic."
-    },
-    {
-      name: "Jan Alfred G. Violanta",
-      role: "Frontend Dev Lead",
-      image: alfredImage,
-      description: "Designed and developed the user interface."
-    }
-  ];
+  {
+    name: "John Danmel C. Laranga",
+    role: "Thesis Leader/Project Manager",
+    image: danmelImage,
+    location: "University of Cabuyao",
+    description: "Leads the team and manages the project timeline. Makes sure everyone stays coordinated and the research meets academic standards.",
+    github: "https://github.com/Danmel502"
+  },
+  {
+    name: "Kier Christian F. Reyes",
+    role: "Backend Dev Lead",
+    image: kierImage,
+    location: "University of Cabuyao",
+    description: "Builds the technical systems and runs simulations. Develops the algorithms that power the research and test different solutions.",
+    github: "https://github.com/kierre-yes"
+  },
+  {
+    name: "Jan Alfred G. Violanta",
+    role: "Frontend Dev Lead",
+    image: alfredImage,
+    location: "University of Cabuyao",
+    description: "Creates the user interface and visual displays. Transforms complex research data into easy-to-understand charts and interactions.",
+    github: "https://github.com/alfred-jgv"
+  }
+];
+
 
   return (
     <AnimatePresence>
@@ -96,19 +98,19 @@ const AboutUsModal = ({ isOpen, onClose }) => {
           className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
         >
           <div 
-            className="fixed inset-0 bg-black/30" 
+            className="fixed inset-0 bg-gradient-to-br from-black/40 via-[#319694]/10 to-black/40" 
             onClick={onClose}
           />
           
           <motion.div
             variants={modalVariants}
-            className="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl p-6 relative mx-4 overflow-y-auto"
+            className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl relative mx-4 overflow-y-auto"
           >
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl z-10 bg-white rounded-full p-1"
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-700 text-2xl z-10 bg-white rounded-full p-2 shadow-lg"
             >
               <IoClose />
             </motion.button>
@@ -118,100 +120,129 @@ const AboutUsModal = ({ isOpen, onClose }) => {
               initial="hidden"
               animate="visible"
               exit="exit"
+              className="px-6 py-12 lg:px-16 lg:py-16"
             >
-              <motion.h2 
-                variants={itemVariants}
-                className="text-2xl md:text-3xl font-bold text-[#319694] mb-4 flex items-center gap-2"
-              >
-                About The Team
-                <motion.div 
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
+              {/* Header Section */}
+              <div className="mx-auto max-w-3xl text-center mb-16">
+               
+                
+                <motion.h2 
+                  variants={itemVariants}
+                  className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl mb-6"
                 >
-                  <Hand className="text-[#319694]" size={24} />
-                </motion.div>
-              </motion.h2>
+                  Meet the minds behind{' '}
+                  <span className="text-[#319694]">the research</span>
+                </motion.h2>
+                
+                <motion.p 
+                  variants={itemVariants}
+                  className="text-lg leading-relaxed text-gray-600"
+                >
+                  A dedicated team of researchers pushing the boundaries of cloud computing optimization through innovative algorithmic approaches and rigorous academic methodology.
+                </motion.p>
+              </div>
 
-              <motion.p variants={itemVariants} className="mb-6 text-base md:text-lg">
-                This project was developed by passionate University of Cabuyao CS students:
-              </motion.p>
-
-              <motion.div 
-                variants={containerVariants}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+              {/* Team Grid */}
+              <div 
+                className="grid max-w-7xl mx-auto grid-cols-1 gap-8 lg:grid-cols-3 mb-16"
               >
                 {teamMembers.map((member, index) => (
                   <motion.div
                     key={index}
                     variants={itemVariants}
-                    whileHover={cardVariants.hover}
-                    className="bg-gradient-to-b from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                    whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                    className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
                   >
-                    <motion.div 
-                      whileHover={{ rotate: 5, scale: 1.1 }}
-                      className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 rounded-full bg-[#319694]/10 flex items-center justify-center overflow-hidden"
-                    >
+                    {/* Image with overlay effect */}
+                    <div className="relative mb-6 mx-auto w-48 h-48">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#319694]/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <img 
                         loading="lazy"
                         src={member.image} 
                         alt={member.name}
-                        className="w-full h-full object-cover"
+                        className="relative w-full h-full rounded-full object-cover ring-4 ring-white shadow-lg group-hover:ring-[#319694]/20 transition-all duration-300"
                       />
-                    </motion.div>
-                    <h3 className="font-bold text-gray-800 text-sm md:text-base">{member.name}</h3>
-                    <p className="text-sm md:text-sm text-[#319694] font-medium mb-1">{member.role}</p>
-                    <p className="text-sm text-gray-500">{member.description}</p>
+                    </div>
+
+                    {/* Content */}
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-sm font-semibold text-[#319694] mb-3">
+                        {member.role}
+                      </p>
+                      <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                        {member.description}
+                      </p>
+                      <div className="flex items-center justify-center text-xs text-gray-500 mb-4">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                        {member.location}
+                      </div>
+                      
+                      {/* GitHub link */}
+                      <div className="flex justify-center pt-4 border-t border-gray-200">
+                        <motion.a
+                          href={member.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="text-gray-400 hover:text-[#319694] transition-colors"
+                        >
+                          <FaGithub className="w-5 h-5" />
+                        </motion.a>
+                      </div>
+                    </div>
                   </motion.div>
                 ))}
-              </motion.div>
+              </div>
 
+              {/* Project Info Card */}
               <motion.div 
                 variants={itemVariants}
-                className="bg-[#319694]/10 rounded-xl p-4 mb-4"
+                className="mx-auto max-w-4xl relative overflow-hidden"
               >
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <FaUniversity className="text-[#319694]" />
-                  <h4 className="font-semibold text-[#319694] text-sm md:text-base">University of Cabuyao</h4>
-                </div>
-                <div className="text-sm md:text-sm text-gray-700 text-center space-y-2">
-                  <p>
-                    <span className="font-medium">Thesis Title:</span> Enhanced PSO and ACO for Cloud Load Balancing: A Comparative Study
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Research Design:</span> Quantitative, simulation-based methodology using CloudSim framework
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                variants={itemVariants}
-                className="bg-[#319694]/10 rounded-xl p-4 mb-4"
-              >
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#319694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2m-2 6h2a2 2 0 012 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2v-6a2 2 0 012-2z" />
-                  </svg>
-                  <h4 className="font-semibold text-[#319694] text-sm md:text-base">Research Methodology</h4>
-                </div>
-                <div className="text-sm md:text-sm text-gray-700 text-center space-y-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
-                    <div className="space-y-1">
-                      <p><span className="font-medium">Participants:</span> 30 total</p>
-                      <ul className="text-sm text-gray-600 ml-3 space-y-0.5">
-                        <li>• 15 IT Experts </li>
-                        <li>• 15 End Users</li>
-                      </ul>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#319694] to-[#267573]" />
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+                
+                <div className="relative rounded-2xl p-8 lg:p-12">
+                  <div className="grid lg:grid-cols-3 gap-8 items-center">
+                    {/* Left: Stats */}
+                    <div className="lg:col-span-1 space-y-4">
+                      <div className="text-center lg:text-left">
+                        <div className="text-4xl font-bold text-white mb-1">2025</div>
+                        <div className="text-sm text-[#319694]/80 bg-white inline-block px-3 py-1 rounded-full">
+                          Timeline
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-4">
+                        <div className="text-center lg:text-left">
+                          <div className="text-2xl font-bold text-white">CloudSim</div>
+                          <div className="text-xs text-white/70">Framework</div>
+                        </div>
+                        <div className="text-center lg:text-left">
+                          <div className="text-2xl font-bold text-white">Quantitative</div>
+                          <div className="text-xs text-white/70">Methodology</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p><span className="font-medium">Analysis:</span> Statistical comparison</p>
-                      <ul className="text-sm text-gray-600 ml-3 space-y-0.5">
-                        <li>• Paired t-test (α = 0.05)</li>
-                        <li>• Likert scale evaluation</li>
-                        <li>• Purposive sampling</li>
-                      </ul>
+
+                    {/* Right: Project details */}
+                    <div className="lg:col-span-2 text-center lg:text-left">
+                      <h4 className="text-2xl font-bold text-white mb-4">
+                         Research Title
+                      </h4>
+                      <p className="text-lg font-semibold text-white/90 mb-4">
+                        Enhanced PSO and ACO for Cloud Load Balancing: A Comparative Study
+                      </p>
+                      <p className="text-sm text-white/70 leading-relaxed">
+                        A simulation-based study using CloudSim to compare Enhanced Particle Swarm Optimization (EPSO) and Enhanced Ant Colony Optimization (EACO) for cloud load balancing efficiency.
+                      </p>
                     </div>
                   </div>
-                  
                 </div>
               </motion.div>
             </motion.div>

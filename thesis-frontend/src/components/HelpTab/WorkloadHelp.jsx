@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Code,
   Info,
+  Network,
 } from "lucide-react";
 
 const WorkloadHelp = () => {
@@ -21,12 +22,12 @@ const WorkloadHelp = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-3 pb-4 border-b border-gray-200"
       >
-        <Upload className="text-[#319694]" size={28} />
+        <Upload className="text-gray-700" size={28} />
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-gray-900">
             Workload Configuration
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-700 mt-1">
             Upload your task data or choose a ready-made dataset to test cloud scheduling.
           </p>
         </div>
@@ -37,28 +38,30 @@ const WorkloadHelp = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-5"
+        className="bg-gray-50 border border-gray-200 rounded-lg p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <Zap className="text-teal-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">Quick Start</h3>
+          <Zap className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">Quick Start</h3>
         </div>
         <ol className="space-y-2 text-sm text-gray-700">
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">1.</span>
             <span>
-              Pick a dataset from our library, upload your own CSV file, or use the default synthetic dataset.
+             <span className="font-semibold"> Pick a dataset from our library </span>, check in workload tab then you can also upload your <span className="font-semibold"> own CSV file </span>, or use the default synthetic dataset.
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">2.</span>
             <span>
-              Set how many tasks to simulate. We recommend 10,000 or fewer for accurate results.
+              Set how many tasks to simulate. <span className="font-semibold"> We recommend 10,000 or fewer </span> for accurate results.
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="font-bold text-teal-600">3.</span>
-            <span>Click "Run Simulation" to start.</span>
+            <span>
+              Click <span className="font-semibold"> "Run Simulation" </span> to start.
+            </span>
           </li>
         </ol>
       </motion.div>
@@ -71,8 +74,8 @@ const WorkloadHelp = () => {
         className="bg-white rounded-lg border border-gray-200 p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <FileText className="text-[#319694]" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">
+          <FileText className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">
             Supported File Formats
           </h3>
         </div>
@@ -82,10 +85,11 @@ const WorkloadHelp = () => {
 
         <div className="space-y-4">
           {/* Google Format */}
-          <div className="bg-blue-50 border border-blue-200 rounded p-4">
-            <p className="text-sm font-semibold text-gray-800 mb-2">
-              Google Cluster Format
-            </p>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Database size={16} className="text-gray-600" />
+              <span className="font-medium text-gray-900">Google Cluster Format</span>
+            </div>
             <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">
                 cpu_request,pes_number,file_size,output_size,arrival_ts
@@ -98,15 +102,22 @@ const WorkloadHelp = () => {
               </div>
             </div>
             <p className="text-sm text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> CPU usage (0 to 1), cores needed (1-8), file size, output size, and arrival time (optional).
+              <span className="font-medium">Fields:</span> CPU usage (0 to 1), cores needed (1-8), <strong className="font-semibold">file size (network input data)</strong>, <strong className="font-semibold">output size (network output data)</strong>, and arrival time (optional).
             </p>
+            <div className="flex items-start gap-2 mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+              <Network size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-gray-700">
+                <strong className="font-medium">Network support:</strong> file_size and output_size represent data transfer requirements in normalized [0-1] range.
+              </p>
+            </div>
           </div>
 
           {/* Standard Format */}
-          <div className="bg-green-50 border border-green-200 rounded p-4">
-            <p className="text-sm font-semibold text-gray-800 mb-2">
-              Standard CloudSim Format (Normalized)
-            </p>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Code size={16} className="text-gray-600" />
+              <span className="font-medium text-gray-900">Standard CloudSim Format (Normalized)</span>
+            </div>
             <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">
                 length,pes,file_size,output_size
@@ -116,15 +127,22 @@ const WorkloadHelp = () => {
               <div className="text-gray-800">20000,1,0.5,0.4</div>
             </div>
             <p className="text-sm text-gray-600 mt-2">
-              <span className="font-medium">Fields:</span> task length in MI (minimum 1000), cores needed (1-8), file size, and output size.
+              <span className="font-medium">Fields:</span> task length in MI (minimum 1000), cores needed (1-8), <strong className="font-semibold">file size (network ingress)</strong>, and <strong className="font-semibold">output size (network egress)</strong>.
             </p>
+            <div className="flex items-start gap-2 mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+              <Network size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-gray-700">
+                <strong className="font-medium">Network modeling:</strong> These values represent data transferred to/from VMs over the network.
+              </p>
+            </div>
           </div>
 
           {/* Simple Format */}
-          <div className="bg-purple-50 border border-purple-200 rounded p-4">
-            <p className="text-sm font-semibold text-gray-800 mb-2">
-              Minimal Format (Auto-filled defaults)
-            </p>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText size={16} className="text-gray-600" />
+              <span className="font-medium text-gray-900">Minimal Format (Auto-filled defaults)</span>
+            </div>
             <div className="bg-white rounded p-3 font-mono text-sm overflow-x-auto">
               <div className="text-gray-600">length</div>
               <div className="text-gray-800">10000</div>
@@ -146,8 +164,8 @@ const WorkloadHelp = () => {
         className="bg-white rounded-lg border border-gray-200 p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <Clock className="text-[#319694]" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">
+          <Clock className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">
             Submission Modes
           </h3>
         </div>
@@ -161,7 +179,8 @@ const WorkloadHelp = () => {
               Instant Submission
             </p>
             <p className="text-sm text-gray-600 mb-2">
-              All tasks arrive at time zero. This works well for testing.
+              All tasks arrive at time zero.
+              This works well for testing.
             </p>
             <p className="text-sm text-gray-600 italic">
               Best for: Comparing how algorithms perform.
@@ -173,7 +192,8 @@ const WorkloadHelp = () => {
               Gradual Submission
             </p>
             <p className="text-sm text-gray-600 mb-2">
-              Tasks arrive at different times using your timestamps. More realistic.
+              Tasks arrive at different times using your timestamps.
+              More realistic.
             </p>
             <p className="text-sm text-gray-600 italic">
               Best for: Real-world testing with changing workloads.
@@ -190,20 +210,21 @@ const WorkloadHelp = () => {
         className="bg-white rounded-lg border border-gray-200 p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <Database className="text-[#319694]" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">
+          <Database className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">
             Google Cluster Workload Presets
           </h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          We provide 30 ready-made datasets from real Google servers. Pick one from the "Research Benchmark Dataset" dropdown.
+          We provide 30 ready-made datasets from real Google servers.
+          Pick one from the "Research Benchmark Dataset" dropdown.
         </p>
 
         <div className="space-y-3">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Database className="text-blue-600" size={18} />
-              <span className="text-sm font-semibold text-blue-800">
+              <Database className="text-gray-700" size={18} />
+              <span className="text-sm font-medium text-gray-900">
                 Google Cluster Subsets 1-30
               </span>
             </div>
@@ -225,16 +246,16 @@ const WorkloadHelp = () => {
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span>Varying task counts suitable for different scales</span>
+                <span>Varying task counts suitable for different scales.</span>
               </li>
             </ul>
           </div>
 
-          <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg">
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
             <div className="flex items-start gap-2">
-              <Info className="text-teal-600 mt-0.5 flex-shrink-0" size={16} />
+              <Info className="text-gray-700 mt-0.5 flex-shrink-0" size={16} />
               <div className="text-sm text-gray-700">
-                <strong className="text-teal-700">How to use:</strong> Select any preset from 1-30 in the dropdown above.
+                <strong className="font-medium">How to use:</strong> Select any preset from 1-30 in the dropdown above.
                 Each subset provides a different mix of task characteristics for testing your scheduling algorithms.
               </div>
             </div>
@@ -250,8 +271,8 @@ const WorkloadHelp = () => {
         className="bg-white rounded-lg border border-gray-200 p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <AlertCircle className="text-[#319694]" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">Common Issues</h3>
+          <AlertCircle className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">Common Issues</h3>
         </div>
 
         <div className="space-y-3">
@@ -274,14 +295,14 @@ const WorkloadHelp = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="bg-red-50 border border-red-200 rounded p-3"
+              className="border border-gray-200 rounded-lg p-3"
             >
-              <p className="text-sm font-medium text-gray-800">
+              <p className="text-sm font-medium text-gray-900">
                 {item.problem}
               </p>
               <p className="text-sm text-gray-700 mt-1">{item.solution}</p>
-              <p className="text-sm text-gray-600 mt-1 italic">
-                Example: {item.example}
+              <p className="text-sm text-gray-600 mt-1">
+                <strong className="font-medium">Example:</strong> {item.example}
               </p>
             </div>
           ))}
@@ -296,37 +317,80 @@ const WorkloadHelp = () => {
         className="bg-white rounded-lg border border-gray-200 p-5"
       >
         <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="text-[#319694]" size={20} />
-          <h3 className="text-lg font-semibold text-gray-800">Key Terms</h3>
+          <BookOpen className="text-gray-700" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">Key Terms</h3>
         </div>
 
         <div className="grid md:grid-cols-2 gap-3">
           {[
-            { term: "Cloudlet", def: "A task or job to be executed on a VM" },
+            { 
+              term: "Cloudlet", 
+              def: (
+                <>
+                  A <span className="font-semibold">task or job</span> to be executed on a VM.
+                </>
+              )
+            },
             {
               term: "MI (Million Instructions)",
-              def: "Measure of computational work required",
+              def: (
+                <>
+                  Measure of <span className="font-semibold">computational work</span> required.
+                </>
+              )
             },
             {
               term: "Length",
-              def: "Number of instructions a task needs to complete",
+              def: (
+                <>
+                  Number of <span className="font-semibold">instructions</span> a task needs to complete.
+                </>
+              )
             },
             {
               term: "PEs",
-              def: "Processing Elements (CPU cores) needed by task",
+              def: (
+                <>
+                  <span className="font-semibold">Processing Elements (CPU cores)</span> needed by task.
+                </>
+              )
             },
             {
               term: "Timestamp",
-              def: "When a task arrives in the system (seconds)",
+              def: (
+                <>
+                  When a task <span className="font-semibold">arrives in the system</span> (seconds).
+                </>
+              )
             },
             {
               term: "Priority",
-              def: "Task importance level (higher = more urgent)",
+              def: (
+                <>
+                  Task importance level (<span className="font-semibold">higher = more urgent</span>).
+                </>
+              )
+            },
+            {
+              term: "File Size (Network Input)",
+              def: (
+                <>
+                  Data transferred <span className="font-semibold">TO the VM</span> before execution (network ingress).
+                </>
+              )
+            },
+            {
+              term: "Output Size (Network Output)",
+              def: (
+                <>
+                  Data transferred <span className="font-semibold">FROM the VM</span> after execution (network egress).
+                </>
+              )
             },
           ].map((item, idx) => (
-            <div key={idx} className="bg-gray-50 rounded p-3">
-              <p className="text-sm font-semibold text-gray-800">{item.term}</p>
-              <p className="text-sm text-gray-600 mt-1">{item.def}</p>
+            <div key={idx} className="border border-gray-200 rounded-lg p-3">
+              <p className="text-sm font-medium text-gray-900">{item.term}</p>
+              <p className="text-sm text-gray-700 mt-1">{item.def}</p>
             </div>
           ))}
         </div>
