@@ -60,20 +60,12 @@ const PresetSelector = ({
         iconColor: "text-purple-600",
       },
       "10k-tasks": {
-        title: windowWidth < 768 ? "10K" : "Large Scale (10K)",
+        title: windowWidth < 768 ? "10K" : "Research Scale (10K)",
         description:
           windowWidth < 500 ? "Real scenario" : "Real-world test",
         taskCount: "10,000",
         icon: Building2,
         iconColor: "text-orange-600",
-      },
-      "20k-tasks": {
-        title: windowWidth < 768 ? "20K" : "Enterprise (20K)",
-        description:
-          windowWidth < 500 ? "Stress test" : "Test at scale",
-        taskCount: "20,000",
-        icon: Globe,
-        iconColor: "text-green-600",
       },
     };
     return presetData[presetKey] || {};

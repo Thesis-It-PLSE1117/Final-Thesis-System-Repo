@@ -8,18 +8,9 @@ import {
   HardDrive,
   Server,
   Gauge,
-  HardDriveDownload,
-  HardDriveUpload,
   Disc,
-  Play,
   MoreHorizontal,
-  ChevronDown,
-  ChevronRight,
-  Settings,
-  ChevronUp,
-  X,
 } from "lucide-react";
-import ConfigSection from "./ConfigurationPanel";
 import InputField from "./InputField";
 import VMCard from "./VMCard";
 import HostCard from "./HostCard";

@@ -69,22 +69,7 @@ export const PRESET_CONFIGS = {
     vmScheduler: "TimeShared",
     optimizationAlgorithm: "EACO"
   },
-  '20k-tasks': {
-    numHosts: 80,
-    numPesPerHost: 12,
-    peMips: 3500,
-    ramPerHost: 16384,
-    bwPerHost: 40000,
-    storagePerHost: 1000000,
-    numVMs: 200,
-    vmMips: 2000,
-    vmPes: 4,
-    vmRam: 4096,
-    vmBw: 4000,
-    vmSize: 40000,
-    vmScheduler: "TimeShared",
-    optimizationAlgorithm: "EACO"
-  }
+
 };
 
 export const DEFAULT_CLOUDLET_COUNT = 100;

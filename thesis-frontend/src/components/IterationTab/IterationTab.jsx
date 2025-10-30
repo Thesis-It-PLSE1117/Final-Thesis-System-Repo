@@ -13,7 +13,7 @@ import {
 
 const IterationTab = ({ config, onChange }) => {
   const handleIterationChange = (value) => {
-    const iterations = Math.max(1, Math.min(100, parseInt(value) || 1));
+    const iterations = Math.max(1, Math.min(50, parseInt(value) || 1));
     onChange({ iterations });
   };
 
@@ -41,87 +41,90 @@ const IterationTab = ({ config, onChange }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of Iterations
-            </label>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Iterations
+              </label>
 
-            {/* Quick Select Presets */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleIterationChange(1)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  (config.iterations || 1) === 1
-                    ? "bg-[#319694] text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
-                }`}
-              >
-                <Zap size={14} />
-                <span>Single (1)</span>
-              </motion.button>
+              {/* Quick Select Presets */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleIterationChange(1)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    (config.iterations || 1) === 1
+                      ? "bg-[#319694] text-white shadow-md"
+                      : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
+                  }`}
+                >
+                  <Zap size={14} />
+                  <span>Single (1)</span>
+                </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleIterationChange(30)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  (config.iterations || 1) === 30
-                    ? "bg-[#319694] text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
-                }`}
-              >
-                <FlaskConical size={14} />
-                <span>Testing (30)</span>
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleIterationChange(30)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    (config.iterations || 1) === 30
+                      ? "bg-[#319694] text-white shadow-md"
+                      : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
+                  }`}
+                >
+                  <FlaskConical size={14} />
+                  <span>Testing (30)</span>
+                </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleIterationChange(50)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  (config.iterations || 1) === 50
-                    ? "bg-[#319694] text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
-                }`}
-              >
-                <GraduationCap size={14} />
-                <span>Research (50)</span>
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleIterationChange(50)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    (config.iterations || 1) === 50
+                      ? "bg-[#319694] text-white shadow-md"
+                      : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
+                  }`}
+                >
+                  <GraduationCap size={14} />
+                  <span>Research (50)</span>
+                </motion.button>
+              </div>
+
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={config.iterations || 1}
+                onChange={(e) => handleIterationChange(e.target.value)}
+                placeholder="1"
+                disabled
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#319694] focus:border-transparent bg-gray-100 cursor-not-allowed"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Pick 1 to 50 runs. We recommend 30 or more for research.
+              </p>
             </div>
-
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={config.iterations || 1}
-              onChange={(e) => handleIterationChange(e.target.value)}
-              placeholder="1"
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#319694] focus:border-transparent bg-gray-100 cursor-not-allowed"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              Pick 1 to 100 runs. We recommend 30 or more for research.
-            </p>
           </div>
 
-          <div className="flex items-center">
-            <div className="bg-[#319694]/5 border border-[#319694]/20 rounded-lg p-4 w-full">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="text-[#319694]" size={16} />
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
+          {/* Status Card - Fixed Alignment */}
+          <div className="flex flex-col justify-center">
+            <div className="bg-[#319694]/5 border border-[#319694]/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="text-[#319694] mt-0.5 flex-shrink-0" size={18} />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">
                     {(config.iterations || 30) > 1
-                      ? "Multiple Runs"
-                      : "Single Run"}
+                      ? "Multiple Runs Selected"
+                      : "Single Run Selected"}
                   </p>
-                  <p className="text-sm text-gray-600 mt-0.5">
+                  <p className="text-sm text-gray-600 mt-1 leading-relaxed">
                     {(config.iterations || 30) === 1
-                      ? "Fast test mode."
+                      ? "Fast test mode for quick comparisons."
                       : (config.iterations || 30) >= 30
                         ? "Statistical analysis available."
-                        : `${config.iterations} runs selected.`}
+                        : `${config.iterations} runs for basic averaging.`}
                   </p>
                 </div>
               </div>
@@ -212,8 +215,21 @@ const IterationTab = ({ config, onChange }) => {
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
+                  <strong>Data Normality Analysis:</strong> Provide recommendations on which test to look at.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
+                <span>
                   <strong>Paired T-Test:</strong> Statistical significance
-                  analysis with p-values and t-statistics.
+                  analysis with p-values and t-statistics on assumed normal data.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
+                <span>
+                  <strong>Wilcoxon Signed-Rank Test:</strong> Statistical significance
+                  analysis on non normal data.
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -287,10 +303,10 @@ const IterationTab = ({ config, onChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">
-              Quick Test (30 iterations)
+              Quick Test (1 iteration)
             </p>
             <p className="text-gray-600">
-              Provides statistical analysis with paired t-tests.
+              Provides individual algorithmic analysis for each algorithm.
             </p>
           </div>
           <div className="bg-white rounded-lg p-3">
@@ -298,12 +314,12 @@ const IterationTab = ({ config, onChange }) => {
               Research (30-50 iterations)
             </p>
             <p className="text-gray-600">
-              Generates reliable t-test results for academic work.
+              Generates reliable results for academic work.
             </p>
           </div>
           <div className="bg-white rounded-lg p-3">
             <p className="font-medium text-[#319694]">
-              Publication (50-100 iterations)
+              Publication (50 iterations)
             </p>
             <p className="text-gray-600">
               Delivers high-confidence statistical validation.
