@@ -70,17 +70,6 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
         </div>
       )}
 
-      {!enabled && isToggleable && (
-        <div className="mt-3">
-          <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
-            <Info className="text-gray-500" size={16} />
-            <span className="text-sm text-gray-700">
-              Using default configuration: {defaultValue} cloudlets
-            </span>
-          </div>
-        </div>
-      )}
-
       {!hasWorkload && !enabled && (
         <div className="mt-3">
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">

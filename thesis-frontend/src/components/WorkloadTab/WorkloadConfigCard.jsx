@@ -111,16 +111,6 @@ const WorkloadConfigCard = ({
               </motion.p>
             )
           )}
-          {!isDisabled && !hasWorkload && (
-            <motion.p
-              className="text-sm text-blue-500 mt-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Custom cloudlet configuration enabled
-            </motion.p>
-          )}
         </motion.div>
 
         <motion.div variants={itemVariants}>
