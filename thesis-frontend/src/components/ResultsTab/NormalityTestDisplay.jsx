@@ -66,7 +66,7 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
                 Normality Assessment
               </h3>
               <p className="text-sm text-gray-600 mt-1">
-                Anderson-Darling test applied to all metrics
+                Anderson-Darling test applied to all metrics.
               </p>
             </div>
           </div>

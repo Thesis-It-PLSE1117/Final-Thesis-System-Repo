@@ -87,51 +87,14 @@ const CloudLoadingModal = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const estimateRemainingTime = () => {
-    // Use backend ETA if available
-    if (eta && eta > 0) {
-      return `Approximately ${formatTime(eta)} remaining`;
+  const getIterationBasedEta = () => {
+    if (actualCurrentIteration === 0 || iterations <= 1) {
+      return null;
     }
-
-    if (overallProgress === 0 || elapsedTime === 0) {
-      if (isLargeTaskSet) {
-        const baseTimePerTask = 0.12;
-        const iterationMultiplier = isMultipleIterations ? iterations : 1;
-        const totalEstimatedSeconds =
-          effectiveTaskCount * baseTimePerTask * iterationMultiplier;
-
-        const overhead = isMultipleIterations ? totalEstimatedSeconds * 0.3 : 0;
-        const finalEstimate = totalEstimatedSeconds + overhead;
-
-        const estimatedMinutes = Math.ceil(finalEstimate / 60);
-        return `Estimated time: ${estimatedMinutes} minutes for ${effectiveTaskCount.toLocaleString()} tasks${isMultipleIterations ? ` × ${iterations} iterations` : ""}`;
-      } else if (isMultipleIterations) {
-        const estimatedMinutes = Math.ceil((iterations * 30) / 60); // ~30 seconds per iteration
-        return `Estimated time: ${estimatedMinutes} minutes for ${iterations} iterations`;
-      }
-      return "Estimating time...";
-    }
-
-    const safeProgress = Math.min(overallProgress, 85);
-    const estimatedTotal = (elapsedTime / safeProgress) * 100;
-    let remaining = Math.max(0, estimatedTotal - elapsedTime);
-
-    if (isLargeTaskSet) {
-      const conservativeBuffer = 1.4;
-      remaining = remaining * conservativeBuffer;
-
-      if (isMultipleIterations && actualCurrentIteration < iterations) {
-        const iterationsLeft = iterations - actualCurrentIteration;
-        const avgTimePerIteration =
-          elapsedTime / Math.max(1, actualCurrentIteration);
-        const iterationTimeRemaining = iterationsLeft * avgTimePerIteration;
-        remaining = Math.max(remaining, iterationTimeRemaining);
-      }
-
-      return `Approximately ${formatTime(Math.round(remaining))} remaining`;
-    }
-
-    return `Approximately ${formatTime(Math.round(remaining))} remaining`;
+    
+    const avgTimePerIteration = elapsedTime / actualCurrentIteration;
+    const remainingIterations = iterations - actualCurrentIteration;
+    return Math.round(avgTimePerIteration * remainingIterations);
   };
 
   const tips = [
@@ -257,12 +220,13 @@ const CloudLoadingModal = ({
             />
           </div>
 
-          {/* Enhanced ETA Display */}
-          <div className="flex justify-center items-center mt-1.5">
-            <div className="text-sm text-gray-600">
-              {estimateRemainingTime()}
+          {getIterationBasedEta() !== null && (
+            <div className="flex justify-center items-center mt-1.5">
+              <div className="text-sm text-gray-600">
+                Approximately {formatTime(getIterationBasedEta())} remaining
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
