@@ -174,17 +174,30 @@ const CloudLoadingModal = ({
         transition={{ type: "spring", damping: 15 }}
         className="relative bg-white rounded-xl p-5 max-w-md w-full mx-4 shadow-2xl border border-gray-100"
       >
+        {isAborting && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl z-10 flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-red-500 border-t-transparent"></div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-lg font-semibold text-gray-800">Cancelling Simulation</h4>
+                <p className="text-sm text-gray-600">Please wait while the simulation stops...</p>
+              </div>
+            </div>
+          </div>
+        )}
         {canAbort && (
           <motion.button
             onClick={onAbort}
             disabled={isAborting}
-            className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-[#319694] hover:bg-gray-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             title={isAborting ? "Stopping simulation..." : "Stop simulation"}
           >
             {isAborting ? (
-              <div className="animate-spin motion-reduce:animate-none rounded-full h-3.5 w-3.5 border-2 border-[#319694] border-t-transparent" />
+              <div className="animate-spin motion-reduce:animate-none rounded-full h-3.5 w-3.5 border-2 border-red-500 border-t-transparent" />
             ) : (
               <X size={ICON_SIZES.sm} />
             )}
