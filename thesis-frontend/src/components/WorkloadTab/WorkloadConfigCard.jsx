@@ -124,11 +124,11 @@ const WorkloadConfigCard = ({
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <FileText size={18} className="text-[#319694]" />
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <FileText size={18} className="text-[#319694] inline mr-2" />
             Research Benchmark Dataset
-            <span className="text-sm text-gray-500 font-normal">
-              (Google cluster workload traces)
+            <span className="text-sm text-gray-500 font-normal ml-1">
+              (Google cluster traces)
             </span>
           </label>
           <select

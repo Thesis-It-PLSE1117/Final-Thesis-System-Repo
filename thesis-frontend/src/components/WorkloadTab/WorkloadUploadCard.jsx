@@ -190,7 +190,7 @@ const WorkloadUploadCard = ({
                 Upload Custom Workload
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Upload your CSV file with task data.
+                Upload your CSV file with task data (e.g. traffic model).
               </p>
             </div>
           </div>
