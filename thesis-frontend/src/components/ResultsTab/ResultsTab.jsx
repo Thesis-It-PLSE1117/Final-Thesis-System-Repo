@@ -28,7 +28,10 @@ import { normalizeData, getSummaryData } from "./utils";
 import ImageModal from "../modals/ImageModal";
 import PlotWithInterpretation from "./PlotWithInterpretation";
 import EChartsVisualization from "../ECharts/EChartsVisualization";
-import { validateEChartsData, logDataStructure } from "../../utils/echartsDataValidator";
+import {
+  validateEChartsData,
+  logDataStructure,
+} from "../../utils/echartsDataValidator";
 import { FEATURES } from "../../config/features";
 
 const ResultsTab = ({
@@ -39,11 +42,11 @@ const ResultsTab = ({
   plotData,
   plotsGenerating,
 }) => {
-  console.log('[DEBUG] ResultsTab props received:', {
+  console.log("[DEBUG] ResultsTab props received:", {
     eacoHasTTest: !!eacoResults?.ttestResults,
     epsoHasTTest: !!epsoResults?.ttestResults,
     eacoNormality: eacoResults?.ttestResults?.normalityTests,
-    epsoNormality: epsoResults?.ttestResults?.normalityTests
+    epsoNormality: epsoResults?.ttestResults?.normalityTests,
   });
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
@@ -62,7 +65,7 @@ const ResultsTab = ({
     eaco: {},
     epso: {},
   });
-  const [activeStatisticalTest, setActiveStatisticalTest] = useState('ttest');
+  const [activeStatisticalTest, setActiveStatisticalTest] = useState("ttest");
 
   // Check if this is a single iteration run
   const isSingleIteration = React.useMemo(() => {
@@ -91,10 +94,10 @@ const ResultsTab = ({
     (plotData.eaco?.plotPaths?.length > 0 ||
       plotData.epso?.plotPaths?.length > 0);
   const matlabPlotsExpected = plotsGenerating === true || hasMatlabPlots;
-  
-  const hasRawResultsForECharts = 
-    eacoResults?.rawResults?.summary && 
-    epsoResults?.rawResults?.summary && 
+
+  const hasRawResultsForECharts =
+    eacoResults?.rawResults?.summary &&
+    epsoResults?.rawResults?.summary &&
     isSingleIteration;
   const shouldUseECharts = !matlabPlotsExpected && hasRawResultsForECharts;
 
@@ -120,15 +123,19 @@ const ResultsTab = ({
       enabled: true,
     },
     // Conditionally include visualizations tab only when available
-    ...(matlabPlotsExpected || shouldUseECharts ? [{
-      id: "visualizations",
-      label: "Visualizations",
-      icon: <FiActivity className="w-4 h-4" />,
-      description: matlabPlotsExpected
-        ? "MATLAB plots and charts"
-        : "Interactive ECharts visualizations",
-      enabled: true,
-    }] : []),
+    ...(matlabPlotsExpected || shouldUseECharts
+      ? [
+          {
+            id: "visualizations",
+            label: "Visualizations",
+            icon: <FiActivity className="w-4 h-4" />,
+            description: matlabPlotsExpected
+              ? "MATLAB plots and charts"
+              : "Interactive ECharts visualizations",
+            enabled: true,
+          },
+        ]
+      : []),
     {
       id: "logs",
       label: "Logs",
@@ -136,12 +143,12 @@ const ResultsTab = ({
       description: "Detailed execution logs",
       enabled: true,
     },
-  ].filter(tab => tab.enabled); // Also filter out any disabled tabs
+  ].filter((tab) => tab.enabled); // also filter out any disabled tabs
 
   useEffect(() => {
     const hasAutoSwitched = sessionStorage.getItem("results-tab-auto-switched");
 
-    // For single iteration runs, always show analysis tab first
+    // for single iteration runs, always show analysis tab first
     if (isSingleIteration && activeTab === "metadata" && !hasAutoSwitched) {
       setActiveTab("analysis");
       sessionStorage.setItem("results-tab-auto-switched", "true");
@@ -149,8 +156,10 @@ const ResultsTab = ({
     // For multi-iteration runs with T-test results, show analysis tab
     else if (
       !isSingleIteration &&
-      (eacoResults?.tTestResults || eacoResults?.ttestResults || 
-       epsoResults?.tTestResults || epsoResults?.ttestResults) &&
+      (eacoResults?.tTestResults ||
+        eacoResults?.ttestResults ||
+        epsoResults?.tTestResults ||
+        epsoResults?.ttestResults) &&
       activeTab === "metadata" &&
       !hasAutoSwitched
     ) {
@@ -158,7 +167,11 @@ const ResultsTab = ({
       sessionStorage.setItem("results-tab-auto-switched", "true");
     }
 
-    if (activeTab === "visualizations" && !matlabPlotsExpected && !shouldUseECharts) {
+    if (
+      activeTab === "visualizations" &&
+      !matlabPlotsExpected &&
+      !shouldUseECharts
+    ) {
       setActiveTab("analysis");
     }
   }, [
@@ -339,54 +352,69 @@ const ResultsTab = ({
   const rrSummary = getSummaryData(resultsRR);
   const epsoSummary = getSummaryData(resultsEPSO);
   const hasTTest = !!(
-    eacoResults?.tTestResults || eacoResults?.ttestResults || 
-    epsoResults?.tTestResults || epsoResults?.ttestResults
+    eacoResults?.tTestResults ||
+    eacoResults?.ttestResults ||
+    epsoResults?.tTestResults ||
+    epsoResults?.ttestResults
   );
-  const hasWilcoxon = FEATURES.ENABLE_WILCOXON && !!(
-    eacoResults?.wilcoxonTestResults ||
-    epsoResults?.wilcoxonTestResults ||
-    eacoResults?.wilcoxonResults ||
-    epsoResults?.wilcoxonResults ||
-    eacoResults?.wilcoxonTests ||
-    epsoResults?.wilcoxonTests
-  );
-  
-  console.log('[DEBUG] Checking eacoResults structure:', {
+  const hasWilcoxon =
+    FEATURES.ENABLE_WILCOXON &&
+    !!(
+      eacoResults?.wilcoxonTestResults ||
+      epsoResults?.wilcoxonTestResults ||
+      eacoResults?.wilcoxonResults ||
+      epsoResults?.wilcoxonResults ||
+      eacoResults?.wilcoxonTests ||
+      epsoResults?.wilcoxonTests
+    );
+
+  console.log("[DEBUG] Checking eacoResults structure:", {
     hasEaco: !!eacoResults,
     eacoKeys: eacoResults ? Object.keys(eacoResults) : null,
     hasTTestResults: !!eacoResults?.tTestResults,
     hasttestResults: !!eacoResults?.ttestResults,
-    ttestResultsKeys: eacoResults?.ttestResults ? Object.keys(eacoResults.ttestResults) : null,
-    hasNormalityInTtest: !!eacoResults?.ttestResults?.normalityTests
+    ttestResultsKeys: eacoResults?.ttestResults
+      ? Object.keys(eacoResults.ttestResults)
+      : null,
+    hasNormalityInTtest: !!eacoResults?.ttestResults?.normalityTests,
   });
-  
-  const tTestResults = eacoResults?.tTestResults || eacoResults?.ttestResults || 
-                        epsoResults?.tTestResults || epsoResults?.ttestResults;
-  
-  console.log('[DEBUG] tTestResults selected:', {
+
+  const tTestResults =
+    eacoResults?.tTestResults ||
+    eacoResults?.ttestResults ||
+    epsoResults?.tTestResults ||
+    epsoResults?.ttestResults;
+
+  console.log("[DEBUG] tTestResults selected:", {
     tTestResults,
     hasNormalityTests: !!tTestResults?.normalityTests,
-    normalityTestsKeys: tTestResults?.normalityTests ? Object.keys(tTestResults.normalityTests) : null
+    normalityTestsKeys: tTestResults?.normalityTests
+      ? Object.keys(tTestResults.normalityTests)
+      : null,
   });
-  
+
   const rawNormalityTests = tTestResults?.normalityTests;
-  
-  const hasNormalityTests = !!(rawNormalityTests && Object.keys(rawNormalityTests).length > 0);
-  
-  const normalityTests = rawNormalityTests ? Object.fromEntries(
-    Object.entries(rawNormalityTests).map(([key, test]) => [
-      key,
-      {
-        ...test,
-        isNormal: test.isNormal ?? test.normal ?? false,
-        pValue: test.pValue ?? test.pvalue
-      }
-    ])
-  ) : null;
-  
+
+  const hasNormalityTests = !!(
+    rawNormalityTests && Object.keys(rawNormalityTests).length > 0
+  );
+
+  const normalityTests = rawNormalityTests
+    ? Object.fromEntries(
+        Object.entries(rawNormalityTests).map(([key, test]) => [
+          key,
+          {
+            ...test,
+            isNormal: test.isNormal ?? test.normal ?? false,
+            pValue: test.pValue ?? test.pvalue,
+          },
+        ]),
+      )
+    : null;
+
   const normalityAnalysis = tTestResults?.interpretation?.normalityAnalysis;
-  
-  console.log('[DEBUG] Normality tests data:', {
+
+  console.log("[DEBUG] Normality tests data:", {
     hasNormalityTests,
     rawNormalityTests,
     normalizedTests: normalityTests,
@@ -395,33 +423,45 @@ const ResultsTab = ({
     epsoHasNormality: !!epsoResults?.tTestResults?.normalityTests,
     tTestResultsKeys: tTestResults ? Object.keys(tTestResults) : null,
     fullTTestResults: tTestResults,
-    eacoTTestKeys: eacoResults?.tTestResults ? Object.keys(eacoResults.tTestResults) : null,
-    epsoTTestKeys: epsoResults?.tTestResults ? Object.keys(epsoResults.tTestResults) : null
+    eacoTTestKeys: eacoResults?.tTestResults
+      ? Object.keys(eacoResults.tTestResults)
+      : null,
+    epsoTTestKeys: epsoResults?.tTestResults
+      ? Object.keys(epsoResults.tTestResults)
+      : null,
   });
-  
-  const normalizedWilcoxonResults = 
+
+  const normalizedWilcoxonResults =
     eacoResults?.wilcoxonTestResults ||
     epsoResults?.wilcoxonTestResults ||
     eacoResults?.wilcoxonResults ||
     epsoResults?.wilcoxonResults ||
     eacoResults?.wilcoxonTests ||
     epsoResults?.wilcoxonTests;
-  
-  console.log('[DEBUG] Raw Wilcoxon data from props:', {
+
+  console.log("[DEBUG] Raw Wilcoxon data from props:", {
     fromEaco: eacoResults?.wilcoxonTests || eacoResults?.wilcoxonTestResults,
     fromEpso: epsoResults?.wilcoxonTests || epsoResults?.wilcoxonTestResults,
     normalized: normalizedWilcoxonResults,
-    eacoKeys: eacoResults ? Object.keys(eacoResults).filter(k => k.toLowerCase().includes('wilcoxon')) : [],
-    epsoKeys: epsoResults ? Object.keys(epsoResults).filter(k => k.toLowerCase().includes('wilcoxon')) : []
+    eacoKeys: eacoResults
+      ? Object.keys(eacoResults).filter((k) =>
+          k.toLowerCase().includes("wilcoxon"),
+        )
+      : [],
+    epsoKeys: epsoResults
+      ? Object.keys(epsoResults).filter((k) =>
+          k.toLowerCase().includes("wilcoxon"),
+        )
+      : [],
   });
-  
-  console.log('[DEBUG] ResultsTab - Test availability check:', {
+
+  console.log("[DEBUG] ResultsTab - Test availability check:", {
     hasTTest,
     hasWilcoxon,
-    eacoKeys: eacoResults ? Object.keys(eacoResults) : 'no eaco',
-    epsoKeys: epsoResults ? Object.keys(epsoResults) : 'no epso',
+    eacoKeys: eacoResults ? Object.keys(eacoResults) : "no eaco",
+    epsoKeys: epsoResults ? Object.keys(epsoResults) : "no epso",
     eacoWilcoxonType: typeof eacoResults?.wilcoxonTestResults,
-    epsoWilcoxonType: typeof epsoResults?.wilcoxonTestResults
+    epsoWilcoxonType: typeof epsoResults?.wilcoxonTestResults,
   });
 
   if (loading)
@@ -567,12 +607,15 @@ const ResultsTab = ({
               <>
                 {/*shown when both tests available */}
                 {(() => {
-                  console.log('[DEBUG] StatisticalTestSelector render decision:', { 
-                    hasTTest, 
-                    hasWilcoxon, 
-                    willRender: hasTTest || hasWilcoxon,
-                    currentActiveTest: activeStatisticalTest
-                  });
+                  console.log(
+                    "[DEBUG] StatisticalTestSelector render decision:",
+                    {
+                      hasTTest,
+                      hasWilcoxon,
+                      willRender: hasTTest || hasWilcoxon,
+                      currentActiveTest: activeStatisticalTest,
+                    },
+                  );
                   // return (hasTTest || hasWilcoxon) && (
                   //   <StatisticalTestSelector
                   //     activeTest={activeStatisticalTest}
@@ -585,11 +628,13 @@ const ResultsTab = ({
 
                 {/* normality test */}
                 {(() => {
-                  console.log('[DEBUG] Normality test render check:', {
+                  console.log("[DEBUG] Normality test render check:", {
                     hasNormalityTests,
-                    normalityTestsKeys: normalityTests ? Object.keys(normalityTests) : null,
+                    normalityTestsKeys: normalityTests
+                      ? Object.keys(normalityTests)
+                      : null,
                     normalityTests,
-                    normalityAnalysis
+                    normalityAnalysis,
                   });
                   return hasNormalityTests && (
                     <NormalityTestDisplay
@@ -600,47 +645,49 @@ const ResultsTab = ({
                 })()}
 
                 {/* T-Test Results */}
-                {hasTTest && activeStatisticalTest === 'ttest' && (
+                {hasTTest && activeStatisticalTest === "ttest" && (
                   <>
                     <PairedTTestDisplay
                       tTestResults={
-                        eacoResults?.tTestResults || eacoResults?.ttestResults || 
-                        epsoResults?.tTestResults || epsoResults?.ttestResults
+                        eacoResults?.tTestResults ||
+                        eacoResults?.ttestResults ||
+                        epsoResults?.tTestResults ||
+                        epsoResults?.ttestResults
                       }
                       comparisonResults={eacoResults || epsoResults}
                       isLoading={false}
                     />
 
                     {/* Individual Iteration Details */}
-                    {eacoResults?.rawResults &&
-                      epsoResults?.rawResults && (
-                        <IterationDetailsDisplay
-                          eacoResults={eacoResults?.rawResults}
-                          epsoResults={epsoResults?.rawResults}
-                        />
-                      )}
+                    {eacoResults?.rawResults && epsoResults?.rawResults && (
+                      <IterationDetailsDisplay
+                        eacoResults={eacoResults?.rawResults}
+                        epsoResults={epsoResults?.rawResults}
+                      />
+                    )}
                   </>
                 )}
 
                 {/*  render if feature is enabled */}
-                {FEATURES.ENABLE_WILCOXON && hasWilcoxon && activeStatisticalTest === 'wilcoxon' && (
-                  <>
-                    {/* <WilcoxonTestDisplay
+                {FEATURES.ENABLE_WILCOXON &&
+                  hasWilcoxon &&
+                  activeStatisticalTest === "wilcoxon" && (
+                    <>
+                      {/* <WilcoxonTestDisplay
                       wilcoxonResults={normalizedWilcoxonResults}
                       comparisonResults={eacoResults || epsoResults}
                       isLoading={false}
                     /> */}
 
-                    {/* Individual Iteration Details */}
-                    {eacoResults?.rawResults &&
-                      epsoResults?.rawResults && (
+                      {/* Individual Iteration Details */}
+                      {eacoResults?.rawResults && epsoResults?.rawResults && (
                         <IterationDetailsDisplay
                           eacoResults={eacoResults?.rawResults}
                           epsoResults={epsoResults?.rawResults}
                         />
                       )}
-                  </>
-                )}
+                    </>
+                  )}
 
                 {/* Statistics Display */}
                 {!hasTTest && eacoResults?.rawResults?.averageMetrics && (
@@ -663,8 +710,10 @@ const ResultsTab = ({
                 ) : // Show fallback ONLY when there are no interpretations, no t-test results,
                 // and no descriptive statistics available
                 !(
-                    eacoResults?.tTestResults || eacoResults?.ttestResults ||
-                    epsoResults?.tTestResults || epsoResults?.ttestResults ||
+                    eacoResults?.tTestResults ||
+                    eacoResults?.ttestResults ||
+                    epsoResults?.tTestResults ||
+                    epsoResults?.ttestResults ||
                     eacoResults?.rawResults?.averageMetrics ||
                     epsoResults?.rawResults?.averageMetrics
                   ) ? (
@@ -895,23 +944,31 @@ const ResultsTab = ({
     if (!hasRawResultsForECharts) return null;
 
     if (import.meta.env.DEV) {
-      const eacoValidation = validateEChartsData(eacoResults.rawResults, 'EACO');
-      const epsoValidation = validateEChartsData(epsoResults.rawResults, 'EPSO');
-      
+      const eacoValidation = validateEChartsData(
+        eacoResults.rawResults,
+        "EACO",
+      );
+      const epsoValidation = validateEChartsData(
+        epsoResults.rawResults,
+        "EPSO",
+      );
+
       if (!eacoValidation.valid || !epsoValidation.valid) {
-        console.error('❌ ECharts data validation failed. Check console for details.');
+        console.error(
+          "❌ ECharts data validation failed. Check console for details.",
+        );
       }
-      
-      logDataStructure(eacoResults.rawResults, 'EACO');
-      logDataStructure(epsoResults.rawResults, 'EPSO');
+
+      logDataStructure(eacoResults.rawResults, "EACO");
+      logDataStructure(epsoResults.rawResults, "EPSO");
     }
 
     const plotTypes = [
-      { type: 'metrics', title: 'Performance Metrics Overview' },
-      { type: 'detailed', title: 'Detailed Performance Analysis' },
-      { type: 'vm_utilization', title: 'VM Resource Utilization' },
-      { type: 'energy', title: 'Energy Consumption Analysis' },
-      { type: 'radar', title: 'Multi-Metric Radar Analysis' }
+      { type: "metrics", title: "Performance Metrics Overview" },
+      { type: "detailed", title: "Detailed Performance Analysis" },
+      { type: "vm_utilization", title: "VM Resource Utilization" },
+      { type: "energy", title: "Energy Consumption Analysis" },
+      { type: "radar", title: "Multi-Metric Radar Analysis" },
     ];
 
     const eacoPlotMetadata = eacoResults?.plotMetadata || [];
@@ -921,24 +978,38 @@ const ResultsTab = ({
       <div className="space-y-8">
         <div className="bg-gradient-to-r from-green-50 to-pink-50 border border-purple-200 rounded-lg p-4 mb-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <svg
+              className="w-5 h-5 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
             <div>
               <p className="text-green-900 font-semibold text-md">
                 Visualizations using Apache ECharts
               </p>
               <p className="text-green-700 text-sm mt-1">
-                Export options available for each chart.
+                Export options available for each chart, you can click the chart
+                for a better view.
               </p>
             </div>
           </div>
         </div>
 
         {plotTypes.map(({ type, title }, index) => {
-          const shouldSkipVMUtil = type === 'vm_utilization' && 
-            (!eacoResults?.rawResults?.vmUtilization || eacoResults.rawResults.vmUtilization.length === 0) &&
-            (!epsoResults?.rawResults?.vmUtilization || epsoResults.rawResults.vmUtilization.length === 0);
+          const shouldSkipVMUtil =
+            type === "vm_utilization" &&
+            (!eacoResults?.rawResults?.vmUtilization ||
+              eacoResults.rawResults.vmUtilization.length === 0) &&
+            (!epsoResults?.rawResults?.vmUtilization ||
+              epsoResults.rawResults.vmUtilization.length === 0);
 
           if (shouldSkipVMUtil) return null;
 
@@ -960,14 +1031,20 @@ const ResultsTab = ({
                   plotTitle={title}
                   algorithm="EACO"
                   rawResults={eacoResults.rawResults}
-                  interpretation={findPlotInterpretation(eacoPlotMetadata, type)}
+                  interpretation={findPlotInterpretation(
+                    eacoPlotMetadata,
+                    type,
+                  )}
                 />
                 <EChartsVisualization
                   plotType={type}
                   plotTitle={title}
                   algorithm="EPSO"
                   rawResults={epsoResults.rawResults}
-                  interpretation={findPlotInterpretation(epsoPlotMetadata, type)}
+                  interpretation={findPlotInterpretation(
+                    epsoPlotMetadata,
+                    type,
+                  )}
                 />
               </div>
             </motion.div>
@@ -1205,8 +1282,10 @@ const ResultsTab = ({
               {/* Badge for T-Test Results on Analysis Tab - Only for multi-iteration */}
               {tab.id === "analysis" &&
                 !isSingleIteration &&
-                (eacoResults?.tTestResults || eacoResults?.ttestResults || 
-                 epsoResults?.tTestResults || epsoResults?.ttestResults) && (
+                (eacoResults?.tTestResults ||
+                  eacoResults?.ttestResults ||
+                  epsoResults?.tTestResults ||
+                  epsoResults?.ttestResults) && (
                   <span className="absolute -top-1 -right-2 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#319694] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-[#319694]"></span>
@@ -1218,8 +1297,10 @@ const ResultsTab = ({
                 {tab.description}
                 {tab.id === "analysis" &&
                   !isSingleIteration &&
-                  (eacoResults?.tTestResults || eacoResults?.ttestResults || 
-                   epsoResults?.tTestResults || epsoResults?.ttestResults) && (
+                  (eacoResults?.tTestResults ||
+                    eacoResults?.ttestResults ||
+                    epsoResults?.tTestResults ||
+                    epsoResults?.ttestResults) && (
                     <span className="block text-[#319694] font-medium mt-1">
                       T-Test results available
                     </span>

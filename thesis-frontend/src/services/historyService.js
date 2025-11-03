@@ -617,15 +617,93 @@ export const exportHistory = async () => {
  */
 export const importHistory = async (backupData) => {
   try {
-    if (!backupData || !backupData.entries) {
+    if (!backupData) {
       throw new Error("Invalid backup data format");
+    }
+
+    let entriesToImport = [];
+
+    if (backupData.entries && Array.isArray(backupData.entries)) {
+      entriesToImport = backupData.entries;
+    } else if (backupData.metadata && backupData.metadata.algorithms) {
+      const timestamp = new Date().toISOString();
+      const baseId = Date.now().toString();
+
+      const eacoMetadata = backupData.metadata.algorithms.EACO;
+      const epsoMetadata = backupData.metadata.algorithms.EPSO;
+
+      if (eacoMetadata) {
+        const eacoRawResults = backupData.eacoResults || {};
+        const eacoSchedulingLog = eacoMetadata.schedulingLog || 
+          (eacoRawResults.individualResults && eacoRawResults.individualResults.length > 0
+            ? eacoRawResults.individualResults[eacoRawResults.individualResults.length - 1]?.schedulingLog || []
+            : []);
+
+        entriesToImport.push({
+          id: `${baseId}-eaco`,
+          baseId,
+          timestamp,
+          algorithm: "EACO",
+          config: backupData.configSnapshot || {},
+          rawResults: eacoRawResults,
+          summary: eacoMetadata.summary || {},
+          energyConsumption: eacoMetadata.energyConsumption || 0,
+          vmUtilization: eacoMetadata.vmUtilization || [],
+          schedulingLog: eacoSchedulingLog,
+          analysis: eacoMetadata.analysis || null,
+          plotAnalysis: eacoMetadata.plotAnalysis || null,
+          tTestResults: backupData.ttestResults || null,
+          wilcoxonTestResults: null,
+          simulationId: backupData.runId ? `sim#${backupData.runId}` : `sim#${baseId}`,
+          runId: backupData.runId || baseId,
+          seed: backupData.seed || null,
+          configSnapshot: backupData.configSnapshot || {},
+          datasetId: backupData.datasetId || "imported-data",
+        });
+      }
+
+      if (epsoMetadata) {
+        const epsoRawResults = backupData.epsoResults || {};
+        const epsoSchedulingLog = epsoMetadata.schedulingLog || 
+          (epsoRawResults.individualResults && epsoRawResults.individualResults.length > 0
+            ? epsoRawResults.individualResults[epsoRawResults.individualResults.length - 1]?.schedulingLog || []
+            : []);
+
+        entriesToImport.push({
+          id: `${baseId}-epso`,
+          baseId,
+          timestamp,
+          algorithm: "EPSO",
+          config: backupData.configSnapshot || {},
+          rawResults: epsoRawResults,
+          summary: epsoMetadata.summary || {},
+          energyConsumption: epsoMetadata.energyConsumption || 0,
+          vmUtilization: epsoMetadata.vmUtilization || [],
+          schedulingLog: epsoSchedulingLog,
+          analysis: epsoMetadata.analysis || null,
+          plotAnalysis: epsoMetadata.plotAnalysis || null,
+          tTestResults: backupData.ttestResults || null,
+          wilcoxonTestResults: null,
+          simulationId: backupData.runId ? `sim#${backupData.runId}` : `sim#${baseId}`,
+          runId: backupData.runId || baseId,
+          seed: backupData.seed || null,
+          configSnapshot: backupData.configSnapshot || {},
+          datasetId: backupData.datasetId || "imported-data",
+        });
+      }
+    } else {
+      throw new Error("Unrecognized backup format: missing 'entries' or 'metadata' fields");
+    }
+
+    if (entriesToImport.length === 0) {
+      throw new Error("No valid entries found in backup data");
     }
 
     const db = await getDB();
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
-    const entriesToImport = backupData.entries.map((entry) => {
+    const normalizedEntries = entriesToImport.map((entry) => {
       if (!entry.baseId && entry.id) {
         return {
           ...entry,
@@ -635,11 +713,12 @@ export const importHistory = async (backupData) => {
       return entry;
     });
 
-    await Promise.all(entriesToImport.map((entry) => store.add(entry)));
+    await Promise.all(normalizedEntries.map((entry) => store.add(entry)));
 
     await tx.done;
     return true;
   } catch (error) {
+    console.error("Import failed:", error.message);
     return false;
   }
 };
