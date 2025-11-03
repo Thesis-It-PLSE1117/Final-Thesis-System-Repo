@@ -2,8 +2,9 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ReactECharts from 'echarts-for-react';
 import { FiInfo, FiDownload } from 'react-icons/fi';
-import { Dot, Download } from 'lucide-react';
+import { Dot, Download, Maximize2 } from 'lucide-react';
 import PlotInterpretationCard from '../ResultsTab/PlotInterpretationCard';
+import ChartModal from './ChartModal';
 import {
   transformPerformanceMetrics,
   transformDetailedAnalysis,
@@ -22,6 +23,7 @@ const EChartsVisualization = ({
   const [showInterpretation, setShowInterpretation] = useState(true);
   const [chartError, setChartError] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef(null);
   const chartRefsArray = useRef([]);
   const exportMenuRef = useRef(null);
@@ -186,6 +188,13 @@ const EChartsVisualization = ({
             <span className="text-sm text-gray-600">{plotTitle}</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="text-sm px-2 py-1 rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+              title="Expand chart"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
             <div className="relative" ref={exportMenuRef}>
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
@@ -232,7 +241,19 @@ const EChartsVisualization = ({
         </div>
       </div>
 
-      <div className="p-4 bg-white">
+      <div 
+        className="p-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={() => setIsModalOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsModalOpen(true);
+          }
+        }}
+        aria-label="Click to expand chart"
+      >
         {isDetailedAnalysis ? (
           <div className="grid grid-cols-2 gap-6">
             {chartOption.map((option, idx) => (
@@ -241,7 +262,9 @@ const EChartsVisualization = ({
                 ref={(el) => { chartRefsArray.current[idx] = el; }}
                 option={option}
                 style={{ height: '300px', width: '100%' }}
-                opts={{ renderer: 'canvas' }}
+                opts={{ renderer: 'canvas', locale: 'EN' }}
+                notMerge={true}
+                lazyUpdate={true}
               />
             ))}
           </div>
@@ -253,7 +276,9 @@ const EChartsVisualization = ({
                 ref={(el) => { chartRefsArray.current[idx] = el; }}
                 option={option}
                 style={{ height: '350px', width: '100%' }}
-                opts={{ renderer: 'canvas' }}
+                opts={{ renderer: 'canvas', locale: 'EN' }}
+                notMerge={true}
+                lazyUpdate={true}
               />
             ))}
           </div>
@@ -265,10 +290,21 @@ const EChartsVisualization = ({
               height: plotType === 'radar' ? '500px' : plotType === 'vm_utilization' ? '450px' : '400px', 
               width: '100%' 
             }}
-            opts={{ renderer: 'canvas' }}
+            opts={{ renderer: 'canvas', locale: 'EN' }}
+            notMerge={true}
+            lazyUpdate={true}
           />
         )}
       </div>
+
+      <ChartModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        chartOption={chartOption}
+        chartTitle={plotTitle}
+        algorithm={algorithm}
+        isMultiChart={isDetailedAnalysis || isEnergyAnalysis}
+      />
 
       {showInterpretation && hasInterpretation && (
         <div className="p-4 bg-gray-50 border-t border-gray-200">

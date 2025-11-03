@@ -55,15 +55,18 @@ export const transformPerformanceMetrics = (summary, algorithmName) => {
     grid: {
       left: '12%',
       right: '10%',
-      bottom: '15%',
-      top: '15%'
+      bottom: '20%',
+      top: '25%',
+      containLabel: true
     },
     xAxis: {
       type: 'category',
-      data: ['Makespan', 'Response Time', 'Resource Util.', 'Energy Cons.', 'Degree of Imbalance'],
+      data: ['Makespan', 'Response\nTime', 'Resource\nUtil.', 'Energy\nCons.', 'Degree of\nImbalance'],
       axisLabel: {
         color: '#374151',
-        fontSize: 11
+        fontSize: 10,
+        interval: 0,
+        lineHeight: 14
       }
     },
     yAxis: {
@@ -82,22 +85,81 @@ export const transformPerformanceMetrics = (summary, algorithmName) => {
     series: [{
       type: 'bar',
       data: [
-        { value: makespan, itemStyle: { color: COLORS.primary } },
-        { value: responseTime, itemStyle: { color: COLORS.primary } },
-        { value: resourceUtilization, itemStyle: { color: COLORS.success } },
-        { value: energyConsumption, itemStyle: { color: COLORS.warning } },
-        { value: degreeOfImbalance, itemStyle: { color: COLORS.danger } }
+        {
+          value: makespan,
+          itemStyle: { color: COLORS.primary },
+          label: { 
+            show: true, 
+            position: 'top', 
+            formatter: () => formatNumber(makespan),
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#1F2937',
+            distance: 10
+          }
+        },
+        {
+          value: responseTime,
+          itemStyle: { color: COLORS.primary },
+          label: { 
+            show: true, 
+            position: 'top', 
+            formatter: () => formatNumber(responseTime),
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#1F2937',
+            distance: 10
+          }
+        },
+        {
+          value: resourceUtilization,
+          itemStyle: { color: COLORS.success },
+          label: { 
+            show: true, 
+            position: 'top', 
+            formatter: () => formatNumber(resourceUtilization),
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#1F2937',
+            distance: 10
+          }
+        },
+        {
+          value: energyConsumption,
+          itemStyle: { color: COLORS.warning },
+          label: { 
+            show: true, 
+            position: 'top', 
+            formatter: () => formatNumber(energyConsumption),
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#1F2937',
+            distance: 10
+          }
+        },
+        {
+          value: degreeOfImbalance,
+          itemStyle: { color: COLORS.danger },
+          label: { 
+            show: true, 
+            position: 'top', 
+            formatter: () => formatNumber(degreeOfImbalance),
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#1F2937',
+            distance: 10
+          }
+        }
       ],
-      label: {
-        show: true,
-        position: 'top',
-        formatter: (params) => formatNumber(params.value),
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#000'
-      },
-      barWidth: '60%'
-    }]
+      barCategoryGap: '60%',
+      barWidth: '40%',
+      labelLayout: {
+        hideOverlap: false
+      }
+    }],
+    labelLayout: {
+      hideOverlap: false
+    }
   };
 };
 
@@ -120,15 +182,52 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
         trigger: 'axis',
         formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)}s`
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Avg Response Time', 'Makespan'] },
-      yAxis: { type: 'value', name: 'Time (seconds)' },
+      grid: { left: '18%', right: '12%', bottom: '20%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Avg Response\nTime', 'Makespan'],
+        axisLabel: { fontSize: 10, color: '#374151', interval: 0, lineHeight: 14 }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Time (seconds)',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [avgResponseTime, makespan],
+        data: [
+          {
+            value: avgResponseTime,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(avgResponseTime),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          },
+          {
+            value: makespan,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(makespan),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
         itemStyle: { color: COLORS.primary },
-        label: { show: true, position: 'top', formatter: (params) => formatNumber(params.value) }
-      }]
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     },
     {
       title: { text: 'Efficiency Metrics', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
@@ -136,15 +235,52 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
         trigger: 'axis',
         formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)}`
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Resource Util. (%)', 'Throughput'] },
-      yAxis: { type: 'value', name: 'Value' },
+      grid: { left: '18%', right: '12%', bottom: '20%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Resource\nUtil. (%)', 'Throughput'],
+        axisLabel: { fontSize: 10, color: '#374151', interval: 0, lineHeight: 14 }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Value',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [resourceUtilization, throughput],
+        data: [
+          {
+            value: resourceUtilization,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(resourceUtilization),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          },
+          {
+            value: throughput,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(throughput),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
         itemStyle: { color: COLORS.success },
-        label: { show: true, position: 'top', formatter: (params) => formatNumber(params.value) }
-      }]
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     },
     {
       title: { text: 'Energy Consumption', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
@@ -152,15 +288,52 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
         trigger: 'axis',
         formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)} mWh`
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Total Energy', 'Energy/Time'] },
-      yAxis: { type: 'value', name: 'Energy (mWh)' },
+      grid: { left: '18%', right: '12%', bottom: '20%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Total\nEnergy', 'Energy/\nTime'],
+        axisLabel: { fontSize: 10, color: '#374151', interval: 0, lineHeight: 14 }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Energy (mWh)',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [energyDisplay, energyPerTime],
+        data: [
+          {
+            value: energyDisplay,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(energyDisplay),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          },
+          {
+            value: energyPerTime,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(energyPerTime),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
         itemStyle: { color: COLORS.warning },
-        label: { show: true, position: 'top', formatter: (params) => formatNumber(params.value) }
-      }]
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     },
     {
       title: { text: 'Degree of Imbalance', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
@@ -168,15 +341,40 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
         trigger: 'axis',
         formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)}`
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Degree of Imbalance'] },
-      yAxis: { type: 'value', name: 'Value' },
+      grid: { left: '18%', right: '12%', bottom: '20%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Degree of\nImbalance'],
+        axisLabel: { fontSize: 10, color: '#374151', interval: 0, lineHeight: 14 }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Value',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [degreeOfImbalance],
+        data: [
+          {
+            value: degreeOfImbalance,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => formatNumber(degreeOfImbalance),
+              fontSize: 10,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 10
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
         itemStyle: { color: COLORS.danger },
-        label: { show: true, position: 'top', formatter: (params) => formatNumber(params.value) }
-      }]
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     }
   ];
 };
@@ -238,13 +436,15 @@ export const transformVMUtilization = (vmUtilization, algorithmName) => {
         name: 'CPU',
         type: 'bar',
         data: cpuUtil,
-        itemStyle: { color: COLORS.primary }
+        itemStyle: { color: COLORS.primary },
+        label: { show: false }
       },
       {
         name: 'RAM',
         type: 'bar',
         data: ramUtil,
-        itemStyle: { color: COLORS.warning }
+        itemStyle: { color: COLORS.warning },
+        label: { show: false }
       }
     ],
     graphic: [{
@@ -282,21 +482,52 @@ export const transformEnergyAnalysis = (summary, algorithmName) => {
     {
       title: { text: 'Energy Consumption', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
       tooltip: { trigger: 'axis', formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)} mWh` },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Total', 'Per Second'] },
-      yAxis: { type: 'value', name: 'Energy (mWh)' },
+      grid: { left: '18%', right: '12%', bottom: '15%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Total', 'Per Second'],
+        axisLabel: { fontSize: 11, color: '#374151' }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Energy (mWh)',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [energyData1000, energyPerSecond],
+        data: [
+          {
+            value: energyData1000,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => `${formatNumber(energyData1000)} mWh`,
+              fontSize: 11,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 8
+            }
+          },
+          {
+            value: energyPerSecond,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => `${formatNumber(energyPerSecond)} mWh`,
+              fontSize: 11,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 8
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
         itemStyle: { color: COLORS.warning },
-        label: { 
-          show: true, 
-          position: 'top', 
-          formatter: (params) => `${formatNumber(params.value)} mWh`,
-          fontSize: 9,
-          fontWeight: 'bold'
-        }
-      }]
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     },
     {
       title: { text: 'Energy Efficiency', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
@@ -308,24 +539,52 @@ export const transformEnergyAnalysis = (summary, algorithmName) => {
           return `${item.name}: ${formatNumber(item.value)}${unit}`;
         }
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '22%' },
-      xAxis: { type: 'category', data: ['Tasks/Wh', 'mWh/Task'] },
-      yAxis: { type: 'value', name: 'Efficiency' },
+      grid: { left: '18%', right: '12%', bottom: '15%', top: '30%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: ['Tasks/Wh', 'mWh/Task'],
+        axisLabel: { fontSize: 11, color: '#374151' }
+      },
+      yAxis: { 
+        type: 'value', 
+        name: 'Efficiency',
+        nameTextStyle: { fontSize: 11, color: '#374151' },
+        axisLabel: { fontSize: 10, color: '#374151' }
+      },
       series: [{
         type: 'bar',
-        data: [tasksPerWh, mWhPerTask],
-        itemStyle: { color: COLORS.success },
-        label: { 
-          show: true, 
-          position: 'top', 
-          formatter: (params) => {
-            if (params.dataIndex === 0) return `${formatNumber(params.value)} tasks/Wh`;
-            return `${formatNumber(params.value)} mWh/task`;
+        data: [
+          {
+            value: tasksPerWh,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => `${formatNumber(tasksPerWh)} tasks/Wh`,
+              fontSize: 11,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 8
+            }
           },
-          fontSize: 9,
-          fontWeight: 'bold'
-        }
-      }]
+          {
+            value: mWhPerTask,
+            label: { 
+              show: true, 
+              position: 'top', 
+              formatter: () => `${formatNumber(mWhPerTask)} mWh/task`,
+              fontSize: 11,
+              fontWeight: 'bold',
+              color: '#1F2937',
+              distance: 8
+            }
+          }
+        ],
+        barCategoryGap: '50%',
+        barWidth: '45%',
+        itemStyle: { color: COLORS.success },
+        labelLayout: { hideOverlap: false }
+      }],
+      labelLayout: { hideOverlap: false }
     }
   ];
 };
