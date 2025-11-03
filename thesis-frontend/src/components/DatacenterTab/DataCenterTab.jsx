@@ -10,6 +10,7 @@ import {
   Gauge,
   Disc,
   MoreHorizontal,
+  AlertTriangle,
 } from "lucide-react";
 import InputField from "./InputField";
 import VMCard from "./VMCard";
@@ -36,6 +37,20 @@ const DataCenterTab = ({
     distribution: false,
     preview: false,
   });
+  const [warnings, setWarnings] = useState({
+    storagePerHost: false,
+    bwPerHost: false,
+    vmBw: false,
+    vmSize: false,
+  });
+
+  // Default minimum values for storage and bandwidth
+  const defaultMinValues = {
+    storagePerHost: 200000, // MB
+    bwPerHost: 10000, // MBps
+    vmBw: 1000, // MBps
+    vmSize: 10000, // MB
+  };
 
   // Limit the number of displayed hosts and VMs
   const MAX_DISPLAY_HOSTS = 20;
@@ -50,8 +65,36 @@ const DataCenterTab = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
     // Convert empty string to 0 or keep the numeric value
-    const numericValue = value === "" ? 0 : Number(value);
+    let numericValue = value === "" ? 0 : Number(value);
+    
+    // Enforce minimum values - prevent going below defaultMinValues
+    if (defaultMinValues[name] !== undefined) {
+      numericValue = Math.max(numericValue, defaultMinValues[name]);
+      
+      // Show warning if user tried to input a value below minimum
+      if (Number(value) < defaultMinValues[name]) {
+        setWarnings(prev => ({
+          ...prev,
+          [name]: true
+        }));
+        
+        // Clear warning after 3 seconds
+        setTimeout(() => {
+          setWarnings(prev => ({
+            ...prev,
+            [name]: false
+          }));
+        }, 3000);
+      } else {
+        setWarnings(prev => ({
+          ...prev,
+          [name]: false
+        }));
+      }
+    }
+    
     onChange({
       target: {
         name,
@@ -63,6 +106,14 @@ const DataCenterTab = ({
   // Handle preset selection - use the passed applyPreset function or fallback to onChange
   const handlePresetSelect = (presetName) => {
     setPresetDropdownOpen(false);
+    // Clear warnings when applying preset
+    setWarnings({
+      storagePerHost: false,
+      bwPerHost: false,
+      vmBw: false,
+      vmSize: false,
+    });
+    
     if (applyPreset) {
       applyPreset(presetName);
     } else {
@@ -78,6 +129,14 @@ const DataCenterTab = ({
   // Handle clearing preset - use the passed clearPreset function or fallback to onChange
   const handleClearPreset = () => {
     setPresetDropdownOpen(false);
+    // Clear warnings when clearing preset
+    setWarnings({
+      storagePerHost: false,
+      bwPerHost: false,
+      vmBw: false,
+      vmSize: false,
+    });
+    
     if (clearPreset) {
       clearPreset();
     } else {
@@ -257,6 +316,24 @@ const DataCenterTab = ({
     config.vmBw,
   ]);
 
+  // Warning message component
+  const WarningMessage = ({ fieldName }) => (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      className="flex items-center mt-1 p-2 bg-amber-50 border border-amber-200 rounded-md text-amber-700 text-xs"
+    >
+      <AlertTriangle size={14} className="mr-2 flex-shrink-0" />
+      <span>
+        {fieldName === 'storagePerHost' && `Value adjusted to minimum: ${defaultMinValues.storagePerHost}MB`}
+        {fieldName === 'bwPerHost' && `Value adjusted to minimum: ${defaultMinValues.bwPerHost}MBps`}
+        {fieldName === 'vmBw' && `Value adjusted to minimum: ${defaultMinValues.vmBw}MBps`}
+        {fieldName === 'vmSize' && `Value adjusted to minimum: ${defaultMinValues.vmSize}MB`}
+      </span>
+    </motion.div>
+  );
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Sidebar with Preset Configurations */}
@@ -334,26 +411,36 @@ const DataCenterTab = ({
                 icon={MemoryStick}
                 unit="MB"
               />
-              <InputField
-                label="Bandwidth per Host"
-                name="bwPerHost"
-                value={config.bwPerHost}
-                onChange={handleInputChange}
-                type="number"
-                min="1"
-                icon={Network}
-                unit="MBps"
-              />
-              <InputField
-                label="Storage per Host"
-                name="storagePerHost"
-                value={config.storagePerHost}
-                onChange={handleInputChange}
-                type="number"
-                min="1"
-                icon={Disc}
-                unit="MB"
-              />
+              <div>
+                <InputField
+                  label="Bandwidth per Host"
+                  name="bwPerHost"
+                  value={config.bwPerHost}
+                  onChange={handleInputChange}
+                  type="number"
+                  min={defaultMinValues.bwPerHost}
+                  icon={Network}
+                  unit="MBps"
+                />
+                <AnimatePresence>
+                  {warnings.bwPerHost && <WarningMessage fieldName="bwPerHost" />}
+                </AnimatePresence>
+              </div>
+              <div>
+                <InputField
+                  label="Storage per Host"
+                  name="storagePerHost"
+                  value={config.storagePerHost}
+                  onChange={handleInputChange}
+                  type="number"
+                  min={defaultMinValues.storagePerHost}
+                  icon={Disc}
+                  unit="MB"
+                />
+                <AnimatePresence>
+                  {warnings.storagePerHost && <WarningMessage fieldName="storagePerHost" />}
+                </AnimatePresence>
+              </div>
             </div>
           </ConfigurationPanel>
 
@@ -403,26 +490,36 @@ const DataCenterTab = ({
                 icon={MemoryStick}
                 unit="MB"
               />
-              <InputField
-                label="VM Bandwidth"
-                name="vmBw"
-                value={config.vmBw}
-                onChange={handleInputChange}
-                type="number"
-                min="1"
-                icon={Network}
-                unit="MBps"
-              />
-              <InputField
-                label="VM Size"
-                name="vmSize"
-                value={config.vmSize}
-                onChange={handleInputChange}
-                type="number"
-                min="1"
-                icon={Database}
-                unit="MB"
-              />
+              <div>
+                <InputField
+                  label="VM Bandwidth"
+                  name="vmBw"
+                  value={config.vmBw}
+                  onChange={handleInputChange}
+                  type="number"
+                  min={defaultMinValues.vmBw}
+                  icon={Network}
+                  unit="MBps"
+                />
+                <AnimatePresence>
+                  {warnings.vmBw && <WarningMessage fieldName="vmBw" />}
+                </AnimatePresence>
+              </div>
+              <div>
+                <InputField
+                  label="VM Size"
+                  name="vmSize"
+                  value={config.vmSize}
+                  onChange={handleInputChange}
+                  type="number"
+                  min={defaultMinValues.vmSize}
+                  icon={Database}
+                  unit="MB"
+                />
+                <AnimatePresence>
+                  {warnings.vmSize && <WarningMessage fieldName="vmSize" />}
+                </AnimatePresence>
+              </div>
             </div>
           </ConfigurationPanel>
         </div>

@@ -8,12 +8,12 @@ import {
 } from "../../constants/designSystem";
 
 const ConfigRecommendations = {
-  numHosts: "Recommended: 4-8 hosts (start small for testing)",
+  numHosts: "Recommended: 10-20 hosts (start small for testing)",
   numPesPerHost: "Recommended: 4-16 cores per host",
   peMips: "Recommended: 1000-3000 MIPS per core",
   ramPerHost: "Recommended: 8192-32768 MB (8GB-32GB)",
   bwPerHost: "Recommended: 10000-20000 MBps network bandwidth",
-  storagePerHost: "Recommended: 1-2TB (1000000-2000000 MB)",
+  storagePerHost: "Recommended: 200GB-2TB (200000-2000000 MB)",
   numVMs: "Recommended: 10-50 VMs (should exceed host count)",
   vmMips: "Recommended: 500-2000 MIPS (less than host PE MIPS)",
   vmPes: "Recommended: 1-4 virtual CPUs per VM",
