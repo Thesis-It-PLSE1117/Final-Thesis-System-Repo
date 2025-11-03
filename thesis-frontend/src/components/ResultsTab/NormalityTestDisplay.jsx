@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, TrendingUp, Activity, AlertTriangle } from "lucide-react";
+import { FEATURES } from "../../config/features";
 
 const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
   const [expanded, setExpanded] = useState(false);
@@ -24,7 +25,11 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
     (t) => t.isNormal
   ).length;
   const totalCount = Object.keys(normalityTests).length;
-  const preferredTest = normalityAnalysis?.preferredTest || "Unknown";
+  
+  let preferredTest = normalityAnalysis?.preferredTest || "Unknown";
+  if (!FEATURES.ENABLE_WILCOXON && preferredTest.includes("Wilcoxon")) {
+    preferredTest = "Paired T-Test";
+  }
 
   const getTestIcon = (preferredTest) => {
     if (preferredTest.includes("T-Test")) {
@@ -157,7 +162,9 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
                         </h5>
                       </div>
                       <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                        {test.interpretation}
+                        {FEATURES.ENABLE_WILCOXON 
+                          ? test.interpretation 
+                          : test.interpretation?.replace(/Wilcoxon[^.]*\.?/gi, '') || test.interpretation}
                       </p>
                       <div className="flex gap-6 text-sm">
                         <div>
