@@ -296,12 +296,6 @@ const HistoryTab = ({ onBack, onViewResults }) => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {/* Warning message about export limitations */}
-            {history.length > 0 && (
-              <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg border border-red-100">
-                Can't export all history because it's too large.
-              </div>
-            )}
 
             {history.length > 0 && !selectedResult && (
               <div className="bg-green-50 text-green-600 text-sm px-3 py-2 rounded-lg border border-green-100">
