@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, Activity, Info, CheckCircle, AlertTriangle, Layers, Target, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { FEATURES } from "../../config/features";
 
 const StatisticalMethodology = () => {
   const [expandedSection, setExpandedSection] = useState('ttest');
@@ -18,9 +19,11 @@ const StatisticalMethodology = () => {
           <div>
             <h2 className="text-xl font-medium text-gray-900 mb-3">Overview</h2>
             <p className="text-gray-700 mb-4">
-              Two complementary methods validate algorithm performance differences with 95% confidence.
+              {FEATURES.ENABLE_WILCOXON 
+                ? "Two complementary methods validate algorithm performance differences with 95% confidence."
+                : "Paired t-test validates algorithm performance differences with 95% confidence."}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className={`grid grid-cols-1 ${FEATURES.ENABLE_WILCOXON ? 'md:grid-cols-2' : ''} gap-3`}>
               <div className="border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp size={16} className="text-gray-600" />
@@ -28,13 +31,15 @@ const StatisticalMethodology = () => {
                 </div>
                 <p className="text-sm text-gray-600">Parametric • Assumes normality • Compares means</p>
               </div>
-              <div className="border border-gray-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity size={16} className="text-gray-600" />
-                  <span className="font-medium text-gray-900">Wilcoxon Test</span>
+              {FEATURES.ENABLE_WILCOXON && (
+                <div className="border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Activity size={16} className="text-gray-600" />
+                    <span className="font-medium text-gray-900">Wilcoxon Test</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Non-parametric • No assumptions • Compares medians</p>
                 </div>
-                <p className="text-sm text-gray-600">Non-parametric • No assumptions • Compares medians</p>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -184,7 +189,8 @@ const StatisticalMethodology = () => {
         </AnimatePresence>
       </section>
 
-      {/* Wilcoxon Section */}
+      {/* Wilcoxon Section - Only shown if feature is enabled */}
+      {FEATURES.ENABLE_WILCOXON && (
       <section className="border border-gray-200 rounded-lg">
         <button
           onClick={() => toggleSection('wilcoxon')}
@@ -306,49 +312,79 @@ const StatisticalMethodology = () => {
           )}
         </AnimatePresence>
       </section>
+      )}
 
       {/* Test Selection Guidance */}
       <div className="border border-gray-200 rounded-lg p-6">
         <div className="flex items-start gap-3 mb-5">
-          <AlertTriangle className="text-gray-700 flex-shrink-0 mt-1" size={20} />
-          <h3 className="text-lg font-medium text-gray-900">When to Use Which Test?</h3>
+          <Info className="text-gray-700 flex-shrink-0 mt-1" size={20} />
+          <h3 className="text-lg font-medium text-gray-900">
+            {FEATURES.ENABLE_WILCOXON ? "When to Use Which Test?" : "Statistical Test Methodology"}
+          </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {FEATURES.ENABLE_WILCOXON ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3">Use Paired T-Test</h4>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>Normal distribution of differences</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>More powerful with valid assumptions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>Provides narrower confidence intervals</span>
+                </li>
+              </ul>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3">Use Wilcoxon Test</h4>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>Non-normal/skewed distributions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>Presence of outliers</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
+                  <span>Ordinal data or small samples</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        ) : (
           <div className="border border-gray-200 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-3">Use Paired T-Test</h4>
+            <h4 className="font-medium text-gray-900 mb-3">Paired T-Test Analysis</h4>
+            <p className="text-gray-700 mb-3">
+              This system uses <span className="font-semibold">paired t-test analysis</span> to compare EACO and EPSO algorithm performance across multiple iterations.
+            </p>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>Normal distribution of differences</span>
+                <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+                <span>Assumes <span className="font-semibold">normal distribution</span> of performance differences</span>
               </li>
               <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>More powerful with valid assumptions</span>
+                <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+                <span>Compares <span className="font-semibold">mean values</span> across paired observations</span>
               </li>
               <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>Provides narrower confidence intervals</span>
+                <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+                <span>Tests statistical significance at <span className="font-semibold">α = 0.05</span> (95% confidence)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
+                <span>Provides <span className="font-semibold">Cohen's d</span> effect size for practical significance</span>
               </li>
             </ul>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-3">Use Wilcoxon Test</h4>
-            <ul className="space-y-2 text-gray-700">
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>Non-normal/skewed distributions</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>Presence of outliers</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0"></div>
-                <span>Ordinal data or small samples</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -358,11 +394,13 @@ const StatisticalMethodology = () => {
           <h4 className="font-medium text-gray-900">Implementation Details</h4>
         </div>
         <p className="text-gray-700 mb-3">
-          Both tests implemented using <strong>Apache Commons Math 3</strong> library 
+          {FEATURES.ENABLE_WILCOXON 
+            ? "Both tests implemented using" 
+            : "Paired t-test implemented using"} <strong>Apache Commons Math 3</strong> library 
           with significance level α = 0.05 (95% confidence).
         </p>
         <p className="text-sm text-gray-600">
-          <strong>References:</strong> Student (1908), Wilcoxon (1945), Cohen (1988), Hodges & Lehmann (1963).
+          <strong>References:</strong> Student (1908){FEATURES.ENABLE_WILCOXON && ", Wilcoxon (1945)"}, Cohen (1988){FEATURES.ENABLE_WILCOXON && ", Hodges & Lehmann (1963)"}.
         </p>
       </div>
     </div>

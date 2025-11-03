@@ -29,6 +29,7 @@ import ImageModal from "../modals/ImageModal";
 import PlotWithInterpretation from "./PlotWithInterpretation";
 import EChartsVisualization from "../ECharts/EChartsVisualization";
 import { validateEChartsData, logDataStructure } from "../../utils/echartsDataValidator";
+import { FEATURES } from "../../config/features";
 
 const ResultsTab = ({
   onBackToAnimation,
@@ -342,7 +343,7 @@ const ResultsTab = ({
     eacoResults?.tTestResults || eacoResults?.ttestResults || 
     epsoResults?.tTestResults || epsoResults?.ttestResults
   );
-  const hasWilcoxon = !!(
+  const hasWilcoxon = FEATURES.ENABLE_WILCOXON && !!(
     eacoResults?.wilcoxonTestResults ||
     epsoResults?.wilcoxonTestResults ||
     eacoResults?.wilcoxonResults ||
@@ -622,8 +623,8 @@ const ResultsTab = ({
                   </>
                 )}
 
-                {/* Wilcoxon Test Results */}
-                {hasWilcoxon && activeStatisticalTest === 'wilcoxon' && (
+                {/*  render if feature is enabled */}
+                {FEATURES.ENABLE_WILCOXON && hasWilcoxon && activeStatisticalTest === 'wilcoxon' && (
                   <>
                     <WilcoxonTestDisplay
                       wilcoxonResults={normalizedWilcoxonResults}

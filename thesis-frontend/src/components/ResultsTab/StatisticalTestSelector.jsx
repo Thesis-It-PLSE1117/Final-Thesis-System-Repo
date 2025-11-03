@@ -1,6 +1,7 @@
 import React from "react";
 import { BarChart3, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { FEATURES } from "../../config/features";
 
 /**
  * tab-based selector for switching between statistical test displays.
@@ -27,13 +28,13 @@ const StatisticalTestSelector = ({
       available: hasTTest,
       description: "Parametric analysis",
     },
-    {
+    ...(FEATURES.ENABLE_WILCOXON ? [{
       id: "wilcoxon",
       label: "Wilcoxon Test",
       icon: BarChart3,
       available: hasWilcoxon,
       description: "Non-parametric analysis",
-    },
+    }] : []),
   ];
 
   const availableTests = tests.filter((test) => test.available);
