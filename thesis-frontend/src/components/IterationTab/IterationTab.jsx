@@ -215,21 +215,8 @@ const IterationTab = ({ config, onChange }) => {
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
-                  <strong>Data Normality Analysis:</strong> Provide recommendations on which test to look at.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span>
                   <strong>Paired T-Test:</strong> Statistical significance
                   analysis with p-values and t-statistics on assumed normal data.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <TrendingUp className="text-[#319694] mt-0.5" size={16} />
-                <span>
-                  <strong>Wilcoxon Signed-Rank Test:</strong> Statistical significance
-                  analysis on non normal data.
                 </span>
               </li>
               <li className="flex items-start gap-2">

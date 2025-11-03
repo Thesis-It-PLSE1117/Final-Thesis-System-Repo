@@ -573,14 +573,14 @@ const ResultsTab = ({
                     willRender: hasTTest || hasWilcoxon,
                     currentActiveTest: activeStatisticalTest
                   });
-                  return (hasTTest || hasWilcoxon) && (
-                    <StatisticalTestSelector
-                      activeTest={activeStatisticalTest}
-                      onTestChange={setActiveStatisticalTest}
-                      hasTTest={hasTTest}
-                      hasWilcoxon={hasWilcoxon}
-                    />
-                  );
+                  // return (hasTTest || hasWilcoxon) && (
+                  //   <StatisticalTestSelector
+                  //     activeTest={activeStatisticalTest}
+                  //     onTestChange={setActiveStatisticalTest}
+                  //     hasTTest={hasTTest}
+                  //     hasWilcoxon={hasWilcoxon}
+                  //   />
+                  // );
                 })()}
 
                 {/* normality test */}
@@ -591,12 +591,12 @@ const ResultsTab = ({
                     normalityTests,
                     normalityAnalysis
                   });
-                  return hasNormalityTests && (
-                    <NormalityTestDisplay
-                      normalityTests={normalityTests}
-                      normalityAnalysis={normalityAnalysis}
-                    />
-                  );
+                  // return hasNormalityTests && (
+                  //   <NormalityTestDisplay
+                  //     normalityTests={normalityTests}
+                  //     normalityAnalysis={normalityAnalysis}
+                  //   />
+                  // );
                 })()}
 
                 {/* T-Test Results */}
@@ -625,11 +625,11 @@ const ResultsTab = ({
                 {/* Wilcoxon Test Results */}
                 {hasWilcoxon && activeStatisticalTest === 'wilcoxon' && (
                   <>
-                    <WilcoxonTestDisplay
+                    {/* <WilcoxonTestDisplay
                       wilcoxonResults={normalizedWilcoxonResults}
                       comparisonResults={eacoResults || epsoResults}
                       isLoading={false}
-                    />
+                    /> */}
 
                     {/* Individual Iteration Details */}
                     {eacoResults?.rawResults &&

@@ -121,7 +121,7 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "Algorithmic Statistical Analysis",
-          content: "Paired t-test for normally distributed data: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size. Wilcoxon signed-rank test for non-normal data: W = sum of signed ranks, used when normality assumptions are violated. Significance level α = 0.05, two-tailed tests."
+          content: "Paired t-test for normally distributed data: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size."
         },
         {
           title: "System Evaluation Methodology",
