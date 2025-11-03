@@ -119,17 +119,16 @@ const ResultsTab = ({
         : "Statistical analysis and interpretations",
       enabled: true,
     },
-    {
+    // Conditionally include visualizations tab only when available
+    ...(matlabPlotsExpected || shouldUseECharts ? [{
       id: "visualizations",
       label: "Visualizations",
       icon: <FiActivity className="w-4 h-4" />,
       description: matlabPlotsExpected
         ? "MATLAB plots and charts"
-        : shouldUseECharts
-        ? "Interactive ECharts visualizations"
-        : "Visualizations not available for this simulation",
-      enabled: matlabPlotsExpected || shouldUseECharts,
-    },
+        : "Interactive ECharts visualizations",
+      enabled: true,
+    }] : []),
     {
       id: "logs",
       label: "Logs",
@@ -137,7 +136,7 @@ const ResultsTab = ({
       description: "Detailed execution logs",
       enabled: true,
     },
-  ];
+  ].filter(tab => tab.enabled); // Also filter out any disabled tabs
 
   useEffect(() => {
     const hasAutoSwitched = sessionStorage.getItem("results-tab-auto-switched");

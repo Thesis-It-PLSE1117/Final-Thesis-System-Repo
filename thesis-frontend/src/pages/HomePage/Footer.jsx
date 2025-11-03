@@ -29,14 +29,6 @@ const Footer = ({ footerLinks }) => {
               <h4 className="text-base md:text-lg font-medium tracking-wide">© 2025 Cloud Load Balancer Simulator.</h4>
             </div>
             <div className="flex flex-col gap-3">
-              <div className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-white border border-gray-200 text-red-600 font-semibold text-sm md:text-base w-fit">
-                <img 
-                  src="https://flagcdn.com/w40/ph.png" 
-                  alt="Philippines Flag" 
-                  className="w-6 h-4 md:w-7 md:h-5 object-cover rounded shadow-sm"
-                />
-                Made in Philippines
-              </div>
               <div className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-sky-100 border border-sky-200 text-sky-700 font-semibold text-sm md:text-base w-fit">
                 <div className="relative w-5 h-5 md:w-6 md:h-6">
                   <Cloud className="w-4 h-4 md:w-5 md:h-5 absolute top-0 left-0" />
