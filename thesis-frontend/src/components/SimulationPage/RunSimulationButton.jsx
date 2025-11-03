@@ -9,6 +9,14 @@ export const RunSimulationButton = ({
   config,
   executeSimulation,
 }) => {
+  // More explicit logic:
+  // - If workload file exists, always valid
+  // - If preset is selected, only valid when cloudlet toggle is ON
+  // - If no preset, only valid when cloudlet toggle is ON
+  const hasValidConfig = 
+    config.workloadFile || 
+    config.cloudletToggleEnabled;
+
   return (
     <div className="mt-6 flex justify-center">
       <button
@@ -19,9 +27,7 @@ export const RunSimulationButton = ({
           isSimulating ||
           simulationState === "loading" ||
           isCoolingDown ||
-          (!config.workloadFile &&
-            !config.selectedPreset &&
-            !config.cloudletToggleEnabled)
+          !hasValidConfig
         }
       >
         {isSimulating || simulationState === "loading" ? (
