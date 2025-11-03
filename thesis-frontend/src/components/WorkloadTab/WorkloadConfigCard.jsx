@@ -30,8 +30,8 @@ const WorkloadConfigCard = ({
   // Always disable when cloudlet toggle is off, regardless of workload
   const isDisabled = false;
 
-  // Enforce 1000-10000 range for cloudlets
-  const minCloudlets = 1000;
+  // Enforce 5000-10000 range for cloudlets
+  const minCloudlets = 5000;
   const maxCloudlets = 10000;
   
   // Calculate the actual max value - use the smaller of csvRowCount or 10000
