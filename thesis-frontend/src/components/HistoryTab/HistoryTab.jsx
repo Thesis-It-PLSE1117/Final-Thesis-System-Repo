@@ -14,7 +14,7 @@ import HistoryPlaceholder from "./HistoryPlaceHolder";
 import { exportSimulationHistory } from "../../utils/exportUtils";
 import HistoryDropdown from "./HistoryDropdown";
 import HistoryDetails from "./HistoryDetails";
-import { DeleteConfirmationDialog, ImportDialog } from "./HistoryDialogs";
+import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './HistoryDialogs';
 
 const HistoryTab = ({ onBack, onViewResults }) => {
   const [history, setHistory] = useState([]);
@@ -29,6 +29,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showImportConfirm, setShowImportConfirm] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [pendingImportData, setPendingImportData] = useState(null);
 
   // Load history and stats on component mount
   useEffect(() => {
@@ -159,52 +162,71 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     try {
       const text = await file.text();
       const backupData = JSON.parse(text);
-
-      if (
-        window.confirm(
-          "This will add the imported data to your existing history. Continue?",
-        )
-      ) {
-        const success = await importHistory(backupData);
-        if (success) {
-          await loadHistory();
-          await loadHistoryStats();
-          setSelectedResult(null);
-          alert("History imported successfully");
-        } else {
-          alert("Failed to import history");
-        }
-      }
+      
+      setPendingImportData({ backupData, fileInput: event.target });
+      setShowImportConfirm(true);
+      setShowImportDialog(false);
     } catch (err) {
       console.error("Error importing history:", err);
       alert("Invalid backup file format");
+      event.target.value = "";
+      setShowImportDialog(false);
     }
-
-    // Reset file input
-    event.target.value = "";
-    setShowImportDialog(false);
   };
 
-  const handleClearHistory = async () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear all history? This cannot be undone.",
-      )
-    ) {
-      try {
-        const success = await clearHistory();
-        if (success) {
-          setHistory([]);
-          setFilteredHistory([]);
-          setSelectedResult(null);
-          await loadHistoryStats();
-        } else {
-          alert("Failed to clear history");
-        }
-      } catch (err) {
-        console.error("Error clearing history:", err);
-        alert("Error clearing history");
+  const confirmImport = async () => {
+    if (!pendingImportData) return;
+
+    try {
+      const success = await importHistory(pendingImportData.backupData);
+      if (success) {
+        await loadHistory();
+        await loadHistoryStats();
+        setSelectedResult(null);
+        alert("History imported successfully");
+      } else {
+        alert("Failed to import history");
       }
+    } catch (err) {
+      console.error("Error during import:", err);
+      alert("Error importing history");
+    } finally {
+      if (pendingImportData.fileInput) {
+        pendingImportData.fileInput.value = "";
+      }
+      setPendingImportData(null);
+      setShowImportConfirm(false);
+    }
+  };
+
+  const cancelImport = () => {
+    if (pendingImportData?.fileInput) {
+      pendingImportData.fileInput.value = "";
+    }
+    setPendingImportData(null);
+    setShowImportConfirm(false);
+  };
+
+  const handleClearHistory = () => {
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearHistory = async () => {
+    try {
+      const success = await clearHistory();
+      if (success) {
+        setHistory([]);
+        setFilteredHistory([]);
+        setSelectedResult(null);
+        await loadHistoryStats();
+      } else {
+        alert("Failed to clear history");
+      }
+    } catch (err) {
+      console.error("Error clearing history:", err);
+      alert("Error clearing history");
+    } finally {
+      setShowClearConfirm(false);
     }
   };
 
@@ -607,6 +629,26 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             showImportDialog={showImportDialog}
             setShowImportDialog={setShowImportDialog}
             handleImportHistory={handleImportHistory}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showImportConfirm && (
+          <ImportConfirmationDialog
+            isOpen={showImportConfirm}
+            onConfirm={confirmImport}
+            onCancel={cancelImport}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showClearConfirm && (
+          <ClearHistoryConfirmationDialog
+            isOpen={showClearConfirm}
+            onConfirm={confirmClearHistory}
+            onCancel={() => setShowClearConfirm(false)}
           />
         )}
       </AnimatePresence>
