@@ -108,27 +108,6 @@ const WilcoxonTestDisplay = ({
 
   const alpha = wilcoxonResults.alpha || 0.05; // Default significance level
 
-  console.log("[Wilcoxon Debug] Data structure:", {
-    hasMetricTests: !!metricTests,
-    metricTestsKeys: metricTests ? Object.keys(metricTests) : [],
-    totalMetricCount: metricTests ? Object.keys(metricTests).length : 0,
-    hasInterpretation: !!wilcoxonResults?.interpretation,
-    hasWilcoxonAnalysis: !!wilcoxonResults?.interpretation?.wilcoxonAnalysis,
-    sampleSizeDisplay,
-    overallWinner,
-    significantDifferences,
-    winnerCount:
-      overallWinner === "EACO"
-        ? Object.values(metricTests || {}).filter(
-            (t) => t && t.significant && t.betterAlgorithm === "EACO",
-          ).length
-        : overallWinner === "EPSO"
-          ? Object.values(metricTests || {}).filter(
-              (t) => t && t.significant && t.betterAlgorithm === "EPSO",
-            ).length
-          : 0,
-  });
-
   const eacoWins = Object.values(metricTests || {}).filter(
     (t) => t && t.significant && t.betterAlgorithm === "EACO",
   ).length;
