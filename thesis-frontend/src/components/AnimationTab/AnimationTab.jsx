@@ -825,8 +825,8 @@ const AnimationTab = ({
                 Iteration Results
               </div>
             ) : (
-              <div className="px-2 sm:px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full whitespace-nowrap">
-                {totalTasks} Tasks
+              <div>
+                {/* {totalTasks} Tasks */}
               </div>
             )}
           </div>

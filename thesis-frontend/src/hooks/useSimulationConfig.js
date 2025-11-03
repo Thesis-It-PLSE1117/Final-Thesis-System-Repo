@@ -196,7 +196,7 @@ export const useSimulationConfig = () => {
       const file = new File([blob], `${presetName}`, { type: 'text/csv' });
 
       loadWorkloadFile(file, rowCount);
-      showNotification(`Loaded preset workload: ${presetName} (${rowCount} rows)`, 'success');
+      showNotification(`Loaded preset workload: ${presetName})`, 'success');
     } catch (err) {
       console.warn('[preset] load failed', err);
       showNotification(`Could not load preset CSV "${presetName}". Make sure /public/presets/${presetName}.csv exists.`, 'warning');
