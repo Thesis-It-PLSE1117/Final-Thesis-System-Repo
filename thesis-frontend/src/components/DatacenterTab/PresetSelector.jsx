@@ -353,12 +353,12 @@ const PresetSelector = ({
                       ? `${getPresetInfo(selectedPreset).title} Configuration`
                       : "Default Configuration"}
                   </h4>
-                  {selectedPreset && (
+                  {/* {selectedPreset && (
                     <p className="text-sm text-[#267b79] mt-0.5">
                       Optimized for {getPresetInfo(selectedPreset).taskCount}{" "}
                       tasks
                     </p>
-                  )}
+                  )} */}
                 </div>
               </div>
               {/* Minimalist Active Indicator */}
