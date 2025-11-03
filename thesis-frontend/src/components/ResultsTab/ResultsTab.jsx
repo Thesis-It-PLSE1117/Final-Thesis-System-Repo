@@ -673,11 +673,11 @@ const ResultsTab = ({
                   hasWilcoxon &&
                   activeStatisticalTest === "wilcoxon" && (
                     <>
-                      {/* <WilcoxonTestDisplay
+                      <WilcoxonTestDisplay
                       wilcoxonResults={normalizedWilcoxonResults}
                       comparisonResults={eacoResults || epsoResults}
                       isLoading={false}
-                    /> */}
+                    />
 
                       {/* Individual Iteration Details */}
                       {eacoResults?.rawResults && epsoResults?.rawResults && (
