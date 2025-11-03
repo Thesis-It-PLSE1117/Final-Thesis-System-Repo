@@ -42,8 +42,8 @@ const PresetSelector = ({
 
   const getPresetInfo = (presetKey) => {
     const presetData = {
-      "1k-tasks": {
-        title: windowWidth < 768 ? "1K" : "Small Scale (1K)",
+      "small-scale": {
+        title: windowWidth < 768 ? "SS" : "Small Scale",
         description:
           windowWidth < 500
             ? "Quick test"
@@ -52,16 +52,16 @@ const PresetSelector = ({
         icon: Microscope,
         iconColor: "text-blue-600",
       },
-      "5k-tasks": {
-        title: windowWidth < 768 ? "5K" : "Medium Scale (5K)",
+      "medium-scale": {
+        title: windowWidth < 768 ? "MS" : "Medium Scale",
         description:
-          windowWidth < 500 ? "Compare speed" : "Compare performance",
+          windowWidth < 500 ? "Compare speed" : "Compare performance | Real-world test",
         taskCount: "5,000",
         icon: Scale,
         iconColor: "text-purple-600",
       },
-      "10k-tasks": {
-        title: windowWidth < 768 ? "10K" : "Research Scale (10K)",
+      "large-scale": {
+        title: windowWidth < 768 ? "RS" : "Research Scale",
         description:
           windowWidth < 500 ? "Real scenario" : "Real-world test",
         taskCount: "10,000",

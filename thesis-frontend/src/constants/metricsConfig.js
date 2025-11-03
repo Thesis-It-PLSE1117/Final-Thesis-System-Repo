@@ -12,7 +12,7 @@ export const METRICS_CONFIG = {
     description: 'How long tasks take from start to finish. Lower is faster.',
     icon: Clock,
     demoKey: 'responseTime',
-    unit: 'ms',
+    unit: 's',
     category: 'core'
   },
   'Energy Efficiency': {

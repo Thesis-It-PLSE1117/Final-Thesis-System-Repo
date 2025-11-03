@@ -21,7 +21,7 @@ export const PRESET_CONFIGS = {
   'default': {
     ...DEFAULT_CONFIG
   },
-  '1k-tasks': {
+  'small-scale': {
     numHosts: 10,
     numPesPerHost: 4,
     peMips: 2000,
@@ -37,7 +37,7 @@ export const PRESET_CONFIGS = {
     vmScheduler: "TimeShared",
     optimizationAlgorithm: "EACO"
   },
-  '5k-tasks': {
+  'medium-scale': {
     numHosts: 20,
     numPesPerHost: 6,
     peMips: 2500,
@@ -53,7 +53,7 @@ export const PRESET_CONFIGS = {
     vmScheduler: "TimeShared",
     optimizationAlgorithm: "EACO"
   },
-  '10k-tasks': {
+  'large-scale': {
     numHosts: 40,
     numPesPerHost: 16,
     peMips: 3000,

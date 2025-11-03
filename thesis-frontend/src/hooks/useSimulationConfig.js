@@ -50,13 +50,13 @@ export const useSimulationConfig = () => {
     if (selectedPreset) {
       let presetCloudletCount = DEFAULT_CLOUDLET_COUNT;
       switch(selectedPreset) {
-        case '1k-tasks':
-          presetCloudletCount = 1000;
+        case 'small-scale':
+          presetCloudletCount = DEFAULT_CLOUDLET_COUNT;
           break;
-        case '5k-tasks':
-          presetCloudletCount = 5000;
+        case 'medium-scale':
+          presetCloudletCount = DEFAULT_CLOUDLET_COUNT;
           break;
-        case '10k-tasks':
+        case 'large-scale':
           presetCloudletCount = 10000;
           break;
         default:
