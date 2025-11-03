@@ -591,12 +591,12 @@ const ResultsTab = ({
                     normalityTests,
                     normalityAnalysis
                   });
-                  // return hasNormalityTests && (
-                  //   <NormalityTestDisplay
-                  //     normalityTests={normalityTests}
-                  //     normalityAnalysis={normalityAnalysis}
-                  //   />
-                  // );
+                  return hasNormalityTests && (
+                    <NormalityTestDisplay
+                      normalityTests={normalityTests}
+                      normalityAnalysis={normalityAnalysis}
+                    />
+                  );
                 })()}
 
                 {/* T-Test Results */}
