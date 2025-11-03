@@ -105,39 +105,85 @@ const HistoryDetails = ({ result, onViewResults }) => {
     return values.reduce((sum, val) => sum + val, 0) / values.length;
   };
 
-  // Enhanced getMetric function to handle both single and multi-iteration runs
+  const getEnergyValue = (energyData) => {
+    if (typeof energyData === "number") {
+      return energyData;
+    }
+    if (energyData && typeof energyData === "object") {
+      return energyData.totalEnergyWh || 0;
+    }
+    return 0;
+  };
+
   const getMetric = (metricName) => {
-    // Priority 1: Direct summary values (for single iteration or direct storage)
+    if (metricName === "energyConsumption") {
+      if (summary[metricName] !== undefined && summary[metricName] !== null) {
+        const val = getEnergyValue(summary[metricName]);
+        if (val > 0) return val;
+      }
+      if (summary.averageMetrics?.[metricName] !== undefined) {
+        const val = getEnergyValue(summary.averageMetrics[metricName]);
+        if (val > 0) return val;
+      }
+      if (result.rawResults?.summary?.[metricName] !== undefined) {
+        const val = getEnergyValue(result.rawResults.summary[metricName]);
+        if (val > 0) return val;
+      }
+      if (result.rawResults?.averageMetrics?.[metricName] !== undefined) {
+        const val = getEnergyValue(result.rawResults.averageMetrics[metricName]);
+        if (val > 0) return val;
+      }
+      
+      if (!isSingleIteration) {
+        const individualResults = result.rawResults?.individualResults;
+        if (individualResults && Array.isArray(individualResults) && individualResults.length > 0) {
+          const values = individualResults
+            .map((item) => getEnergyValue(item.summary?.[metricName] || item[metricName]))
+            .filter((val) => typeof val === "number" && !isNaN(val) && val > 0);
+          if (values.length > 0) {
+            return values.reduce((sum, val) => sum + val, 0) / values.length;
+          }
+        }
+      }
+      
+      if (result[metricName] !== undefined && result[metricName] !== null) {
+        const val = getEnergyValue(result[metricName]);
+        if (val > 0) return val;
+      }
+      
+      if (
+        isSingleIteration &&
+        result.rawResults?.individualResults?.[0]?.summary?.[metricName]
+      ) {
+        return getEnergyValue(result.rawResults.individualResults[0].summary[metricName]);
+      }
+      return 0;
+    }
+
     if (summary[metricName] !== undefined && summary[metricName] !== null) {
       return summary[metricName];
     }
 
-    // Priority 2: Summary's averageMetrics
     if (summary.averageMetrics?.[metricName] !== undefined) {
       return summary.averageMetrics[metricName];
     }
 
-    // Priority 3: RawResults summary (single iteration case)
     if (result.rawResults?.summary?.[metricName] !== undefined) {
       return result.rawResults.summary[metricName];
     }
 
-    // Priority 4: RawResults averageMetrics
     if (result.rawResults?.averageMetrics?.[metricName] !== undefined) {
       return result.rawResults.averageMetrics[metricName];
     }
 
-    // Priority 5: Direct on result object
     if (result[metricName] !== undefined) {
       return result[metricName];
     }
 
-    // Priority 6: Calculate from individual results (multi-iteration)
     if (!isSingleIteration) {
       return calculateMetricFromIndividual(metricName);
     }
 
-    // Priority 7: For single iteration, check the first individual result
     if (
       isSingleIteration &&
       result.rawResults?.individualResults?.[0]?.summary?.[metricName]
