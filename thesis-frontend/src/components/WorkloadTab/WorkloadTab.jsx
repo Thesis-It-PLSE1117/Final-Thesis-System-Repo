@@ -39,7 +39,7 @@ const WorkloadTab = ({
 
   const presetOptions = [
     { label: "Select a preset workload...", value: "" },
-    ...Array.from({ length: 30 }, (_, i) => ({
+    ...Array.from({ length: 10 }, (_, i) => ({
       label: `Google Cluster Subset ${i + 1}`,
       value: `final_cluster_${i + 1}.csv`,
     })),

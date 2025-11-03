@@ -63,7 +63,7 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
 
           <div className="p-3 bg-blue-50 rounded-md">
             <p className="text-sm text-blue-700">
-              <strong>Note:</strong> You can now customize the number of cloudlets in the configuration below. 
+              <strong>Note:</strong> 
               This will generate a synthetic workload where all tasks arrive simultaneously at time 0.
             </p>
           </div>

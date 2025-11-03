@@ -72,4 +72,4 @@ export const PRESET_CONFIGS = {
 
 };
 
-export const DEFAULT_CLOUDLET_COUNT = 100;
+export const DEFAULT_CLOUDLET_COUNT = 5000;
