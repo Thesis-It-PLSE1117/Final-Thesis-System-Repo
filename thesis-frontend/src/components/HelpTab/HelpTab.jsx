@@ -85,7 +85,7 @@ const HelpTab = () => {
           }`}
           onClick={() => setActiveTab('workload')}
         >
-          Workload Configuration
+          Workload
         </button>
         <button
           className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
@@ -107,7 +107,7 @@ const HelpTab = () => {
           onClick={() => setActiveTab('methodology')}
         >
           <BarChart3 size={16} />
-          Statistical Tests
+          Statistics Used
         </button>
       </motion.nav>
 

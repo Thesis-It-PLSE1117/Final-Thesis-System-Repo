@@ -16,18 +16,12 @@ const ProjectOverview = () => {
     {
       title: "Project Introduction",
       icon: <FileText className="w-5 h-5" />,
-      content: "This system compares two cloud algorithms: EPSO and EACO. It uses the CloudSim framework with real Google Cluster data to test how they balance loads."
-    },
-    {
-      title: "Dataset & Provenance",
-      icon: <BookOpen className="w-5 h-5" />,
-      content: "We use cleaned Google Cluster data. The timestamps start in microseconds, then we convert them to seconds. File sizes are normalized values between 0 and 1, which we scale to actual bytes for the simulation.",
-      subsections: [
-        { 
-          title: "Two CSV Schemas Supported", 
-          content: "We support two data formats. (1) Normalized: task length in MI, processor cores needed, file sizes. (2) Google: arrival times, CPU usage, memory usage, file sizes, and core count. Both formats work automatically."
-        }
-      ]
+      content: (
+        <>
+          This system compares two cloud algorithms: <span className="font-semibold">EPSO</span> and <span className="font-semibold">EACO</span>. 
+          It uses the <span className="font-semibold">CloudSim framework</span> with real Google Cluster data to test how they balance loads.
+        </>
+      )
     },
     {
       title: "Performance Metrics",
@@ -35,23 +29,48 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "1. Response Time",
-          content: "How long each task takes from start to finish. Lower response time means faster results. This measures how quickly the system responds to your tasks."
+          content: (
+            <>
+              How long each task takes from start to finish. <span className="font-semibold">Lower response time</span> means faster results. 
+              This measures how quickly the system responds to your tasks.
+            </>
+          )
         },
         {
           title: "2. Resource Utilization", 
-          content: "How well your virtual machines use CPU and memory. Higher percentages mean you're using resources efficiently. Low utilization wastes available computing power."
+          content: (
+            <>
+              How well your virtual machines use CPU and memory. <span className="font-semibold">Higher percentages</span> mean you're using resources efficiently. 
+              Low utilization wastes available computing power.
+            </>
+          )
         },
         {
           title: "3. Energy Efficiency",
-          content: "Total power used while running tasks. The system tracks both active power (215W) and idle power (162W). Lower energy means greener, more cost-effective computing."
+          content: (
+            <>
+              Total power used while running tasks. The system tracks both <span className="font-semibold">active power (215W)</span> and <span className="font-semibold">idle power (162W)</span>. 
+              Lower energy means greener, more cost-effective computing.
+            </>
+          )
         },
         {
           title: "4. Degree of Imbalance (DI)",
-          content: "Shows how evenly work is spread across your virtual machines. Lower numbers mean better balance. High imbalance means some VMs work harder than others."
+          content: (
+            <>
+              Shows how evenly work is spread across your virtual machines. <span className="font-semibold">Lower numbers</span> mean better balance. 
+              High imbalance means some VMs work harder than others.
+            </>
+          )
         },
         {
           title: "5. Makespan",
-          content: "The total time to finish all your tasks. Think of it as the finish time of the slowest VM. Shorter makespan means your algorithm schedules work more efficiently."
+          content: (
+            <>
+              The total time to finish all your tasks. Think of it as the finish time of the slowest VM. 
+              <span className="font-semibold">Shorter makespan</span> means your algorithm schedules work more efficiently.
+            </>
+          )
         }
       ]
     },
@@ -61,11 +80,24 @@ const ProjectOverview = () => {
       subsections: [
         {
           title: "Enhanced Ant Colony Optimization (EACO)",
-          content: "An improved ant colony algorithm designed for cloud tasks. It adapts as it learns better solutions. Like real ants, it marks good paths and avoids bad ones. The algorithm stops early when it finds optimal task assignments."
+          content: (
+            <>
+              An improved <span className="font-semibold">ant colony algorithm</span> designed for cloud tasks. 
+              It adapts as it learns better solutions. Like real ants, it marks <span className="font-semibold">good paths</span> and avoids bad ones. 
+              The algorithm stops early when it finds <span className="font-semibold">optimal task assignments</span>.
+            </>
+          )
         },
         {
           title: "Enhanced Particle Swarm Optimization (EPSO)",
-          content: "An improved particle swarm algorithm for cloud scheduling. Each particle is a possible solution that learns from the swarm. The algorithm balances exploring new solutions with refining good ones. It stops when it finds the best task assignment."
+          content: (
+            <>
+              An improved <span className="font-semibold">particle swarm algorithm</span> for cloud scheduling. 
+              Each particle is a <span className="font-semibold">possible solution</span> that learns from the swarm. 
+              The algorithm balances <span className="font-semibold">exploring new solutions</span> with refining good ones. 
+              It stops when it finds the <span className="font-semibold">best task assignment</span>.
+            </>
+          )
         },
         {
           title: "Algorithm References",
@@ -79,7 +111,7 @@ const ProjectOverview = () => {
                   href="https://www.techscience.com/cmc/v82n2/59521/html" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#319694] hover:text-[#267b79] transition-colors"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   <LinkIcon className="w-4 h-4" />
                   Particle Swarm Optimization (PSO) - Technical Overview
@@ -88,7 +120,7 @@ const ProjectOverview = () => {
                   href="https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#319694] hover:text-[#267b79] transition-colors"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   <LinkIcon className="w-4 h-4" />
                   Ant Colony Optimization (ACO) - Algorithm Overview
@@ -102,51 +134,69 @@ const ProjectOverview = () => {
     {
       title: "System Architecture",
       icon: <BarChart2 className="w-5 h-5" />,
-      content: "CloudSim-based simulation framework with Spring Boot backend and React frontend. CustomBroker class inherits from CloudSim's DatacenterBroker and implements ISchedulingAlgorithm interface. MATLAB integration provides advanced visualization and statistical analysis of results.",
+      content: (
+        <>
+          <span className="font-semibold">CloudSim-based</span> simulation framework with Spring Boot backend and React frontend. 
+          <span className="font-semibold">CustomBroker</span> class inherits from CloudSim's DatacenterBroker and implements 
+          <span className="font-semibold">ISchedulingAlgorithm</span> interface. MATLAB integration provides advanced visualization and statistical analysis of results.
+        </>
+      ),
       subsections: [
         {
           title: "Core Components",
-          content: "CustomBroker governs task and VM assignment, EnhancedACO and EnhancedPSO implement ISchedulingAlgorithm interface, DataCenterConfigurator manages simulation setup with hosts, VMs, and power models."
+          content: (
+            <>
+              <span className="font-semibold">CustomBroker</span> governs task and VM assignment. 
+              <span className="font-semibold">EnhancedACO</span> and <span className="font-semibold">EnhancedPSO</span> implement ISchedulingAlgorithm interface. 
+              <span className="font-semibold">DataCenterConfigurator</span> manages simulation setup with hosts, VMs, and power models.
+            </>
+          )
         },
         {
           title: "Technology Stack",
-          content: "Backend: Spring Boot + CloudSim core + MATLAB Engine. Frontend: React.js + Chart.js for visualization. Data: Google Cluster Dataset preprocessing with Python + pandas/numpy."
+          content: (
+            <>
+              <span className="font-semibold">Backend:</span> Spring Boot + CloudSim core + MATLAB Engine. 
+              <span className="font-semibold">Frontend:</span> React.js + Chart.js for visualization. 
+              <span className="font-semibold">Data:</span> Google Cluster Dataset preprocessing with Python + pandas/numpy.
+            </>
+          )
         }
       ]
     },
     {
       title: "Research Approach",
       icon: <HelpCircle className="w-5 h-5" />,
-      content: "Quantitative, simulation-based research design with expert evaluation. 30 participants: 15 IT experts and 15 end users (11 cloud specialists + 4 academic professionals). Purposive sampling method ensures relevant expertise.",
+      content: (
+        <>
+          <span className="font-semibold">Quantitative, simulation-based</span> research design with expert evaluation. 
+          <span className="font-semibold">30 participants:</span> 15 IT experts and 15 end users 
+          (11 cloud specialists + 4 academic professionals). <span className="font-semibold">Purposive sampling</span> method ensures relevant expertise.
+        </>
+      ),
       subsections: [
-        {
-          title: "Algorithmic Statistical Analysis",
-          content: "Paired t-test for normally distributed data: t = X̄_d / (S_d/√n) where X̄_d is mean difference, S_d is standard deviation of differences, n is sample size."
-        },
         {
           title: "System Evaluation Methodology",
-          content: "Likert scale with four response options: 4 (Strongly Agree, 3.26–4.00), 3 (Agree, 2.51–3.25), 2 (Disagree, 1.76–2.50), 1 (Strongly Disagree, 1.00–1.75). Median scores used for stability with small groups. Non-parametric tests applied to ordinal Likert data."
+          content: (
+            <>
+              <span className="font-semibold">Likert scale</span> with four response options: <span className="font-semibold">4</span> (Strongly Agree, 3.26–4.00), 
+              <span className="font-semibold">3</span> (Agree, 2.51–3.25), <span className="font-semibold">2</span> (Disagree, 1.76–2.50), 
+              <span className="font-semibold">1</span> (Strongly Disagree, 1.00–1.75). <span className="font-semibold">Median scores</span> used for stability with small groups.
+            </>
+          )
         }
       ]
     },
     {
-      title: "Submission Modes",
-      icon: <Cpu className="w-5 h-5" />,
-      content: "Two submission modes supported: (1) Batch submission (default) - all tasks submitted at t=0 for controlled algorithm comparison, (2) Staged submission (optional) - tasks submitted according to normalized arrival times when arrival_ts is present and enabled."
-    },
-    {
-      title: "Methodology Notes",
+      title: "Ethics & Data Handling",
       icon: <BookOpen className="w-5 h-5" />,
-      subsections: [
-        { 
-          title: "Survey Administration", 
-          content: "End-user and IT-expert questionnaires administered via Google Forms using Likert scale. Participants evaluate functional suitability, interaction capability, performance efficiency, and scalability. Aggregated findings reported in manuscript; this app does not store survey responses." 
-        },
-        { 
-          title: "Data Provenance & Ethics", 
-          content: "Google Cluster subset with arrival_ts in μs, normalized to seconds. Voluntary participation with informed consent. Confidentiality maintained throughout evaluation process. Results validated through expert feedback from cloud specialists and IT professionals." 
-        }
-      ]
+      content: (
+        <>
+          <span className="font-semibold">Voluntary participation</span> with <span className="font-semibold">informed consent</span>. 
+          <span className="font-semibold">Confidentiality</span> maintained throughout evaluation. Survey responses administered via <span className="font-semibold">Google Forms</span>—this app does not store user data. 
+          Results validated through expert feedback from <span className="font-semibold">cloud specialists and IT professionals</span>.
+        </>
+      )
     }
   ];
 
@@ -164,9 +214,9 @@ const ProjectOverview = () => {
         className="flex items-center gap-4 mb-8"
       >
         <div className="p-3 bg-[#319694]/10 rounded-full">
-          <Zap className="text-[#319694] animate-pulse" />
+          <Zap className="text-gray-700 animate-pulse" size={24} />
         </div>
-        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]">
+        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-900">
           Project Overview
         </h2>
       </motion.div>
@@ -178,25 +228,25 @@ const ProjectOverview = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
-              className="bg-white/90 backdrop-blur-sm rounded-xl border border-[#319694]/10 shadow-sm overflow-hidden"
+              className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
             >
               <motion.button
-                whileHover={{ backgroundColor: "#f0fdf4" }}
+                whileHover={{ backgroundColor: "#f9fafb" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => toggleSection(index)}
                 className={`w-full p-5 text-left flex items-center justify-between transition-colors ${
-                  activeSections[index] ? 'bg-[#319694]/10' : 'bg-white/90'
+                  activeSections[index] ? 'bg-gray-50' : 'bg-white'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#319694]">{section.icon}</div>
-                  <h3 className="font-semibold text-gray-800">{section.title}</h3>
+                  <div className="text-gray-700">{section.icon}</div>
+                  <h3 className="font-medium text-gray-900">{section.title}</h3>
                 </div>
                 <motion.div
                   animate={{ rotate: activeSections[index] ? 90 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronRight className="text-[#319694]" />
+                  <ChevronRight className="text-gray-400" />
                 </motion.div>
               </motion.button>
 
@@ -215,7 +265,7 @@ const ProjectOverview = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}
-                          className="text-gray-600 mb-4"
+                          className="text-gray-700 mb-4"
                         >
                           {section.content}
                         </motion.p>
@@ -234,10 +284,10 @@ const ProjectOverview = () => {
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 0.3 + subIndex * 0.1 }}
-                              className="pl-4 border-l-2 border-[#319694]/30"
+                              className="pl-4 border-l-2 border-gray-200"
                             >
-                              <h4 className="font-medium text-[#319694]">{sub.title}</h4>
-                              <p className="text-sm text-gray-500 mt-1">{sub.content}</p>
+                              <h4 className="font-medium text-gray-900">{sub.title}</h4>
+                              <p className="text-sm text-gray-700 mt-1">{sub.content}</p>
                             </motion.div>
                           ))}
                         </motion.div>

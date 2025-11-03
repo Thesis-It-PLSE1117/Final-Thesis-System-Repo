@@ -43,9 +43,6 @@ export const useSimulationRunner = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Progress data received successfully
-
-        // Always update state, regardless of conditions
         setCurrentIteration(data.currentIteration || 0);
         setTotalIterations(data.totalIterations || 0);
         setIterationStage(data.currentStage || null);
@@ -55,13 +52,12 @@ export const useSimulationRunner = () => {
         }
       }
     } catch (error) {
-      // Progress polling failed silently
     }
   };
   
   const startIterationPolling = () => {
     if (!iterationPollingInterval) {
-      const interval = setInterval(pollIterationProgress, 5000); // Changed from 1000ms to 5000ms
+      const interval = setInterval(pollIterationProgress, 5000);
       setIterationPollingInterval(interval);
       pollIterationProgress();
     }
@@ -708,6 +704,12 @@ export const useSimulationRunner = () => {
     }
   };
 
+  useEffect(() => {
+    if (currentIteration >= totalIterations && totalIterations > 0 && currentIteration > 0) {
+      stopIterationPolling();
+    }
+  }, [currentIteration, totalIterations]);
+
   // cleanup effect to stop polling when simulation is complete
   useEffect(() => {
     // Only stop polling when simulation is truly complete (not loading anymore)
@@ -715,41 +717,32 @@ export const useSimulationRunner = () => {
       stopIterationPolling();
     }
 
-    // Don't stop polling just because iterationStage is 'INITIALIZING' and totalIterations is 0
-    // Let the backend determine when polling should stop
-
     // Cleanup function to stop polling when component unmounts
     return () => {
       stopIterationPolling();
     };
-  }, [simulationState]); // Only depend on simulationState, not iteration data
+  }, [simulationState]);
 
   // cancel the simulation
   const cancelSimulation = async () => {
     setIsAborting(true);
     showNotification('Stopping simulation...', 'info');
     
-    // Clear the progress interval first
     if (progressInterval) {
       clearInterval(progressInterval);
       setProgressInterval(null);
     }
     
-    // Cancel async job if running
     if (currentJobId) {
       try {
-        // await jobService.cancelJob(currentJobId);
         showNotification('Job cancelled successfully', 'info');
       } catch (error) {
-        // Job cancellation failed silently
       }
       setCurrentJobId(null);
     }
     
     if (abortController) {
-      
       sessionStorage.removeItem('activeSimulation');
-      
       abortController.abort();
       
       try {
@@ -757,23 +750,22 @@ export const useSimulationRunner = () => {
       } catch (error) {
       }
       
-      // clean up states
       setProgress(0);
       setSimulationState('config');
       setAbortController(null);
-      setIsAborting(false);
       setPlotStatus(null);
       setPlotTrackingIds(null);
-      stopIterationPolling(); // stop progress polling on cancellation
+      stopIterationPolling();
       
-      showNotification('Simulation cancelled by user', 'info');
+      showNotification('Simulation cancelled by user', 'error');
+      setIsAborting(false);
     } else {
-      // fallback for when no active simulation
       setProgress(0);
       setSimulationState('config');
       sessionStorage.removeItem('activeSimulation');
-      stopIterationPolling(); // Stop progress polling on fallback cancellation
-      showNotification('✓ Operation cancelled', 'success');
+      stopIterationPolling();
+      showNotification('Operation cancelled', 'success');
+      setIsAborting(false);
     }
   };
 

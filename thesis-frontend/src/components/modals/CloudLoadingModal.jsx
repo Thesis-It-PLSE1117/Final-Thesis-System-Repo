@@ -87,51 +87,14 @@ const CloudLoadingModal = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const estimateRemainingTime = () => {
-    // Use backend ETA if available
-    if (eta && eta > 0) {
-      return `Approximately ${formatTime(eta)} remaining`;
+  const getIterationBasedEta = () => {
+    if (actualCurrentIteration === 0 || iterations <= 1) {
+      return null;
     }
-
-    if (overallProgress === 0 || elapsedTime === 0) {
-      if (isLargeTaskSet) {
-        const baseTimePerTask = 0.12;
-        const iterationMultiplier = isMultipleIterations ? iterations : 1;
-        const totalEstimatedSeconds =
-          effectiveTaskCount * baseTimePerTask * iterationMultiplier;
-
-        const overhead = isMultipleIterations ? totalEstimatedSeconds * 0.3 : 0;
-        const finalEstimate = totalEstimatedSeconds + overhead;
-
-        const estimatedMinutes = Math.ceil(finalEstimate / 60);
-        return `Estimated time: ${estimatedMinutes} minutes for ${effectiveTaskCount.toLocaleString()} tasks${isMultipleIterations ? ` × ${iterations} iterations` : ""}`;
-      } else if (isMultipleIterations) {
-        const estimatedMinutes = Math.ceil((iterations * 30) / 60); // ~30 seconds per iteration
-        return `Estimated time: ${estimatedMinutes} minutes for ${iterations} iterations`;
-      }
-      return "Estimating time...";
-    }
-
-    const safeProgress = Math.min(overallProgress, 85);
-    const estimatedTotal = (elapsedTime / safeProgress) * 100;
-    let remaining = Math.max(0, estimatedTotal - elapsedTime);
-
-    if (isLargeTaskSet) {
-      const conservativeBuffer = 1.4;
-      remaining = remaining * conservativeBuffer;
-
-      if (isMultipleIterations && actualCurrentIteration < iterations) {
-        const iterationsLeft = iterations - actualCurrentIteration;
-        const avgTimePerIteration =
-          elapsedTime / Math.max(1, actualCurrentIteration);
-        const iterationTimeRemaining = iterationsLeft * avgTimePerIteration;
-        remaining = Math.max(remaining, iterationTimeRemaining);
-      }
-
-      return `Approximately ${formatTime(Math.round(remaining))} remaining`;
-    }
-
-    return `Approximately ${formatTime(Math.round(remaining))} remaining`;
+    
+    const avgTimePerIteration = elapsedTime / actualCurrentIteration;
+    const remainingIterations = iterations - actualCurrentIteration;
+    return Math.round(avgTimePerIteration * remainingIterations);
   };
 
   const tips = [
@@ -174,17 +137,30 @@ const CloudLoadingModal = ({
         transition={{ type: "spring", damping: 15 }}
         className="relative bg-white rounded-xl p-5 max-w-md w-full mx-4 shadow-2xl border border-gray-100"
       >
+        {isAborting && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl z-10 flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-red-500 border-t-transparent"></div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-lg font-semibold text-gray-800">Cancelling Simulation</h4>
+                <p className="text-sm text-gray-600">Please wait while the simulation stops...</p>
+              </div>
+            </div>
+          </div>
+        )}
         {canAbort && (
           <motion.button
             onClick={onAbort}
             disabled={isAborting}
-            className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-[#319694] hover:bg-gray-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             title={isAborting ? "Stopping simulation..." : "Stop simulation"}
           >
             {isAborting ? (
-              <div className="animate-spin motion-reduce:animate-none rounded-full h-3.5 w-3.5 border-2 border-[#319694] border-t-transparent" />
+              <div className="animate-spin motion-reduce:animate-none rounded-full h-3.5 w-3.5 border-2 border-red-500 border-t-transparent" />
             ) : (
               <X size={ICON_SIZES.sm} />
             )}
@@ -244,12 +220,13 @@ const CloudLoadingModal = ({
             />
           </div>
 
-          {/* Enhanced ETA Display */}
-          <div className="flex justify-center items-center mt-1.5">
-            <div className="text-sm text-gray-600">
-              {estimateRemainingTime()}
+          {getIterationBasedEta() !== null && (
+            <div className="flex justify-center items-center mt-1.5">
+              <div className="text-sm text-gray-600">
+                Approximately {formatTime(getIterationBasedEta())} remaining
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">

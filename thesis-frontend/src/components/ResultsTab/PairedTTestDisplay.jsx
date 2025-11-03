@@ -650,29 +650,12 @@ const PairedTTestDisplay = ({
 
                         {test?.stdInterpretation &&
                           (() => {
-                            const parts =
-                              test.stdInterpretation.split(/\. (?=[A-Z])/);
-                            const eacoLine = parts.find((p) =>
-                              p.startsWith("EACO:"),
-                            );
-                            const epsoLine = parts.find((p) =>
-                              p.startsWith("EPSO:"),
-                            );
-                            const comparisonLine = parts.find(
-                              (p) =>
-                                p.includes("Both algorithms") ||
-                                p.includes("demonstrate similar"),
-                            );
-                            const stabilityLine = parts.find(
-                              (p) =>
-                                p.includes("results are") &&
-                                p.includes("stable"),
-                            );
-                            const implicationLine = parts.find(
-                              (p) =>
-                                p.includes("indicates") ||
-                                p.includes("suitable"),
-                            );
+                            const fullText = test.stdInterpretation;
+                            const consistencyCheck = fullText.match(/Consistency check - (.*?)\./)?.[1] || null;
+                            const comparisonText = fullText.match(/(Both algorithms show similar.*?)\./)?.[1] || 
+                                                   fullText.match(/(EACO is \d+\.\d+% more consistent.*?)\./)?.[1] ||
+                                                   fullText.match(/(EPSO is \d+\.\d+% more consistent.*?)\./)?.[1] || null;
+                            const implicationText = fullText.match(/(Excellent news|Good consistency|Moderate consistency|Warning).*$/)?.[0] || null;
 
                             return (
                               <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-3">
@@ -683,67 +666,30 @@ const PairedTTestDisplay = ({
                                   </h6>
                                 </div>
 
-                                <div className="space-y-2 text-sm text-gray-700">
-                                  {eacoLine && (
-                                    <div className="flex items-start gap-2">
-                                      <span className="text-blue-600 font-medium mt-0.5">
-                                        •
-                                      </span>
+                                <div className="space-y-3 text-sm text-gray-700">
+                                  {consistencyCheck && (
+                                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                                       <p className="leading-relaxed">
-                                        {eacoLine.trim()}
-                                        {!eacoLine.trim().endsWith(".") && "."}
+                                        <span className="font-semibold text-gray-800">Consistency Check:</span>{" "}
+                                        {consistencyCheck}.
                                       </p>
                                     </div>
                                   )}
 
-                                  {epsoLine && (
-                                    <div className="flex items-start gap-2">
-                                      <span className="text-orange-600 font-medium mt-0.5">
-                                        •
-                                      </span>
-                                      <p className="leading-relaxed">
-                                        {epsoLine.trim()}
-                                        {!epsoLine.trim().endsWith(".") && "."}
-                                      </p>
-                                    </div>
-                                  )}
-
-                                  {comparisonLine && (
-                                    <div className="mt-2 pt-2 border-t border-gray-200">
+                                  {comparisonText && (
+                                    <div className="bg-[#319694]/5 rounded-lg p-3 border border-[#319694]/20">
                                       <p className="leading-relaxed font-medium text-gray-800">
-                                        {comparisonLine.trim()}
-                                        {!comparisonLine.trim().endsWith(".") &&
-                                          "."}
+                                        {comparisonText}.
                                       </p>
                                     </div>
                                   )}
 
-                                  {(stabilityLine || implicationLine) && (
-                                    <div className="mt-2 pt-2 border-t border-gray-200 bg-[#319694]/5 -mx-4 -mb-4 p-3 rounded-b-lg">
-                                      {stabilityLine && (
-                                        <p className="leading-relaxed text-gray-700 mb-2">
-                                          <span className="font-semibold text-[#319694]">
-                                            Assessment:
-                                          </span>{" "}
-                                          {stabilityLine
-                                            .trim()
-                                            .replace(/^The results are /, "")
-                                            .replace(/\.$/, "")}
-                                          .
-                                        </p>
-                                      )}
-                                      {implicationLine && (
-                                        <p className="leading-relaxed text-gray-700">
-                                          <span className="font-semibold text-[#319694]">
-                                            Impact:
-                                          </span>{" "}
-                                          {implicationLine
-                                            .trim()
-                                            .replace(/^This indicates /, "")
-                                            .replace(/\.$/, "")}
-                                          .
-                                        </p>
-                                      )}
+                                  {implicationText && (
+                                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                      <p className="leading-relaxed text-gray-700">
+                                        <span className="font-semibold text-blue-700">Assessment:</span>{" "}
+                                        {implicationText}
+                                      </p>
                                     </div>
                                   )}
                                 </div>
