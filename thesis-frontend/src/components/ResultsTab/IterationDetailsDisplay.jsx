@@ -29,6 +29,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
   const [selectedMetric, setSelectedMetric] = useState('all');
   const [hoveredRow, setHoveredRow] = useState(null);
   const [showMiniChart, setShowMiniChart] = useState(true);
+  const [hoveredBothRow, setHoveredBothRow] = useState(null); // New state for both view hover
 
   // Helper to safely extract individual results
   const getIndividualResults = (results) => {
@@ -147,31 +148,8 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
     link.click();
   };
 
-  // Mini sparkline chart component
-  const MiniSparkline = ({ data, color = 'blue' }) => {
-    if (!data || data.length === 0) return null;
-    
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-    
-    const points = data.map((value, index) => {
-      const x = (index / (data.length - 1)) * 100;
-      const y = 100 - ((value - min) / range) * 100;
-      return `${x},${y}`;
-    }).join(' ');
-    
-    return (
-      <svg width="60" height="20" className="inline-block ml-2">
-        <polyline
-          fill="none"
-          stroke={`var(--tw-colors-${color}-500)`}
-          strokeWidth="2"
-          points={points}
-        />
-      </svg>
-    );
-  };
+  // Get the maximum number of iterations for side-by-side display
+  const maxIterations = Math.max(eacoIterations.length, epsoIterations.length);
 
   return (
     <motion.div 
@@ -198,7 +176,7 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                 Individual Iteration Results
               </h3>
               <p className={`text-sm sm:text-sm mt-0.5 ${showDetails ? 'text-white/80' : 'text-gray-600'} leading-relaxed`}>
-                <span className="block sm:inline">Detailed analysis of {Math.max(eacoIterations.length, epsoIterations.length)} iterations</span>
+                <span className="block sm:inline">Detailed analysis of {maxIterations} iterations</span>
                 <span className="hidden sm:inline"> <Dot className="inline mx-1" size={12} /> </span>
                 <span className="block sm:inline">Raw paired data used in t-test</span>
               </p>
@@ -349,22 +327,65 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 text-sm sm:text-sm">
                           Iteration
                         </th>
-                        {selectedAlgorithm !== 'paired' && (
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold text-gray-700 text-sm sm:text-sm">Algorithm</th>
+                        
+                        {selectedAlgorithm === 'both' ? (
+                          // Side-by-side headers for both algorithms
+                          <>
+                            <th colSpan={displayMetrics.length} className="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold text-blue-700 bg-blue-50 text-sm sm:text-sm border-l border-r border-gray-200">
+                              EACO
+                            </th>
+                            <th colSpan={displayMetrics.length} className="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold text-orange-700 bg-orange-50 text-sm sm:text-sm">
+                              EPSO
+                            </th>
+                          </>
+                        ) : selectedAlgorithm === 'paired' ? (
+                          // Headers for paired differences
+                          displayMetrics.map(metric => (
+                            <th key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-700 text-sm sm:text-sm">
+                              <div className="flex items-center justify-end gap-1">
+                                <span className="truncate">{metric.label}</span>
+                                {metric.unit && <span className="font-normal text-gray-500 hidden sm:inline">({metric.unit})</span>}
+                              </div>
+                            </th>
+                          ))
+                        ) : (
+                          // Headers for single algorithm
+                          displayMetrics.map(metric => (
+                            <th key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-700 text-sm sm:text-sm">
+                              <div className="flex items-center justify-end gap-1">
+                                <span className="truncate">{metric.label}</span>
+                                {metric.unit && <span className="font-normal text-gray-500 hidden sm:inline">({metric.unit})</span>}
+                              </div>
+                            </th>
+                          ))
                         )}
-                        {displayMetrics.map(metric => (
-                          <th key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-700 text-sm sm:text-sm">
-                            <div className="flex items-center justify-end gap-1">
-                              <span className="truncate">{metric.label}</span>
-                              {metric.unit && <span className="font-normal text-gray-500 hidden sm:inline">({metric.unit})</span>}
-                            </div>
-                          </th>
-                        ))}
                       </tr>
+                      
+                      {/* Sub-headers for side-by-side view */}
+                      {selectedAlgorithm === 'both' && (
+                        <tr>
+                          <th className="px-2 sm:px-4 py-1 text-left font-medium text-gray-600 sticky left-0 bg-gray-50 z-10 text-xs sm:text-sm">
+                            {/* Empty for iteration column */}
+                          </th>
+                          {/* EACO metric sub-headers */}
+                          {displayMetrics.map(metric => (
+                            <th key={`eaco-${metric.key}`} className="px-2 sm:px-4 py-1 text-right font-medium text-blue-600 bg-blue-50 text-xs sm:text-sm border-l border-gray-200">
+                              {metric.label}
+                            </th>
+                          ))}
+                          {/* EPSO metric sub-headers */}
+                          {displayMetrics.map(metric => (
+                            <th key={`epso-${metric.key}`} className="px-2 sm:px-4 py-1 text-right font-medium text-orange-600 bg-orange-50 text-xs sm:text-sm">
+                              {metric.label}
+                            </th>
+                          ))}
+                        </tr>
+                      )}
                     </thead>
+                    
                     <tbody className="divide-y divide-gray-100">
                       {selectedAlgorithm === 'paired' ? (
-                        // Paired Differences View
+                        // Paired Differences View - Always colored
                         Array.from({ length: Math.min(eacoIterations.length, epsoIterations.length) }).map((_, idx) => {
                           const eacoIter = eacoIterations[idx];
                           const epsoIter = epsoIterations[idx];
@@ -431,66 +452,138 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                             </motion.tr>
                           );
                         })
+                      ) : selectedAlgorithm === 'both' ? (
+                        // Side-by-side view for both algorithms - Color only on hover
+                        Array.from({ length: maxIterations }).map((_, idx) => {
+                          const eacoIter = eacoIterations[idx];
+                          const epsoIter = epsoIterations[idx];
+                          const isHovered = hoveredBothRow === idx;
+                          
+                          return (
+                            <motion.tr 
+                              key={`both-${idx}`}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: idx * 0.01 }}
+                              className="hover:bg-gray-50 transition-colors group"
+                              onMouseEnter={() => setHoveredBothRow(idx)}
+                              onMouseLeave={() => setHoveredBothRow(null)}
+                            >
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm border-r border-gray-200">
+                                {idx + 1}
+                              </td>
+                              
+                              {/* EACO Data - Black and white by default, colored on hover */}
+                              {displayMetrics.map(metric => {
+                                const eacoValue = eacoIter ? eacoIter.summary[metric.key] || 0 : 0;
+                                const epsoValue = epsoIter ? epsoIter.summary[metric.key] || 0 : 0;
+                                const { trend } = calculateDifference(eacoValue, epsoValue, metric.key);
+                                
+                                // Determine text color based on hover state and trend
+                                const textColorClass = isHovered 
+                                  ? trend === 'better' ? 'text-green-700' 
+                                    : trend === 'worse' ? 'text-red-700' 
+                                    : 'text-gray-700'
+                                  : 'text-gray-700';
+                                
+                                return (
+                                  <td 
+                                    key={`eaco-${metric.key}`} 
+                                    className={`px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-sm sm:text-sm transition-colors border-l border-gray-200 ${
+                                      isHovered 
+                                        ? trend === 'better' ? 'bg-green-50/50' 
+                                          : trend === 'worse' ? 'bg-red-50/50' 
+                                          : 'bg-gray-50/50'
+                                        : 'bg-white'
+                                    }`}
+                                  >
+                                    <div className="text-right">
+                                      <div className={textColorClass}>
+                                        {eacoIter ? metric.format(eacoValue) : '-'}
+                                      </div>
+                                      <span className={`text-sm ${
+                                        isHovered 
+                                          ? trend === 'better' ? 'text-green-500' 
+                                            : trend === 'worse' ? 'text-red-500' 
+                                            : 'text-gray-500'
+                                          : 'text-gray-500'
+                                      } hidden sm:inline`}>
+                                        {metric.unit}
+                                      </span>
+                                    </div>
+                                  </td>
+                                );
+                              })}
+                              
+                              {/* EPSO Data - Black and white by default, colored on hover */}
+                              {displayMetrics.map(metric => {
+                                const eacoValue = eacoIter ? eacoIter.summary[metric.key] || 0 : 0;
+                                const epsoValue = epsoIter ? epsoIter.summary[metric.key] || 0 : 0;
+                                const { trend } = calculateDifference(eacoValue, epsoValue, metric.key);
+                                
+                                // For EPSO, we need to invert the trend logic since we're comparing EACO-EPSO
+                                const invertedTrend = trend === 'better' ? 'worse' : trend === 'worse' ? 'better' : 'neutral';
+                                
+                                const textColorClass = isHovered 
+                                  ? invertedTrend === 'better' ? 'text-green-700' 
+                                    : invertedTrend === 'worse' ? 'text-red-700' 
+                                    : 'text-gray-700'
+                                  : 'text-gray-700';
+                                
+                                return (
+                                  <td 
+                                    key={`epso-${metric.key}`} 
+                                    className={`px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-sm sm:text-sm transition-colors ${
+                                      isHovered 
+                                        ? invertedTrend === 'better' ? 'bg-green-50/50' 
+                                          : invertedTrend === 'worse' ? 'bg-red-50/50' 
+                                          : 'bg-gray-50/50'
+                                        : 'bg-white'
+                                    }`}
+                                  >
+                                    <div className="text-right">
+                                      <div className={textColorClass}>
+                                        {epsoIter ? metric.format(epsoValue) : '-'}
+                                      </div>
+                                      <span className={`text-sm ${
+                                        isHovered 
+                                          ? invertedTrend === 'better' ? 'text-green-500' 
+                                            : invertedTrend === 'worse' ? 'text-red-500' 
+                                            : 'text-gray-500'
+                                          : 'text-gray-500'
+                                      } hidden sm:inline`}>
+                                        {metric.unit}
+                                      </span>
+                                    </div>
+                                  </td>
+                                );
+                              })}
+                            </motion.tr>
+                          );
+                        })
                       ) : (
-                        // Individual Algorithm Data
-                        <>
-                          {(selectedAlgorithm === 'both' || selectedAlgorithm === 'eaco') && 
-                            eacoIterations.map((iter, idx) => (
-                              <motion.tr 
-                                key={`eaco-${idx}`}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: idx * 0.01 }}
-                                className="hover:bg-blue-50/50 transition-colors"
-                              >
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">{idx + 1}</td>
-                                {selectedAlgorithm !== 'paired' && (
-                                  <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                    <span className="px-2 sm:px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full font-semibold">
-                                      EACO
-                                    </span>
-                                  </td>
-                                )}
-                                {displayMetrics.map(metric => (
-                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
-                                    <div className="text-right">
-                                      <div>{metric.format(iter.summary[metric.key] || 0)}</div>
-                                      <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
-                                    </div>
-                                  </td>
-                                ))}
-                              </motion.tr>
-                            ))
-                          }
-                          {(selectedAlgorithm === 'both' || selectedAlgorithm === 'epso') && 
-                            epsoIterations.map((iter, idx) => (
-                              <motion.tr 
-                                key={`epso-${idx}`}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: idx * 0.01 }}
-                                className="hover:bg-orange-50/50 transition-colors"
-                              >
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">{idx + 1}</td>
-                                {selectedAlgorithm !== 'paired' && (
-                                  <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                    <span className="px-2 sm:px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded-full font-semibold">
-                                      EPSO
-                                    </span>
-                                  </td>
-                                )}
-                                {displayMetrics.map(metric => (
-                                  <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
-                                    <div className="text-right">
-                                      <div>{metric.format(iter.summary[metric.key] || 0)}</div>
-                                      <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
-                                    </div>
-                                  </td>
-                                ))}
-                              </motion.tr>
-                            ))
-                          }
-                        </>
+                        // Individual Algorithm Data (EACO Only or EPSO Only) - Always black and white
+                        (selectedAlgorithm === 'eaco' ? eacoIterations : epsoIterations).map((iter, idx) => (
+                          <motion.tr 
+                            key={`${selectedAlgorithm}-${idx}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: idx * 0.01 }}
+                            className="hover:bg-gray-50 transition-colors"
+                          >
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium sticky left-0 bg-white text-sm sm:text-sm">
+                              {idx + 1}
+                            </td>
+                            {displayMetrics.map(metric => (
+                              <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
+                                <div className="text-right">
+                                  <div>{metric.format(iter.summary[metric.key] || 0)}</div>
+                                  <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
+                                </div>
+                              </td>
+                            ))}
+                          </motion.tr>
+                        ))
                       )}
                     </tbody>
                   </table>
