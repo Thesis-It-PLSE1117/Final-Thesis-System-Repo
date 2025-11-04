@@ -358,10 +358,6 @@ const WorkloadUploadCard = ({
                       {(workloadFile.size / 1024).toFixed(2)} KB
                     </span>
                   )}
-                  <span className="text-sm font-semibold text-[#319694] flex items-center gap-1">
-                    <Zap size={14} />
-                    {csvRowCount} tasks loaded
-                  </span>
                 </div>
               </div>
 
@@ -469,7 +465,7 @@ const WorkloadUploadCard = ({
                     </table>
                   </div>
                   <div className="px-3 py-1.5 text-sm text-[#319694]/80 bg-[#f0fdfa] border-t border-[#319694]/10 sticky bottom-0">
-                    Showing {csvPreview.rows.length} of {csvRowCount} rows{" "}
+                    Showing a Preview of {csvPreview.rows.length} rows{" "} from the
                     <Dot className="inline mx-1" size={12} />{" "}
                     {csvPreview.type === "preset"
                       ? "Preset workload"

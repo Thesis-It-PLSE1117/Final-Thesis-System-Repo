@@ -42,6 +42,12 @@ const ResultsTab = ({
   plotData,
   plotsGenerating,
 }) => {
+  console.log("[DEBUG] ResultsTab props received:", {
+    eacoHasTTest: !!eacoResults?.ttestResults,
+    epsoHasTTest: !!epsoResults?.ttestResults,
+    eacoNormality: eacoResults?.ttestResults?.normalityTests,
+    epsoNormality: epsoResults?.ttestResults?.normalityTests,
+  });
   const [resultsRR, setResultsRR] = useState(null);
   const [resultsEPSO, setResultsEPSO] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -359,14 +365,33 @@ const ResultsTab = ({
       eacoResults?.wilcoxonResults ||
       epsoResults?.wilcoxonResults ||
       eacoResults?.wilcoxonTests ||
-    epsoResults?.wilcoxonTests
-  );
+      epsoResults?.wilcoxonTests
+    );
+
+  console.log("[DEBUG] Checking eacoResults structure:", {
+    hasEaco: !!eacoResults,
+    eacoKeys: eacoResults ? Object.keys(eacoResults) : null,
+    hasTTestResults: !!eacoResults?.tTestResults,
+    hasttestResults: !!eacoResults?.ttestResults,
+    ttestResultsKeys: eacoResults?.ttestResults
+      ? Object.keys(eacoResults.ttestResults)
+      : null,
+    hasNormalityInTtest: !!eacoResults?.ttestResults?.normalityTests,
+  });
 
   const tTestResults =
     eacoResults?.tTestResults ||
     eacoResults?.ttestResults ||
     epsoResults?.tTestResults ||
     epsoResults?.ttestResults;
+
+  console.log("[DEBUG] tTestResults selected:", {
+    tTestResults,
+    hasNormalityTests: !!tTestResults?.normalityTests,
+    normalityTestsKeys: tTestResults?.normalityTests
+      ? Object.keys(tTestResults.normalityTests)
+      : null,
+  });
 
   const rawNormalityTests = tTestResults?.normalityTests;
 
@@ -389,6 +414,23 @@ const ResultsTab = ({
 
   const normalityAnalysis = tTestResults?.interpretation?.normalityAnalysis;
 
+  console.log("[DEBUG] Normality tests data:", {
+    hasNormalityTests,
+    rawNormalityTests,
+    normalizedTests: normalityTests,
+    normalityAnalysis,
+    eacoHasNormality: !!eacoResults?.tTestResults?.normalityTests,
+    epsoHasNormality: !!epsoResults?.tTestResults?.normalityTests,
+    tTestResultsKeys: tTestResults ? Object.keys(tTestResults) : null,
+    fullTTestResults: tTestResults,
+    eacoTTestKeys: eacoResults?.tTestResults
+      ? Object.keys(eacoResults.tTestResults)
+      : null,
+    epsoTTestKeys: epsoResults?.tTestResults
+      ? Object.keys(epsoResults.tTestResults)
+      : null,
+  });
+
   const normalizedWilcoxonResults =
     eacoResults?.wilcoxonTestResults ||
     epsoResults?.wilcoxonTestResults ||
@@ -396,6 +438,31 @@ const ResultsTab = ({
     epsoResults?.wilcoxonResults ||
     eacoResults?.wilcoxonTests ||
     epsoResults?.wilcoxonTests;
+
+  console.log("[DEBUG] Raw Wilcoxon data from props:", {
+    fromEaco: eacoResults?.wilcoxonTests || eacoResults?.wilcoxonTestResults,
+    fromEpso: epsoResults?.wilcoxonTests || epsoResults?.wilcoxonTestResults,
+    normalized: normalizedWilcoxonResults,
+    eacoKeys: eacoResults
+      ? Object.keys(eacoResults).filter((k) =>
+          k.toLowerCase().includes("wilcoxon"),
+        )
+      : [],
+    epsoKeys: epsoResults
+      ? Object.keys(epsoResults).filter((k) =>
+          k.toLowerCase().includes("wilcoxon"),
+        )
+      : [],
+  });
+
+  console.log("[DEBUG] ResultsTab - Test availability check:", {
+    hasTTest,
+    hasWilcoxon,
+    eacoKeys: eacoResults ? Object.keys(eacoResults) : "no eaco",
+    epsoKeys: epsoResults ? Object.keys(epsoResults) : "no epso",
+    eacoWilcoxonType: typeof eacoResults?.wilcoxonTestResults,
+    epsoWilcoxonType: typeof epsoResults?.wilcoxonTestResults,
+  });
 
   if (loading)
     return (
@@ -538,6 +605,44 @@ const ResultsTab = ({
               />
             ) : (
               <>
+                {/*shown when both tests available */}
+                {(() => {
+                  console.log(
+                    "[DEBUG] StatisticalTestSelector render decision:",
+                    {
+                      hasTTest,
+                      hasWilcoxon,
+                      willRender: hasTTest || hasWilcoxon,
+                      currentActiveTest: activeStatisticalTest,
+                    },
+                  );
+                  // return (hasTTest || hasWilcoxon) && (
+                  //   <StatisticalTestSelector
+                  //     activeTest={activeStatisticalTest}
+                  //     onTestChange={setActiveStatisticalTest}
+                  //     hasTTest={hasTTest}
+                  //     hasWilcoxon={hasWilcoxon}
+                  //   />
+                  // );
+                })()}
+
+                {/* normality test */}
+                {(() => {
+                  console.log("[DEBUG] Normality test render check:", {
+                    hasNormalityTests,
+                    normalityTestsKeys: normalityTests
+                      ? Object.keys(normalityTests)
+                      : null,
+                    normalityTests,
+                    normalityAnalysis,
+                  });
+                  return hasNormalityTests && (
+                    <NormalityTestDisplay
+                      normalityTests={normalityTests}
+                      normalityAnalysis={normalityAnalysis}
+                    />
+                  );
+                })()}
 
                 {/* T-Test Results */}
                 {hasTTest && activeStatisticalTest === "ttest" && (
@@ -849,7 +954,9 @@ const ResultsTab = ({
       );
 
       if (!eacoValidation.valid || !epsoValidation.valid) {
-        console.error("ECharts data validation failed.");
+        console.error(
+          "❌ ECharts data validation failed. Check console for details.",
+        );
       }
 
       logDataStructure(eacoResults.rawResults, "EACO");
