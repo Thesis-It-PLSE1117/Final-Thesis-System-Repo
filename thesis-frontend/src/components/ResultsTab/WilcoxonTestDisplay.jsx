@@ -53,6 +53,7 @@ import {
   Shield,
   Lightbulb,
 } from "lucide-react";
+import { formatPValue } from "../../utils/pValueFormatter";
 
 /**
  * displays Wilcoxon signed-rank test results with progressive disclosure.
@@ -554,9 +555,7 @@ const WilcoxonTestDisplay = ({
                       className={`text-sm sm:text-base font-mono ${getSignificanceColor(test?.pValue)}`}
                     >
                       p ={" "}
-                      {typeof test?.pValue === "number"
-                        ? test.pValue.toFixed(4)
-                        : "—"}
+                      {formatPValue(test?.pValue)}
                       {typeof test?.pValue === "number" &&
                         test.pValue < 0.001 &&
                         " ***"}

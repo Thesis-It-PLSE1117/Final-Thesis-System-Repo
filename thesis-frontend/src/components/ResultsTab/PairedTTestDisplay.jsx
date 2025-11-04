@@ -20,6 +20,7 @@ import {
   Target,
   LineChart,
 } from "lucide-react";
+import { formatPValue } from "../../utils/pValueFormatter";
 
 const PairedTTestDisplay = ({
   tTestResults,
@@ -493,9 +494,7 @@ const PairedTTestDisplay = ({
                       className={`text-sm sm:text-base font-mono ${getSignificanceColor(test?.pValue)}`}
                     >
                       p ={" "}
-                      {typeof test?.pValue === "number"
-                        ? test.pValue.toFixed(4)
-                        : "—"}
+                      {formatPValue(test?.pValue)}
                       {typeof test?.pValue === "number" &&
                         test.pValue < 0.001 &&
                         " ***"}
