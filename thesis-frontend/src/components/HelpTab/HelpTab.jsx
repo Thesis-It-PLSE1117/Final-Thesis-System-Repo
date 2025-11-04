@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { HelpCircle, BookOpen, BarChart3 } from "lucide-react";
+import { HelpCircle, BookOpen, BarChart3, Navigation, Activity } from "lucide-react";
 import DataCenterHelp from "./DataCenterHelp";
 import WorkloadHelp from "./WorkloadHelp";
 import ProjectOverview from "./ProjectOverview";
 import StatisticalMethodology from "./StatisticalMethodology";
+import SystemNavigationHelp from "./SystemNavigationHelp";
+import AnimationResultsHelp from "./AnimationResultsHelp";
 
 // Animation variants
 const containerVariants = {
@@ -37,7 +39,7 @@ const tabContentVariants = {
 };
 
 const HelpTab = () => {
-  const [activeTab, setActiveTab] = useState('datacenter');
+  const [activeTab, setActiveTab] = useState('navigation');
 
   return (
     <motion.div
@@ -64,11 +66,33 @@ const HelpTab = () => {
 
       {/* Tab Navigation */}
       <motion.nav 
-        className="flex border-b border-[#319694]/10"
+        className="flex flex-wrap border-b border-[#319694]/10"
         variants={itemVariants}
       >
         <button
-          className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'navigation' 
+              ? 'text-[#319694] border-b-2 border-[#319694]' 
+              : 'text-gray-500 hover:text-[#319694]'
+          }`}
+          onClick={() => setActiveTab('navigation')}
+        >
+          <Navigation size={16} />
+          Navigation
+        </button>
+        <button
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'animation' 
+              ? 'text-[#319694] border-b-2 border-[#319694]' 
+              : 'text-gray-500 hover:text-[#319694]'
+          }`}
+          onClick={() => setActiveTab('animation')}
+        >
+          <Activity size={16} />
+          Results
+        </button>
+        <button
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
             activeTab === 'datacenter' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -78,7 +102,7 @@ const HelpTab = () => {
           Data Center
         </button>
         <button
-          className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
             activeTab === 'workload' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -88,7 +112,7 @@ const HelpTab = () => {
           Workload
         </button>
         <button
-          className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
             activeTab === 'documentation' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -96,10 +120,10 @@ const HelpTab = () => {
           onClick={() => setActiveTab('documentation')}
         >
           <BookOpen size={16} />
-          Project Overview
+          Overview
         </button>
         <button
-          className={`px-4 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
             activeTab === 'methodology' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -107,7 +131,7 @@ const HelpTab = () => {
           onClick={() => setActiveTab('methodology')}
         >
           <BarChart3 size={16} />
-          Statistics Used
+          Statistics
         </button>
       </motion.nav>
 
@@ -121,8 +145,10 @@ const HelpTab = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="min-h-[400px]"
       >
+        {activeTab === 'navigation' && <SystemNavigationHelp />}
         {activeTab === 'datacenter' && <DataCenterHelp />}
         {activeTab === 'workload' && <WorkloadHelp />}
+        {activeTab === 'animation' && <AnimationResultsHelp />}
         {activeTab === 'documentation' && <ProjectOverview />}
         {activeTab === 'methodology' && <StatisticalMethodology />}
       </motion.div>

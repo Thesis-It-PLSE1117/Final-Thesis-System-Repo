@@ -152,7 +152,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
               whileHover={INTERACTION_STATES.scale.subtle}
             >
               <Award size={ICON_SIZES.xs} className="animate-pulse" />
-              Cloud Load Balancing Algorithm Comparison
+              For Cloud Load Balancing Algorithm Comparison
             </motion.div>
             <motion.div
               className={`${SPACING_SCALE.padding.button.sm} bg-gradient-to-r from-[#319694]/10 to-[#4fd1c5]/10 ${BORDER_RADIUS.full} ${COLOR_SYSTEM.text.secondary} ${TYPOGRAPHY_SCALE.weights.medium} text-sm inline-flex items-center gap-1.5 ${COLOR_SYSTEM.borders.primary}`}
@@ -266,7 +266,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
             }}
             whileTap={INTERACTION_STATES.scale.tap}
           >
-            <span>View Docs</span>
+            <span>View User Guide </span>
             <Settings size={ICON_SIZES.sm} />
           </motion.button>
         </motion.div>

@@ -123,12 +123,12 @@ const HomePage = () => {
 
   const footerLinks = [
     {
-      text: "GitHub",
+      text: "Check on Github",
       href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git",
       icon: <FaGithub size={20} />,
     },
     {
-      text: "Documentation",
+      text: "User Guide & Docs",
       href: "#",
       icon: <BookOpen size={18} />,
       onClick: () => {
@@ -137,7 +137,7 @@ const HomePage = () => {
       },
     },
     {
-      text: "Team",
+      text: "Know the Team",
       href: "#",
       icon: <Users size={18} />,
       onClick: () => setIsAboutModalOpen(true),
