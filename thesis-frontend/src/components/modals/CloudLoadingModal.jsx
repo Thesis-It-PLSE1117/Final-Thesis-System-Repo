@@ -12,6 +12,7 @@ import {
   Info,
   Repeat,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import {
   ICON_SIZES,
@@ -35,9 +36,8 @@ const CloudLoadingModal = ({
   message = null,
 }) => {
   const [elapsedTime, setElapsedTime] = React.useState(0);
-  const [currentPhase, setCurrentPhase] = React.useState("initializing");
 
-  const isLargeTaskSet = (totalTasks || numCloudlets) > 1000;
+  const isLargeTaskSet = (totalTasks || numCloudlets) > 5000;
   const isMultipleIterations = iterations > 1;
   const effectiveTaskCount = totalTasks || numCloudlets;
 
@@ -46,24 +46,49 @@ const CloudLoadingModal = ({
   const displayStage =
     iterationStage || (currentIteration ? "Processing..." : null);
 
-  // Calculate overall progress based on iterations
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const getOverallProgress = () => {
     if (!isMultipleIterations || iterations <= 1) {
       return progress;
     }
 
-    // Calculate progress range for current iteration
     const progressPerIteration = 100 / iterations;
     const minProgress = (actualCurrentIteration - 1) * progressPerIteration;
     const currentIterationProgress = (progress * progressPerIteration) / 100;
-    
-    // Total progress is base from previous iterations + current iteration progress
     const totalProgress = minProgress + currentIterationProgress;
     
     return Math.min(totalProgress, 99);
   };
 
   const overallProgress = getOverallProgress();
+
+  const getIterationBasedEta = () => {
+    if (iterations > 1 && actualCurrentIteration > 0) {
+      const avgTimePerIteration = elapsedTime / actualCurrentIteration;
+      const remainingIterations = iterations - actualCurrentIteration;
+      return Math.round(avgTimePerIteration * remainingIterations);
+    }
+    
+    if (iterations === 1 && elapsedTime > 2) {
+      const taskCount = effectiveTaskCount;
+      const baseTimePerTask = 0.015;
+      const estimatedTotalTime = taskCount * baseTimePerTask;
+      const remainingTime = estimatedTotalTime - elapsedTime;
+      
+      if (remainingTime > 0 && overallProgress < 95) {
+        return Math.round(remainingTime);
+      }
+    }
+    
+    return null;
+  };
+
+  const estimatedTimeRemaining = getIterationBasedEta();
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -73,35 +98,11 @@ const CloudLoadingModal = ({
     return () => clearInterval(timer);
   }, []);
 
-  React.useEffect(() => {
-    if (overallProgress < 10) setCurrentPhase("initializing");
-    else if (overallProgress < 30) setCurrentPhase("scheduling");
-    else if (overallProgress < 60) setCurrentPhase("simulating");
-    else if (overallProgress < 90) setCurrentPhase("analyzing");
-    else setCurrentPhase("finalizing");
-  }, [overallProgress]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const getIterationBasedEta = () => {
-    if (actualCurrentIteration === 0 || iterations <= 1) {
-      return null;
-    }
-    
-    const avgTimePerIteration = elapsedTime / actualCurrentIteration;
-    const remainingIterations = iterations - actualCurrentIteration;
-    return Math.round(avgTimePerIteration * remainingIterations);
-  };
-
   const tips = [
+    "For robust statistical analysis, use 50 or more iterations to ensure reliable comparison results.",
     "EPSO and EACO are enhanced optimization algorithms designed for better cloud resource scheduling.",
     "The simulation balances multiple objectives: execution time, cost efficiency, energy usage, and load distribution.",
-    "Both algorithms are optimized for convergence speed while maintaining high solution quality.",
-    "Results include detailed performance metrics and statistical comparisons between algorithms.",
+    "Higher iteration counts provide more accurate performance metrics and confidence in algorithm comparison.",
   ];
 
   const [currentTipIndex, setCurrentTipIndex] = React.useState(0);
@@ -112,7 +113,7 @@ const CloudLoadingModal = ({
     }, 15000);
 
     return () => clearInterval(tipInterval);
-  }, []);
+  }, [tips.length]);
 
   return (
     <motion.div
@@ -220,39 +221,35 @@ const CloudLoadingModal = ({
             />
           </div>
 
-          {getIterationBasedEta() !== null && (
+          {estimatedTimeRemaining !== null && (
             <div className="flex justify-center items-center mt-1.5">
               <div className="text-sm text-gray-600">
-                Approximately {formatTime(getIterationBasedEta())} remaining
+                Approximately {formatTime(estimatedTimeRemaining)} remaining
               </div>
             </div>
           )}
         </div>
 
-        <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Info className="text-gray-600" size={ICON_SIZES.sm} />
-            <span className="text-gray-700 font-medium text-sm">
-              Processing Information
-            </span>
-          </div>
-          {message ? (
-            <div className="text-sm text-gray-700 font-medium mb-2">
+        {message ? (
+          <div className="mb-3 p-2.5 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-sm text-blue-800 font-medium">
               {message}
             </div>
-          ) : null}
-
-          <motion.p
-            key={currentTipIndex}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.5 }}
-            className="text-sm text-gray-600 leading-relaxed"
-          >
-            {tips[currentTipIndex]}
-          </motion.p>
-        </div>
+          </div>
+        ) : (
+          <div className="mb-3 min-h-[2.5rem] flex items-center justify-center">
+            <motion.p
+              key={currentTipIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="text-xs text-center text-gray-500 italic px-4"
+            >
+              {tips[currentTipIndex]}
+            </motion.p>
+          </div>
+        )}
 
         {iterations > 1 && (
           <div className="mb-3 p-2.5 bg-[#319694]/5 rounded-lg border border-[#319694]/20">
@@ -290,10 +287,10 @@ const CloudLoadingModal = ({
               <Database className="text-[#319694]" size={ICON_SIZES.sm} />
               <div>
                 <div className="font-medium text-gray-700 text-sm">Tasks</div>
-                <div className="text-gray-900 font-semibold text-sm">
+                <div className="text-gray-900 font-semibold text-sm flex items-center gap-1">
                   {effectiveTaskCount.toLocaleString()}
                   {isLargeTaskSet && (
-                    <span className="text-sm text-amber-600 ml-1">⚠</span>
+                    <AlertTriangle size={14} className="text-amber-600" />
                   )}
                 </div>
               </div>

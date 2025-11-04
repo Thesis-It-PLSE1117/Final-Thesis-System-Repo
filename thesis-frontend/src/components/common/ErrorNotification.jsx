@@ -54,13 +54,13 @@ const ErrorNotification = ({ message, type = 'error', onClose, duration = 5000 }
         >
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">{getIcon()}</div>
-            <div className="flex-1 text-sm">{message}</div>
+            <div className="flex-1 text-sm break-words">{message}</div>
             <button
               onClick={() => {
                 setIsVisible(false);
                 if (onClose) onClose();
               }}
-              className="flex-shrink-0 ml-4 hover:opacity-70 transition-opacity"
+              className="flex-shrink-0 hover:opacity-70 transition-opacity"
             >
               <X className="w-4 h-4" />
             </button>
@@ -91,7 +91,7 @@ export const NotificationManager = () => {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 max-w-md space-y-2">
+    <div className="fixed top-4 right-4 z-50 w-full max-w-md px-4 space-y-2">
       <AnimatePresence>
         {notifications.map((notification) => (
           <motion.div
