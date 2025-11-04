@@ -55,9 +55,13 @@ export const useSimulationRunner = () => {
     }
   };
   
-  const startIterationPolling = () => {
+  const startIterationPolling = (iterations) => {
+    if (iterations <= 1) {
+      return;
+    }
+    
     if (!iterationPollingInterval) {
-      const interval = setInterval(pollIterationProgress, 5000);
+      const interval = setInterval(pollIterationProgress, 120000);
       setIterationPollingInterval(interval);
       pollIterationProgress();
     }
@@ -353,7 +357,7 @@ export const useSimulationRunner = () => {
 
     setSimulationState('loading');
     setProgress(0);
-    startIterationPolling();
+    startIterationPolling(iterationConfig.iterations);
     
     // Store simulation start in session storage
     sessionStorage.setItem('activeSimulation', JSON.stringify({

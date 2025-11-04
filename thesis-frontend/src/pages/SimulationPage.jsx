@@ -191,7 +191,6 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
       const isDeployedEnvironment =
         !window.location.hostname.includes("localhost");
       const totalOperations =
-        config.dataCenterConfig.numVMs *
         effectiveCloudletCount *
         config.iterationConfig.iterations;
 
