@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, TrendingUp, Activity, AlertTriangle } from "lucide-react";
 import { FEATURES } from "../../config/features";
+import { formatPValue } from "../../utils/pValueFormatter";
 
 const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
   const [expanded, setExpanded] = useState(false);
@@ -191,7 +192,7 @@ const NormalityTestDisplay = ({ normalityTests, normalityAnalysis }) => {
                               <div>
                                 <span className="text-gray-500 font-medium">P-value: </span>
                                 <span className="font-semibold text-gray-900">
-                                  {test.pValue?.toFixed(4) || "—"}
+                                  {formatPValue(test.pValue)}
                                 </span>
                               </div>
                             </div>
