@@ -26,7 +26,7 @@ const Footer = ({ footerLinks }) => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 items-start">
               <Cloud className="w-10 h-10 md:w-12 md:h-12" />
-              <h4 className="text-base md:text-lg font-medium tracking-wide">© 2025 Cloud Load Balancer Simulator.</h4>
+              <h4 className="text-base md:text-lg font-medium tracking-wide">© 2025, Cloud Load Balancer Simulator.</h4>
             </div>
             <div className="flex flex-col gap-3">
               <div className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-sky-100 border border-sky-200 text-sky-700 font-semibold text-sm md:text-base w-fit">
@@ -48,7 +48,7 @@ const Footer = ({ footerLinks }) => {
         </div>
         
         <div>
-          <h5 className="font-semibold mb-4 md:mb-5 text-lg md:text-xl">Resources</h5>
+          <h5 className="font-semibold mb-4 md:mb-5 text-lg md:text-xl">Know more about our system?</h5>
           <ul className="space-y-3 md:space-y-4">
             {footerLinks.map((link, i) => (
               <li key={i}>
@@ -69,11 +69,15 @@ const Footer = ({ footerLinks }) => {
         <div className="flex flex-col gap-4 md:gap-5 rounded-xl bg-white/10 p-5 md:p-8 backdrop-blur-sm border border-white/20">
           <h5 className="font-semibold text-lg md:text-xl">Contact</h5>
           <p className="text-sm md:text-base text-white/90">
-            You can request a copy of the research paper by contacting:
+            You can request a copy of the research paper or ask further questions by contacting:
           </p>
           <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-white border border-gray-200">
             <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
             <span className="text-sm md:text-base text-gray-700 font-medium break-all">larangajohndanmel31@gmail.com</span>
+          </div>
+           <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-white border border-gray-200">
+            <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
+            <span className="text-sm md:text-base text-gray-700 font-medium break-all">reyeskierchristian64@gmail.com</span>
           </div>
         </div>
       </div>
