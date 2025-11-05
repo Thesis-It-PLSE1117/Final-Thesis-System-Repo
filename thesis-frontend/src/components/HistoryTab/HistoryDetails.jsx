@@ -207,7 +207,7 @@ const HistoryDetails = ({ result, onViewResults }) => {
       value: (
         getMetric("responseTime") || getMetric("avgResponseTime")
       ).toFixed(2),
-      unit: "ms",
+      unit: "s",
     },
     {
       icon: <Cpu size={20} className="text-[#319694]" />,
