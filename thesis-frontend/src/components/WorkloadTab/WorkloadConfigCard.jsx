@@ -31,7 +31,7 @@ const WorkloadConfigCard = ({
   const isDisabled = false;
 
   // Enforce 5000-10000 range for cloudlets
-  const minCloudlets = 5000;
+  const minCloudlets = 1000;
   const maxCloudlets = 10000;
   
   // Calculate the actual max value - use the smaller of csvRowCount or 10000

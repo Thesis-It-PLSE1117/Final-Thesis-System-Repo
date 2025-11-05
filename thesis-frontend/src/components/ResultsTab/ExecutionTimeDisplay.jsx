@@ -1,5 +1,5 @@
 import React from 'react';
-import { Timer, GitCompare } from 'lucide-react';
+import { Clock, Timer, CheckCircle, Calendar, BarChart2, GitCompare } from 'lucide-react';
 
 const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
   const getExecutionInfo = (results) => {
@@ -8,6 +8,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
     let duration = null;
     let timestamp = null;
     let isComparison = false;
+    
 
     if (results.totalExecutionTime) {
       duration = results.totalExecutionTime / 1000; 
@@ -20,8 +21,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
       duration = results.rawResults.executionTimeMs / 1000;
     }
     
-    // Use the timestamp from results, don't generate a new one
-    timestamp = results.metadata?.timestamp || results.timestamp;
+    timestamp = results.metadata?.timestamp || results.timestamp || new Date().toISOString();
     
     return {
       duration,
@@ -75,8 +75,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
   
   const overallCompletion = getOverallCompletion();
   
-  // Only show if we have comparison results with duration
-  if (!eacoInfo?.isComparisonResult || !eacoInfo?.duration) {
+  if (!eacoInfo?.duration && !epsoInfo?.duration && !eacoInfo?.isComparisonResult) {
     return null;
   }
 
@@ -94,9 +93,10 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
         </div>
       </div>
       
+      {/* Content */}
       <div className="p-4">
-        {/* Comparison timing - only show total simulation time */}
-        {eacoInfo?.isComparisonResult && eacoInfo?.duration && (
+        {/* Comparison timing */}
+        {eacoInfo?.isComparisonResult && eacoInfo?.duration ? (
           <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
             <div className="flex items-center gap-2">
               <GitCompare className="text-blue-600" size={16} />
@@ -106,13 +106,9 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
               {formatDuration(eacoInfo.duration)}
             </span>
           </div>
-        )}
-
-        {/*
-        Individual algorithm times (commented out - for future use if needed)
-        
-        {eacoInfo?.duration && epsoInfo?.duration && (
-          <div className="space-y-2 mt-4">
+        ) : (
+          /* Individual algorithm times */
+          <div className="space-y-2">
             {eacoInfo?.duration && (
               <div className="flex items-center justify-between p-3 bg-teal-50 rounded-lg">
                 <span className="font-medium text-teal-800">EACO</span>
@@ -131,7 +127,7 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
               </div>
             )}
             
-            {/* Winner indicator - compact * /}
+            {/* Winner indicator - compact */}
             {eacoInfo?.duration && epsoInfo?.duration && (
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <div className="flex items-center justify-center gap-4 text-sm">
@@ -148,7 +144,6 @@ const ExecutionTimeDisplay = ({ eacoResults, epsoResults }) => {
             )}
           </div>
         )}
-        */}
       </div>
     </div>
   );
