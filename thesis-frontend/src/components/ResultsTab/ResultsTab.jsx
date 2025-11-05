@@ -129,9 +129,7 @@ const ResultsTab = ({
             id: "visualizations",
             label: "Visualizations",
             icon: <FiActivity className="w-4 h-4" />,
-            description: matlabPlotsExpected
-              ? "MATLAB plots and charts"
-              : "Interactive ECharts visualizations",
+            description: "Interactive visualizations and charts",
             enabled: true,
           },
         ]
@@ -765,7 +763,7 @@ const ResultsTab = ({
                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
                   <div>
                     <p className="text-blue-800 font-medium">
-                      MATLAB plots are being generated...
+                      Visualizations are being generated...
                     </p>
                     <p className="text-blue-600 text-sm mt-1">
                       This may take a few moments.
@@ -800,11 +798,10 @@ const ResultsTab = ({
                     Visualizations Not Available
                   </p>
                   <p className="text-gray-500 text-sm mt-2">
-                    MATLAB plots were not generated for this simulation type.
+                    Visualizations are not available for this simulation type.
                   </p>
                   <p className="text-gray-400 text-sm mt-1">
-                    Enable MATLAB plots in simulation configuration to generate
-                    visualizations.
+                    Run a single iteration simulation to view interactive charts.
                   </p>
                 </div>
               </div>
@@ -1080,8 +1077,7 @@ const ResultsTab = ({
                   No Visualization Data Available
                 </p>
                 <p className="text-yellow-700 text-sm mt-1">
-                  Enable MATLAB plots in the simulation configuration to
-                  generate visualizations.
+                  Run a single iteration simulation to generate interactive visualizations.
                 </p>
               </div>
             </div>

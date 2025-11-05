@@ -138,7 +138,7 @@ const ProjectOverview = () => {
         <>
           <span className="font-semibold">CloudSim-based</span> simulation framework with Spring Boot backend and React frontend. 
           <span className="font-semibold">CustomBroker</span> class inherits from CloudSim's DatacenterBroker and implements 
-          <span className="font-semibold">ISchedulingAlgorithm</span> interface. MATLAB integration provides advanced visualization and statistical analysis of results.
+          <span className="font-semibold">ISchedulingAlgorithm</span> interface. Apache ECharts provides interactive visualization and statistical analysis of results.
         </>
       ),
       subsections: [
@@ -156,8 +156,8 @@ const ProjectOverview = () => {
           title: "Technology Stack",
           content: (
             <>
-              <span className="font-semibold">Backend:</span> Spring Boot + CloudSim core + MATLAB Engine. 
-              <span className="font-semibold">Frontend:</span> React.js + Chart.js for visualization. 
+              <span className="font-semibold">Backend:</span> Spring Boot + CloudSim core. 
+              <span className="font-semibold">Frontend:</span> React.js + Apache ECharts for visualization. 
               <span className="font-semibold">Data:</span> Google Cluster Dataset preprocessing with Python + pandas/numpy.
             </>
           )

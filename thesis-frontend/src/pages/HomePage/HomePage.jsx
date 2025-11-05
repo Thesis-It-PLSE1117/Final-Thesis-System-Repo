@@ -87,8 +87,7 @@ const HomePage = () => {
         "Upload custom CSV files with task details.",
         "Choose from 30 Google Cluster preset options.",
         "Set the number of tasks.",
-        "Enable MATLAB charts for detailed analysis (mainly for researchers).",
-        "Standard charts will show automatically if MATLAB is not selected.",
+        "Interactive charts will display automatically for single iterations.",
       ],
     },
     {
@@ -115,7 +114,7 @@ const HomePage = () => {
       list: [
         "View test details, analysis, charts, and execution logs",
         "Get statistical significance results with t-tests",
-        "See MATLAB-generated or Apache E-Charts performance charts and graphs",
+        "See interactive Apache ECharts performance visualizations",
         "Browse your test history and export data",
       ],
     },
