@@ -5,7 +5,6 @@ import WorkloadConfigCard from "./WorkloadConfigCard";
 import CSVFormatGuide from "./CSVFormatGuide";
 import WorkloadUploadCard from "./WorkloadUploadCard";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import MatlabToggle from "./MatlabToggle";
 import CloudletToggle from "./CloudletToggle";
 import {
   SPACING_SCALE,
@@ -126,7 +125,7 @@ const WorkloadTab = ({
                     For Visualizations (Single iteration)
                   </h4>
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    Results will display as charts using Apache ECharts with export options, toggle below to switch on Matlab.
+                    Results will display as interactive charts using Apache ECharts with export options.
                   </p>
                 </div>
               </div>
@@ -169,15 +168,6 @@ const WorkloadTab = ({
           />
         </div>
       </motion.div>
-
-      {/* MATLAB Visualization Toggle */}
-      <div className="mt-6 mb-6">
-        <MatlabToggle
-          enabled={enableMatlabPlots}
-          onChange={onMatlabToggle}
-          disabled={iterations > 1}
-        />
-      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (

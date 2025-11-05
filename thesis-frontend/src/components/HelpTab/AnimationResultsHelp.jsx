@@ -198,7 +198,7 @@ const AnimationResultsHelp = () => {
               and task distribution visualized for easy understanding.
             </p>
             <div className="bg-gray-50 rounded p-3 text-base text-gray-600">
-              <strong className="font-medium">Note:</strong> Only available when running single iterations or if MATLAB plots are enabled
+              <strong className="font-medium">Note:</strong> Only available when running single iterations.
             </div>
           </div>
 
