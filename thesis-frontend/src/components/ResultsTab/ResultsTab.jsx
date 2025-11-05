@@ -990,10 +990,10 @@ const ResultsTab = ({
             </svg>
             <div>
               <p className="text-green-900 font-semibold text-md">
-                Visualizations using Apache ECharts
+                Using Apache ECharts
               </p>
               <p className="text-green-700 text-sm mt-1">
-                Export options available for each chart, you can click the chart
+                Export options available for each plot, you can click the chart
                 for a better view.
               </p>
             </div>
