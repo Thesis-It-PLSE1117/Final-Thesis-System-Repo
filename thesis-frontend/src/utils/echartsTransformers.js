@@ -28,7 +28,7 @@ export const transformPerformanceMetrics = (summary, algorithmName) => {
 
   return {
     title: {
-      text: `${algorithmName} Algorithm - Performance Metrics`,
+      text: `${algorithmName}`,
       left: 'center',
       textStyle: {
         fontSize: 16,
@@ -238,7 +238,7 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
       grid: { left: '18%', right: '12%', bottom: '20%', top: '30%', containLabel: true },
       xAxis: { 
         type: 'category', 
-        data: ['Resource\nUtil. (%)', 'Throughput'],
+        data: ['Resource\nUtil. (%)'],
         axisLabel: { fontSize: 10, color: '#374151', interval: 0, lineHeight: 14 }
       },
       yAxis: { 
@@ -262,18 +262,7 @@ export const transformDetailedAnalysis = (summary, algorithmName) => {
               distance: 10
             }
           },
-          {
-            value: throughput,
-            label: { 
-              show: true, 
-              position: 'top', 
-              formatter: () => formatNumber(throughput),
-              fontSize: 10,
-              fontWeight: 'bold',
-              color: '#1F2937',
-              distance: 10
-            }
-          }
+          
         ],
         barCategoryGap: '50%',
         barWidth: '45%',
@@ -391,7 +380,7 @@ export const transformVMUtilization = (vmUtilization, algorithmName) => {
 
   return {
     title: {
-      text: `${algorithmName} - VM Resource Utilization`,
+      text: `${algorithmName}`,
       left: 'center',
       textStyle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937' }
     },
@@ -480,146 +469,268 @@ export const transformEnergyAnalysis = (summary, algorithmName) => {
 
   return [
     {
-      title: { text: 'Energy Consumption', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
-      tooltip: { trigger: 'axis', formatter: (params) => `${params[0].name}: ${formatNumber(params[0].value)} mWh` },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '30%', containLabel: true },
+      title: { 
+        text: 'Energy Consumption Analysis', 
+        left: 'center', 
+        top: '2%',
+        textStyle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937' } 
+      },
+      tooltip: { 
+        trigger: 'axis',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        textStyle: { color: '#000' },
+        formatter: function(params) {
+          const item = params[0];
+          return `<strong>${item.name}</strong><br/>${item.seriesName}: ${formatNumber(item.value)} mWh`;
+        }
+      },
+      legend: {
+        data: ['Energy Consumption'],
+        top: '12%',
+        left: 'center'
+      },
+      grid: { 
+        left: '20%', 
+        right: '20%', 
+        bottom: '25%', 
+        top: '30%', 
+        containLabel: true 
+      },
       xAxis: { 
         type: 'category', 
-        data: ['Total', 'Per Second'],
-        axisLabel: { fontSize: 11, color: '#374151' }
+        data: ['Total\nEnergy', 'Energy per\nSecond'],
+        axisLabel: { 
+          fontSize: 11, 
+          color: '#374151',
+          interval: 0,
+          rotate: 0,
+          margin: 15,
+          lineHeight: 16
+        },
+        axisLine: {
+          lineStyle: { color: '#374151' }
+        }
       },
       yAxis: { 
         type: 'value', 
         name: 'Energy (mWh)',
-        nameTextStyle: { fontSize: 11, color: '#374151' },
-        axisLabel: { fontSize: 10, color: '#374151' }
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: { fontSize: 12, color: '#374151' },
+        axisLabel: { fontSize: 11, color: '#374151' },
+        splitLine: {
+          lineStyle: { color: '#e5e7eb', type: 'dashed' }
+        }
       },
       series: [{
+        name: 'Energy Consumption',
         type: 'bar',
         data: [
           {
             value: energyData1000,
+            itemStyle: { color: COLORS.warning },
             label: { 
               show: true, 
               position: 'top', 
-              formatter: () => `${formatNumber(energyData1000)} mWh`,
-              fontSize: 11,
+              formatter: () => `${formatNumber(energyData1000)}`,
+              fontSize: 10,
               fontWeight: 'bold',
               color: '#1F2937',
-              distance: 8
+              distance: 15,
+              padding: [5, 8, 5, 8]
             }
           },
           {
             value: energyPerSecond,
+            itemStyle: { color: COLORS.warning },
             label: { 
               show: true, 
               position: 'top', 
-              formatter: () => `${formatNumber(energyPerSecond)} mWh`,
-              fontSize: 11,
+              formatter: () => `${formatNumber(energyPerSecond)}`,
+              fontSize: 10,
               fontWeight: 'bold',
               color: '#1F2937',
-              distance: 8
+              distance: 15,
+              padding: [5, 8, 5, 8]
             }
           }
         ],
-        barCategoryGap: '50%',
-        barWidth: '45%',
-        itemStyle: { color: COLORS.warning },
-        labelLayout: { hideOverlap: false }
+        barMaxWidth: 80,
+        barCategoryGap: '60%',
+        emphasis: {
+          itemStyle: {
+            color: COLORS.warning,
+            shadowBlur: 10,
+            shadowColor: 'rgba(0,0,0,0.3)'
+          }
+        },
+        labelLayout: { 
+          hideOverlap: false,
+          moveOverlap: 'shiftY'
+        }
       }],
-      labelLayout: { hideOverlap: false }
+      labelLayout: { 
+        hideOverlap: false,
+        moveOverlap: 'shiftY'
+      }
     },
     {
-      title: { text: 'Energy Efficiency', left: 'center', textStyle: { fontSize: 12, fontWeight: 'bold' } },
+      title: { 
+        text: 'Energy Efficiency Metrics', 
+        left: 'center', 
+        top: '2%',
+        textStyle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937' } 
+      },
       tooltip: { 
         trigger: 'axis',
-        formatter: (params) => {
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        textStyle: { color: '#000' },
+        formatter: function(params) {
           const item = params[0];
           const unit = item.dataIndex === 0 ? ' tasks/Wh' : ' mWh/task';
-          return `${item.name}: ${formatNumber(item.value)}${unit}`;
+          return `<strong>${item.name}</strong><br/>${item.seriesName}: ${formatNumber(item.value)}${unit}`;
         }
       },
-      grid: { left: '18%', right: '12%', bottom: '15%', top: '30%', containLabel: true },
+      legend: {
+        data: ['Energy Efficiency'],
+        top: '12%',
+        left: 'center'
+      },
+      grid: { 
+        left: '20%', 
+        right: '20%', 
+        bottom: '25%', 
+        top: '30%', 
+        containLabel: true 
+      },
       xAxis: { 
         type: 'category', 
-        data: ['Tasks/Wh', 'mWh/Task'],
-        axisLabel: { fontSize: 11, color: '#374151' }
+        data: ['Tasks per\nWh', 'mWh per\nTask'],
+        axisLabel: { 
+          fontSize: 11, 
+          color: '#374151',
+          interval: 0,
+          rotate: 0,
+          margin: 15,
+          lineHeight: 16
+        },
+        axisLine: {
+          lineStyle: { color: '#374151' }
+        }
       },
       yAxis: { 
         type: 'value', 
         name: 'Efficiency',
-        nameTextStyle: { fontSize: 11, color: '#374151' },
-        axisLabel: { fontSize: 10, color: '#374151' }
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: { fontSize: 12, color: '#374151' },
+        axisLabel: { fontSize: 11, color: '#374151' },
+        splitLine: {
+          lineStyle: { color: '#e5e7eb', type: 'dashed' }
+        }
       },
       series: [{
+        name: 'Energy Efficiency',
         type: 'bar',
         data: [
           {
             value: tasksPerWh,
+            itemStyle: { color: COLORS.success },
             label: { 
               show: true, 
               position: 'top', 
-              formatter: () => `${formatNumber(tasksPerWh)} tasks/Wh`,
-              fontSize: 11,
+              formatter: () => `${formatNumber(tasksPerWh)}`,
+              fontSize: 10,
               fontWeight: 'bold',
               color: '#1F2937',
-              distance: 8
+              distance: 15,
+              padding: [5, 8, 5, 8]
             }
           },
           {
             value: mWhPerTask,
+            itemStyle: { color: COLORS.success },
             label: { 
               show: true, 
               position: 'top', 
-              formatter: () => `${formatNumber(mWhPerTask)} mWh/task`,
-              fontSize: 11,
+              formatter: () => `${formatNumber(mWhPerTask)}`,
+              fontSize: 10,
               fontWeight: 'bold',
               color: '#1F2937',
-              distance: 8
+              distance: 15,
+              padding: [5, 8, 5, 8]
             }
           }
         ],
-        barCategoryGap: '50%',
-        barWidth: '45%',
-        itemStyle: { color: COLORS.success },
-        labelLayout: { hideOverlap: false }
+        barMaxWidth: 80,
+        barCategoryGap: '60%',
+        emphasis: {
+          itemStyle: {
+            color: COLORS.success,
+            shadowBlur: 10,
+            shadowColor: 'rgba(0,0,0,0.3)'
+          }
+        },
+        labelLayout: { 
+          hideOverlap: false,
+          moveOverlap: 'shiftY'
+        }
       }],
-      labelLayout: { hideOverlap: false }
+      labelLayout: { 
+        hideOverlap: false,
+        moveOverlap: 'shiftY'
+      }
     }
   ];
 };
 
+
 export const transformRadarChart = (summary, algorithmName) => {
   if (!summary) return null;
 
-  const makespan = summary.makespan || 0;
-  const avgResponseTime = summary.responseTime || summary.avgResponseTime || 0;
-  const resourceUtilization = summary.resourceUtilization || 0;
-  const energyConsumption = summary.energyConsumption || 0;
-  const degreeOfImbalance = summary.loadImbalance || 0;
+  const makespan = Math.max(0, summary.makespan || 0);
+  const avgResponseTime = Math.max(0, summary.responseTime || summary.avgResponseTime || 0);
+  const resourceUtilization = Math.max(0, Math.min(100, summary.resourceUtilization || 0));
+  const energyConsumption = Math.max(0, summary.energyConsumption || 0);
+  const degreeOfImbalance = Math.max(0, summary.loadImbalance || 0);
 
   const values = [
     makespan,
-    avgResponseTime,
+    avgResponseTime, 
     resourceUtilization,
     energyConsumption,
     degreeOfImbalance
   ];
 
+  // Better max calculations based on official examples
   const maxMakespan = Math.max(makespan * 1.2, 100);
   const maxResponseTime = Math.max(avgResponseTime * 1.2, 100);
   const maxEnergy = Math.max(energyConsumption * 1.2, 10);
-  const maxImbalance = Math.max(degreeOfImbalance * 1.2, 10);
+  const maxImbalance = Math.max(degreeOfImbalance * 1.2, 5);
 
   return {
     title: {
-      text: `${algorithmName} - Performance Radar`,
+      text: `${algorithmName} Performance Radar`,
       left: 'center',
-      top: '5%',
-      textStyle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937' }
+      top: '3%',
+      textStyle: { 
+        fontSize: 16, 
+        fontWeight: 'bold', 
+        color: '#1F2937' 
+      }
     },
     tooltip: {
       trigger: 'item',
+      backgroundColor: 'rgba(255,255,255,0.9)',
+      borderColor: '#ccc',
+      borderWidth: 1,
+      textStyle: {
+        color: '#000'
+      },
       formatter: (params) => {
         if (!params.value || !Array.isArray(params.value)) {
           return `${algorithmName}`;
@@ -627,8 +738,8 @@ export const transformRadarChart = (summary, algorithmName) => {
         const dimensions = [
           { name: 'Makespan', unit: 's' },
           { name: 'Response Time', unit: 's' },
-          { name: 'Resource Util.', unit: '%' },
-          { name: 'Energy Cons.', unit: ' Wh' },
+          { name: 'Resource Utilization', unit: '%' },
+          { name: 'Energy Consumption', unit: ' Wh' },
           { name: 'Degree of Imbalance', unit: '' }
         ];
         let result = `<strong>${algorithmName}</strong><br/>`;
@@ -640,62 +751,80 @@ export const transformRadarChart = (summary, algorithmName) => {
         return result;
       }
     },
+    legend: {
+      data: [algorithmName],
+      top: '15%',
+      left: 'center'
+    },
     radar: {
+      shape: 'polygon',
+      center: ['50%', '60%'],
+      radius: '65%',
+      startAngle: 90,
+      splitNumber: 5,
       indicator: [
-        { name: 'Makespan', max: maxMakespan },
-        { name: 'Response Time', max: maxResponseTime },
-        { name: 'Resource Util.', max: 100 },
-        { name: 'Energy Cons.', max: maxEnergy },
+        { name: 'Makespan (s)', max: maxMakespan },
+        { name: 'Response Time (s)', max: maxResponseTime },
+        { name: 'Resource Util. (%)', max: 100 },
+        { name: 'Energy Cons. (Wh)', max: maxEnergy },
         { name: 'Degree of Imbalance', max: maxImbalance }
       ],
-      center: ['50%', '55%'],
-      radius: '60%',
-      splitNumber: 4,
       name: {
         textStyle: {
-          fontSize: 11,
-          fontWeight: 'bold',
+          fontSize: 12,
+          fontWeight: 'normal',
           color: '#374151'
         }
       },
       splitLine: {
         lineStyle: {
           color: COLORS.neutral,
-          opacity: 0.3
+          width: 1,
+          type: 'solid'
         }
       },
       splitArea: {
         show: true,
         areaStyle: {
-          color: ['rgba(49, 150, 148, 0.05)', 'rgba(49, 150, 148, 0.1)']
+          color: [
+            'rgba(49, 150, 148, 0.05)',
+            'rgba(49, 150, 148, 0.1)',
+            'rgba(49, 150, 148, 0.05)',
+            'rgba(49, 150, 148, 0.1)',
+            'rgba(49, 150, 148, 0.05)'
+          ]
         }
       },
       axisLine: {
         lineStyle: {
           color: COLORS.neutral,
-          opacity: 0.3
+          width: 1
         }
       }
     },
     series: [{
+      name: algorithmName,
       type: 'radar',
+      emphasis: {
+        disabled: true
+      },
       data: [{
         value: values,
         name: algorithmName,
-        areaStyle: {
-          color: 'rgba(49, 150, 148, 0.3)'
-        },
+        symbol: 'circle',
+        symbolSize: 6,
         lineStyle: {
           color: COLORS.teal,
-          width: 2.5
+          width: 2
         },
         itemStyle: {
           color: COLORS.teal,
           borderColor: '#fff',
-          borderWidth: 2
+          borderWidth: 1
         },
-        symbol: 'circle',
-        symbolSize: 8
+        areaStyle: {
+          color: 'rgba(49, 150, 148, 0.2)'
+        }
       }]
     }]
   };
