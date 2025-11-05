@@ -109,7 +109,7 @@ const WorkloadTab = ({
         transition={{ duration: 0.3 }}
       >
         <div className="space-y-6">
-          {!enableMatlabPlots && (
+          {/* {!enableMatlabPlots && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ const WorkloadTab = ({
                 </div>
               </div>
             </motion.div>
-          )}
+          )} */}
 
           {/* Cloudlet Configuration Control */}
           <CloudletToggle

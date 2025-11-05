@@ -41,11 +41,109 @@ export const downloadCSV = (csvContent, filename = "data.csv") => {
 
 //as json
 export const downloadJSON = (jsonData, filename = "data.json") => {
-  const jsonContent = JSON.stringify(jsonData, null, 2);
-  const blob = new Blob([jsonContent], {
-    type: "application/json;charset=utf-8;",
-  });
-  downloadFile(blob, filename);
+  try {
+    // Try with pretty formatting first
+    const jsonContent = JSON.stringify(jsonData, null, 2);
+    const blob = new Blob([jsonContent], {
+      type: "application/json;charset=utf-8;",
+    });
+    downloadFile(blob, filename);
+  } catch (error) {
+    if (error.message.includes("Invalid string length")) {
+      // If pretty formatting fails, try compact
+      try {
+        const jsonContent = JSON.stringify(jsonData);
+        const blob = new Blob([jsonContent], {
+          type: "application/json;charset=utf-8;",
+        });
+        downloadFile(blob, filename);
+      } catch (compactError) {
+        // Data is too large, need to find maximum size that works
+        console.warn("Data too large, finding maximum exportable size...");
+        
+        // Binary search to find maximum number of iterations that fit
+        const findMaxIterations = (data) => {
+          const hasEacoResults = data.eacoResults?.individualResults?.length > 0;
+          const hasEpsoResults = data.epsoResults?.individualResults?.length > 0;
+          
+          if (!hasEacoResults && !hasEpsoResults) {
+            // No individual results to trim
+            alert("Error: Dataset is too large to export as JSON even without iteration data.");
+            return null;
+          }
+          
+          const maxEaco = hasEacoResults ? data.eacoResults.individualResults.length : 0;
+          const maxEpso = hasEpsoResults ? data.epsoResults.individualResults.length : 0;
+          const maxIterations = Math.max(maxEaco, maxEpso);
+          
+          let low = 1;
+          let high = maxIterations;
+          let bestWorking = 0;
+          
+          while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            const testData = { ...data };
+            
+            if (hasEacoResults) {
+              testData.eacoResults = {
+                ...testData.eacoResults,
+                individualResults: testData.eacoResults.individualResults.slice(0, mid)
+              };
+            }
+            if (hasEpsoResults) {
+              testData.epsoResults = {
+                ...testData.epsoResults,
+                individualResults: testData.epsoResults.individualResults.slice(0, mid)
+              };
+            }
+            
+            try {
+              JSON.stringify(testData);
+              bestWorking = mid;
+              low = mid + 1;
+            } catch (e) {
+              high = mid - 1;
+            }
+          }
+          
+          return bestWorking;
+        };
+        
+        const maxIterations = findMaxIterations(jsonData);
+        
+        if (maxIterations && maxIterations > 0) {
+          const reduced = { ...jsonData };
+          
+          if (reduced.eacoResults?.individualResults) {
+            reduced.eacoResults = {
+              ...reduced.eacoResults,
+              individualResults: reduced.eacoResults.individualResults.slice(0, maxIterations)
+            };
+          }
+          if (reduced.epsoResults?.individualResults) {
+            reduced.epsoResults = {
+              ...reduced.epsoResults,
+              individualResults: reduced.epsoResults.individualResults.slice(0, maxIterations)
+            };
+          }
+          
+          const jsonContent = JSON.stringify(reduced);
+          const blob = new Blob([jsonContent], {
+            type: "application/json;charset=utf-8;",
+          });
+          downloadFile(blob, filename);
+          
+          const totalEaco = jsonData.eacoResults?.individualResults?.length || 0;
+          const totalEpso = jsonData.epsoResults?.individualResults?.length || 0;
+          const total = Math.max(totalEaco, totalEpso);
+          
+          alert(`Exported maximum data possible: ${maxIterations} of ${total} iterations. Use CSV export for complete data.`);
+        }
+      }
+    } else {
+      throw error;
+    }
+  }
 };
 
 //blob file
