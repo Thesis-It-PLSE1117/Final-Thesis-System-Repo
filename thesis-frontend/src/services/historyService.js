@@ -8,7 +8,7 @@ import { openDB, deleteDB } from "idb";
 const DB_NAME = "SimulationHistoryDB";
 const DB_VERSION = 2;
 const STORE_NAME = "history";
-const MAX_HISTORY_ENTRIES = 200;
+const MAX_HISTORY_ENTRIES = 6;
 
 let dbPromise = null;
 

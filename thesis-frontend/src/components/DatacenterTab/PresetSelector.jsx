@@ -61,7 +61,7 @@ const PresetSelector = ({
         iconColor: "text-purple-600",
       },
       "large-scale": {
-        title: windowWidth < 768 ? "RS" : "Research Scale",
+        title: windowWidth < 768 ? "RS" : "Research Setup",
         description:
           windowWidth < 500 ? "Real scenario" : "Real-world test",
         taskCount: "10,000",

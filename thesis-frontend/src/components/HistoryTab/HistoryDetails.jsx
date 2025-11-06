@@ -416,12 +416,6 @@ const HistoryDetails = ({ result, onViewResults }) => {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500 mb-1">VM Scheduler</p>
-                    <p className="font-semibold text-gray-800">
-                      {config.vmScheduler || "N/A"}
-                    </p>
-                  </div>
-                  <div>
                     <p className="text-gray-500 mb-1">Workload</p>
                     <p className="font-semibold text-gray-800">
                       {config.workloadType || "N/A"}
