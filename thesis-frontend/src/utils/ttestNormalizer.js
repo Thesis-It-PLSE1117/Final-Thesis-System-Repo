@@ -185,7 +185,10 @@ export const normalizeTTestResults = (raw) => {
     
     const eacoStd = parseNumber(test?.eacoStd ?? test?.eaco_std);
     const epsoStd = parseNumber(test?.epsoStd ?? test?.epso_std);
+    const eacoMean = parseNumber(test?.eacoMean ?? test?.eaco_mean);
+    const epsoMean = parseNumber(test?.epsoMean ?? test?.epso_mean);
     const stdInterpretation = test?.stdInterpretation ?? test?.std_interpretation ?? null;
+    const meanInterpretation = test?.meanInterpretation ?? test?.mean_interpretation ?? null;
 
     // Fallback: compute t-statistic if missing and values available
     let computedT = tStatistic;
@@ -208,7 +211,10 @@ export const normalizeTTestResults = (raw) => {
       improvementPercentage,
       eacoStd,
       epsoStd,
+      eacoMean,
+      epsoMean,
       stdInterpretation,
+      meanInterpretation,
     };
   }
 

@@ -23,6 +23,7 @@ import MetadataDisplay from "./MetadataDisplay";
 import AnalysisDisplay from "./AnalysisDisplay";
 import AnalysisComparison from "./AnalysisComparison";
 import IterationDetailsDisplay from "./IterationDetailsDisplay";
+import ComparisonVisualizationTab from "./ComparisonVisualizationTab";
 import ExecutionTimeDisplay from "./ExecutionTimeDisplay";
 import { normalizeData, getSummaryData } from "./utils";
 import ImageModal from "../modals/ImageModal";
@@ -101,10 +102,13 @@ const ResultsTab = ({
     isSingleIteration;
   const shouldUseECharts = !matlabPlotsExpected && hasRawResultsForECharts;
 
-  /**
-   * I define tabs following UI/UX best practices for progressive disclosure
-   * This reduces cognitive load and improves focus
-   */
+  const hasTTest = !!(
+    eacoResults?.tTestResults ||
+    eacoResults?.ttestResults ||
+    epsoResults?.tTestResults ||
+    epsoResults?.ttestResults
+  );
+
   const tabs = [
     {
       id: "metadata",
@@ -122,6 +126,17 @@ const ResultsTab = ({
         : "Statistical analysis and interpretations",
       enabled: true,
     },
+    ...(hasTTest && !isSingleIteration
+      ? [
+          {
+            id: "metric-comparison",
+            label: "Mean Comparisons",
+            icon: <FiBarChart2 className="w-4 h-4" />,
+            description: "Comparison of EACO and EPSO mean across all metrics",
+            enabled: true,
+          },
+        ]
+      : []),
     // Conditionally include visualizations tab only when available
     ...(matlabPlotsExpected || shouldUseECharts
       ? [
@@ -349,12 +364,6 @@ const ResultsTab = ({
 
   const rrSummary = getSummaryData(resultsRR);
   const epsoSummary = getSummaryData(resultsEPSO);
-  const hasTTest = !!(
-    eacoResults?.tTestResults ||
-    eacoResults?.ttestResults ||
-    epsoResults?.tTestResults ||
-    epsoResults?.ttestResults
-  );
   const hasWilcoxon =
     FEATURES.ENABLE_WILCOXON &&
     !!(
@@ -583,6 +592,24 @@ const ResultsTab = ({
             {eacoResults?.rawResults?.totalIterations > 1 && (
               <IterationBadge iterationData={eacoResults.rawResults} />
             )}
+          </motion.div>
+        );
+
+      case "metric-comparison":
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <ComparisonVisualizationTab
+              tTestResults={
+                eacoResults?.tTestResults ||
+                eacoResults?.ttestResults ||
+                epsoResults?.tTestResults ||
+                epsoResults?.ttestResults
+              }
+            />
           </motion.div>
         );
 
