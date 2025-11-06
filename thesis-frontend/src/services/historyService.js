@@ -266,7 +266,10 @@ export const saveToHistory = async (
         simulationId: results.eaco.simulationId,
         runId: results.eaco.runId || null,
         seed: results.eaco.seed || null,
-        configSnapshot: results.eaco.configSnapshot || fullConfig,
+        configSnapshot: {
+          ...(results.eaco.configSnapshot || fullConfig),
+          algorithm: 'EACO'
+        },
         datasetId:
           results.eaco.datasetId ||
           (workloadFile ? "custom-csv" : "synthetic-random"),
@@ -333,7 +336,10 @@ export const saveToHistory = async (
         simulationId: results.epso.simulationId,
         runId: results.epso.runId || null,
         seed: results.epso.seed || null,
-        configSnapshot: results.epso.configSnapshot || fullConfig,
+        configSnapshot: {
+          ...(results.epso.configSnapshot || fullConfig),
+          algorithm: 'EPSO'
+        },
         datasetId:
           results.epso.datasetId ||
           (workloadFile ? "custom-csv" : "synthetic-random"),

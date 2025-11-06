@@ -743,7 +743,13 @@ export const exportSimulationHistory = (
       adjustmentMessage: eacoData?.adjustmentMessage || epsoData?.adjustmentMessage || null,
       runId: eacoData?.runId || epsoData?.runId || runId,
       seed: eacoData?.seed || epsoData?.seed || null,
-      configSnapshot: eacoData?.configSnapshot || epsoData?.configSnapshot || eacoData?.config || epsoData?.config || null,
+      configSnapshot: (() => {
+        const snapshot = eacoData?.configSnapshot || epsoData?.configSnapshot || eacoData?.config || epsoData?.config || null;
+        if (snapshot && !snapshot.algorithm) {
+          return { ...snapshot, algorithm: eacoData ? 'EACO' : 'EPSO' };
+        }
+        return snapshot;
+      })(),
       datasetId: eacoData?.datasetId || epsoData?.datasetId || null,
       ttestResults: eacoData?.tTestResults || epsoData?.tTestResults || null,
       summaryMessage: null,
