@@ -33,6 +33,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pendingImportData, setPendingImportData] = useState(null);
 
+  // Check if storage is full
+  const isStorageFull = historyStats.totalEntries >= historyStats.maxEntries;
+
   // Load history and stats on component mount
   useEffect(() => {
     loadHistory();
@@ -310,9 +313,10 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               total entries
             </div>
             {historyStats.totalEntries > 0 && (
-              <div className="text-sm text-gray-500 mt-1">
+              <div className={`text-sm mt-1 ${isStorageFull ? 'text-red-700 font-light' : 'text-gray-500'}`}>
                 Storage: {historyStats.totalEntries}/{historyStats.maxEntries}{" "}
                 entries
+                {isStorageFull && " - Maximum Entries Reached"}
               </div>
             )}
           </div>
@@ -444,11 +448,20 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </div>
             )}
 
-            {/* Import - always available */}
+            {/* Import - disabled when storage is full */}
             <button
               onClick={() => setShowImportDialog(true)}
-              className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
-              title="Import history from backup"
+              disabled={isStorageFull}
+              className={`px-3 py-2 rounded-lg text-sm border flex items-center transition-colors ${
+                isStorageFull
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+              title={
+                isStorageFull 
+                  ? "Storage full - cannot import more data" 
+                  : "Import history from backup"
+              }
               data-testid="import-button"
             >
               <svg
@@ -629,6 +642,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             showImportDialog={showImportDialog}
             setShowImportDialog={setShowImportDialog}
             handleImportHistory={handleImportHistory}
+            isStorageFull={isStorageFull}
           />
         )}
       </AnimatePresence>
