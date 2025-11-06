@@ -37,10 +37,7 @@ const getEffectSizeCategory = (rankBiserial) => {
 };
 
 export const normalizeWilcoxonResults = (raw) => {
-  console.log('[DEBUG] Wilcoxon normalizer called with:', raw);
-  
   if (!raw) {
-    console.warn('[DEBUG] Wilcoxon normalizer: NULL/UNDEFINED input');
     return null;
   }
 
@@ -269,13 +266,6 @@ export const normalizeWilcoxonResults = (raw) => {
     ) ?? 0.05,
     interpretation: raw.interpretation ?? null,
   };
-  
-  console.log('[DEBUG] Wilcoxon normalizer output:', {
-    hasMetricTests: Object.keys(metricTests).length > 0,
-    metricsCount: Object.keys(metricTests).length,
-    overallWinner: normalizedResult.overallWinner,
-    sampleSize: normalizedResult.sampleSize
-  });
   
   return normalizedResult;
 };
