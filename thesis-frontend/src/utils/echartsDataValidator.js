@@ -52,42 +52,9 @@ export const validateEChartsData = (rawResults, algorithmName) => {
 
   const valid = errors.length === 0;
 
-  if (valid && warnings.length === 0) {
-    console.log(`[${algorithmName}] ECharts data validation passed`);
-  } else if (valid && warnings.length > 0) {
-    console.warn(`[${algorithmName}] ECharts data validation passed with warnings:`, warnings);
-  } else {
-    console.error(`[${algorithmName}] ECharts data validation failed:`, errors);
-    if (warnings.length > 0) {
-      console.warn(`Additional warnings:`, warnings);
-    }
-  }
-
   return { valid, errors, warnings, summary };
 };
 
 export const logDataStructure = (rawResults, algorithmName) => {
-  console.group(`📊 ${algorithmName} Data Structure`);
-  console.log('rawResults:', rawResults);
-  
-  if (rawResults?.summary) {
-    console.log('summary:', {
-      makespan: rawResults.summary.makespan,
-      responseTime: rawResults.summary.responseTime,
-      avgResponseTime: rawResults.summary.avgResponseTime,
-      resourceUtilization: rawResults.summary.resourceUtilization,
-      energyConsumption: rawResults.summary.energyConsumption,
-      loadBalance: rawResults.summary.loadBalance,
-      loadImbalance: rawResults.summary.loadImbalance
-    });
-  }
-  
-  if (rawResults?.vmUtilization) {
-    console.log('vmUtilization count:', rawResults.vmUtilization.length);
-    if (rawResults.vmUtilization.length > 0) {
-      console.log('vmUtilization[0]:', rawResults.vmUtilization[0]);
-    }
-  }
-  
-  console.groupEnd();
+  // Debug logging disabled in production
 };

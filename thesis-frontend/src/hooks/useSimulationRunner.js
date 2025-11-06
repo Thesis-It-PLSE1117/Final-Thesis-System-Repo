@@ -37,6 +37,19 @@ export const useSimulationRunner = () => {
   });
   const [plotTrackingIds, setPlotTrackingIds] = useState(null);
   
+  const calculatePollingInterval = (taskCount) => {
+    if (taskCount <= 100) return 7000;
+    if (taskCount >= 5000) return 165000;
+    
+    const minTasks = 100;
+    const maxTasks = 5000;
+    const minInterval = 7000;
+    const maxInterval = 165000;
+    
+    const ratio = (taskCount - minTasks) / (maxTasks - minTasks);
+    return Math.round(minInterval + (ratio * (maxInterval - minInterval)));
+  };
+
   const pollIterationProgress = async () => {
     try {
       const response = await fetch(`${API_BASE}/api/progress`);
@@ -55,13 +68,14 @@ export const useSimulationRunner = () => {
     }
   };
   
-  const startIterationPolling = (iterations) => {
+  const startIterationPolling = (iterations, taskCount) => {
     if (iterations <= 1) {
       return;
     }
     
     if (!iterationPollingInterval) {
-      const interval = setInterval(pollIterationProgress, 120000);
+      const pollingIntervalMs = calculatePollingInterval(taskCount);
+      const interval = setInterval(pollIterationProgress, pollingIntervalMs);
       setIterationPollingInterval(interval);
       pollIterationProgress();
     }
@@ -357,7 +371,7 @@ export const useSimulationRunner = () => {
 
     setSimulationState('loading');
     setProgress(0);
-    startIterationPolling(iterationConfig.iterations);
+    startIterationPolling(iterationConfig.iterations, cloudletConfig.numCloudlets);
     
     // Store simulation start in session storage
     sessionStorage.setItem('activeSimulation', JSON.stringify({
@@ -418,18 +432,7 @@ export const useSimulationRunner = () => {
           } else {
             comparisonResults = await apiClient.compare(configData);
           }
-          console.log('[DEBUG] ===== BACKEND RESPONSE INSPECTION =====');
-          console.log('[DEBUG] All top-level keys:', Object.keys(comparisonResults));
           const ttestData = comparisonResults.tTestResults || comparisonResults.ttestResults;
-          console.log('[DEBUG] T-Test data found:', !!ttestData);
-          if (ttestData) {
-            console.log('[DEBUG] Keys inside ttestResults:', Object.keys(ttestData));
-            console.log('[DEBUG] Wilcoxon nested inside ttestResults:', !!ttestData.wilcoxonTests);
-            if (ttestData.wilcoxonTests) {
-              console.log('[DEBUG] Wilcoxon test metrics:', Object.keys(ttestData.wilcoxonTests));
-            }
-          }
-          console.log('[DEBUG] ==========================================');
           
           const tTestResultsNormalized = normalizeTTestResults(ttestData);
           
@@ -446,19 +449,6 @@ export const useSimulationRunner = () => {
               null
             )
           );
-          
-          console.log('[DEBUG] After normalization:', {
-            tTest: tTestResultsNormalized ? 'PRESENT' : 'NULL',
-            wilcoxon: wilcoxonResultsNormalized ? 'PRESENT' : 'NULL'
-          });
-          
-          if (wilcoxonResultsNormalized) {
-            console.log('[DEBUG] Wilcoxon normalized data:', {
-              metricsCount: Object.keys(wilcoxonResultsNormalized.metricTests || {}).length,
-              overallWinner: wilcoxonResultsNormalized.overallWinner,
-              sampleSize: wilcoxonResultsNormalized.sampleSize
-            });
-          }
           
           const combinedResults = {
             eaco: {

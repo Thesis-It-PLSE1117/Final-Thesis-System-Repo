@@ -14,13 +14,6 @@ const METRIC_DISPLAY_NAMES = {
 };
 
 const ComparisonVisualizationTab = ({ tTestResults }) => {
-  console.log('[DEBUG] ComparisonVisualizationTab received:', {
-    hasTTestResults: !!tTestResults,
-    hasMetricTests: !!tTestResults?.metricTests,
-    metricTestsKeys: tTestResults?.metricTests ? Object.keys(tTestResults.metricTests) : null,
-    sampleData: tTestResults?.metricTests?.makespan
-  });
-
   if (!tTestResults || !tTestResults.metricTests) {
     return (
       <div className="flex items-center justify-center h-64">
