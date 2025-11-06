@@ -28,7 +28,7 @@ export const useSimulationConfig = () => {
   const [workloadFile, setWorkloadFile] = useState(null);
   const [enableMatlabPlots, setEnableMatlabPlots] = useState(false);
   const [iterationConfig, setIterationConfigState] = useState({
-    iterations: 30,
+    iterations: 1,
   });
 
   const setIterationConfig = (newConfig) => {

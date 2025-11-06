@@ -91,8 +91,8 @@ export const getMetricDisplayName = (metricKey) => {
 
 export const RESEARCH_STATISTICS = {
   metricsCompared: 5,
-  simulationsTested: "5K+",
-  testRuns: 30,
+  simulationsTested: "1k+",
+  testRuns: "1-50",
   statisticalConfidence: "95%",
-  significanceLevel: "p < 0.05"
+  significanceLevel: "95%"
 };

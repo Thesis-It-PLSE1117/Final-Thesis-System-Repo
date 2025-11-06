@@ -17,6 +17,9 @@ const IterationTab = ({ config, onChange }) => {
     onChange({ iterations });
   };
 
+  // Use consistent default value
+  const currentIterations = config.iterations || 1;
+
   return (
     <div className="space-y-6">
       {/* Main Configuration Card */}
@@ -54,7 +57,7 @@ const IterationTab = ({ config, onChange }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleIterationChange(1)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    (config.iterations || 1) === 1
+                    currentIterations === 1
                       ? "bg-[#319694] text-white shadow-md"
                       : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
                   }`}
@@ -68,7 +71,7 @@ const IterationTab = ({ config, onChange }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleIterationChange(30)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    (config.iterations || 1) === 30
+                    currentIterations === 30
                       ? "bg-[#319694] text-white shadow-md"
                       : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
                   }`}
@@ -82,7 +85,7 @@ const IterationTab = ({ config, onChange }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleIterationChange(50)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    (config.iterations || 1) === 50
+                    currentIterations === 50
                       ? "bg-[#319694] text-white shadow-md"
                       : "bg-white text-gray-700 border border-gray-300 hover:border-[#319694] hover:bg-[#319694]/5"
                   }`}
@@ -96,7 +99,7 @@ const IterationTab = ({ config, onChange }) => {
                 type="number"
                 min="1"
                 max="50"
-                value={config.iterations || 1}
+                value={currentIterations}
                 onChange={(e) => handleIterationChange(e.target.value)}
                 placeholder="1"
                 disabled
@@ -115,16 +118,16 @@ const IterationTab = ({ config, onChange }) => {
                 <CheckCircle2 className="text-[#319694] mt-0.5 flex-shrink-0" size={18} />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">
-                    {(config.iterations || 30) > 1
+                    {currentIterations > 1
                       ? "Multiple Runs Selected"
                       : "Single Run Selected"}
                   </p>
                   <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                    {(config.iterations || 30) === 1
+                    {currentIterations === 1
                       ? "Fast test mode for quick comparisons."
-                      : (config.iterations || 30) >= 30
+                      : currentIterations >= 30
                         ? "Statistical analysis available."
-                        : `${config.iterations} runs for basic averaging.`}
+                        : `${currentIterations} runs for basic averaging.`}
                   </p>
                 </div>
               </div>
@@ -157,8 +160,8 @@ const IterationTab = ({ config, onChange }) => {
                 fill="currentColor"
               />
               <span>
-                The system runs the test {config.iterations || 30} time
-                {(config.iterations || 30) > 1 ? "s" : ""} with the same settings.
+                The system runs the test {currentIterations} time
+                {currentIterations > 1 ? "s" : ""} with the same settings.
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -210,7 +213,7 @@ const IterationTab = ({ config, onChange }) => {
             </h4>
           </div>
 
-          {(config.iterations || 30) >= 30 ? (
+          {currentIterations >= 30 ? (
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
@@ -241,13 +244,13 @@ const IterationTab = ({ config, onChange }) => {
                 </span>
               </li>
             </ul>
-          ) : (config.iterations || 30) > 1 ? (
+          ) : currentIterations > 1 ? (
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
                   <strong>Average Performance:</strong> Mean results calculated
-                  from {config.iterations} runs.
+                  from {currentIterations} runs.
                 </span>
               </li>
               <li className="flex items-start gap-2">

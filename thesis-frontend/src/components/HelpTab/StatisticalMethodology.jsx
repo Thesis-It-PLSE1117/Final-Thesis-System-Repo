@@ -34,7 +34,7 @@ const StatisticalMethodology = () => {
               {FEATURES.ENABLE_WILCOXON && (
                 <div className="border border-gray-200 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <Activity size={16} className="text-gray-600" />
+                    {/* <Activity size={16} className="text-gray-600" /> */}
                     <span className="font-medium text-gray-900">Wilcoxon Test</span>
                   </div>
                   <p className="text-sm text-gray-600">Non-parametric • No assumptions • Compares medians</p>
@@ -198,7 +198,7 @@ const StatisticalMethodology = () => {
         >
           <div className="flex items-center gap-4">
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Activity className="text-gray-700" size={20} />
+              {/* <Activity className="text-gray-700" size={20} /> */}
             </div>
             <div className="text-left">
               <h3 className="text-lg font-medium text-gray-900">Wilcoxon Signed-Rank Test</h3>

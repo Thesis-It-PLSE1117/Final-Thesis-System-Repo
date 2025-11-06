@@ -13,7 +13,7 @@ export const DEFAULT_CONFIG = {
   vmBw: 1000,                 // 1 Gbps VM network bandwidth
   vmSize: 10000,              // 10GB storage per VM
   vmScheduler: "TimeShared",   // Fair resource sharing policy
-  optimizationAlgorithm: "EACO" // EACO often performs better for cloud scheduling
+  optimizationAlgorithm: "EACO" // It will start load balancing first using EACO then use EPSO afterwards
 };
 
 // Preset configurations for different task sizes (including default)
@@ -72,4 +72,4 @@ export const PRESET_CONFIGS = {
 
 };
 
-export const DEFAULT_CLOUDLET_COUNT = 5000;
+export const DEFAULT_CLOUDLET_COUNT = 1000;
