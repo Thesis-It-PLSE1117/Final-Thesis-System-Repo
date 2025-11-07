@@ -91,9 +91,12 @@ const ResultsTab = ({
   const matlabPlotsExpected = plotsGenerating === true || hasMatlabPlots;
 
   const hasRawResultsForECharts =
+    isSingleIteration &&
     eacoResults?.rawResults?.summary &&
     epsoResults?.rawResults?.summary &&
-    isSingleIteration;
+    (eacoResults?.hasVisualizationData || epsoResults?.hasVisualizationData ||
+     (eacoResults?.vmUtilization && epsoResults?.vmUtilization));
+  
   const shouldUseECharts = !matlabPlotsExpected && hasRawResultsForECharts;
 
   const hasTTest = !!(
