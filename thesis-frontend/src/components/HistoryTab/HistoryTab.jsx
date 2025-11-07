@@ -319,7 +319,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               <div className={`text-sm mt-1 ${isStorageFull ? 'text-red-700 font-light' : 'text-gray-500'}`}>
                 Storage: {historyStats.totalEntries}/{historyStats.maxEntries}{" "}
                 entries
-                {isStorageFull && " - Maximum Entries Reached"}
+                {isStorageFull && " - Maximum Entries Reached."}
               </div>
             )}
           </div>

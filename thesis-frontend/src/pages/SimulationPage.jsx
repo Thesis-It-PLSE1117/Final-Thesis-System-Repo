@@ -11,6 +11,8 @@ import { showNotification } from "../components/common/ErrorNotification";
 import { useAutoSave } from "../hooks/useAutoSave";
 import ConfirmationDialog from "../components/common/ConfirmationDialog";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
+// ADD THIS IMPORT - This was missing!
+import { getHistoryStats } from "../services/historyService";
 
 // components
 import Header from "../components/SimulationPage/Header";
@@ -107,6 +109,8 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
     simulationState === "config",
   );
 
+  const [isStorageFull, setIsStorageFull] = useState(false);
+
   useEffect(() => {
     const savedConfig = localStorage.getItem("simulationConfig");
     if (savedConfig) {
@@ -148,6 +152,24 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
       setWorkflowStep(5);
     }
   }, [activeTab, simulationState]);
+
+  // Check storage status periodically
+  useEffect(() => {
+    const checkStorageStatus = async () => {
+      try {
+        const stats = await getHistoryStats();
+        setIsStorageFull(stats.totalEntries >= stats.maxEntries);
+      } catch (error) {
+        console.error("Error checking storage status:", error);
+      }
+    };
+
+    // Check initially and set up interval to check periodically
+    checkStorageStatus();
+    const interval = setInterval(checkStorageStatus, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle data center changes including preset application
   const handleDataCenterChange = useCallback(
@@ -341,6 +363,7 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
             isCoolingDown={isCoolingDown}
             config={config}
             executeSimulation={executeSimulation}
+            isStorageFull={isStorageFull}
           />
         )}
       </main>
