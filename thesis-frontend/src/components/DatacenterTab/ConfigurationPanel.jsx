@@ -30,7 +30,7 @@ const ConfigurationPanel = ({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden pb-4"
+            className="pb-4" 
           >
             {children}
           </motion.div>

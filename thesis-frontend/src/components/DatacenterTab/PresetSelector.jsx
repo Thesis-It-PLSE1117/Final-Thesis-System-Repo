@@ -11,6 +11,7 @@ import {
   Building2,
   Trash2,
   RotateCcw,
+  Clock
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -443,41 +444,84 @@ const PresetSelector = ({
 
         {/* Research Information - Only show on larger screens */}
         {windowWidth > 640 && (
-          <motion.div
-            className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-200 shadow-sm"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <div className="flex items-center mb-3">
-              <div className="p-2 bg-indigo-100 rounded-lg mr-3">
-                <Info className="text-indigo-600" size={16} />
+          <div className="space-y-4">
+            {/* Research Standards Card */}
+            <motion.div
+              className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-200 shadow-sm"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <div className="flex items-center mb-3">
+                <div className="p-2 bg-indigo-100 rounded-lg mr-3">
+                  <Info className="text-indigo-600" size={16} />
+                </div>
+                <h4 className="text-sm font-bold text-gray-800">
+                  Research Standards
+                </h4>
               </div>
-              <h4 className="text-sm font-bold text-gray-800">
-                Research Standards
-              </h4>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600">
-              <div className="flex items-start">
-                <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <div>
-                  <span className="font-semibold text-indigo-700">
-                    Task Counts:
-                  </span>{" "}
-                  Standard benchmarks for algorithm evaluation.
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-start">
+                  <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <div>
+                    <span className="font-semibold text-indigo-700">
+                      Task Counts:
+                    </span>{" "}
+                    Standard benchmarks for algorithm evaluation.
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <div>
+                    <span className="font-semibold text-indigo-700">
+                      Scalability:
+                    </span>{" "}
+                    Assess performance as workloads grow.
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start">
-                <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <div>
-                  <span className="font-semibold text-indigo-700">
-                    Scalability:
-                  </span>{" "}
-                  Assess performance as workloads grow.
+            </motion.div>
+
+            {/* Simulation Time Estimates Card */}
+            <motion.div
+              className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200 shadow-sm"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
+              <div className="flex items-center mb-3">
+                <div className="p-2 bg-amber-100 rounded-lg mr-3">
+                  <Clock className="text-amber-600" size={16} />
+                </div>
+                <h4 className="text-sm font-bold text-gray-800">
+                  Simulation Time Estimates
+                </h4>
+              </div>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-start">
+                  <span className="inline-block w-2 h-2 bg-amber-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <div>
+                    <span className="font-semibold text-amber-700">Large Scale:</span>{" "}
+                    ~10 min/iteration • 30 Iterations: 1-4 hrs • 50 Iterations: 2-8 hrs
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <span className="inline-block w-2 h-2 bg-amber-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <div>
+                    <span className="font-semibold text-amber-700">Medium Scale:</span>{" "}
+                    ~1 min/iteration • 30 Iteration: ~40 min • 50 Iteration: ~1 hr
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <span className="inline-block w-2 h-2 bg-amber-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <div>
+                    <span className="font-semibold text-amber-700">Small Scale:</span>{" "}
+                    ~1-20 min total runtime
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </motion.div>
     </>

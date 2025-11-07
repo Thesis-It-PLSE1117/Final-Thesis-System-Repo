@@ -10,7 +10,6 @@ import {
   Gauge,
   Disc,
   MoreHorizontal,
-  AlertTriangle,
 } from "lucide-react";
 import InputField from "./InputField";
 import VMCard from "./VMCard";
@@ -37,24 +36,17 @@ const DataCenterTab = ({
     distribution: false,
     preview: false,
   });
-  const [warnings, setWarnings] = useState({
-    storagePerHost: false,
-    bwPerHost: false,
-    vmBw: false,
-    vmSize: false,
-  });
-
-  // Default minimum values for storage and bandwidth
-  const defaultMinValues = {
-    storagePerHost: 200000, // MB
-    bwPerHost: 10000, // MBps
-    vmBw: 1000, // MBps
-    vmSize: 10000, // MB
-  };
+  const [fieldWarnings, setFieldWarnings] = useState({});
+  const [isPresetActive, setIsPresetActive] = useState(false);
 
   // Limit the number of displayed hosts and VMs
   const MAX_DISPLAY_HOSTS = 20;
   const MAX_DISPLAY_VMS = 20;
+
+  // Update isPresetActive when selectedPreset changes
+  useEffect(() => {
+    setIsPresetActive(!!selectedPreset);
+  }, [selectedPreset]);
 
   const toggleSection = (section) => {
     setExpandedSection((prev) => ({
@@ -66,53 +58,36 @@ const DataCenterTab = ({
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Convert empty string to 0 or keep the numeric value
-    let numericValue = value === "" ? 0 : Number(value);
-    
-    // Enforce minimum values - prevent going below defaultMinValues
-    if (defaultMinValues[name] !== undefined) {
-      numericValue = Math.max(numericValue, defaultMinValues[name]);
-      
-      // Show warning if user tried to input a value below minimum
-      if (Number(value) < defaultMinValues[name]) {
-        setWarnings(prev => ({
-          ...prev,
-          [name]: true
-        }));
-        
-        // Clear warning after 3 seconds
-        setTimeout(() => {
-          setWarnings(prev => ({
-            ...prev,
-            [name]: false
-          }));
-        }, 3000);
-      } else {
-        setWarnings(prev => ({
-          ...prev,
-          [name]: false
-        }));
+    // When user manually changes a value, clear the preset
+    if (isPresetActive) {
+      setIsPresetActive(false);
+      if (clearPreset) {
+        clearPreset();
       }
     }
     
+    // Update parent with the numeric value
     onChange({
       target: {
         name,
-        value: numericValue,
+        value: Number(value),
       },
     });
   };
 
-  // Handle preset selection - use the passed applyPreset function or fallback to onChange
+  const handleValidationChange = (fieldName, hasWarning) => {
+    setFieldWarnings(prev => ({
+      ...prev,
+      [fieldName]: hasWarning
+    }));
+  };
+
+  // Handle preset selection
   const handlePresetSelect = (presetName) => {
     setPresetDropdownOpen(false);
     // Clear warnings when applying preset
-    setWarnings({
-      storagePerHost: false,
-      bwPerHost: false,
-      vmBw: false,
-      vmSize: false,
-    });
+    setFieldWarnings({});
+    setIsPresetActive(true);
     
     if (applyPreset) {
       applyPreset(presetName);
@@ -126,16 +101,12 @@ const DataCenterTab = ({
     }
   };
 
-  // Handle clearing preset - use the passed clearPreset function or fallback to onChange
+  // Handle clearing preset
   const handleClearPreset = () => {
     setPresetDropdownOpen(false);
     // Clear warnings when clearing preset
-    setWarnings({
-      storagePerHost: false,
-      bwPerHost: false,
-      vmBw: false,
-      vmSize: false,
-    });
+    setFieldWarnings({});
+    setIsPresetActive(false);
     
     if (clearPreset) {
       clearPreset();
@@ -316,24 +287,6 @@ const DataCenterTab = ({
     config.vmBw,
   ]);
 
-  // Warning message component
-  const WarningMessage = ({ fieldName }) => (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      className="flex items-center mt-1 p-2 bg-amber-50 border border-amber-200 rounded-md text-amber-700 text-xs"
-    >
-      <AlertTriangle size={14} className="mr-2 flex-shrink-0" />
-      <span>
-        {fieldName === 'storagePerHost' && `Value adjusted to minimum: ${defaultMinValues.storagePerHost}MB`}
-        {fieldName === 'bwPerHost' && `Value adjusted to minimum: ${defaultMinValues.bwPerHost}MBps`}
-        {fieldName === 'vmBw' && `Value adjusted to minimum: ${defaultMinValues.vmBw}MBps`}
-        {fieldName === 'vmSize' && `Value adjusted to minimum: ${defaultMinValues.vmSize}MB`}
-      </span>
-    </motion.div>
-  );
-
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Sidebar with Preset Configurations */}
@@ -378,69 +331,59 @@ const DataCenterTab = ({
                 name="numHosts"
                 value={config.numHosts}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("numHosts", hasWarning)}
                 icon={Server}
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="PEs per Host"
                 name="numPesPerHost"
                 value={config.numPesPerHost}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("numPesPerHost", hasWarning)}
                 icon={Cpu}
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="PE MIPS"
                 name="peMips"
                 value={config.peMips}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("peMips", hasWarning)}
                 icon={Gauge}
                 unit="MIPS"
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="RAM per Host"
                 name="ramPerHost"
                 value={config.ramPerHost}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("ramPerHost", hasWarning)}
                 icon={MemoryStick}
                 unit="MB"
+                isPresetApplied={isPresetActive}
               />
-              <div>
-                <InputField
-                  label="Bandwidth per Host"
-                  name="bwPerHost"
-                  value={config.bwPerHost}
-                  onChange={handleInputChange}
-                  type="number"
-                  min={defaultMinValues.bwPerHost}
-                  icon={Network}
-                  unit="MBps"
-                />
-                <AnimatePresence>
-                  {warnings.bwPerHost && <WarningMessage fieldName="bwPerHost" />}
-                </AnimatePresence>
-              </div>
-              <div>
-                <InputField
-                  label="Storage per Host"
-                  name="storagePerHost"
-                  value={config.storagePerHost}
-                  onChange={handleInputChange}
-                  type="number"
-                  min={defaultMinValues.storagePerHost}
-                  icon={Disc}
-                  unit="MB"
-                />
-                <AnimatePresence>
-                  {warnings.storagePerHost && <WarningMessage fieldName="storagePerHost" />}
-                </AnimatePresence>
-              </div>
+              <InputField
+                label="Bandwidth per Host"
+                name="bwPerHost"
+                value={config.bwPerHost}
+                onChange={handleInputChange}
+                onValidationChange={(hasWarning) => handleValidationChange("bwPerHost", hasWarning)}
+                icon={Network}
+                unit="MBps"
+                isPresetApplied={isPresetActive}
+              />
+              <InputField
+                label="Storage per Host"
+                name="storagePerHost"
+                value={config.storagePerHost}
+                onChange={handleInputChange}
+                onValidationChange={(hasWarning) => handleValidationChange("storagePerHost", hasWarning)}
+                icon={Disc}
+                unit="MB"
+                isPresetApplied={isPresetActive}
+              />
             </div>
           </ConfigurationPanel>
 
@@ -457,69 +400,59 @@ const DataCenterTab = ({
                 name="numVMs"
                 value={config.numVMs}
                 onChange={handleInputChange}
-                type="number"
-                min="0"
+                onValidationChange={(hasWarning) => handleValidationChange("numVMs", hasWarning)}
                 icon={HardDrive}
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="VM MIPS"
                 name="vmMips"
                 value={config.vmMips}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("vmMips", hasWarning)}
                 icon={Gauge}
                 unit="MIPS"
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="VM PEs"
                 name="vmPes"
                 value={config.vmPes}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("vmPes", hasWarning)}
                 icon={Cpu}
+                isPresetApplied={isPresetActive}
               />
               <InputField
                 label="VM RAM"
                 name="vmRam"
                 value={config.vmRam}
                 onChange={handleInputChange}
-                type="number"
-                min="1"
+                onValidationChange={(hasWarning) => handleValidationChange("vmRam", hasWarning)}
                 icon={MemoryStick}
                 unit="MB"
+                isPresetApplied={isPresetActive}
               />
-              <div>
-                <InputField
-                  label="VM Bandwidth"
-                  name="vmBw"
-                  value={config.vmBw}
-                  onChange={handleInputChange}
-                  type="number"
-                  min={defaultMinValues.vmBw}
-                  icon={Network}
-                  unit="MBps"
-                />
-                <AnimatePresence>
-                  {warnings.vmBw && <WarningMessage fieldName="vmBw" />}
-                </AnimatePresence>
-              </div>
-              <div>
-                <InputField
-                  label="VM Size"
-                  name="vmSize"
-                  value={config.vmSize}
-                  onChange={handleInputChange}
-                  type="number"
-                  min={defaultMinValues.vmSize}
-                  icon={Database}
-                  unit="MB"
-                />
-                <AnimatePresence>
-                  {warnings.vmSize && <WarningMessage fieldName="vmSize" />}
-                </AnimatePresence>
-              </div>
+              <InputField
+                label="VM Bandwidth"
+                name="vmBw"
+                value={config.vmBw}
+                onChange={handleInputChange}
+                onValidationChange={(hasWarning) => handleValidationChange("vmBw", hasWarning)}
+                icon={Network}
+                unit="MBps"
+                isPresetApplied={isPresetActive}
+              />
+              <InputField
+                label="VM Size"
+                name="vmSize"
+                value={config.vmSize}
+                onChange={handleInputChange}
+                onValidationChange={(hasWarning) => handleValidationChange("vmSize", hasWarning)}
+                icon={Database}
+                unit="MB"
+                isPresetApplied={isPresetActive}
+              />
             </div>
           </ConfigurationPanel>
         </div>
