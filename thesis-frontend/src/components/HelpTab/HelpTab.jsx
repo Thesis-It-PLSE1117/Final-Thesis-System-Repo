@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { HelpCircle, BookOpen, BarChart3, Navigation, Activity } from "lucide-react";
+import { HelpCircle, BookOpen, BarChart3, Navigation, Activity, Building, Settings } from "lucide-react";
 import DataCenterHelp from "./DataCenterHelp";
 import WorkloadHelp from "./WorkloadHelp";
 import ProjectOverview from "./ProjectOverview";
@@ -99,6 +99,7 @@ const HelpTab = () => {
           }`}
           onClick={() => setActiveTab('datacenter')}
         >
+          <Building size={16} />
           Data Center
         </button>
         <button
@@ -109,6 +110,7 @@ const HelpTab = () => {
           }`}
           onClick={() => setActiveTab('workload')}
         >
+          <Settings size={16} />
           Workload
         </button>
         <button
