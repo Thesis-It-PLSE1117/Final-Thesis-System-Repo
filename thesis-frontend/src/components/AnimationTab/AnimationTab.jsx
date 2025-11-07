@@ -1,8 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import VMCard from "./VMCard";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import MetricsPanel from "./MetricsPanel";
 import Controls from "./Controls";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAnimationState } from "../../hooks/useAnimationState";
+import { useMetrics } from "../../hooks/useMetrics";
+import { useVMStatus } from "../../hooks/useVMStatus";
+import { useAnimationEngine } from "../../hooks/useAnimationEngine";
+import { AlgorithmTabs } from "./AlgorithmTabs";
+import { IterationNotice } from "./IterationNotice";
+import { ComparisonView } from "./ComparisonView";
+import { VMCardsGrid } from "./VMCardsGrid";
 
 const AnimationTab = ({
   dataCenterConfig,
@@ -14,895 +21,209 @@ const AnimationTab = ({
   epsoResults,
 }) => {
   const [activeAlgorithm, setActiveAlgorithm] = useState("EPSO");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [activeVMs, setActiveVMs] = useState({ EPSO: [], EACO: [] });
-  const [taskCounts, setTaskCounts] = useState({ EPSO: {}, EACO: {} });
-  const [cpuLoads, setCpuLoads] = useState({ EPSO: {}, EACO: {} });
-  const [totalTasks, setTotalTasks] = useState(0);
-  const animationRef = useRef(null);
-  const [metrics, setMetrics] = useState({
-    EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
-    EACO: { imbalance: 0, makespan: 0, utilization: 0 },
-  });
   const [showResultsButton, setShowResultsButton] = useState(true);
-  const [highlightedVM, setHighlightedVM] = useState({
-    EPSO: null,
-    EACO: null,
+
+  const animationState = useAnimationState(dataCenterConfig);
+  const metricsState = useMetrics(epsoResults, eacoResults);
+  const vmStatus = useVMStatus(animationState.activeVMs, animationState.taskCounts, animationState.cpuLoads);
+
+  const isIterationResult = checkIfIterationResult(epsoResults, eacoResults);
+
+  useWorkloadFile(workloadFile, metricsState.setTotalTasks);
+
+  const animationEngine = useAnimationEngine({
+    dataCenterConfig,
+    epsoResults,
+    eacoResults,
+    animationState,
+    metricsState,
+    setShowResultsButton,
   });
 
-  const isIterationResult =
+  if (isIterationResult) {
+    return <IterationNotice onViewResults={onViewResults} onBack={onBack} />;
+  }
+
+  return (
+    <AnimationTabLayout
+      dataCenterConfig={dataCenterConfig}
+      cloudletConfig={cloudletConfig}
+      activeAlgorithm={activeAlgorithm}
+      animationState={animationState}
+      metricsState={metricsState}
+      vmStatus={vmStatus}
+      showResultsButton={showResultsButton}
+      onViewResults={onViewResults}
+      onAlgorithmChange={setActiveAlgorithm}
+      onPlayPause={animationEngine.handlePlayPause}
+      onReset={animationState.resetAnimationState}
+    />
+  );
+};
+
+// Helper Components
+const AnimationTabLayout = ({
+  dataCenterConfig,
+  cloudletConfig,
+  activeAlgorithm,
+  animationState,
+  metricsState,
+  vmStatus,
+  showResultsButton,
+  onViewResults,
+  onAlgorithmChange,
+  onPlayPause,
+  onReset,
+}) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="flex-grow p-3 sm:p-6 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
+  >
+    <motion.div
+      className="bg-white p-4 sm:p-8 rounded-xl shadow-lg mb-4 sm:mb-6 border border-gray-200"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <HeaderSection dataCenterConfig={dataCenterConfig} cloudletConfig={cloudletConfig} />
+      
+      <AlgorithmTabs activeAlgorithm={activeAlgorithm} setActiveAlgorithm={onAlgorithmChange} />
+
+      {activeAlgorithm === "comparison" ? (
+        <ComparisonView
+          activeVMs={animationState.activeVMs}
+          taskCounts={animationState.taskCounts}
+          cpuLoads={animationState.cpuLoads}
+          metrics={metricsState.metrics}
+          dataCenterConfig={dataCenterConfig}
+          getVmStatus={vmStatus.getVmStatus}
+          getStatusColor={vmStatus.getStatusColor}
+        />
+      ) : (
+        <SingleAlgorithmView
+          algorithm={activeAlgorithm}
+          activeVMs={animationState.activeVMs}
+          taskCounts={animationState.taskCounts}
+          cpuLoads={animationState.cpuLoads}
+          metrics={metricsState.metrics}
+          dataCenterConfig={dataCenterConfig}
+          getVmStatus={vmStatus.getVmStatus}
+          getStatusColor={vmStatus.getStatusColor}
+        />
+      )}
+
+      <div className="space-y-4 sm:space-y-6"> {/* Added spacing wrapper */}
+        <Controls
+          isPlaying={animationState.isPlaying}
+          handlePlayPause={onPlayPause}
+          handleReset={onReset}
+          progress={animationState.progress}
+          total={metricsState.totalTasks}
+          cloudlets={cloudletConfig.numCloudlets}
+        />
+
+        <ResultsButton onViewResults={onViewResults} />
+      </div>
+    </motion.div>
+  </motion.div>
+);
+
+const HeaderSection = ({ dataCenterConfig, cloudletConfig }) => (
+  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+    <div className="flex-1">
+      <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Task Assignment View</h3>
+      <div className="text-sm sm:text-sm text-gray-600 space-y-1">
+        <div className="flex items-center">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span className="break-words">{cloudletConfig.numCloudlets} tasks → {dataCenterConfig.numVMs} VMs</span>
+        </div>
+        <div className="flex items-center text-sm text-gray-500">
+          <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span className="break-words">VM: {dataCenterConfig.vmPes} PEs @ {dataCenterConfig.vmMips} MIPS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const SingleAlgorithmView = ({
+  algorithm,
+  activeVMs,
+  taskCounts,
+  cpuLoads,
+  metrics,
+  dataCenterConfig,
+  getVmStatus,
+  getStatusColor,
+}) => (
+  <>
+    <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll mb-4 sm:mb-6 pr-1 sm:pr-2">
+      <VMCardsGrid
+        algorithm={algorithm}
+        dataCenterConfig={dataCenterConfig}
+        activeVMs={activeVMs}
+        taskCounts={taskCounts}
+        cpuLoads={cpuLoads}
+        getVmStatus={getVmStatus}
+        getStatusColor={getStatusColor}
+      />
+    </div>
+    <div className="mb-4 sm:mb-6">
+      <MetricsPanel
+        metrics={metrics[algorithm]}
+        color={algorithm === "EPSO" ? "blue" : "purple"}
+      />
+    </div>
+  </>
+);
+
+const ResultsButton = ({ onViewResults }) => (
+  <div className="flex justify-end">
+    <motion.button
+      onClick={onViewResults}
+      className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:shadow-md transition-all flex items-center justify-center text-sm sm:text-base w-full sm:w-auto"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      <span>View Detailed Results</span>
+    </motion.button>
+  </div>
+);
+
+// Helper functions
+const checkIfIterationResult = (epsoResults, eacoResults) => {
+  return (
     (epsoResults && epsoResults.isIterationResult) ||
     (eacoResults && eacoResults.isIterationResult) ||
     epsoResults?.rawResults?.totalIterations > 1 ||
-    eacoResults?.rawResults?.totalIterations > 1;
+    eacoResults?.rawResults?.totalIterations > 1
+  );
+};
 
-  // Load backend results
-  useEffect(() => {
-    if (epsoResults && eacoResults) {
-      // Handle new API response structure
-      const epsoData = epsoResults.rawResults || epsoResults;
-      const eacoData = eacoResults.rawResults || eacoResults;
-
-      setMetrics({
-        EPSO: {
-          imbalance:
-            epsoData.summary?.loadImbalance !== undefined
-              ? epsoData.summary.loadImbalance.toFixed(4)
-              : epsoData.summary?.loadBalance !== undefined
-                ? epsoData.summary.loadBalance.toFixed(4)
-                : "0.0000",
-          makespan: (epsoData.summary?.makespan || 0).toFixed(2),
-          utilization: (
-            epsoData.summary?.resourceUtilization ||
-            epsoData.summary?.utilization ||
-            0
-          ).toFixed(2),
-        },
-        EACO: {
-          imbalance:
-            eacoData.summary?.loadImbalance !== undefined
-              ? eacoData.summary.loadImbalance.toFixed(4)
-              : eacoData.summary?.loadBalance !== undefined
-                ? eacoData.summary.loadBalance.toFixed(4)
-                : "0.0000",
-          makespan: (eacoData.summary?.makespan || 0).toFixed(2),
-          utilization: (
-            eacoData.summary?.resourceUtilization ||
-            eacoData.summary?.utilization ||
-            0
-          ).toFixed(2),
-        },
-      });
-
-      // Prepare VM utilization data
-      const epsoLoads = {};
-      const eacoLoads = {};
-      const epsoCounts = {};
-      const eacoCounts = {};
-      const epsoActive = [];
-      const eacoActive = [];
-
-      // Process EPSO VM utilization
-      if (epsoData.vmUtilization) {
-        epsoData.vmUtilization.forEach((vm) => {
-          const vmId = vm.vmId;
-          epsoLoads[vmId] = vm.cpuUtilization / 100 || 0; // Scale to 0-1 range
-          epsoCounts[vmId] = vm.numAPECloudlets || 0;
-          if (vm.cpuUtilization > 0) epsoActive.push(vmId);
-        });
-      }
-
-      // Process EACO VM utilization
-      if (eacoData.vmUtilization) {
-        eacoData.vmUtilization.forEach((vm) => {
-          const vmId = vm.vmId;
-          eacoLoads[vmId] = vm.cpuUtilization / 100 || 0; // Scale to 0-1 range
-          eacoCounts[vmId] = vm.numAPECloudlets || 0;
-          if (vm.cpuUtilization > 0) eacoActive.push(vmId);
-        });
-      }
-
-      // Set component state
-      setCpuLoads({ EPSO: epsoLoads, EACO: eacoLoads });
-      setTaskCounts({ EPSO: epsoCounts, EACO: eacoCounts });
-      setActiveVMs({ EPSO: epsoActive, EACO: eacoActive });
-
-      // Find VMs with highest load for highlighting
-      let maxEpsoLoad = 0;
-      let maxEpsoVmId = null;
-      let maxEacoLoad = 0;
-      let maxEacoVmId = null;
-
-      if (epsoData.vmUtilization) {
-        epsoData.vmUtilization.forEach((vm) => {
-          if (vm.cpuUtilization > maxEpsoLoad) {
-            maxEpsoLoad = vm.cpuUtilization;
-            maxEpsoVmId = vm.vmId;
-          }
-        });
-      }
-
-      if (eacoData.vmUtilization) {
-        eacoData.vmUtilization.forEach((vm) => {
-          if (vm.cpuUtilization > maxEacoLoad) {
-            maxEacoLoad = vm.cpuUtilization;
-            maxEacoVmId = vm.vmId;
-          }
-        });
-      }
-
-      setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
-
-      // Set total tasks from backend data
-      setTotalTasks(epsoData.summary?.totalCloudlets || 100);
-    }
-  }, [epsoResults, eacoResults, dataCenterConfig.numVMs]);
-
-  // Handle workload file for task count
+const useWorkloadFile = (workloadFile, setTotalTasks) => {
   useEffect(() => {
     if (workloadFile) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target.result;
         const lines = text.split("\n").filter((line) => line.trim() !== "");
-        setTotalTasks(lines.length - 1); // Exclude header
+        setTotalTasks(lines.length - 1);
       };
       reader.readAsText(workloadFile);
     }
-  }, [workloadFile]);
-
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      setIsPlaying(false);
-    } else {
-      setIsPlaying(true);
-      const startTime = performance.now();
-      const duration = 10000; // 10 seconds for animation
-
-      if (epsoResults && eacoResults) {
-        // Handle new API response structure
-        const epsoData = epsoResults.rawResults || epsoResults;
-        const eacoData = eacoResults.rawResults || eacoResults;
-
-        // Reset state
-        const resetCounts = { EPSO: {}, EACO: {} };
-        const resetLoads = { EPSO: {}, EACO: {} };
-        // initialVMs variable removed as it was unused
-        for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-          resetCounts.EPSO[i] = 0;
-          resetLoads.EPSO[i] = 0;
-          resetCounts.EACO[i] = 0;
-          resetLoads.EACO[i] = 0;
-        }
-        setTaskCounts(resetCounts);
-        setCpuLoads(resetLoads);
-        setActiveVMs({ EPSO: [], EACO: [] });
-        setProgress(0);
-        setHighlightedVM({ EPSO: null, EACO: null });
-
-        // Get final state from backend
-        const finalEpsoLoads = {};
-        const finalEacoLoads = {};
-        const finalEpsoCounts = {};
-        const finalEacoCounts = {};
-        const finalEpsoActive = [];
-        const finalEacoActive = [];
-
-        if (epsoData.vmUtilization) {
-          epsoData.vmUtilization.forEach((vm) => {
-            const vmId = vm.vmId;
-            finalEpsoLoads[vmId] = vm.cpuUtilization / 100 || 0;
-            finalEpsoCounts[vmId] = vm.numAPECloudlets || 0;
-            if (vm.cpuUtilization > 0) finalEpsoActive.push(vmId);
-          });
-        }
-
-        if (eacoData.vmUtilization) {
-          eacoData.vmUtilization.forEach((vm) => {
-            const vmId = vm.vmId;
-            finalEacoLoads[vmId] = vm.cpuUtilization / 100 || 0;
-            finalEacoCounts[vmId] = vm.numAPECloudlets || 0;
-            if (vm.cpuUtilization > 0) finalEacoActive.push(vmId);
-          });
-        }
-
-        // Use RAF timestamp for more accurate timing
-        let lastUpdateTime = 0;
-        const updateInterval = 1000 / 30; // Cap updates to 30fps for better performance
-
-        const animate = (timestamp) => {
-          const elapsed = timestamp - startTime;
-          const newProgress = Math.min(100, (elapsed / duration) * 100);
-
-          // Only update state at controlled intervals
-          if (
-            timestamp - lastUpdateTime < updateInterval &&
-            newProgress < 100
-          ) {
-            animationRef.current = requestAnimationFrame(animate);
-            return;
-          }
-          lastUpdateTime = timestamp;
-
-          setProgress(newProgress);
-
-          const currentEpsoLoads = {};
-          const currentEacoLoads = {};
-          const currentEpsoCounts = {};
-          const currentEacoCounts = {};
-          const currentEpsoActive = [];
-          const currentEacoActive = [];
-
-          // Interpolate based on progress
-          for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-            const percentPerVM =
-              95 / Math.max(finalEpsoActive.length, finalEacoActive.length);
-            const revealThreshold = finalEpsoActive.indexOf(i) * percentPerVM;
-
-            // EPSO
-            if (finalEpsoActive.includes(i) && newProgress >= revealThreshold) {
-              currentEpsoActive.push(i);
-              const vmVisibleProgress =
-                Math.min(
-                  100,
-                  (newProgress - revealThreshold) * (100 / percentPerVM),
-                ) / 100;
-              currentEpsoLoads[i] = finalEpsoLoads[i] * vmVisibleProgress;
-              currentEpsoCounts[i] = Math.round(
-                finalEpsoCounts[i] * vmVisibleProgress,
-              );
-            } else {
-              currentEpsoLoads[i] = 0;
-              currentEpsoCounts[i] = 0;
-            }
-
-            // EACO
-            if (finalEacoActive.includes(i) && newProgress >= revealThreshold) {
-              currentEacoActive.push(i);
-              const vmVisibleProgress =
-                Math.min(
-                  100,
-                  (newProgress - revealThreshold) * (100 / percentPerVM),
-                ) / 100;
-              currentEacoLoads[i] = finalEacoLoads[i] * vmVisibleProgress;
-              currentEacoCounts[i] = Math.round(
-                finalEacoCounts[i] * vmVisibleProgress,
-              );
-            } else {
-              currentEacoLoads[i] = 0;
-              currentEacoCounts[i] = 0;
-            }
-          }
-
-          // Remove console logging during animation for better performance
-
-          // Highlight VMs with highest load
-          let maxEpsoLoad = 0;
-          let maxEpsoVmId = null;
-          let maxEacoLoad = 0;
-          let maxEacoVmId = null;
-
-          for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-            if (currentEpsoLoads[i] > maxEpsoLoad) {
-              maxEpsoLoad = currentEpsoLoads[i];
-              maxEpsoVmId = i;
-            }
-            if (currentEacoLoads[i] > maxEacoLoad) {
-              maxEacoLoad = currentEacoLoads[i];
-              maxEacoVmId = i;
-            }
-          }
-
-          setActiveVMs({ EPSO: currentEpsoActive, EACO: currentEacoActive });
-          setTaskCounts({ EPSO: currentEpsoCounts, EACO: currentEacoCounts });
-          setCpuLoads({ EPSO: currentEpsoLoads, EACO: currentEacoLoads });
-          setHighlightedVM({ EPSO: maxEpsoVmId, EACO: maxEacoVmId });
-
-          // Use loadImbalance (raw DI value) directly
-          const epsoImbalance =
-            epsoData.summary?.loadImbalance !== undefined
-              ? epsoData.summary.loadImbalance
-              : epsoData.summary?.loadBalance !== undefined
-                ? epsoData.summary.loadBalance
-                : 0;
-          const eacoImbalance =
-            eacoData.summary?.loadImbalance !== undefined
-              ? eacoData.summary.loadImbalance
-              : eacoData.summary?.loadBalance !== undefined
-                ? eacoData.summary.loadBalance
-                : 0;
-
-          setMetrics({
-            EPSO:
-              newProgress >= 99
-                ? {
-                    imbalance: epsoImbalance.toFixed(4),
-                    makespan: (epsoData.summary?.makespan || 0).toFixed(2),
-                    utilization: (
-                      epsoData.summary?.resourceUtilization || 0
-                    ).toFixed(2),
-                  }
-                : {
-                    imbalance: (epsoImbalance * (newProgress / 100)).toFixed(4),
-                    makespan: (
-                      (epsoData.summary?.makespan || 0) *
-                      (newProgress / 100)
-                    ).toFixed(2),
-                    utilization: (
-                      (epsoData.summary?.resourceUtilization || 0) *
-                      (newProgress / 100)
-                    ).toFixed(2),
-                  },
-            EACO:
-              newProgress >= 99
-                ? {
-                    imbalance: eacoImbalance.toFixed(4),
-                    makespan: (eacoData.summary?.makespan || 0).toFixed(2),
-                    utilization: (
-                      eacoData.summary?.resourceUtilization || 0
-                    ).toFixed(2),
-                  }
-                : {
-                    imbalance: (eacoImbalance * (newProgress / 100)).toFixed(4),
-                    makespan: (
-                      (eacoData.summary?.makespan || 0) *
-                      (newProgress / 100)
-                    ).toFixed(2),
-                    utilization: (
-                      (eacoData.summary?.resourceUtilization || 0) *
-                      (newProgress / 100)
-                    ).toFixed(2),
-                  },
-          });
-
-          if (newProgress < 100) {
-            animationRef.current = requestAnimationFrame(animate);
-          } else {
-            setIsPlaying(false);
-            setShowResultsButton(true);
-            setActiveVMs({ EPSO: finalEpsoActive, EACO: finalEacoActive });
-            setTaskCounts({ EPSO: finalEpsoCounts, EACO: finalEacoCounts });
-            setCpuLoads({ EPSO: finalEpsoLoads, EACO: finalEacoLoads });
-            setMetrics({
-              EPSO: {
-                imbalance: epsoImbalance.toFixed(4),
-                makespan: (epsoData.summary?.makespan || 0).toFixed(2),
-                utilization: (
-                  epsoData.summary?.resourceUtilization || 0
-                ).toFixed(2),
-              },
-              EACO: {
-                imbalance: eacoImbalance.toFixed(4),
-                makespan: (eacoData.summary?.makespan || 0).toFixed(2),
-                utilization: (
-                  eacoData.summary?.resourceUtilization || 0
-                ).toFixed(2),
-              },
-            });
-          }
-        };
-
-        animationRef.current = requestAnimationFrame(animate);
-      }
-    }
-  };
-
-  const handleReset = () => {
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    setIsPlaying(false);
-    setProgress(0);
-
-    const resetCounts = { EPSO: {}, EACO: {} };
-    const resetLoads = { EPSO: {}, EACO: {} };
-    const initialVMs = { EPSO: [], EACO: [] };
-    for (let i = 0; i < dataCenterConfig.numVMs; i++) {
-      resetCounts.EPSO[i] = 0;
-      resetLoads.EPSO[i] = 0;
-      resetCounts.EACO[i] = 0;
-      resetLoads.EACO[i] = 0;
-    }
-
-    setTaskCounts(resetCounts);
-    setCpuLoads(resetLoads);
-    setActiveVMs(initialVMs);
-    setHighlightedVM({ EPSO: null, EACO: null });
-    setMetrics({
-      EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
-      EACO: { imbalance: 0, makespan: 0, utilization: 0 },
-    });
-    setShowResultsButton(false);
-  };
-
-  const getVmStatus = (vmId, algorithm) => {
-    const cpuLoad = cpuLoads[algorithm][vmId] || 0;
-    const cpuPercentage = Math.min(100, cpuLoad * 100); // Convert to percentage
-    const vmTaskCount = taskCounts[algorithm][vmId] || 0;
-
-    // calc the avg task per vm
-    const totalTasks = Object.values(taskCounts[algorithm]).reduce(
-      (sum, count) => sum + count,
-      0,
-    );
-    const avgTasksPerVm = totalTasks / dataCenterConfig.numVMs;
-    const taskOverloadThreshold = avgTasksPerVm * 1.5; // Backend uses 1.5x average
-
-    // cpuUtilization > 90.0 OR taskCount > avgTasksPerVm * 1.5 which is determinant for overhead
-    const isCpuOverloaded = cpuPercentage > 90;
-    const isTaskOverloaded = vmTaskCount > taskOverloadThreshold;
-
-    if (isCpuOverloaded || isTaskOverloaded) return "Overloaded";
-    if (cpuPercentage > 70) return "High Load";
-    if (cpuPercentage > 40) return "Medium Load";
-    if (cpuPercentage > 0) return "Normal";
-    return "Idle";
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Overloaded":
-        return "bg-red-100 text-red-800 border-red-300";
-      case "High Load":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      case "Medium Load":
-        return "bg-orange-100 text-orange-800 border-orange-300";
-      case "Normal":
-        return "bg-green-100 text-green-800 border-green-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
-  };
-
-  const renderAlgorithmTabs = () => (
-    <div className="flex mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
-      <div className="flex min-w-full sm:min-w-0 sm:w-full">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={`flex-1 sm:flex-none px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-sm rounded-t-lg transition-all ${
-            activeAlgorithm === "EPSO"
-              ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-              : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-          }`}
-          onClick={() => setActiveAlgorithm("EPSO")}
-        >
-          <div className="flex items-center justify-center">
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            <span className="whitespace-nowrap">EPSO</span>
-          </div>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={`flex-1 sm:flex-none px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-sm rounded-t-lg transition-all ${
-            activeAlgorithm === "EACO"
-              ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50"
-              : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-          }`}
-          onClick={() => setActiveAlgorithm("EACO")}
-        >
-          <div className="flex items-center justify-center">
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-              />
-            </svg>
-            <span className="whitespace-nowrap">EACO</span>
-          </div>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={`flex-1 sm:flex-none px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-sm rounded-t-lg transition-all ${
-            activeAlgorithm === "comparison"
-              ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50"
-              : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-          }`}
-          onClick={() => setActiveAlgorithm("comparison")}
-        >
-          <div className="flex items-center justify-center">
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-            <span className="whitespace-nowrap">Compare</span>
-          </div>
-        </motion.button>
-      </div>
-    </div>
-  );
-
-  const renderVMCards = (algorithm) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-4">
-      {Array.from({ length: dataCenterConfig.numVMs }).map((_, i) => (
-        <motion.div
-          key={`${algorithm}-${i}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            scale: highlightedVM[algorithm] === i ? 1.02 : 1,
-            boxShadow:
-              highlightedVM[algorithm] === i
-                ? "0 4px 8px -2px rgba(0, 0, 0, 0.1)"
-                : "none",
-          }}
-          transition={{ duration: 0.3, delay: i * 0.02 }}
-          whileHover={{ scale: 1.01 }}
-        >
-          <VMCard
-            vmId={i}
-            isActive={activeVMs[algorithm].includes(i)}
-            isHighlighted={highlightedVM[algorithm] === i}
-            taskCount={taskCounts[algorithm][i] || 0}
-            cpuLoad={cpuLoads[algorithm][i] || 0}
-            dataCenterConfig={dataCenterConfig}
-            status={getVmStatus(i, algorithm)}
-            getStatusColor={getStatusColor}
-          />
-        </motion.div>
-      ))}
-    </div>
-  );
-
-  const renderComparisonView = () => (
-    <div className="mb-4 sm:mb-6">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex items-center justify-between mb-3 sm:mb-4"
-      >
-        <h4 className="text-lg sm:text-xl font-bold text-gray-800">
-          Algorithm Comparison
-        </h4>
-      </motion.div>
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-3 sm:gap-6">
-        <motion.div
-          className="bg-white p-3 sm:p-6 rounded-xl shadow-sm border border-blue-100"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h5 className="font-bold text-base sm:text-lg text-blue-600 flex items-center">
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-              <span>EPSO</span>
-            </h5>
-            <span className="text-sm bg-blue-600 text-white px-2 py-1 rounded-full">
-              {activeVMs.EPSO.length} Active VMs
-            </span>
-          </div>
-          <div className="h-[300px] sm:h-[400px] overflow-y-auto smooth-scroll pr-1 sm:pr-2 mb-3 sm:mb-4">
-            {renderVMCards("EPSO")}
-          </div>
-          <MetricsPanel metrics={metrics.EPSO} color="blue" />
-        </motion.div>
-
-        <motion.div
-          className="bg-white p-3 sm:p-6 rounded-xl shadow-sm border border-purple-100"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h5 className="font-bold text-base sm:text-lg text-purple-600 flex items-center">
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                />
-              </svg>
-              <span>EACO</span>
-            </h5>
-            <span className="text-sm bg-purple-600 text-white px-2 py-1 rounded-full">
-              {activeVMs.EACO.length} Active VMs
-            </span>
-          </div>
-          <div className="h-[300px] sm:h-[400px] overflow-y-auto smooth-scroll pr-1 sm:pr-2 mb-3 sm:mb-4">
-            {renderVMCards("EACO")}
-          </div>
-          <MetricsPanel metrics={metrics.EACO} color="purple" />
-        </motion.div>
-      </div>
-    </div>
-  );
-
-  // Render iteration notice message
-  const renderIterationNotice = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center min-h-[300px] sm:h-[400px] text-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-dashed border-blue-200 p-4 sm:p-6"
-    >
-      <motion.div
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white p-4 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-6"
-      >
-        <svg
-          className="w-8 h-8 sm:w-12 sm:h-12 text-blue-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </motion.div>
-
-      <motion.h4
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3"
-      >
-        Animation Not Available
-      </motion.h4>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-sm px-2"
-      >
-        Animation works with single runs only. Your current results come from
-        multiple runs. View the results tab instead.
-      </motion.p>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-sm px-2"
-      >
-        <motion.button
-          onClick={onViewResults}
-          className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:shadow-md transition-all flex items-center justify-center text-sm sm:text-base"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-          <span>View Results</span>
-        </motion.button>
-
-        <motion.button
-          onClick={onBack}
-          className="bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center text-sm sm:text-base"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span>Back to Config</span>
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  );
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="flex-grow p-3 sm:p-6 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
-    >
-      <motion.div
-        className="bg-white p-4 sm:p-8 rounded-xl shadow-lg mb-4 sm:mb-6 border border-gray-200"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
-          <div className="flex-1">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
-              Task Assignment View
-            </h3>
-            <div className="text-sm sm:text-sm text-gray-600 space-y-1">
-              <div className="flex items-center">
-                <svg
-                  className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gray-500 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <span className="break-words">
-                  {isIterationResult
-                    ? `Results from ${epsoResults?.rawResults?.totalIterations || eacoResults?.rawResults?.totalIterations || "N/A"} iterations`
-                    : `${cloudletConfig.numCloudlets} tasks → ${dataCenterConfig.numVMs} VMs`}
-                </span>
-              </div>
-              {!isIterationResult && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <svg
-                    className="w-3 h-3 mr-1 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                  <span className="break-words">
-                    VM: {dataCenterConfig.vmPes} PEs @ {dataCenterConfig.vmMips}{" "}
-                    MIPS
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            {isIterationResult ? (
-              <div className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full whitespace-nowrap">
-                Iteration Results
-              </div>
-            ) : (
-              <div>
-                {/* {totalTasks} Tasks */}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {isIterationResult ? (
-          renderIterationNotice()
-        ) : (
-          <>
-            {renderAlgorithmTabs()}
-
-            {activeAlgorithm === "comparison" ? (
-              renderComparisonView()
-            ) : (
-              <>
-                <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll mb-4 sm:mb-6 pr-1 sm:pr-2">
-                  {renderVMCards(activeAlgorithm)}
-                </div>
-                <div className="mb-4 sm:mb-6">
-                  <MetricsPanel
-                    metrics={metrics[activeAlgorithm]}
-                    color={activeAlgorithm === "EPSO" ? "blue" : "purple"}
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="mb-4 sm:mb-6">
-              <Controls
-                isPlaying={isPlaying}
-                handlePlayPause={handlePlayPause}
-                handleReset={handleReset}
-                progress={progress}
-                total={totalTasks}
-                cloudlets={cloudletConfig.numCloudlets}
-              />
-            </div>
-
-            <AnimatePresence>
-              {showResultsButton && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3"
-                >
-                  <motion.button
-                    onClick={onViewResults}
-                    className="bg-gradient-to-r from-[#319694] to-[#2a827f] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:shadow-md transition-all flex items-center justify-center text-sm sm:text-base"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      />
-                    </svg>
-                    <span>View Detailed Results</span>
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
-      </motion.div>
-    </motion.div>
-  );
+  }, [workloadFile, setTotalTasks]);
 };
 
 export default AnimationTab;
