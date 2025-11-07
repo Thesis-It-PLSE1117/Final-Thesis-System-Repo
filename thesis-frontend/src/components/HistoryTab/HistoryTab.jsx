@@ -327,19 +327,27 @@ const HistoryTab = ({ onBack, onViewResults }) => {
           <div className="flex flex-wrap gap-2">
 
             {history.length > 0 && !selectedResult && (
-              <div className="bg-green-50 text-green-600 text-sm px-3 py-2 rounded-lg border border-green-100">
-                Select a simulation run to export.
+              <div className="text-gray-600 text-sm px-3 py-2 rounded border border-gray-200 bg-white">
+                Select a simulation run to export
               </div>
             )}
 
             {history.length > 0 && selectedResult && (
               <div className="relative group">
                 <button
-                  className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 flex items-center transition-colors"
+                  className="bg-white text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-200 hover:border-gray-300 hover:bg-gray-50 flex items-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                   title="Export run data"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.classList.add('border-gray-300', 'bg-gray-50');
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.parentElement.querySelector(':hover')) {
+                      e.currentTarget.classList.remove('border-gray-300', 'bg-gray-50');
+                    }
+                  }}
                 >
                   <svg
-                    className="w-4 h-4 mr-1"
+                    className="w-4 h-4 flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -351,11 +359,13 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                       d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  Export Run #
-                  {selectedResult.simulationId?.split("#")[1] ||
-                    selectedResult.id.split("-")[0]}
+                  <span className="whitespace-nowrap">
+                    Export Run #
+                    {selectedResult.simulationId?.split("#")[1] ||
+                      selectedResult.id.split("-")[0]}
+                  </span>
                   <svg
-                    className="w-4 h-4 ml-1"
+                    className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -368,7 +378,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                     />
                   </svg>
                 </button>
-                <div className="hidden group-hover:block absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
                   <button
                     onClick={() => {
                       const baseId = selectedResult.id.split("-")[0];
@@ -391,10 +403,12 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                         );
                       }
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center rounded-t-lg"
+                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg"
+                    onMouseEnter={(e) => e.currentTarget.classList.add('bg-blue-50', 'text-blue-700')}
+                    onMouseLeave={(e) => e.currentTarget.classList.remove('bg-blue-50', 'text-blue-700')}
                   >
                     <svg
-                      className="w-4 h-4 mr-2"
+                      className="w-4 h-4 mr-3 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -406,7 +420,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                         d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                       />
                     </svg>
-                    Export as JSON
+                    <div className="flex flex-col">
+                      <span className="font-medium">Export as JSON</span>
+                    </div>
                   </button>
                   <button
                     onClick={() => {
@@ -430,10 +446,12 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                         );
                       }
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center rounded-b-lg border-t border-gray-100"
+                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg border-t border-gray-100"
+                    onMouseEnter={(e) => e.currentTarget.classList.add('bg-blue-50', 'text-blue-700')}
+                    onMouseLeave={(e) => e.currentTarget.classList.remove('bg-blue-50', 'text-blue-700')}
                   >
                     <svg
-                      className="w-4 h-4 mr-2"
+                      className="w-4 h-4 mr-3 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -445,7 +463,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                         d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                       />
                     </svg>
-                    Export CSV (Iterations)
+                    <div className="flex flex-col">
+                      <span className="font-medium">Export CSV</span>
+                    </div>
                   </button>
                 </div>
               </div>
@@ -462,7 +482,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               }`}
               title={
                 isStorageFull 
-                  ? "Storage full - cannot import more data" 
+                  ? "Storage full - cannot import and save more data | clear history first before running another simulation" 
                   : "Import history from backup"
               }
               data-testid="import-button"
