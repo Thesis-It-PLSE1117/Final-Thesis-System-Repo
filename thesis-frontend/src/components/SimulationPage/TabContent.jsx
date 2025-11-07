@@ -88,6 +88,14 @@ export const TabContent = ({
                              (rawResults.individualResults && rawResults.individualResults[0]?.vmUtilization) ||
                              [];
         
+        const isSingleIteration = rawResults.totalIterations === 1 || 
+                                  !rawResults.individualResults || 
+                                  rawResults.individualResults.length <= 1;
+        
+        const hasVisualizationData = isSingleIteration && 
+                                     summary && 
+                                     Object.keys(summary).length > 0;
+        
         return {
           ...algorithmResult,
           summary,
@@ -116,12 +124,13 @@ export const TabContent = ({
             hasPlots: algorithmResult.plotAnalysis.hasPlots || false
           } : null,
           plotMetadata: algorithmResult.plotAnalysis?.plotMetadata || [],
-          analysis: algorithmResult.plotAnalysis?.analysis || null,
+          analysis: algorithmResult.plotAnalysis?.analysis || algorithmResult.analysis || null,
           tTestResults: algorithmResult.tTestResults || null,
           runId: algorithmResult.runId || null,
           seed: algorithmResult.seed || null,
           configSnapshot: algorithmResult.configSnapshot || algorithmResult.config || null,
-          datasetId: algorithmResult.datasetId || null
+          datasetId: algorithmResult.datasetId || null,
+          hasVisualizationData
         };
       };
 

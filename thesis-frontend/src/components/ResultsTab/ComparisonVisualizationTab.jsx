@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Download, Maximize2 } from 'lucide-react';
 import MetricComparisonChart from './MetricComparisonChart';
 import MetricInterpretations from './MetricInterpretations';
+import ChartModal from '../ECharts/ChartModal';
 import { backupMetricData } from '../../utils/backupMetricData';
 
 const METRICS = ['makespan', 'energyConsumption', 'resourceUtilization', 'responseTime', 'loadBalance'];
@@ -15,6 +17,11 @@ const METRIC_DISPLAY_NAMES = {
 };
 
 const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) => {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const chartRefsArray = useRef([]);
+  const exportMenuRef = useRef(null);
+
   if (!tTestResults || !tTestResults.metricTests) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -42,6 +49,157 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
   }
 
   const metricTests = tTestResults.metricTests;
+
+  const handleExportPNG = () => {
+    const validRefs = chartRefsArray.current.filter(ref => ref !== null);
+    if (validRefs.length === 0) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const padding = 20;
+    const cols = 2;
+    const chartWidth = 600;
+    const chartHeight = 350;
+    
+    canvas.width = (chartWidth * cols) + (padding * (cols + 1));
+    canvas.height = (chartHeight * Math.ceil(validRefs.length / cols)) + (padding * (Math.ceil(validRefs.length / cols) + 1));
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const imagePromises = validRefs.map((ref, idx) => {
+      return new Promise((resolve) => {
+        const instance = ref.getEchartsInstance();
+        const url = instance.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+        const img = new Image();
+        img.onload = () => resolve({ img, idx });
+        img.src = url;
+      });
+    });
+
+    Promise.all(imagePromises).then((images) => {
+      images.forEach(({ img, idx }) => {
+        const row = Math.floor(idx / cols);
+        const col = idx % cols;
+        const x = padding + (col * (chartWidth + padding));
+        const y = padding + (row * (chartHeight + padding));
+        ctx.drawImage(img, x, y, chartWidth, chartHeight);
+      });
+
+      const link = document.createElement('a');
+      link.download = 'comparison_metrics_chart.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      setShowExportMenu(false);
+    });
+  };
+
+  const getChartOptionsForModal = () => {
+    return METRICS
+      .map(metricKey => {
+        const metricData = metricTests[metricKey];
+        if (!metricData) return null;
+        
+        const enrichedData = backupMetricData(metricKey, metricData, eacoResults, epsoResults);
+        
+        if (!enrichedData || enrichedData.eacoMean === undefined || enrichedData.epsoMean === undefined) {
+          return null;
+        }
+
+        const METRIC_LABELS = {
+          makespan: 'Makespan (seconds)',
+          energyConsumption: 'Energy Consumption (Wh)',
+          resourceUtilization: 'Resource Utilization (%)',
+          responseTime: 'Response Time (seconds)',
+          loadBalance: 'Load Balance Index'
+        };
+
+        const getBarColor = (algorithm, isWinner, isSignificant) => {
+          if (algorithm === 'EACO') {
+            return isWinner && isSignificant ? '#1d4ed8' : '#3b82f6';
+          }
+          return isWinner && isSignificant ? '#c2410c' : '#f97316';
+        };
+
+        return {
+          title: {
+            text: METRIC_LABELS[metricKey] || metricKey,
+            left: 'center',
+            textStyle: {
+              fontSize: 18,
+              fontWeight: 600,
+              color: '#374151'
+            }
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: (params) => {
+              const algo = params[0].name;
+              const mean = params[0].value;
+              const std = algo === 'EACO' ? enrichedData.eacoStd : enrichedData.epsoStd;
+              return `<strong>${algo}</strong><br/>Mean: ${mean.toFixed(3)}<br/>Std Dev: ±${std?.toFixed(3) || 'N/A'}`;
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: ['EACO', 'EPSO'],
+            axisLabel: {
+              fontSize: 14,
+              fontWeight: 600
+            }
+          },
+          yAxis: {
+            type: 'value',
+            name: METRIC_LABELS[metricKey] || metricKey,
+            nameTextStyle: {
+              fontSize: 13,
+              color: '#6b7280'
+            }
+          },
+          series: [{
+            type: 'bar',
+            data: [
+              {
+                value: enrichedData.eacoMean,
+                itemStyle: {
+                  color: getBarColor('EACO', enrichedData.betterAlgorithm === 'EACO', enrichedData.significant)
+                }
+              },
+              {
+                value: enrichedData.epsoMean,
+                itemStyle: {
+                  color: getBarColor('EPSO', enrichedData.betterAlgorithm === 'EPSO', enrichedData.significant)
+                }
+              }
+            ],
+            label: {
+              show: true,
+              position: 'top',
+              formatter: (params) => params.value.toFixed(3),
+              fontSize: 13,
+              fontWeight: 600
+            },
+            barWidth: '60%'
+          }],
+          grid: {
+            left: '15%',
+            right: '5%',
+            bottom: '10%',
+            top: '20%'
+          }
+        };
+      })
+      .filter(option => option !== null);
+  };
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <motion.div
@@ -75,6 +233,42 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
         </div>
       </div>
 
+      <div className="flex items-center justify-between bg-blue-50 border border-blue-300 rounded-lg p-4">
+        <p className="text-blue-700 text-lg font-semibold">
+          You can export them in one go.
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 rounded-md transition-colors bg-white text-green-600 hover:bg-green-50 border border-green-200 flex items-center gap-2 font-medium"
+            title="Expand all charts"
+          >
+            <Maximize2 className="w-4 h-4" />
+            <span className="text-md">View All</span>
+          </button>
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="px-4 py-2 rounded-md transition-colors bg-white text-green-600 hover:bg-green-50 border border-green-200 flex items-center gap-2 font-medium"
+              title="Export all charts"
+            >
+              <Download className="w-4 h-4" />
+              <span className="text-md">Export All</span>
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                <button
+                  onClick={handleExportPNG}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                >
+                  Export PNG
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {METRICS.map((metricKey, index) => {
           const metricData = metricTests[metricKey];
@@ -98,6 +292,7 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
               </h3>
               
               <MetricComparisonChart
+                ref={(el) => { chartRefsArray.current[index] = el; }}
                 metricName={metricKey}
                 data={enrichedData}
               />
@@ -107,6 +302,15 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
           );
         })}
       </div>
+
+      <ChartModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        chartOption={getChartOptionsForModal()}
+        chartTitle="Metric Comparison"
+        algorithm="EACO vs EPSO"
+        isMultiChart={true}
+      />
     </motion.div>
   );
 };
