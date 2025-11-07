@@ -101,18 +101,7 @@ export const backupMetricData = (metricKey, metricData, eacoResults, epsoResults
     return metricData;
   }
 
-  if (metricKey === 'makespan') {
-    console.log('🔍 FULL eacoResults structure:', {
-      keys: Object.keys(eacoResults || {}),
-      hasRawResults: !!eacoResults?.rawResults,
-      rawResultsKeys: eacoResults?.rawResults ? Object.keys(eacoResults.rawResults) : null,
-      hasIndividualResults: !!eacoResults?.individualResults,
-      individualResultsLength: eacoResults?.individualResults?.length || 0,
-      rawIndividualResultsLength: eacoResults?.rawResults?.individualResults?.length || 0
-    });
-  }
-
-  if (metricData.eacoMean !== undefined && 
+  if (metricData.eacoMean !== undefined &&
       metricData.epsoMean !== undefined &&
       metricData.meanInterpretation &&
       metricData.stdInterpretation) {
@@ -143,13 +132,6 @@ export const backupMetricData = (metricKey, metricData, eacoResults, epsoResults
     if (enriched.eacoMean === undefined && enriched.epsoMean === undefined) {
       const eacoIndividual = eacoResults?.individualResults;
       const epsoIndividual = epsoResults?.individualResults;
-      
-      console.log(`📢 [${metricKey}] Attempting calculation from iterations:`, {
-        eacoIndividualCount: eacoIndividual?.length || 0,
-        epsoIndividualCount: epsoIndividual?.length || 0,
-        eacoHasSummary: eacoIndividual?.[0]?.summary ? true : false,
-        epsoHasSummary: epsoIndividual?.[0]?.summary ? true : false
-      });
       
       if (eacoIndividual && eacoIndividual.length > 0) {
         const values = eacoIndividual.map(r => r.summary?.[metricKey]).filter(v => v !== undefined && v !== null);
