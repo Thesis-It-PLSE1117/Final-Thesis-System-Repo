@@ -36,6 +36,7 @@ const CloudLoadingModal = ({
   message = null,
 }) => {
   const [elapsedTime, setElapsedTime] = React.useState(0);
+  const [showConfirmCancel, setShowConfirmCancel] = React.useState(false);
 
   const isLargeTaskSet = (totalTasks || numCloudlets) > 5000;
   const isMultipleIterations = iterations > 1;
@@ -45,6 +46,16 @@ const CloudLoadingModal = ({
     currentIteration || (isMultipleIterations ? 1 : 1);
   const displayStage =
     iterationStage || (currentIteration ? "Processing..." : null);
+
+  // Reset state when modal appears or when key props change
+  React.useEffect(() => {
+    // Reset elapsed time and confirm cancel state
+    setElapsedTime(0);
+    setShowConfirmCancel(false);
+    
+    // Reset current tip index to 0
+    setCurrentTipIndex(0);
+  }, [numCloudlets, numHosts, numVMs, iterations, totalTasks]); // Reset when these key props change
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -98,6 +109,19 @@ const CloudLoadingModal = ({
     return () => clearInterval(timer);
   }, []);
 
+  const handleCancelClick = () => {
+    setShowConfirmCancel(true);
+  };
+
+  const handleConfirmCancel = () => {
+    setShowConfirmCancel(false);
+    onAbort();
+  };
+
+  const handleCancelCancel = () => {
+    setShowConfirmCancel(false);
+  };
+
   const tips = [
     "For robust statistical analysis, use 50 or more iterations to ensure reliable comparison results.",
     "EPSO and EACO are enhanced optimization algorithms designed for better cloud resource scheduling.",
@@ -131,6 +155,45 @@ const CloudLoadingModal = ({
         animate={{ opacity: 1 }}
       />
 
+      {/* Confirmation Dialog */}
+      {showConfirmCancel && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="absolute z-20 bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gray-200"
+        >
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <AlertTriangle className="text-red-600" size={24} />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Stop Simulation?
+              </h3>
+              <p className="text-sm text-gray-600">
+                Are you sure you want to stop the simulation? All progress will be lost and this action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleCancelCancel}
+                className="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors duration-200"
+              >
+                Continue
+              </button>
+              <button
+                onClick={handleConfirmCancel}
+                className="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200"
+              >
+                Stop
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Main modal container */}
       <motion.div
         initial={{ scale: 0.9, y: 20 }}
@@ -151,10 +214,11 @@ const CloudLoadingModal = ({
             </div>
           </div>
         )}
+        
         {canAbort && (
           <motion.button
-            onClick={onAbort}
-            disabled={isAborting}
+            onClick={handleCancelClick}
+            disabled={isAborting || showConfirmCancel}
             className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
