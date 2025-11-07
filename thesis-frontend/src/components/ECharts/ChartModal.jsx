@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactECharts from 'echarts-for-react';
 import { X, Maximize2 } from 'lucide-react';
-//chart mod template, just found on tailwind docs for ui.
+
 const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMultiChart = false }) => {
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -43,7 +43,7 @@ const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMul
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           <motion.div
             variants={backdropVariants}
             initial="hidden"
@@ -61,41 +61,43 @@ const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMul
             animate="visible"
             exit="hidden"
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="relative bg-white rounded-xl shadow-2xl w-[95vw] h-[92vh] max-w-[1800px] flex flex-col overflow-hidden"
+            className="relative bg-white rounded-lg sm:rounded-xl shadow-2xl w-full h-full sm:w-[95vw] sm:h-[92vh] max-w-[1800px] max-h-[95vh] flex flex-col overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-labelledby="chart-modal-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Maximize2 className="text-[#319694]" size={20} />
-                <div>
-                  <h2 id="chart-modal-title" className="text-lg font-semibold text-gray-800">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <Maximize2 className="text-[#319694] flex-shrink-0" size={18} />
+                <div className="min-w-0 flex-1">
+                  <h2 id="chart-modal-title" className="text-base sm:text-lg font-semibold text-gray-800 truncate">
                     {algorithm} - {chartTitle}
                   </h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Expanded View</p>
+                  <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Expanded View</p>
                 </div>
               </div>
               
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-gray-200 transition-colors text-gray-600 hover:text-gray-800"
+                className="p-1 sm:p-2 rounded-lg hover:bg-gray-200 transition-colors text-gray-600 hover:text-gray-800 flex-shrink-0 ml-2"
                 aria-label="Close modal"
                 autoFocus
               >
-                <X size={24} />
+                <X size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <div className="flex-1 p-6 overflow-auto bg-white">
+            {/* Chart Content */}
+            <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-auto bg-white">
               {isMultiChart ? (
-                <div className="grid grid-cols-2 gap-6 h-full">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 h-full auto-rows-min">
                   {chartOption.map((option, idx) => (
-                    <div key={idx} className="min-h-[400px]">
+                    <div key={idx} className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
                       <ReactECharts
                         option={option}
-                        style={{ height: '100%', width: '100%', minHeight: '400px' }}
+                        style={{ height: '100%', width: '100%', minHeight: '300px' }}
                         opts={{ renderer: 'canvas', locale: 'EN' }}
                         notMerge={true}
                         lazyUpdate={true}
@@ -104,19 +106,22 @@ const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMul
                   ))}
                 </div>
               ) : (
-                <ReactECharts
-                  option={chartOption}
-                  style={{ height: '100%', width: '100%' }}
-                  opts={{ renderer: 'canvas', locale: 'EN' }}
-                  notMerge={true}
-                  lazyUpdate={true}
-                />
+                <div className="h-full min-h-[300px]">
+                  <ReactECharts
+                    option={chartOption}
+                    style={{ height: '100%', width: '100%' }}
+                    opts={{ renderer: 'canvas', locale: 'EN' }}
+                    notMerge={true}
+                    lazyUpdate={true}
+                  />
+                </div>
               )}
             </div>
 
-            <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-center">
+            {/* Footer */}
+            <div className="bg-gray-50 px-4 sm:px-6 py-2 sm:py-3 border-t border-gray-200 text-center flex-shrink-0">
               <p className="text-xs text-gray-500">
-                Press <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-gray-700 font-mono">ESC</kbd> or click outside to close
+                Press <kbd className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white border border-gray-300 rounded text-gray-700 font-mono text-xs">ESC</kbd> or click outside to close
               </p>
             </div>
           </motion.div>

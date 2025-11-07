@@ -233,35 +233,33 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
         </div>
       </div>
 
-      <div className="flex items-center justify-between bg-blue-50 border border-blue-300 rounded-lg p-4">
-        <p className="text-blue-700 text-lg font-semibold">
-          You can export them in one go.
+      <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-gray-700 text-sm font-medium">
+          Export all charts at once
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 rounded-md transition-colors bg-white text-green-600 hover:bg-green-50 border border-green-200 flex items-center gap-2 font-medium"
-            title="Expand all charts"
+            className="px-3 py-1.5 rounded text-sm text-gray-600 hover:bg-gray-50 border border-gray-300 flex items-center gap-1.5 font-normal transition-colors"
           >
-            <Maximize2 className="w-4 h-4" />
-            <span className="text-md">View All</span>
+            <Maximize2 className="w-3.5 h-3.5" />
+            View All
           </button>
           <div className="relative" ref={exportMenuRef}>
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
-              className="px-4 py-2 rounded-md transition-colors bg-white text-green-600 hover:bg-green-50 border border-green-200 flex items-center gap-2 font-medium"
-              title="Export all charts"
+              className="px-3 py-1.5 rounded text-sm text-gray-600 hover:bg-gray-50 border border-gray-300 flex items-center gap-1.5 font-normal transition-colors"
             >
-              <Download className="w-4 h-4" />
-              <span className="text-md">Export All</span>
+              <Download className="w-3.5 h-3.5" />
+              Export All
             </button>
             {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+              <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-sm border border-gray-200 z-10 py-1">
                 <button
                   onClick={handleExportPNG}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                  className="w-full text-left px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
                 >
-                  Export PNG
+                  Export as PNG
                 </button>
               </div>
             )}
