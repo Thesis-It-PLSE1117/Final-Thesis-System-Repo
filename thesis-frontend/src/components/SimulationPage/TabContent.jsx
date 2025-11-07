@@ -96,8 +96,13 @@ export const TabContent = ({
           vmUtilization,
           rawResults: {
             summary,
-            averageMetrics: summary.averageMetrics || summary,
+            averageMetrics: rawResults.averageMetrics || summary.averageMetrics || summary,
+            stdDevMetrics: rawResults.stdDevMetrics || {},
+            minMetrics: rawResults.minMetrics || {},
+            maxMetrics: rawResults.maxMetrics || {},
+            totalIterations: rawResults.totalIterations || rawResults.individualResults?.length || 1,
             individualResults: rawResults.individualResults || [],
+            bestResult: rawResults.bestResult || null,
             energyConsumption,
             vmUtilization,
             schedulingLog

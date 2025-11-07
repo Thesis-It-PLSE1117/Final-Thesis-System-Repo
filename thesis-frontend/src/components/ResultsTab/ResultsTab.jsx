@@ -542,6 +542,8 @@ const ResultsTab = ({
                 epsoResults?.tTestResults ||
                 epsoResults?.ttestResults
               }
+              eacoResults={eacoResults?.rawResults || eacoResults}
+              epsoResults={epsoResults?.rawResults || epsoResults}
             />
           </motion.div>
         );
