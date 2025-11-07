@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 
 const METRIC_LABELS = {
@@ -16,7 +16,7 @@ const getBarColor = (algorithm, isWinner, isSignificant) => {
   return isWinner && isSignificant ? '#c2410c' : '#f97316';
 };
 
-const MetricComparisonChart = ({ metricName, data }) => {
+const MetricComparisonChart = forwardRef(({ metricName, data }, ref) => {
   if (!data || data.eacoMean === undefined || data.epsoMean === undefined) {
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-300">
@@ -105,12 +105,15 @@ const MetricComparisonChart = ({ metricName, data }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
       <ReactECharts
+        ref={ref}
         option={option}
         style={{ height: '300px', width: '100%' }}
         opts={{ renderer: 'canvas' }}
       />
     </div>
   );
-};
+});
+
+MetricComparisonChart.displayName = 'MetricComparisonChart';
 
 export default MetricComparisonChart;
