@@ -15,7 +15,6 @@ const SimulationPage = lazy(() => import("../SimulationPage"));
 import AnimatedBackground from "./AnimatedBackground";
 import Header from "./Header";
 import HeroSection from "./HeroSection";
-import DemoSection from "./DemoSection";
 import WalkthroughSection from "./WalkthroughSection";
 import CtaSection from "./CtaSection";
 import Footer from "./Footer";
@@ -160,12 +159,6 @@ const HomePage = () => {
           setSimulationInitialTab("help");
           setShowSimulation(true);
         }}
-      />
-
-      <DemoSection
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-        controls={controls}
       />
 
       <WalkthroughSection walkthroughSteps={walkthroughSteps} />
