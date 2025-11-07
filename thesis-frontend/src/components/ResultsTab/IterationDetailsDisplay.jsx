@@ -370,13 +370,19 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                           {/* EACO metric sub-headers */}
                           {displayMetrics.map(metric => (
                             <th key={`eaco-${metric.key}`} className="px-2 sm:px-4 py-1 text-right font-medium text-blue-600 bg-blue-50 text-xs sm:text-sm border-l border-gray-200">
-                              {metric.label}
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{metric.label}</span>
+                                {metric.unit && <span className="text-gray-500">({metric.unit})</span>}
+                              </div>
                             </th>
                           ))}
                           {/* EPSO metric sub-headers */}
                           {displayMetrics.map(metric => (
                             <th key={`epso-${metric.key}`} className="px-2 sm:px-4 py-1 text-right font-medium text-orange-600 bg-orange-50 text-xs sm:text-sm">
-                              {metric.label}
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{metric.label}</span>
+                                {metric.unit && <span className="text-gray-500">({metric.unit})</span>}
+                              </div>
                             </th>
                           ))}
                         </tr>
@@ -497,19 +503,21 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                                         : 'bg-white'
                                     }`}
                                   >
-                                    <div className="text-right">
-                                      <div className={textColorClass}>
+                                    <div className="flex items-center justify-end gap-1">
+                                      <span className={textColorClass}>
                                         {eacoIter ? metric.format(eacoValue) : '-'}
-                                      </div>
-                                      <span className={`text-sm ${
-                                        isHovered 
-                                          ? trend === 'better' ? 'text-green-500' 
-                                            : trend === 'worse' ? 'text-red-500' 
-                                            : 'text-gray-500'
-                                          : 'text-gray-500'
-                                      } hidden sm:inline`}>
-                                        {metric.unit}
                                       </span>
+                                      {metric.unit && (
+                                        <span className={`text-xs ${
+                                          isHovered 
+                                            ? trend === 'better' ? 'text-green-500' 
+                                              : trend === 'worse' ? 'text-red-500' 
+                                              : 'text-gray-500'
+                                            : 'text-gray-500'
+                                        }`}>
+                                          {metric.unit}
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
                                 );
@@ -541,19 +549,21 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                                         : 'bg-white'
                                     }`}
                                   >
-                                    <div className="text-right">
-                                      <div className={textColorClass}>
+                                    <div className="flex items-center justify-end gap-1">
+                                      <span className={textColorClass}>
                                         {epsoIter ? metric.format(epsoValue) : '-'}
-                                      </div>
-                                      <span className={`text-sm ${
-                                        isHovered 
-                                          ? invertedTrend === 'better' ? 'text-green-500' 
-                                            : invertedTrend === 'worse' ? 'text-red-500' 
-                                            : 'text-gray-500'
-                                          : 'text-gray-500'
-                                      } hidden sm:inline`}>
-                                        {metric.unit}
                                       </span>
+                                      {metric.unit && (
+                                        <span className={`text-xs ${
+                                          isHovered 
+                                            ? invertedTrend === 'better' ? 'text-green-500' 
+                                              : invertedTrend === 'worse' ? 'text-red-500' 
+                                              : 'text-gray-500'
+                                            : 'text-gray-500'
+                                        }`}>
+                                          {metric.unit}
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
                                 );
@@ -576,9 +586,11 @@ const IterationDetailsDisplay = ({ eacoResults, epsoResults }) => {
                             </td>
                             {displayMetrics.map(metric => (
                               <td key={metric.key} className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-gray-700 text-sm sm:text-sm">
-                                <div className="text-right">
-                                  <div>{metric.format(iter.summary[metric.key] || 0)}</div>
-                                  <span className="text-sm text-gray-500 hidden sm:inline">{metric.unit}</span>
+                                <div className="flex items-center justify-end gap-1">
+                                  <span>{metric.format(iter.summary[metric.key] || 0)}</span>
+                                  {metric.unit && (
+                                    <span className="text-xs text-gray-500">{metric.unit}</span>
+                                  )}
                                 </div>
                               </td>
                             ))}
