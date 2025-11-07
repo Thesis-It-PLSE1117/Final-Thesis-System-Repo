@@ -483,10 +483,10 @@ const ResultsTab = ({
               )}
             </div>
 
-            <ExecutionTimeDisplay
+            {/* <ExecutionTimeDisplay
               eacoResults={eacoResults}
               epsoResults={epsoResults}
-            />
+            /> */}
 
             {/* Iteration info if applicable */}
             {(eacoResults?.iterationsAdjusted ||
