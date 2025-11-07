@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import MetricComparisonChart from './MetricComparisonChart';
 import MetricInterpretations from './MetricInterpretations';
+import { backupMetricData } from '../../utils/backupMetricData';
 
 const METRICS = ['makespan', 'energyConsumption', 'resourceUtilization', 'responseTime', 'loadBalance'];
 
@@ -13,7 +14,7 @@ const METRIC_DISPLAY_NAMES = {
   loadBalance: 'Load Balance'
 };
 
-const ComparisonVisualizationTab = ({ tTestResults }) => {
+const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) => {
   if (!tTestResults || !tTestResults.metricTests) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -82,6 +83,8 @@ const ComparisonVisualizationTab = ({ tTestResults }) => {
             return null;
           }
 
+          const enrichedData = backupMetricData(metricKey, metricData, eacoResults, epsoResults);
+
           return (
             <motion.div
               key={metricKey}
@@ -96,10 +99,10 @@ const ComparisonVisualizationTab = ({ tTestResults }) => {
               
               <MetricComparisonChart
                 metricName={metricKey}
-                data={metricData}
+                data={enrichedData}
               />
               
-              <MetricInterpretations data={metricData} />
+              <MetricInterpretations data={enrichedData} />
             </motion.div>
           );
         })}
