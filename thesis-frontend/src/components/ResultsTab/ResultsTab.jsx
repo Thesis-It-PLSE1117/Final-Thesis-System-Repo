@@ -1198,18 +1198,20 @@ const ResultsTab = ({
                 )}
 
               {/* Tooltip on hover (hidden on mobile) */}
-              <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                {tab.description}
-                {tab.id === "analysis" &&
-                  !isSingleIteration &&
-                  (eacoResults?.tTestResults ||
-                    eacoResults?.ttestResults ||
-                    epsoResults?.tTestResults ||
-                    epsoResults?.ttestResults) && (
-                    <span className="block text-[#319694] font-medium mt-1">
-                      T-Test results available
-                    </span>
-                  )}
+              <div className="hidden sm:block absolute bottom-full left-0 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 max-w-[calc(100vw-1rem)] break-words before:content-[''] before:absolute before:top-full before:left-4 before:border-4 before:border-transparent before:border-t-gray-800">
+                <div className="whitespace-normal w-max max-w-[300px]">
+                  {tab.description}
+                  {tab.id === "analysis" &&
+                    !isSingleIteration &&
+                    (eacoResults?.tTestResults ||
+                      eacoResults?.ttestResults ||
+                      epsoResults?.tTestResults ||
+                      epsoResults?.ttestResults) && (
+                      <span className="block text-[#319694] font-medium mt-1">
+                        T-Test results available
+                      </span>
+                    )}
+                </div>
               </div>
             </button>
           ))}
