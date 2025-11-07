@@ -94,8 +94,11 @@ const ResultsTab = ({
     isSingleIteration &&
     eacoResults?.rawResults?.summary &&
     epsoResults?.rawResults?.summary &&
-    (eacoResults?.hasVisualizationData || epsoResults?.hasVisualizationData ||
-     (eacoResults?.vmUtilization && epsoResults?.vmUtilization));
+    (eacoResults?.hasVisualizationData || 
+     epsoResults?.hasVisualizationData ||
+     eacoResults?.rawResults?.vmUtilization || 
+     epsoResults?.rawResults?.vmUtilization ||
+     (eacoResults?.rawResults?.summary?.makespan && epsoResults?.rawResults?.summary?.makespan));
   
   const shouldUseECharts = !matlabPlotsExpected && hasRawResultsForECharts;
 
