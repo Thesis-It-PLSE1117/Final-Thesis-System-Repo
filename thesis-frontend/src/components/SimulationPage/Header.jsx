@@ -13,9 +13,6 @@ import {
   TYPOGRAPHY_SCALE,
 } from "../../constants/designSystem";
 
-/**
- * header component for SimulationPage
- */
 const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
   const getHeaderTitle = () => {
     switch (simulationState) {
@@ -40,6 +37,8 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
         return "Task Scheduling Visualization";
       case "results":
         return "Performance Analysis";
+      case "help":
+        return "Algorithm Documentation";
       default:
         return "Load Balancing Simulation";
     }
@@ -68,6 +67,8 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
         return "Visualizing EACO/EPSO task scheduling process";
       case "results":
         return "Analyze algorithm performance metrics";
+      case "help":
+        return "Learn about EACO and EPSO optimization algorithms";
       default:
         return "";
     }
@@ -98,6 +99,8 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
         return <Play size={ICON_SIZES.lg} className="text-white" />;
       case "results":
         return <BarChart2 size={ICON_SIZES.lg} className="text-white" />;
+      case "help":
+        return <HelpCircle size={ICON_SIZES.lg} className="text-white" />;
       default:
         return <Home size={ICON_SIZES.lg} className="text-white" />;
     }

@@ -38,8 +38,8 @@ const tabContentVariants = {
   exit: { opacity: 0, x: -50 }
 };
 
-const HelpTab = () => {
-  const [activeTab, setActiveTab] = useState('navigation');
+const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab = 'navigation' }) => {
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   return (
     <motion.div
@@ -49,19 +49,47 @@ const HelpTab = () => {
       variants={containerVariants}
     >
       {/* Header Section */}
-      <motion.header 
-        className="flex items-center gap-4"
+      <motion.header
+        className="flex items-center justify-between"
         variants={itemVariants}
       >
-        <div className="p-3 bg-[#319694]/10 rounded-full">
-          <HelpCircle className="text-3xl text-[#319694]" />
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-[#319694]/10 rounded-full">
+            <HelpCircle className="text-3xl text-[#319694]" />
+          </div>
+          <motion.h2
+            className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]"
+            variants={itemVariants}
+          >
+            Simulation Configuration Guide
+          </motion.h2>
         </div>
-        <motion.h2
-          className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]"
-          variants={itemVariants}
-        >
-          Simulation Configuration Guide
-        </motion.h2>
+
+        {/* Back Button - Only show when accessed from ResultsTab */}
+        {showBackButton && onNavigateBackToResults && (
+          <motion.button
+            onClick={onNavigateBackToResults}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            variants={itemVariants}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Results
+          </motion.button>
+        )}
       </motion.header>
 
       {/* Tab Navigation */}

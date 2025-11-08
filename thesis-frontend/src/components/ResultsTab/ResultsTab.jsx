@@ -38,6 +38,7 @@ import { FEATURES } from "../../config/features";
 const ResultsTab = ({
   onBackToAnimation,
   onNewSimulation,
+  onNavigateToHelp,
   eacoResults,
   epsoResults,
   plotData,
@@ -463,6 +464,47 @@ const ResultsTab = ({
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            {onNavigateToHelp && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-blue-50 to-blue-50 border border-blue-200 rounded-lg p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <svg
+                      className="w-5 h-5 text-blue-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-blue-900 font-semibold text-md">
+                      Metadata shows configuration snapshots set within the simulation run.
+                    </h4>
+                    <p className="text-blue-700 text-md mt-1">
+                      Also, you can check the methods{" "}
+                      <button
+                        onClick={onNavigateToHelp}
+                        className="text-blue-700 hover:text-blue-600 underline font-semibold transition-colors"
+                      >
+                        here
+                      </button>{" "}
+                      for publication references.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Metadata Display */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               {resultsRR && (
@@ -488,6 +530,8 @@ const ResultsTab = ({
                 />
               )}
             </div>
+
+
 
             {/* <ExecutionTimeDisplay
               eacoResults={eacoResults}
