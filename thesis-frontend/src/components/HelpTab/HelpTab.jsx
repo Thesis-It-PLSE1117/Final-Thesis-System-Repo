@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { HelpCircle, BookOpen, BarChart3, Navigation, Activity, Building, Settings } from "lucide-react";
+import { HelpCircle, BookOpen, BarChart3, Navigation, Activity, Code, Building, DatabaseIcon } from "lucide-react";
 import DataCenterHelp from "./DataCenterHelp";
 import WorkloadHelp from "./WorkloadHelp";
 import ProjectOverview from "./ProjectOverview";
 import StatisticalMethodology from "./StatisticalMethodology";
 import SystemNavigationHelp from "./SystemNavigationHelp";
 import AnimationResultsHelp from "./AnimationResultsHelp";
+import CoreAlgo from "./CoreAlgo";
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -104,19 +104,30 @@ const HelpTab = () => {
         </button>
         <button
           className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
-            activeTab === 'workload' 
-              ? 'text-[#319694] border-b-2 border-[#319694]' 
+            activeTab === 'workload'
+              ? 'text-[#319694] border-b-2 border-[#319694]'
               : 'text-gray-500 hover:text-[#319694]'
           }`}
           onClick={() => setActiveTab('workload')}
         >
-          <Settings size={16} />
+          <DatabaseIcon size={16} />
           Workload
         </button>
         <button
           className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
-            activeTab === 'documentation' 
-              ? 'text-[#319694] border-b-2 border-[#319694]' 
+            activeTab === 'algorithms'
+              ? 'text-[#319694] border-b-2 border-[#319694]'
+              : 'text-gray-500 hover:text-[#319694]'
+          }`}
+          onClick={() => setActiveTab('algorithms')}
+        >
+          <Code size={16} />
+          Core Algorithms
+        </button>
+        <button
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'documentation'
+              ? 'text-[#319694] border-b-2 border-[#319694]'
               : 'text-gray-500 hover:text-[#319694]'
           }`}
           onClick={() => setActiveTab('documentation')}
@@ -151,6 +162,7 @@ const HelpTab = () => {
         {activeTab === 'datacenter' && <DataCenterHelp />}
         {activeTab === 'workload' && <WorkloadHelp />}
         {activeTab === 'animation' && <AnimationResultsHelp />}
+        {activeTab === 'algorithms' && <CoreAlgo />}
         {activeTab === 'documentation' && <ProjectOverview />}
         {activeTab === 'methodology' && <StatisticalMethodology />}
       </motion.div>

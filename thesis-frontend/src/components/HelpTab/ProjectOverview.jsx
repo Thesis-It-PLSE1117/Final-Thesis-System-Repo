@@ -74,63 +74,7 @@ const ProjectOverview = () => {
         }
       ]
     },
-    {
-      title: "Core Algorithms",
-      icon: <Code className="w-5 h-5" />,
-      subsections: [
-        {
-          title: "Enhanced Ant Colony Optimization (EACO)",
-          content: (
-            <>
-              An improved <span className="font-semibold">ant colony algorithm</span> designed for cloud tasks. 
-              It adapts as it learns better solutions. Like real ants, it marks <span className="font-semibold">good paths</span> and avoids bad ones. 
-              The algorithm stops early when it finds <span className="font-semibold">optimal task assignments</span>.
-            </>
-          )
-        },
-        {
-          title: "Enhanced Particle Swarm Optimization (EPSO)",
-          content: (
-            <>
-              An improved <span className="font-semibold">particle swarm algorithm</span> for cloud scheduling. 
-              Each particle is a <span className="font-semibold">possible solution</span> that learns from the swarm. 
-              The algorithm balances <span className="font-semibold">exploring new solutions</span> with refining good ones. 
-              It stops when it finds the <span className="font-semibold">best task assignment</span>.
-            </>
-          )
-        },
-        {
-          title: "Algorithm References",
-          content: (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600 mb-3">
-                Learn more about the foundational algorithms that inspired our enhanced versions:
-              </p>
-              <div className="flex flex-col gap-2">
-                <a 
-                  href="https://www.techscience.com/cmc/v82n2/59521/html" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  <LinkIcon className="w-4 h-4" />
-                  Particle Swarm Optimization (PSO) - Technical Overview
-                </a>
-                <a 
-                  href="https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  <LinkIcon className="w-4 h-4" />
-                  Ant Colony Optimization (ACO) - Algorithm Overview
-                </a>
-              </div>
-            </div>
-          )
-        }
-      ]
-    },
+
     {
       title: "System Architecture",
       icon: <BarChart2 className="w-5 h-5" />,
