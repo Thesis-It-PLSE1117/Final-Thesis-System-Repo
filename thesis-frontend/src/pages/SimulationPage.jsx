@@ -11,7 +11,6 @@ import { showNotification } from "../components/common/ErrorNotification";
 import { useAutoSave } from "../hooks/useAutoSave";
 import ConfirmationDialog from "../components/common/ConfirmationDialog";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
-// ADD THIS IMPORT - This was missing!
 import { getHistoryStats } from "../services/historyService";
 
 // components
@@ -31,6 +30,7 @@ const AnimationTab = lazy(
   () => import("../components/AnimationTab/AnimationTab"),
 );
 const ResultsTab = lazy(() => import("../components/ResultsTab/ResultsTab"));
+const HelpTab = lazy(() => import("../components/HelpTab/HelpTab"));
 
 import CloudLoadingModal from "../components/modals/CloudLoadingModal";
 
@@ -447,10 +447,28 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
               plotsGenerating={simulationResults?.plotsGenerating || false}
               onBackToAnimation={() => setSimulationState("animation")}
               onNewSimulation={() => setSimulationState("config")}
+              onNavigateToHelp={() => setSimulationState("help")}
               plotAnalysis={{
                 eaco: simulationResults?.eaco?.plotAnalysis,
                 epso: simulationResults?.epso?.plotAnalysis,
               }}
+            />
+          </Suspense>
+        );
+
+      case "help":
+        return (
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#319694]"></div>
+              </div>
+            }
+          >
+            <HelpTab
+              onNavigateBackToResults={() => setSimulationState("results")}
+              showBackButton={true}
+              initialTab="algorithms"
             />
           </Suspense>
         );

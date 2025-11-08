@@ -6,7 +6,7 @@ export const useCloudletConfig = () => {
     numCloudlets: DEFAULT_CLOUDLET_COUNT
   });
   
-  const [cloudletToggleEnabled, setCloudletToggleEnabled] = useState(false);
+  const [cloudletToggleEnabled, setCloudletToggleEnabled] = useState(true);
   const [csvRowCount, setCsvRowCount] = useState(0);
 
   const handleCloudletChange = (e) => {
