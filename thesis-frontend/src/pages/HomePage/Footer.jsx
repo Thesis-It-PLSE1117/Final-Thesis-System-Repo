@@ -25,13 +25,21 @@ const Footer = ({ footerLinks }) => {
         <div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 items-start">
-              <Cloud className="w-10 h-10 md:w-12 md:h-12" />
+              <img
+                src="/logo/logo_asset.png"
+                alt="Cloud Load Balancer Simulator Logo"
+                className="w-10 h-10 md:w-12 md:h-12 object-contain"
+              />
               <h4 className="text-base md:text-lg font-medium tracking-wide">© 2025, Cloud Load Balancer Simulator.</h4>
             </div>
             <div className="flex flex-col gap-3">
               <div className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-sky-100 border border-sky-200 text-sky-700 font-semibold text-sm md:text-base w-fit">
                 <div className="relative w-5 h-5 md:w-6 md:h-6">
-                  <Cloud className="w-4 h-4 md:w-5 md:h-5 absolute top-0 left-0" />
+                  <img
+                    src="/logo/logo_asset.png"
+                    alt="CloudSim Logo"
+                    className="w-4 h-4 md:w-5 md:h-5 absolute top-0 left-0 object-contain"
+                  />
                   <Server className="w-2.5 h-2.5 md:w-3 md:h-3 absolute bottom-0 right-0" />
                 </div>
                 CloudSim

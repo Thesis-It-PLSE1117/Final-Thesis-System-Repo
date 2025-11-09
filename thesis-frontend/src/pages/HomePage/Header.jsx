@@ -24,9 +24,13 @@ const Header = ({ onStartSimulation }) => {
             repeatDelay: 5
           }}
         >
-          <Cloud className="text-white w-9 h-9" />
+          <img
+            src="/logo/logo_asset.png"
+            alt="Cloud Load Balancer Simulator Logo"
+            className="w-9 h-9 object-contain"
+          />
         </motion.div>
-        <h1 className="text-white text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-[#a8f0eb]">
+        <h1 className="text-white cursor-pointer text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-[#a8f0eb]">
           Cloud Load Balancer Simulator
         </h1>
       </motion.div>
