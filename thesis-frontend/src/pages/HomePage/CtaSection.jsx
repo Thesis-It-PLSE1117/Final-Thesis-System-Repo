@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { PlayIcon} from "lucide-react";
 
 const CtaSection = ({ onStartSimulation }) => {
   return (
@@ -18,17 +18,16 @@ const CtaSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Find Your Best Algorithm
+          Discover Which Algorithm Schedules Faster
         </motion.h3>
         <motion.p
-          className="text-lg md:text-xl text-white/90 mb-12"
+          className="text-lg md:text-xl text-white mb-12"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Compare EACO vs EPSO to discover which works better for your simulated
-          cloud infrastructure.
+          Compare EACO vs. EPSO on simulated infrastructure. Get insights backed by real data.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}
@@ -45,7 +44,7 @@ const CtaSection = ({ onStartSimulation }) => {
             }}
             whileTap={{ scale: 0.98 }}
           >
-            Start Comparing <Zap className="w-5 h-5" />
+            Start Simulation Now <PlayIcon className="w-5 h-5" />
           </motion.button>
         </motion.div>
       </div>

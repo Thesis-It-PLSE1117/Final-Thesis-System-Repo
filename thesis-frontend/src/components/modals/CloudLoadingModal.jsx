@@ -241,24 +241,34 @@ const CloudLoadingModal = ({
             id="cloud-loading-title"
             className="text-lg font-bold text-gray-800"
           >
-            Simulation Processing
+            Running Simulation
           </h3>
         </div>
 
         <div className="flex justify-center mb-5">
           <div className="relative w-28 h-28">
-            <div className="absolute inset-0 border-4 border-[#319694]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-transparent border-t-[#319694] rounded-full animate-spin motion-reduce:animate-none"></div>
-            <div
-              className="absolute inset-4 border-4 border-transparent border-b-[#4fd1c5] rounded-full animate-spin motion-reduce:animate-none"
-              style={{
-                animationDirection: "reverse",
-                animationDuration: "1.5s",
+            {/* Pulsing background ring */}
+            <div className="absolute inset-0 border-4 border-[#319694]/20 rounded-full animate-pulse"></div>
+
+            {/* Logo container with pulsing animation */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.8, 1, 0.8],
               }}
-            ></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Server className="text-[#319694]" size={ICON_SIZES.xxl} />
-            </div>
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <img
+                src="/logo/logo_asset.png"
+                alt="Cloud Load Balancer Simulator Logo"
+                className="w-16 h-16 object-contain"
+              />
+            </motion.div>
           </div>
         </div>
 

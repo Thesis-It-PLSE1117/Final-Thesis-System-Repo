@@ -67,7 +67,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
       role: "Thesis Leader/Project Manager",
       image: danmelImage,
       location: "University of Cabuyao",
-      description: "Leads the team and manages the project timeline. Makes sure everyone stays coordinated and the research meets academic standards.",
+      description: "Leads the research team and manages the project timeline.",
       github: "https://github.com/Danmel502"
     },
     {
@@ -75,7 +75,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
       role: "Backend Dev Lead",
       image: kierImage,
       location: "University of Cabuyao",
-      description: "Builds the technical systems and runs simulations. Develops the algorithms that power the research and test different solutions.",
+      description: "Builds the backend and develop the algorithms chosen for the study.",
       github: "https://github.com/kierre-yes"
     },
     {
@@ -83,7 +83,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
       role: "Frontend Dev Lead",
       image: alfredImage,
       location: "University of Cabuyao",
-      description: "Creates the user interface and visual displays. Transforms complex research data into easy-to-understand charts and interactions.",
+      description: "Creates the user interface and visual displays.",
       github: "https://github.com/alfred-jgv"
     }
   ];
@@ -139,7 +139,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                   variants={itemVariants}
                   className="text-lg text-gray-600 leading-relaxed"
                 >
-                  A dedicated team of researchers pushing the boundaries of cloud computing optimization through innovative algorithmic approaches and rigorous academic methodology.
+                  A dedicated team of 4th year students  pushing the boundaries of cloud computing optimization through innovative algorithmic approaches and rigorous academic methodology.
                 </motion.p>
               </div>
 
@@ -230,7 +230,7 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                     {/* Right: Project details */}
                     <div className="lg:col-span-2 text-center lg:text-left">
                       <h4 className="text-xl font-bold text-white mb-3">
-                        Research Focus
+                        Research Title
                       </h4>
                       <p className="text-lg font-semibold text-white/95 mb-4 leading-tight">
                         Enhanced PSO and ACO for Cloud Load Balancing: A Comparative Study

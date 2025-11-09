@@ -84,7 +84,7 @@ const HomePage = () => {
       ],
       list: [
         "Upload custom CSV files with task details.",
-        "Choose from 30 Google Cluster preset options.",
+        "Choose from 10 Google Cluster preset options.",
         "Set the number of tasks.",
         "Interactive charts will display automatically for single iterations.",
       ],
