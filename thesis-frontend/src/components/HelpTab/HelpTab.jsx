@@ -43,62 +43,67 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
 
   return (
     <motion.div
-      className="max-w-5xl mx-auto p-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg space-y-10 border border-[#319694]/10"
+      className="w-full max-w-5xl mx-auto p-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg space-y-10 border border-[#319694]/10"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      {/* Header Section */}
+      {/* Header Section with Fixed Layout */}
       <motion.header
-        className="flex items-center justify-between"
+        className="flex items-start justify-between gap-4 w-full"
         variants={itemVariants}
       >
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-[#319694]/10 rounded-full">
+        {/* Left side - Title and icon */}
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="flex-shrink-0 p-3 bg-[#319694]/10 rounded-full">
             <HelpCircle className="text-3xl text-[#319694]" />
           </div>
           <motion.h2
-            className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5]"
+            className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#267b79] to-[#4fd1c5] truncate"
             variants={itemVariants}
           >
             Simulation Configuration Guide
           </motion.h2>
         </div>
 
-        {/* Back Button - Only show when accessed from ResultsTab */}
+        {/* Right side - Back button with fixed width */}
         {showBackButton && onNavigateBackToResults && (
-          <motion.button
-            onClick={onNavigateBackToResults}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <motion.div
+            className="flex-shrink-0"
             variants={itemVariants}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <motion.button
+              onClick={onNavigateBackToResults}
+              className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 font-normal whitespace-nowrap"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Results
-          </motion.button>
+              <svg
+                className="w-4 h-4 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Results
+            </motion.button>
+          </motion.div>
         )}
       </motion.header>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Consistent width */}
       <motion.nav 
-        className="flex flex-wrap border-b border-[#319694]/10"
+        className="flex flex-wrap border-b border-[#319694]/10 w-full"
         variants={itemVariants}
       >
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'navigation' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -109,7 +114,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Navigation
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'animation' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -120,7 +125,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Results
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'datacenter' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -131,7 +136,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Data Center
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'workload'
               ? 'text-[#319694] border-b-2 border-[#319694]'
               : 'text-gray-500 hover:text-[#319694]'
@@ -142,7 +147,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Workload
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'algorithms'
               ? 'text-[#319694] border-b-2 border-[#319694]'
               : 'text-gray-500 hover:text-[#319694]'
@@ -153,7 +158,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Core Algorithms
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'documentation'
               ? 'text-[#319694] border-b-2 border-[#319694]'
               : 'text-gray-500 hover:text-[#319694]'
@@ -164,7 +169,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
           Overview
         </button>
         <button
-          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3 py-2 font-medium text-sm flex items-center gap-2 transition-all duration-200 flex-shrink-0 ${
             activeTab === 'methodology' 
               ? 'text-[#319694] border-b-2 border-[#319694]' 
               : 'text-gray-500 hover:text-[#319694]'
@@ -176,7 +181,7 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
         </button>
       </motion.nav>
 
-      {/* Tab Content with Smooth Transitions */}
+      {/* Tab Content with Strict Width Control */}
       <motion.div 
         key={activeTab}
         initial="enter"
@@ -184,15 +189,17 @@ const HelpTab = ({ onNavigateBackToResults, showBackButton = false, initialTab =
         exit="exit"
         variants={tabContentVariants}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="min-h-[400px]"
+        className="min-h-[400px] w-full"
       >
-        {activeTab === 'navigation' && <SystemNavigationHelp />}
-        {activeTab === 'datacenter' && <DataCenterHelp />}
-        {activeTab === 'workload' && <WorkloadHelp />}
-        {activeTab === 'animation' && <AnimationResultsHelp />}
-        {activeTab === 'algorithms' && <CoreAlgo />}
-        {activeTab === 'documentation' && <ProjectOverview />}
-        {activeTab === 'methodology' && <StatisticalMethodology />}
+        <div className="w-full">
+          {activeTab === 'navigation' && <SystemNavigationHelp />}
+          {activeTab === 'datacenter' && <DataCenterHelp />}
+          {activeTab === 'workload' && <WorkloadHelp />}
+          {activeTab === 'animation' && <AnimationResultsHelp />}
+          {activeTab === 'algorithms' && <CoreAlgo />}
+          {activeTab === 'documentation' && <ProjectOverview />}
+          {activeTab === 'methodology' && <StatisticalMethodology />}
+        </div>
       </motion.div>
     </motion.div>
   );

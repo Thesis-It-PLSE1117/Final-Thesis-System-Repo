@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 export const IterationNotice = ({ onViewResults, onBack }) => (
-  <div className="flex items-center justify-center h-full p-4 mt-40">
+  <div className="flex items-center justify-center h-full p-4 mt-28">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

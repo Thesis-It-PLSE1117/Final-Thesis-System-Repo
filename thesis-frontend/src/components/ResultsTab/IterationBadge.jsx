@@ -47,12 +47,12 @@ const IterationBadge = ({ iterationData }) => {
             </span>
           </div>
           
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Clock className="text-blue-600" size={16} />
             <span className="text-gray-700">
               <span className="font-semibold">{formatTime(totalExecutionTime)}</span> Simulation Runtime
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </motion.div>

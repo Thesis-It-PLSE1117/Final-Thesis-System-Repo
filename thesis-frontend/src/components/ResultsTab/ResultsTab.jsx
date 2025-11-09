@@ -486,15 +486,15 @@ const ResultsTab = ({
                       />
                     </svg>
                   </div>
-                  <div>
-                    <h4 className="text-blue-900 font-semibold text-md">
+                  <div className="space-y-2">
+                    <p className="text-gray-700 text-sm">
                       Metadata shows configuration snapshots set within the simulation run.
-                    </h4>
-                    <p className="text-blue-700 text-md mt-1">
-                      Also, you can check the methods{" "}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Check methods{" "}
                       <button
                         onClick={onNavigateToHelp}
-                        className="text-blue-700 hover:text-blue-600 underline font-semibold transition-colors"
+                        className="text-gray-600 hover:text-gray-900 underline transition-colors"
                       >
                         here
                       </button>{" "}
