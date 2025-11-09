@@ -6,8 +6,6 @@ import {
   clearHistory,
   deleteHistoryEntry,
   getHistoryStats,
-  searchHistory,
-  exportHistory,
   importHistory,
 } from "../../services/historyService";
 import HistoryPlaceholder from "./HistoryPlaceHolder";
@@ -27,14 +25,13 @@ const HistoryTab = ({ onBack, onViewResults }) => {
   const [filterAlgorithm, setFilterAlgorithm] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
-  const [isExporting, setIsExporting] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pendingImportData, setPendingImportData] = useState(null);
 
-  // Check if storage is full
-  const isStorageFull = historyStats.totalEntries >= historyStats.maxEntries;
+  // Check if storage is full (95% threshold)
+  const isStorageFull = historyStats.usedBytes >= historyStats.maxBytes * 0.95;
 
   // Load history and stats on component mount
   useEffect(() => {
@@ -127,34 +124,6 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     } catch (err) {
       console.error("Error deleting history entry:", err);
       alert("Error deleting history entry");
-    }
-  };
-
-  const handleExportSelected = (format) => {
-    const dataToExport = selectedResult
-      ? [selectedResult]
-      : filteredHistory.length > 0
-        ? [filteredHistory[0]]
-        : [];
-    if (dataToExport.length === 0) {
-      alert("No simulation data to export");
-      return;
-    }
-    exportSimulationHistory(dataToExport, format);
-  };
-
-  const handleExportAll = async () => {
-    try {
-      setIsExporting(true);
-      alert(
-        "Due to large dataset size, please export individual algorithm histories instead.",
-      );
-      return;
-    } catch (err) {
-      console.error("Error handling export:", err);
-      alert("Error exporting history");
-    } finally {
-      setIsExporting(false);
     }
   };
 
@@ -316,10 +285,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               total entries
             </div>
             {historyStats.totalEntries > 0 && (
-              <div className={`text-sm mt-1 ${isStorageFull ? 'text-red-700 font-light' : 'text-gray-500'}`}>
-                Storage: {historyStats.totalEntries}/{historyStats.maxEntries}{" "}
-                entries
-                {isStorageFull && " - Maximum Entries Reached."}
+              <div className={`text-sm mt-1 ${isStorageFull ? 'text-red-700 font-medium' : 'text-gray-500'}`}>
+                Storage: {historyStats.usedStorageMB} MB / {historyStats.maxStorageMB} MB ({historyStats.percentageUsed}%)
+                {isStorageFull && " - Storage Nearly Full"}
               </div>
             )}
           </div>
@@ -482,7 +450,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               }`}
               title={
                 isStorageFull 
-                  ? "Storage full - cannot import and save more data | clear history first before running another simulation" 
+                  ? "Storage nearly full - clear history or delete old simulations before importing" 
                   : "Import history from backup"
               }
               data-testid="import-button"

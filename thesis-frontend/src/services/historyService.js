@@ -1,16 +1,34 @@
-/**
- * History Service using IndexedDB
- * Requires: npm install idb
- */
-
 import { openDB, deleteDB } from "idb";
 
 const DB_NAME = "SimulationHistoryDB";
-const DB_VERSION = 2;
+const DB_VERSION = 3; // Increment version for new metadata store
 const STORE_NAME = "history";
-const MAX_HISTORY_ENTRIES = 10;
+const METADATA_STORE = "metadata";
+const MAX_STORAGE_MB = 450;
+const MAX_STORAGE_BYTES = MAX_STORAGE_MB * 1024 * 1024;
 
 let dbPromise = null;
+
+/**
+ * Calculate size of an object in bytes
+ */
+const calculateObjectSize = (obj) => {
+  try {
+    const jsonString = JSON.stringify(obj);
+    // Using Blob to get accurate byte size (handles Unicode properly)
+    return new Blob([jsonString]).size;
+  } catch (error) {
+    console.error("Error calculating object size:", error);
+    return 0;
+  }
+};
+
+/**
+ * Format bytes to MB string
+ */
+const formatMB = (bytes) => {
+  return (bytes / (1024 * 1024)).toFixed(2);
+};
 
 /**
  * Initialize IndexedDB connection
@@ -19,30 +37,33 @@ const initDB = async () => {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db, oldVersion, newVersion, transaction) {
-        let store;
-
+        // Create history store
+        let historyStore;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
-          store = db.createObjectStore(STORE_NAME, {
+          historyStore = db.createObjectStore(STORE_NAME, {
             keyPath: "id",
           });
         } else {
-          store = transaction.objectStore(STORE_NAME);
+          historyStore = transaction.objectStore(STORE_NAME);
         }
 
-        if (!store.indexNames.contains("timestamp")) {
-          store.createIndex("timestamp", "timestamp", { unique: false });
+        if (!historyStore.indexNames.contains("timestamp")) {
+          historyStore.createIndex("timestamp", "timestamp", { unique: false });
+        }
+        if (!historyStore.indexNames.contains("algorithm")) {
+          historyStore.createIndex("algorithm", "algorithm", { unique: false });
+        }
+        if (!historyStore.indexNames.contains("baseId")) {
+          historyStore.createIndex("baseId", "baseId", { unique: false });
         }
 
-        if (!store.indexNames.contains("algorithm")) {
-          store.createIndex("algorithm", "algorithm", { unique: false });
-        }
-
-        if (!store.indexNames.contains("baseId")) {
-          store.createIndex("baseId", "baseId", { unique: false });
+        // Create metadata store for tracking storage usage
+        if (!db.objectStoreNames.contains(METADATA_STORE)) {
+          db.createObjectStore(METADATA_STORE, { keyPath: "key" });
         }
       },
       blocked() {
-        // Database upgrade blocked by other tabs
+        console.warn("Database upgrade blocked by other tabs");
       },
       blocking() {
         if (dbPromise) {
@@ -54,8 +75,86 @@ const initDB = async () => {
 
     const db = await dbPromise;
     await migrateExistingEntries(db);
+    await initializeStorageMetadata(db);
   }
   return dbPromise;
+};
+
+/**
+ * Initialize storage metadata
+ */
+const initializeStorageMetadata = async (db) => {
+  try {
+    const tx = db.transaction([METADATA_STORE, STORE_NAME], "readwrite");
+    const metadataStore = tx.objectStore(METADATA_STORE);
+    const historyStore = tx.objectStore(STORE_NAME);
+
+    // Check if metadata already exists
+    const existing = await metadataStore.get("storageUsage");
+    
+    if (!existing) {
+      // Calculate initial storage from existing entries
+      const allEntries = await historyStore.getAll();
+      const totalSize = allEntries.reduce((sum, entry) => {
+        return sum + calculateObjectSize(entry);
+      }, 0);
+
+      await metadataStore.put({
+        key: "storageUsage",
+        totalBytes: totalSize,
+        lastUpdated: new Date().toISOString(),
+      });
+
+      console.log(`Initialized storage metadata: ${formatMB(totalSize)} MB`);
+    }
+
+    await tx.done;
+  } catch (error) {
+    console.error("Failed to initialize storage metadata:", error);
+  }
+};
+
+/**
+ * Get current storage usage
+ */
+const getStorageUsage = async (db) => {
+  try {
+    const tx = db.transaction(METADATA_STORE, "readonly");
+    const store = tx.objectStore(METADATA_STORE);
+    const metadata = await store.get("storageUsage");
+    await tx.done;
+    return metadata?.totalBytes || 0;
+  } catch (error) {
+    console.error("Failed to get storage usage:", error);
+    return 0;
+  }
+};
+
+/**
+ * Update storage usage
+ */
+const updateStorageUsage = async (db, byteDelta) => {
+  try {
+    const tx = db.transaction(METADATA_STORE, "readwrite");
+    const store = tx.objectStore(METADATA_STORE);
+    
+    const current = await store.get("storageUsage");
+    const currentBytes = current?.totalBytes || 0;
+    const newBytes = Math.max(0, currentBytes + byteDelta);
+
+    await store.put({
+      key: "storageUsage",
+      totalBytes: newBytes,
+      lastUpdated: new Date().toISOString(),
+    });
+
+    await tx.done;
+    console.log(`Storage updated: ${formatMB(currentBytes)} MB → ${formatMB(newBytes)} MB (${byteDelta > 0 ? '+' : ''}${formatMB(byteDelta)} MB)`);
+    return newBytes;
+  } catch (error) {
+    console.error("Failed to update storage usage:", error);
+    return 0;
+  }
 };
 
 const migrateExistingEntries = async (db) => {
@@ -75,7 +174,7 @@ const migrateExistingEntries = async (db) => {
     }
 
     if (migrationCount > 0) {
-      // Migration complete
+      console.log(`Migrated ${migrationCount} entries with baseId`);
     }
 
     await tx.done;
@@ -92,28 +191,26 @@ const getDB = async (retries = 3) => {
     try {
       return await initDB();
     } catch (error) {
-      // Failed to initialize database
+      console.error(`Failed to initialize database (attempt ${i + 1}/${retries}):`, error);
 
       if (error.name === "VersionError") {
-        // Version error detected, clearing database promise and retrying
+        console.log("Version error detected, clearing database promise and retrying");
         dbPromise = null;
 
-        // If it's the last retry, try to delete and recreate the database
         if (i === retries - 1) {
           try {
-            // Attempting to delete existing database
+            console.log("Attempting to delete existing database");
             await deleteDB(DB_NAME);
             dbPromise = null;
             return await initDB();
           } catch (deleteError) {
-            // Failed to delete database
+            console.error("Failed to delete database:", deleteError);
           }
         }
       } else if (i === retries - 1) {
         throw error;
       }
 
-      // Wait before retrying
       await new Promise((resolve) => setTimeout(resolve, 100 * (i + 1)));
     }
   }
@@ -129,18 +226,16 @@ export const getHistory = async () => {
     const store = tx.objectStore(STORE_NAME);
     const index = store.index("timestamp");
 
-    // Get all entries sorted by timestamp (newest first)
     const entries = await index.getAll();
-    return entries.reverse(); // Reverse to get newest first
+    return entries.reverse();
   } catch (error) {
-    // Failed to load history
+    console.error("Failed to load history:", error);
     return [];
   }
 };
 
 /**
  * Save simulation results to history
- * Creates paired entries for EACO and EPSO results
  */
 export const saveToHistory = async (
   results,
@@ -151,16 +246,14 @@ export const saveToHistory = async (
   try {
     const timestamp = new Date().toISOString();
     const id = Date.now();
-    const baseId = id.toString(); // Base ID for pairing entries
+    const baseId = id.toString();
 
-    // Create full config object including cloudlet config
     const fullConfig = {
       ...dataCenterConfig,
       numCloudlets: cloudletConfig.numCloudlets,
       workloadType: workloadFile ? "CSV" : "Random",
     };
 
-    // Ensure we have all required data before saving
     if (!results.eaco || !results.epso) {
       console.error("Missing algorithm results:", {
         eaco: !!results.eaco,
@@ -169,8 +262,6 @@ export const saveToHistory = async (
       return false;
     }
 
-
-    // Helper function to extract plot metadata and analysis without large image data
     const extractPlotAnalysis = (algorithmResults) => {
       if (!algorithmResults) return null;
 
@@ -346,11 +437,32 @@ export const saveToHistory = async (
       },
     ];
 
+    // Calculate sizes of new entries
+    const eacoSize = calculateObjectSize(historyEntries[0]);
+    const epsoSize = calculateObjectSize(historyEntries[1]);
+    const totalNewSize = eacoSize + epsoSize;
+
+    console.log(`New entries size: EACO ${formatMB(eacoSize)} MB + EPSO ${formatMB(epsoSize)} MB = ${formatMB(totalNewSize)} MB`);
+
     const db = await getDB();
+    const currentUsage = await getStorageUsage(db);
+
+    // Check if adding these entries would exceed the limit
+    if (currentUsage + totalNewSize > MAX_STORAGE_BYTES) {
+      const excessBytes = (currentUsage + totalNewSize) - MAX_STORAGE_BYTES;
+      console.warn(`Storage limit would be exceeded by ${formatMB(excessBytes)} MB`);
+      
+      // Try to clean up old entries to make space
+      const cleanedUp = await cleanupOldEntries(db, totalNewSize);
+      
+      if (!cleanedUp) {
+        throw new Error(`Storage limit exceeded. Need ${formatMB(totalNewSize)} MB but only ${formatMB(MAX_STORAGE_BYTES - currentUsage)} MB available after cleanup.`);
+      }
+    }
+
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
-    // Add both entries
     await Promise.all([
       store.add(historyEntries[0]),
       store.add(historyEntries[1]),
@@ -358,44 +470,64 @@ export const saveToHistory = async (
 
     await tx.done;
 
-    // Clean up old entries if we exceed the limit
-    await cleanupOldEntries();
+    // Update storage usage
+    await updateStorageUsage(db, totalNewSize);
 
-    // Saved simulation results successfully
+    console.log("Saved simulation results successfully");
     return true;
   } catch (error) {
-    // Failed to save to history
-    return false;
+    console.error("Failed to save to history:", error);
+    throw error;
   }
 };
 
 /**
- * Clean up old entries to maintain storage limits
+ * Clean up old entries to make space
  */
-const cleanupOldEntries = async () => {
+const cleanupOldEntries = async (db, requiredBytes) => {
   try {
-    const db = await getDB();
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
     const index = store.index("timestamp");
 
-    // Get all entries sorted by timestamp (oldest first for cleanup)
     const allEntries = await index.getAll();
+    const currentUsage = await getStorageUsage(db);
+    const targetUsage = MAX_STORAGE_BYTES - requiredBytes;
 
-    if (allEntries.length > MAX_HISTORY_ENTRIES) {
-      // Calculate how many to remove (keep entries in pairs)
-      const excessCount = allEntries.length - MAX_HISTORY_ENTRIES;
-      const entriesToRemove = allEntries.slice(0, excessCount);
+    if (currentUsage <= targetUsage) {
+      await tx.done;
+      return true;
+    }
 
-      // Delete excess entries
-      await Promise.all(entriesToRemove.map((entry) => store.delete(entry.id)));
+    // Sort by timestamp (oldest first) and calculate sizes
+    const entriesWithSizes = allEntries.map(entry => ({
+      entry,
+      size: calculateObjectSize(entry),
+    }));
 
-      // Cleaned up old history entries
+    let freedBytes = 0;
+    const entriesToDelete = [];
+
+    // Delete oldest entries until we have enough space
+    for (const item of entriesWithSizes) {
+      if (currentUsage - freedBytes <= targetUsage) {
+        break;
+      }
+      entriesToDelete.push(item.entry.id);
+      freedBytes += item.size;
+    }
+
+    if (entriesToDelete.length > 0) {
+      await Promise.all(entriesToDelete.map(id => store.delete(id)));
+      await updateStorageUsage(db, -freedBytes);
+      console.log(`Cleaned up ${entriesToDelete.length} entries, freed ${formatMB(freedBytes)} MB`);
     }
 
     await tx.done;
+    return currentUsage - freedBytes + requiredBytes <= MAX_STORAGE_BYTES;
   } catch (error) {
-    // Failed to cleanup old entries
+    console.error("Failed to cleanup old entries:", error);
+    return false;
   }
 };
 
@@ -405,42 +537,43 @@ const cleanupOldEntries = async () => {
 export const clearHistory = async () => {
   try {
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction([STORE_NAME, METADATA_STORE], "readwrite");
+    const historyStore = tx.objectStore(STORE_NAME);
+    const metadataStore = tx.objectStore(METADATA_STORE);
 
-    await store.clear();
+    await historyStore.clear();
+    await metadataStore.put({
+      key: "storageUsage",
+      totalBytes: 0,
+      lastUpdated: new Date().toISOString(),
+    });
+
     await tx.done;
 
-    // History cleared successfully
+    console.log("History cleared successfully");
     return true;
   } catch (error) {
-    // Failed to clear history
+    console.error("Failed to clear history:", error);
 
-    // If clearing fails, try to delete and recreate the entire database
     try {
-      // Attempting to reset database
+      console.log("Attempting to reset database");
       if (dbPromise) {
         const db = await dbPromise;
         db.close();
       }
       dbPromise = null;
       await deleteDB(DB_NAME);
-      // Database reset successfully
+      console.log("Database reset successfully");
       return true;
     } catch (resetError) {
-      // Failed to reset database
+      console.error("Failed to reset database:", resetError);
       return false;
     }
   }
 };
 
 /**
-| * Get paired history results
-| * Returns both EACO and EPSO results from the same simulation run
-| */
-/**
  * Get paired history results
- * Returns both EACO and EPSO results from the same simulation run
  */
 export const getPairedHistoryResults = async (resultId) => {
   try {
@@ -467,44 +600,25 @@ export const getPairedHistoryResults = async (resultId) => {
       (entry) => entry.algorithm === "EPSO",
     );
 
-    console.log(`🔍 Algorithm breakdown:`, {
-      eacoFound: !!eacoResult,
-      epsoFound: !!epsoResult,
-      eacoId: eacoResult?.id,
-      epsoId: epsoResult?.id,
-    });
-
     if (!eacoResult && !epsoResult) {
-      console.error(`❌ No EACO or EPSO results found in paired entries`);
-      console.log(
-        `📋 Actual algorithms found:`,
-        pairedEntries.map((entry) => entry.algorithm),
-      );
+      console.error("No EACO or EPSO results found in paired entries");
       return null;
     }
 
     if (!eacoResult) {
-      console.warn(`⚠️ EACO result missing for baseId: "${baseId}"`);
+      console.warn(`EACO result missing for baseId: "${baseId}"`);
     }
 
     if (!epsoResult) {
-      console.warn(`⚠️ EPSO result missing for baseId: "${baseId}"`);
+      console.warn(`EPSO result missing for baseId: "${baseId}"`);
     }
 
-    const result = {
+    return {
       eaco: eacoResult || null,
       epso: epsoResult || null,
     };
-
-    console.log(`✅ Successfully retrieved paired results:`, {
-      hasEaco: !!result.eaco,
-      hasEpso: !!result.epso,
-      eacoSummary: result.eaco?.summary ? "Available" : "Missing",
-      epsoSummary: result.epso?.summary ? "Available" : "Missing",
-    });
-
-    return result;
   } catch (error) {
+    console.error("Failed to get paired history results:", error);
     return null;
   }
 };
@@ -515,24 +629,29 @@ export const getPairedHistoryResults = async (resultId) => {
 export const deleteHistoryEntry = async (resultId) => {
   try {
     const baseId = resultId.split("-")[0];
-
     const db = await getDB();
+    
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
     const index = store.index("baseId");
 
-    // Get all entries with the same baseId
     const entriesToDelete = await index.getAll(baseId);
+    
+    // Calculate total size of entries to delete
+    const totalSize = entriesToDelete.reduce((sum, entry) => {
+      return sum + calculateObjectSize(entry);
+    }, 0);
 
-    // Delete all paired entries
     await Promise.all(entriesToDelete.map((entry) => store.delete(entry.id)));
-
     await tx.done;
 
-    // Deleted history entries successfully
+    // Update storage usage
+    await updateStorageUsage(db, -totalSize);
+
+    console.log(`Deleted ${entriesToDelete.length} entries, freed ${formatMB(totalSize)} MB`);
     return true;
   } catch (error) {
-    // Failed to delete history entry
+    console.error("Failed to delete history entry:", error);
     return false;
   }
 };
@@ -543,22 +662,37 @@ export const deleteHistoryEntry = async (resultId) => {
 export const getHistoryStats = async () => {
   try {
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readonly");
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction([STORE_NAME, METADATA_STORE], "readonly");
+    const historyStore = tx.objectStore(STORE_NAME);
+    const metadataStore = tx.objectStore(METADATA_STORE);
 
-    const count = await store.count();
-    const simulationCount = Math.floor(count / 2); // Each simulation has 2 entries
+    const count = await historyStore.count();
+    const simulationCount = Math.floor(count / 2);
+    
+    const storageData = await metadataStore.get("storageUsage");
+    const usedBytes = storageData?.totalBytes || 0;
+
+    await tx.done;
 
     return {
       totalEntries: count,
       simulationRuns: simulationCount,
-      maxEntries: MAX_HISTORY_ENTRIES,
+      usedStorageMB: parseFloat(formatMB(usedBytes)),
+      maxStorageMB: MAX_STORAGE_MB,
+      usedBytes,
+      maxBytes: MAX_STORAGE_BYTES,
+      percentageUsed: ((usedBytes / MAX_STORAGE_BYTES) * 100).toFixed(1),
     };
   } catch (error) {
+    console.error("Failed to get history stats:", error);
     return {
       totalEntries: 0,
       simulationRuns: 0,
-      maxEntries: MAX_HISTORY_ENTRIES,
+      usedStorageMB: 0,
+      maxStorageMB: MAX_STORAGE_MB,
+      usedBytes: 0,
+      maxBytes: MAX_STORAGE_BYTES,
+      percentageUsed: "0.0",
     };
   }
 };
@@ -583,7 +717,6 @@ export const searchHistory = async (filters = {}) => {
       results = await store.getAll();
     }
 
-    // Filter by date range if provided
     if (startDate || endDate) {
       results = results.filter((entry) => {
         const entryDate = new Date(entry.timestamp);
@@ -593,11 +726,11 @@ export const searchHistory = async (filters = {}) => {
       });
     }
 
-    // Sort by timestamp (newest first)
     return results.sort(
       (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
     );
   } catch (error) {
+    console.error("Failed to search history:", error);
     return [];
   }
 };
@@ -614,6 +747,7 @@ export const exportHistory = async () => {
       entries: history,
     };
   } catch (error) {
+    console.error("Failed to export history:", error);
     return null;
   }
 };
@@ -705,9 +839,28 @@ export const importHistory = async (backupData) => {
       throw new Error("No valid entries found in backup data");
     }
 
+    // Calculate size of import
+    const importSize = entriesToImport.reduce((sum, entry) => {
+      return sum + calculateObjectSize(entry);
+    }, 0);
+
+    console.log(`Import size: ${formatMB(importSize)} MB`);
+
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const currentUsage = await getStorageUsage(db);
+
+    // Check if import would exceed limit
+    if (currentUsage + importSize > MAX_STORAGE_BYTES) {
+      const excessBytes = (currentUsage + importSize) - MAX_STORAGE_BYTES;
+      console.warn(`Import would exceed storage limit by ${formatMB(excessBytes)} MB`);
+      
+      // Try to clean up to make space
+      const cleanedUp = await cleanupOldEntries(db, importSize);
+      
+      if (!cleanedUp) {
+        throw new Error(`Storage limit exceeded. Import requires ${formatMB(importSize)} MB but only ${formatMB(MAX_STORAGE_BYTES - currentUsage)} MB available after cleanup.`);
+      }
+    }
 
     const normalizedEntries = entriesToImport.map((entry) => {
       if (!entry.baseId && entry.id) {
@@ -719,12 +872,19 @@ export const importHistory = async (backupData) => {
       return entry;
     });
 
-    await Promise.all(normalizedEntries.map((entry) => store.add(entry)));
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
 
+    await Promise.all(normalizedEntries.map((entry) => store.add(entry)));
     await tx.done;
+
+    // Update storage usage
+    await updateStorageUsage(db, importSize);
+
+    console.log(`Imported ${normalizedEntries.length} entries successfully`);
     return true;
   } catch (error) {
     console.error("Import failed:", error.message);
-    return false;
+    throw error;
   }
 };

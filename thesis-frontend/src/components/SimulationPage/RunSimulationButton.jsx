@@ -50,7 +50,7 @@ export const RunSimulationButton = ({
   // Get appropriate title/tooltip text
   const getButtonTitle = () => {
     if (isStorageFull) {
-      return "Storage full - clear history before running new simulations";
+      return "Storage full/Nearly full - clear history before running new simulations";
     }
     if (!hasValidConfig) {
       return "Enable synthetic workload or upload a workload file";

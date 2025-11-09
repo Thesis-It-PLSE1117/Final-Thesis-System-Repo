@@ -153,23 +153,21 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
     }
   }, [activeTab, simulationState]);
 
-  // Check storage status periodically
   useEffect(() => {
     const checkStorageStatus = async () => {
       try {
         const stats = await getHistoryStats();
-        setIsStorageFull(stats.totalEntries >= stats.maxEntries);
+        setIsStorageFull(stats.usedBytes >= stats.maxBytes * 0.95);
       } catch (error) {
         console.error("Error checking storage status:", error);
       }
     };
 
-    // Check initially and set up interval to check periodically
     checkStorageStatus();
-    const interval = setInterval(checkStorageStatus, 5000); // Check every 5 seconds
+    const interval = setInterval(checkStorageStatus, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [getHistoryStats, setIsStorageFull]); 
 
   // Handle data center changes including preset application
   const handleDataCenterChange = useCallback(
