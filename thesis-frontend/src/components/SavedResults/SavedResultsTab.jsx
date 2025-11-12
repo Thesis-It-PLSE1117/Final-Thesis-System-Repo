@@ -8,11 +8,11 @@ import {
   getHistoryStats,
   importHistory,
 } from "../../services/historyService";
-import HistoryPlaceholder from "./HistoryPlaceHolder";
+import HistoryPlaceholder from "./SavedResultsPlaceholder";
 import { exportSimulationHistory } from "../../utils/exportUtils";
-import HistoryDropdown from "./HistoryDropdown";
-import HistoryDetails from "./HistoryDetails";
-import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './HistoryDialogs';
+import HistoryDropdown from "./ResultsDropdown";
+import HistoryDetails from "./ResultsDetails";
+import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './ResultsDialog';
 
 const HistoryTab = ({ onBack, onViewResults }) => {
   const [history, setHistory] = useState([]);

@@ -8,7 +8,7 @@ const DataCenterTab = lazy(() => import('../DatacenterTab/DataCenterTab'));
 const WorkloadTab = lazy(() => import('../WorkloadTab/WorkloadTab'));
 const IterationTab = lazy(() => import('../IterationTab/IterationTab'));
 const HelpTab = lazy(() => import('../HelpTab/HelpTab'));
-const HistoryTab = lazy(() => import('../HistoryTab/HistoryTab'));
+const HistoryTab = lazy(() => import('../SavedResults/SavedResultsTab'));
 
 // Animation variants
 const tabContentVariants = {

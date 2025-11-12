@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import HistoryCard from './HistoryCard';
+import HistoryCard from './ResultsCard';
 import { Info, BarChart3 } from 'lucide-react';
 
 const HistoryDropdown = ({ history, onSelect, selectedId }) => {
