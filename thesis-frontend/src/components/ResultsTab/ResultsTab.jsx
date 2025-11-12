@@ -494,7 +494,7 @@ const ResultsTab = ({
                       Check methods{" "}
                       <button
                         onClick={onNavigateToHelp}
-                        className="text-gray-600 hover:text-gray-900 underline transition-colors"
+                        className="text-blue-600 hover:text-blue-900 underline transition-colors font-semibold"
                       >
                         here
                       </button>{" "}

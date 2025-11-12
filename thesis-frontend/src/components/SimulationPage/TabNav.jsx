@@ -16,7 +16,7 @@ const TabNav = ({ activeTab, onChange }) => {
     { id: "dataCenter", label: "Data Center", icon: Settings },
     { id: "iterations", label: "Iterations", icon: Repeat },
     { id: "workload", label: "Workload", icon: Play },
-    { id: "history", label: "History", icon: BarChart2 },
+    { id: "history", label: "Saved Results", icon: BarChart2 },
     { id: "help", label: "Help", icon: Info },
   ];
 

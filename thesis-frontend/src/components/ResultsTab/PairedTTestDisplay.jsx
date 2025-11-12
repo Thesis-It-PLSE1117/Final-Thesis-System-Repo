@@ -537,53 +537,41 @@ const PairedTTestDisplay = ({
                   exit={{ height: 0 }}
                   className="border-t border-gray-200 bg-gray-50"
                 >
-                  <div className="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">
-                        Mean Difference
-                      </p>
-                      <p
-                        className="font-semibold text-gray-800"
-                        title="EACO - EPSO"
-                      >
-                        {typeof test?.meanDifference === "number"
-                          ? test.meanDifference.toFixed(4)
-                          : "—"}
-                        <span className="text-sm text-gray-500 ml-1">
-                          {getMetricMeta(metricName).unit}
-                        </span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">Std Error</p>
-                      <p className="font-semibold text-gray-800">
-                        {typeof test?.standardError === "number"
-                          ? test.standardError.toFixed(4)
-                          : "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">95% CI</p>
-                      <p className="font-semibold text-gray-800 text-sm">
-                        [
-                        {typeof test?.ciLower === "number"
-                          ? test.ciLower.toFixed(3)
-                          : "—"}
-                        ,{" "}
-                        {typeof test?.ciUpper === "number"
-                          ? test.ciUpper.toFixed(3)
-                          : "—"}
-                        ]
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">Cohen's d</p>
-                      <p className="font-semibold text-gray-800">
-                        {typeof test?.cohensD === "number"
-                          ? test.cohensD.toFixed(3)
-                          : "—"}{" "}
-                        ({test?.effectSize || "—"})
-                      </p>
+                  <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+                    <div className="bg-gradient-to-r from-[#319694]/5 to-[#4fd1c5]/5 rounded-lg p-4 border border-[#319694]/20">
+                      <div className="flex items-center gap-2 mb-3">
+                        <BarChart3 className="text-[#319694]" size={18} />
+                        <h6 className="font-semibold text-gray-800 text-sm">
+                          Mean Difference Analysis
+                        </h6>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <TrendingUp
+                                className="text-[#319694]"
+                                size={16}
+                              />
+                              <span className="text-sm font-medium text-gray-700">
+                                EACO - EPSO Difference
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-lg font-bold text-[#319694]">
+                            {typeof test?.meanDifference === "number"
+                              ? test.meanDifference.toFixed(4)
+                              : "—"}
+                            <span className="text-sm font-normal text-gray-500 ml-1">
+                              {getMetricMeta(metricName).unit}
+                            </span>
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Average performance difference.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

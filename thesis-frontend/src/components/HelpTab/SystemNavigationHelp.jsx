@@ -67,7 +67,7 @@ const SystemNavigationHelp = () => {
           </div>
           <div className="flex items-start gap-2">
             <span className="font-bold text-teal-600">4.</span>
-            <span><span className="font-semibold">Simulation History</span> - Check out past runs and their results.</span>
+            <span><span className="font-semibold">Saved Results</span> - Check out past runs and their results.</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="font-bold text-teal-600">5.</span>
@@ -181,7 +181,7 @@ const SystemNavigationHelp = () => {
           <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <BarChart2 className="text-gray-600" size={18} />
-              <span className="font-medium text-gray-900">Simulation History Tab</span>
+              <span className="font-medium text-gray-900">Saved Results Tab</span>
             </div>
             <p className="text-sm text-gray-700 mb-2">
               All your past runs live here. Reload old configs, compare results side-by-side, 
@@ -409,7 +409,7 @@ const SystemNavigationHelp = () => {
               def: "The system saves your work silently while you configure. No save button needed.",
             },
             {
-              term: "History",
+              term: "Saved Results",
               def: "Your archive of past runs. Every simulation result gets stored automatically.",
             },
             {

@@ -378,10 +378,7 @@ const StatisticalMethodology = () => {
                 <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
                 <span>Tests statistical significance at <span className="font-semibold">α = 0.05</span> (95% confidence)</span>
               </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle size={16} className="text-gray-700 mt-0.5 flex-shrink-0" />
-                <span>Provides <span className="font-semibold">Cohen's d</span> effect size for practical significance</span>
-              </li>
+
             </ul>
           </div>
         )}
@@ -399,9 +396,7 @@ const StatisticalMethodology = () => {
             : "Paired t-test implemented using"} <strong>Apache Commons Math 3</strong> library 
           with significance level α = 0.05 (95% confidence).
         </p>
-        <p className="text-sm text-gray-600">
-          <strong>References:</strong> Student (1908){FEATURES.ENABLE_WILCOXON && ", Wilcoxon (1945)"}, Cohen (1988){FEATURES.ENABLE_WILCOXON && ", Hodges & Lehmann (1963)"}.
-        </p>
+        
       </div>
     </div>
   );

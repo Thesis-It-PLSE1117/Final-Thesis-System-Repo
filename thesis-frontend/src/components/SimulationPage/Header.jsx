@@ -25,7 +25,7 @@ const Header = ({ simulationState, activeTab, onBack, onGoToConfig }) => {
           case "iterations":
             return "Iteration Settings";
           case "history":
-            return "Results History";
+            return "Saved Results";
           case "help":
             return "Help & Documentation";
           default:

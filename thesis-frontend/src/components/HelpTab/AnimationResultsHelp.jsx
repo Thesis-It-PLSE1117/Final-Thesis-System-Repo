@@ -284,7 +284,7 @@ const AnimationResultsHelp = () => {
           </div>
 
           <div className="border border-gray-200 rounded-lg p-3">
-            <p className="text-base font-medium text-gray-900 mb-1"> From <span className="font-semibold"> Simulation History Tab </span> </p>
+            <p className="text-base font-medium text-gray-900 mb-1"> From <span className="font-semibold"> Saved Results Tab </span> </p>
             <p className="text-base text-gray-700">
               Click on any past result and use the export option to save complete simulation data, 
               including configuration and outcomes.
@@ -350,7 +350,7 @@ const AnimationResultsHelp = () => {
           <h3 className="text-xl font-medium text-gray-900">Pro Tip</h3>
         </div>
         <p className="text-base text-gray-700">
-          After viewing results, head to the <span className="font-semibold">History tab</span> to see all your past runs. 
+          After viewing results, head to the <span className="font-semibold">Saved Results tab</span> to see all your past runs.
           You can compare different configurations side-by-side, reload settings to rerun tests, 
           or export data for reports. Every simulation gets saved automatically—nothing gets lost.
         </p>

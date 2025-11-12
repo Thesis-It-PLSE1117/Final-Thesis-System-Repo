@@ -211,7 +211,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
             }}
             whileTap={INTERACTION_STATES.scale.tap}
           >
-            <span>View User Guide </span>
+            <span>View User Docs </span>
             <Settings size={ICON_SIZES.sm} />
           </motion.button>
         </motion.div>
