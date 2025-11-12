@@ -265,14 +265,14 @@ const HistoryTab = ({ onBack, onViewResults }) => {
                 <History className="text-[#319694]" size={20} />
               </div>
               <h2 className="text-xl font-semibold text-gray-800">
-                Simulation History
+                Saved Results
               </h2>
             </div>
             <p className="text-sm text-gray-600 mb-2">
               Track and analyze EPSO/EACO algorithm performance over time
             </p>
             <p className="text-xs text-gray-600 mb-2">
-              For large simulation runs ≥ 5000 tasks | Only Import/Store one at a time due to browser limitations
+              For <span className="font-semibold"> large simulation runs ≥ 5000 tasks,</span>  only  <span className="font-semibold"> Import/Store one at a time </span> due to browser limitations.
             </p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">
