@@ -105,7 +105,7 @@ const HomePage = () => {
     },
     {
       icon: <LineChart className="w-8 h-8" />,
-      title: "View Results & History",
+      title: "View Saved Results",
       content: [
         "See detailed performance analysis with statistical comparisons.",
         "Access your saved test history and export results.",
@@ -113,8 +113,7 @@ const HomePage = () => {
       list: [
         "View test details, analysis, charts, and execution logs",
         "Get statistical significance results with t-tests",
-        "See interactive Apache ECharts performance visualizations",
-        "Browse your test history and export data",
+        "Browse your saved results and export data",
       ],
     },
   ];

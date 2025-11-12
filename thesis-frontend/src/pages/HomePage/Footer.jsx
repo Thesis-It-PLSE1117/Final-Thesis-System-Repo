@@ -87,6 +87,10 @@ const Footer = ({ footerLinks }) => {
             <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
             <span className="text-sm md:text-base text-gray-700 font-medium break-all">reyeskierchristian64@gmail.com</span>
           </div>
+          <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-white border border-gray-200">
+            <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
+            <span className="text-sm md:text-base text-gray-700 font-medium break-all">violantajanalfred40@gmail.com</span>
+          </div>
         </div>
       </div>
       

@@ -48,7 +48,7 @@ const PresetSelector = ({
         description:
           windowWidth < 500
             ? "Quick test"
-            : "Test algorithms",
+            : "Test algorithms quickly",
         taskCount: "1,000",
         icon: Microscope,
         iconColor: "text-blue-600",
