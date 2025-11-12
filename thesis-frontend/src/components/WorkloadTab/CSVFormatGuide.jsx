@@ -21,8 +21,7 @@ const CSVFormatGuide = () => {
   };
 
   const requiredColumns = [
-    { name: "length", desc: "Task size in MI (min 1000, e.g., 10000)." },
-    { name: "pes", desc: "Processing cores required (1-8)," },
+    { name: "pes_number", desc: "Processing cores required (1-8)," },
     { name: "file_size", desc: "Input data size (0-1 normalized or bytes)." },
     { name: "output_size", desc: "Output data size (0-1 normalized or bytes)." },
   ];
@@ -30,24 +29,18 @@ const CSVFormatGuide = () => {
   const optionalColumns = [
     "arrival_time",
     "cpu_request",
-    "pes_number",
     "arrival_ts",
     "time_window",
     "task_id",
+    "length"
   ];
 
   const sampleFiles = [
     { 
-      name: "Minimal", 
-      tasks: 5, 
-      file: "sample_workload_simple.csv",
-      format: "length only"
-    },
-    { 
       name: "Standard", 
       tasks: 10, 
       file: "sample_workload.csv",
-      format: "length,pes,file_size,output_size"
+      format: "pes,file_size,output_size"
     },
     { 
       name: "With Timing", 

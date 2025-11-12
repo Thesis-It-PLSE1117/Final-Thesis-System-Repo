@@ -37,28 +37,144 @@ const WorkloadUploadCard = ({
   const shouldShowUploadSection =
     (!workloadFile && !selectedPreset) || csvRowCount === 0;
 
-  // Validate CSV content
-  const validateCSV = (file, callback) => {
-    Papa.parse(file, {
-      header: true,
-      preview: 5,
-      skipEmptyLines: true,
-      complete: (results) => {
-        if (!results.meta.fields || results.meta.fields.length === 0) {
-          callback("Your CSV file needs column headers.");
-          return;
-        }
-        if (results.data.length === 0) {
-          callback("Your CSV file has no data rows.");
-          return;
-        }
-        callback(null, results);
-      },
-      error: (error) => {
-        callback("Cannot read your CSV file. Check the format.");
-      },
-    });
+// CSV Validation Utility Function
+const validateCSVFields = (csvData) => {
+  const requiredColumns = [
+    { name: "pes_number", desc: "Processing cores required (1-8)." },
+    { name: "file_size", desc: "Input data size (0-1 normalized or bytes)." },
+    { name: "output_size", desc: "Output data size (0-1 normalized or bytes)." },
+  ];
+
+  const optionalColumns = [
+    "arrival_time",
+    "cpu_request",
+    "pes_number",
+    "arrival_ts",
+    "time_window",
+    "task_id",
+  ];
+
+  const validationResult = {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    missingColumns: [],
+    foundColumns: [],
+    columnDetails: {}
   };
+
+  // Check if we have headers and data
+  if (!csvData.meta?.fields || csvData.meta.fields.length === 0) {
+    validationResult.isValid = false;
+    validationResult.errors.push("CSV file has no column headers.");
+    return validationResult;
+  }
+
+  if (!csvData.data || csvData.data.length === 0) {
+    validationResult.isValid = false;
+    validationResult.errors.push("CSV file has no data rows.");
+    return validationResult;
+  }
+
+  const headers = csvData.meta.fields;
+  validationResult.foundColumns = headers;
+
+  // Check for required columns
+  requiredColumns.forEach(requiredCol => {
+    const foundHeader = headers.find(header => 
+      header.toLowerCase() === requiredCol.name.toLowerCase()
+    );
+
+    if (!foundHeader) {
+      validationResult.isValid = false;
+      validationResult.missingColumns.push(requiredCol.name);
+      validationResult.errors.push(`Missing required column: "${requiredCol.name}" - ${requiredCol.desc}`);
+    } else {
+      validationResult.columnDetails[requiredCol.name] = {
+        foundAs: foundHeader,
+        description: requiredCol.desc,
+        isRequired: true
+      };
+    }
+  });
+
+  // Check for optional columns and note any unexpected columns
+  headers.forEach(header => {
+    const isRequired = requiredColumns.some(col => 
+      col.name.toLowerCase() === header.toLowerCase()
+    );
+    
+    const isOptional = optionalColumns.some(optCol => 
+      optCol.toLowerCase() === header.toLowerCase()
+    );
+
+    if (!isRequired && !isOptional) {
+      validationResult.warnings.push(`Unexpected column: "${header}" - This column will be ignored during simulation.`);
+    } else if (isOptional) {
+      validationResult.columnDetails[header] = {
+        foundAs: header,
+        description: "Optional column",
+        isRequired: false
+      };
+    }
+  });
+
+  // Validate data types and ranges for required columns if we have data
+  if (validationResult.isValid && csvData.data.length > 0) {
+    const firstRow = csvData.data[0];
+
+    // Validate 'file_size' and 'output_size' columns
+    ['file_size', 'output_size'].forEach(colName => {
+      const colHeader = headers.find(h => h.toLowerCase() === colName.toLowerCase());
+      if (colHeader && firstRow[colHeader]) {
+        const sizeValue = parseFloat(firstRow[colHeader]);
+        if (isNaN(sizeValue) || sizeValue < 0) {
+          validationResult.warnings.push(`Column "${colName}" should be a non-negative number. Found: ${firstRow[colHeader]}`);
+        }
+      }
+    });
+  }
+
+  return validationResult;
+};
+
+// Updated validateCSV function that uses the external validation
+const validateCSV = (file, callback) => {
+  Papa.parse(file, {
+    header: true,
+    preview: 10,
+    skipEmptyLines: true,
+    complete: (results) => {
+      // First check basic CSV structure
+      if (!results.meta.fields || results.meta.fields.length === 0) {
+        callback("Your CSV file needs column headers.");
+        return;
+      }
+      if (results.data.length === 0) {
+        callback("Your CSV file has no data rows.");
+        return;
+      }
+
+      // Now validate the fields using our external function
+      const fieldValidation = validateCSVFields(results);
+      
+      if (!fieldValidation.isValid) {
+        const errorMessage = fieldValidation.errors.join(' ');
+        callback(errorMessage);
+        return;
+      }
+
+      // Return both the results and validation info
+      callback(null, {
+        ...results,
+        validation: fieldValidation
+      });
+    },
+    error: (error) => {
+      callback("Cannot read your CSV file. Check the format.");
+    },
+  });
+};
 
   // Load preview when file or preset changes
   useEffect(() => {
