@@ -309,7 +309,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
     >
       <StatHighlight
         value={RESEARCH_STATISTICS.simulationsTested}
-        label="Simulations Tested"
+        label="Tasks Tested"
       />
     </motion.div>
 
@@ -333,7 +333,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
     >
       <StatHighlight
         value={RESEARCH_STATISTICS.statisticalConfidence}
-        label="Statistical Confidence"
+        label="Confidence Level"
       />
     </motion.div>
           </div>
