@@ -155,13 +155,13 @@ const HistoryTab = ({ onBack, onViewResults }) => {
         await loadHistory();
         await loadHistoryStats();
         setSelectedResult(null);
-        alert("History imported successfully");
+        alert("Saved Result imported successfully");
       } else {
-        alert("Failed to import history");
+        alert("Failed to import saved result");
       }
     } catch (err) {
       console.error("Error during import:", err);
-      alert("Error importing history");
+      alert("Error importing saved result");
     } finally {
       if (pendingImportData.fileInput) {
         pendingImportData.fileInput.value = "";
@@ -450,8 +450,8 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               }`}
               title={
                 isStorageFull 
-                  ? "Storage nearly full - clear history or delete old simulations before importing" 
-                  : "Import history from backup"
+                  ? "Storage nearly full - clear saved results or delete old simulations before importing" 
+                  : "Import saved result from backup"
               }
               data-testid="import-button"
             >

@@ -138,7 +138,6 @@ const validateCSVFields = (csvData) => {
   return validationResult;
 };
 
-// Updated validateCSV function that uses the external validation
 const validateCSV = (file, callback) => {
   Papa.parse(file, {
     header: true,
@@ -155,7 +154,6 @@ const validateCSV = (file, callback) => {
         return;
       }
 
-      // Now validate the fields using our external function
       const fieldValidation = validateCSVFields(results);
       
       if (!fieldValidation.isValid) {

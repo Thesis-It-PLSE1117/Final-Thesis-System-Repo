@@ -56,9 +56,9 @@ export const ImportDialog = ({ showImportDialog, setShowImportDialog, handleImpo
         className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Import History</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Import Saved Result</h3>
         <p className="text-gray-600 mb-4 text-sm">
-          Select a downloaded file to import. This will add the imported data to your existing history.
+          Select a downloaded file to import. This will add the imported data to your existing saved results.
         </p>
         <input
           type="file"
