@@ -151,12 +151,12 @@ export const ClearHistoryConfirmationDialog = ({ isOpen, onConfirm, onCancel }) 
             <AlertTriangle className="text-red-600" size={24} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Clear All History</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Clear All Saved Results</h3>
             <p className="text-sm text-gray-500 mt-1">This action cannot be undone</p>
           </div>
         </div>
         <p className="text-gray-600 mb-2 text-sm font-semibold">
-          Are you sure you want to clear all simulation history? This will permanently delete:
+          Are you sure you want to clear all saved results? This will permanently delete:
         </p>
         <ul className="list-disc list-inside text-sm text-gray-600 mb-5 space-y-1 ml-2">
           <li>All simulation runs and results</li>

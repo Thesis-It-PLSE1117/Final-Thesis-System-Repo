@@ -9,7 +9,6 @@ const HistoryPlaceholder = () => {
       <h3 className="text-xl font-semibold text-gray-700 mb-2">No Simulation Results Yet</h3>
       <p className="text-gray-500 text-center max-w-md">
         Your EPSO and EACO simulation results will appear here. 
-        Run your first simulation to start building history.
       </p>
     </div>
   );

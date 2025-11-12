@@ -687,7 +687,7 @@ const PairedTTestDisplay = ({
                     </div>
                   )}
 
-                  {/* Visual representation */}
+                  {/* Visual representation
                   <div className="px-4 pb-4">
                     <div className="bg-white rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
@@ -728,7 +728,7 @@ const PairedTTestDisplay = ({
                         <span>1.0+</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </motion.div>
               )}
             </AnimatePresence>
