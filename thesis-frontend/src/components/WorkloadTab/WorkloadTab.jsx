@@ -132,13 +132,13 @@ const WorkloadTab = ({
             </motion.div>
           )} */}
 
-          {/* Cloudlet Configuration Control */}
+          {/* Cloudlet Configuration Control 
           <CloudletToggle
             enabled={cloudletToggleEnabled}
             onChange={onCloudletToggleChange}
             defaultValue={defaultCloudletCount}
             hasWorkload={hasWorkload}
-          />
+          /> */}
 
           <WorkloadConfigCard
             config={config}
