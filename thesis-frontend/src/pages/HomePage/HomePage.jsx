@@ -66,13 +66,13 @@ const HomePage = () => {
       title: "Set Up Your Cloud Environment",
       content: [
         "Create your cloud infrastructure with hosts and virtual machines.",
-        "Set processing power, memory, storage, and network settings.",
+        "Configure processing power, memory, storage, and network settings tailored to your simulation needs.",
       ],
       list: [
-        "Number of hosts and their processing capacity",
-        "Virtual machine settings (CPU, RAM, Bandwidth)",
-        "Host details (Cores, RAM, Storage)",
-        "Use preset configurations or create custom settings",
+        "Number of hosts and their processing capacity.",
+        "Virtual machine settings (CPU, RAM, Bandwidth).",
+        "Host specifications (cores, RAM, storage).",
+        "Preset configurations or fully custom settings.",
       ],
     },
     {
@@ -80,66 +80,68 @@ const HomePage = () => {
       title: "Upload Your Tasks",
       content: [
         "Upload CSV files with your tasks or choose from Google Cluster presets.",
-        "Set task parameters and enable charts if needed.",
+        "Configure task parameters and view charts for visualized results.",
       ],
       list: [
         "Upload custom CSV files with task details.",
-        "Choose from 10 Google Cluster preset options.",
-        "Set the number of tasks.",
-        "Interactive charts will display automatically for single iterations.",
+        "Select from 10 Google Cluster preset options.",
+        "Set the number of tasks for your simulation.",
+        "View interactive charts automatically for single iterations.",
       ],
     },
     {
       icon: <Cpu className="w-8 h-8" />,
       title: "Run Your Tests",
       content: [
-        "Set how many times to run the test for reliable results.",
-        "Compare EACO vs EPSO algorithms with real-time animation (single run only).",
+        "Set the number of test runs to ensure reliable, statistically significant results.",
+        "Compare EACO vs EPSO algorithms with real-time animation available for single runs.",
       ],
       list: [
-        "Choose test runs (50+ recommended for statistical analysis).",
-        "System will test both EACO and EPSO algorithms.",
-        "Watch live task scheduling animation (works with single run).",
-        "Track progress across multiple test runs.",
+        "Choose test runs (50+ recommended for statistical accuracy).",
+        "System tests both EACO and EPSO algorithms simultaneously.",
+        "Watch live task scheduling animation (single run only).",
+        "Track progress across multiple test iterations.",
       ],
     },
+
     {
       icon: <LineChart className="w-8 h-8" />,
       title: "View Saved Results",
       content: [
-        "See detailed performance analysis with statistical comparisons.",
-        "Access your saved test history and export results.",
+        "Access detailed performance analysis with statistical comparisons between algorithms.",
+        "Review your complete test history and export results for further analysis.",
       ],
       list: [
-        "View test details, analysis, charts, and execution logs",
-        "Get statistical significance results with t-tests",
-        "Browse your saved results and export data",
+        "View test details, analysis charts, and execution logs.",
+        "Access statistical significance results with t-test analysis.",
+        "Browse saved results and export data in multiple formats.",
       ],
     },
   ];
 
   const footerLinks = [
-    {
-      text: "Check on Github",
-      href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git",
-      icon: <FaGithub size={20} />,
+  {
+    text: "View on GitHub",
+    href: "https://github.com/Thesis-It-PLSE1117/Final-Thesis-System-Repo.git",
+    icon: <FaGithub size={20} />,
+  },
+  {
+    text: "User Guide & Documentation",
+    href: "#",
+    icon: <BookOpen size={18} />,
+    onClick: () => {
+      setSimulationInitialTab("help");
+      setShowSimulation(true);
     },
-    {
-      text: "User Guide & Docs",
-      href: "#",
-      icon: <BookOpen size={18} />,
-      onClick: () => {
-        setSimulationInitialTab("help");
-        setShowSimulation(true);
-      },
-    },
-    {
-      text: "Know the Team",
-      href: "#",
-      icon: <Users size={18} />,
-      onClick: () => setIsAboutModalOpen(true),
-    },
-  ];
+  },
+  {
+    text: "Meet the Team",
+    href: "#",
+    icon: <Users size={18} />,
+    onClick: () => setIsAboutModalOpen(true),
+  },
+];
+
 
   return (
     <motion.div
@@ -152,7 +154,7 @@ const HomePage = () => {
 
       <Header onStartSimulation={() => setShowSimulation(true)} />
 
-      <HeroSection 
+      <HeroSection
         onStartSimulation={() => setShowSimulation(true)}
         onViewDocs={() => {
           setSimulationInitialTab("help");

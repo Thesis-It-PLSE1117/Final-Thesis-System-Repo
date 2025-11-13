@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
-  Zap,
+  Settings,
   Server,
   Cpu,
   BarChart2,
@@ -74,9 +74,8 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
             transition={{ duration: 0.3 }}
             viewport={{ once: true }}
           >
-            <Zap className="w-4 h-4" />
+            <Settings className="w-5 h-5" />
             <span>How It Works</span>
-            <Sparkles className="w-4 h-4" />
           </motion.div>
 
           <motion.h3
@@ -98,7 +97,8 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
             transition={{ delay: 0.4 }}
             viewport={{ once: true }}
           >
-            Set up your cloud environment and test algorithm performance.
+            Set up your cloud environment and test algorithm performance in
+            minutes.
           </motion.p>
         </motion.div>
 
@@ -207,13 +207,13 @@ const WalkthroughSection = ({ walkthroughSteps }) => {
               What We Measure
             </h4>
             <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">
-              These metrics show how well your system performs across multiple
-              test runs.
+              These metrics reveal how your system performs across multiple test
+              runs.
               <span className="font-semibold text-[#319694]">
                 {" "}
                 Hover over each metric
               </span>{" "}
-              to see what it means for your setup.
+              to learn what it means for your cloud environment.
             </p>
           </div>
 

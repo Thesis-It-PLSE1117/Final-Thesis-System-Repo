@@ -56,7 +56,7 @@ const Footer = ({ footerLinks }) => {
         </div>
         
         <div>
-          <h5 className="font-semibold mb-4 md:mb-5 text-lg md:text-xl">Know more about our system?</h5>
+          <h5 className="font-semibold mb-4 md:mb-5 text-lg md:text-xl">Want to learn more about our system?</h5>
           <ul className="space-y-3 md:space-y-4">
             {footerLinks.map((link, i) => (
               <li key={i}>
@@ -77,7 +77,7 @@ const Footer = ({ footerLinks }) => {
         <div className="flex flex-col gap-4 md:gap-5 rounded-xl bg-white/10 p-5 md:p-8 backdrop-blur-sm border border-white/20">
           <h5 className="font-semibold text-lg md:text-xl">Contact</h5>
           <p className="text-sm md:text-base text-white/90">
-            You can request a copy of the research paper or ask further questions by contacting:
+            Request a copy of the research paper or ask questions by contacting:
           </p>
           <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-white border border-gray-200">
             <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />

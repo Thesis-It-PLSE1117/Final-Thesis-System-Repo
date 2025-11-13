@@ -176,7 +176,7 @@ const HeroSection = ({ onStartSimulation, onViewDocs }) => {
           <span className="font-semibold text-[#008081]">
             Which algorithm schedules virtual machine tasks faster?{" "}
           </span>
-          Compare performance backed by real cloud data.
+          Compare performance backed by real cloud simulation data.
         </motion.p>
 
         <motion.div

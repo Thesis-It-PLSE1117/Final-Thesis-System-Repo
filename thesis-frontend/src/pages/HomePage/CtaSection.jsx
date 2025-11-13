@@ -27,7 +27,7 @@ const CtaSection = ({ onStartSimulation }) => {
           transition={{ delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Compare EACO vs. EPSO on simulated infrastructure. Get insights backed by real data.
+          Compare EACO vs. EPSO on simulated cloud infrastructure. Get performance insights backed by real simulation data.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}
