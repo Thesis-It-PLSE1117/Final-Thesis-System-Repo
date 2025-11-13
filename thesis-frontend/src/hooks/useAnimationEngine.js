@@ -129,7 +129,7 @@ export const useAnimationEngine = ({
   };
 
   const getImbalanceValue = (data) => {
-    return data.summary?.loadImbalance ?? data.summary?.loadBalance ?? 0;
+    return data.summary?.loadImbalance ?? 0;
   };
 
   const getFinalMetrics = (data) => ({

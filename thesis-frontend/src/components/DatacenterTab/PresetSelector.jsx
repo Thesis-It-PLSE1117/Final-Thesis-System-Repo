@@ -64,7 +64,7 @@ const PresetSelector = ({
       "large-scale": {
         title: windowWidth < 768 ? "RS" : "Research Setup",
         description:
-          windowWidth < 500 ? "Real scenario" : "Real-world test",
+          windowWidth < 500 ? "Real scenario" : "For Production Grade",
         taskCount: "10,000",
         icon: Building2,
         iconColor: "text-orange-600",
