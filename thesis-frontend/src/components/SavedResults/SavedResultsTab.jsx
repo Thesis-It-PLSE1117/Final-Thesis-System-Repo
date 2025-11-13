@@ -269,11 +269,11 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </h2>
             </div>
             <p className="text-sm text-gray-600 mb-2">
-              Track and analyze EPSO/EACO algorithm performance over time
-            </p>
+        Track and analyze EPSO/EACO algorithm performance over time
+      </p>
             <p className="text-xs text-gray-600 mb-2">
-              For <span className="font-semibold"> large simulation runs ≥ 5000 tasks,</span>  only  <span className="font-semibold"> Import/Store one at a time </span> due to built in local storage limitation.
-            </p>
+        For <span className="font-semibold">large simulation runs (≥5000 tasks),</span> <span className="font-semibold">import/store one at a time</span> due to local storage limitations.
+      </p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">
                 {historyStats.simulationRuns || 0}
@@ -295,9 +295,9 @@ const HistoryTab = ({ onBack, onViewResults }) => {
           <div className="flex flex-wrap gap-2">
 
             {history.length > 0 && !selectedResult && (
-              <div className="text-gray-600 text-sm px-3 py-2 rounded border border-gray-200 bg-white">
-                Select a simulation run to export
-              </div>
+               <div className="text-gray-600 text-sm px-3 py-2 rounded border border-gray-200 bg-white">
+          Select a simulation run to export
+        </div>
             )}
 
             {history.length > 0 && selectedResult && (
