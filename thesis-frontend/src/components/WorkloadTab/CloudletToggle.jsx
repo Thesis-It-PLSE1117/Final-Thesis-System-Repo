@@ -57,14 +57,14 @@ const CloudletToggle = ({ enabled, onChange, defaultValue, disabled = false, has
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
             <Settings className="text-[#319694]" size={16} />
             <span className="text-sm text-gray-700">
-              Synthetic workload enabled - all tasks arriving at time 0
+              Synthetic workload enabled, all tasks arrive at time zero.
             </span>
           </div>
 
           <div className="p-3 bg-blue-50 rounded-md">
             <p className="text-sm text-blue-700">
-              <strong>Note:</strong> 
-              This will generate a synthetic workload where all tasks arrive simultaneously at time 0.
+              <strong>Note: {" "}</strong> 
+              This will generate a synthetic workload where all tasks arrive simultaneously at time zero.
             </p>
           </div>
         </div>
