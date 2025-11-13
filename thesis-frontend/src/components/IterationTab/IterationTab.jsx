@@ -106,7 +106,7 @@ const IterationTab = ({ config, onChange }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#319694] focus:border-transparent bg-gray-100 cursor-not-allowed"
               />
               <p className="text-sm text-gray-500 mt-1">
-                Pick 1 to 50 runs. We recommend 30 or more for research.
+                Select 1 to 50 test runs. We recommend 30+ iterations for statistically reliable research results.
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@ const IterationTab = ({ config, onChange }) => {
               />
               <span>
                 The system runs the test {currentIterations} time
-                {currentIterations > 1 ? "s" : ""} with the same settings.
+                {currentIterations > 1 ? "s" : ""} with the identical configuration settings.
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -171,7 +171,7 @@ const IterationTab = ({ config, onChange }) => {
                 fill="currentColor"
               />
               <span>
-                Each run uses the same settings but may show slightly different results.
+                Each iteration uses the same parameters but may produce slightly different results.
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -181,7 +181,7 @@ const IterationTab = ({ config, onChange }) => {
                 fill="currentColor"
               />
               <span>
-                Multiple runs show if performance stays consistent.
+                Multiple iterations reveal performance consistency and statistical reliability.
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -191,7 +191,7 @@ const IterationTab = ({ config, onChange }) => {
                 fill="currentColor"
               />
               <span>
-                Important for research and comparing algorithms.
+                Essential for academic research and rigorous algorithm comparison.
               </span>
             </li>
           </ul>
@@ -218,29 +218,25 @@ const IterationTab = ({ config, onChange }) => {
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
-                  <strong>Paired T-Test:</strong> Statistical significance
-                  analysis with p-values and t-statistics on assumed normal data.
+                  <strong>Paired T-Test:</strong> Statistical significance analysis with p-values and t-statistics on normally distributed data.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
-                  <strong>Average Performance:</strong> Mean results calculated
-                  across all iterations.
+                  <strong>Average Performance:</strong> Mean results calculated across all test iterations.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
-                  <strong>Detailed Breakdown:</strong> Individual results for
-                  each iteration with export options.
+                  <strong>Detailed Breakdown:</strong> Individual results for each iteration with data export options.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <TrendingUp className="text-[#319694] mt-0.5" size={16} />
                 <span>
-                  <strong>Winner Analysis:</strong> Statistically determined
-                  best-performing algorithm.
+                  <strong>Winner Analysis:</strong> Statistically determined best-performing algorithm based on your simulation.
                 </span>
               </li>
             </ul>
@@ -270,8 +266,7 @@ const IterationTab = ({ config, onChange }) => {
             </ul>
           ) : (
             <p className="text-sm text-gray-500">
-              Single iteration provides basic algorithm comparison without
-              statistical analysis.
+              Single iteration provides basic algorithm comparison with visual analysis but without statistical testing.
             </p>
           )}
         </motion.div>
@@ -296,7 +291,7 @@ const IterationTab = ({ config, onChange }) => {
               Quick Test (1 iteration)
             </p>
             <p className="text-gray-600">
-              Provides individual algorithmic analysis for each algorithm.
+              Provides both algorithm analysis with visualization.
             </p>
           </div>
           <div className="bg-white rounded-lg p-3">
@@ -304,7 +299,7 @@ const IterationTab = ({ config, onChange }) => {
               Research (30-50 iterations)
             </p>
             <p className="text-gray-600">
-              Generates reliable results for academic work.
+              Generates statistically reliable results for academic evaluation.
             </p>
           </div>
           <div className="bg-white rounded-lg p-3">
@@ -312,7 +307,7 @@ const IterationTab = ({ config, onChange }) => {
               Publication (50 iterations)
             </p>
             <p className="text-gray-600">
-              Delivers high-confidence statistical validation.
+              Delivers high-confidence statistical validation for formal research.
             </p>
           </div>
         </div>

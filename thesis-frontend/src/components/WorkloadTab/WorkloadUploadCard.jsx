@@ -374,7 +374,7 @@ const validateCSV = (file, callback) => {
               <Info className="text-[#319694] mt-0.5 flex-shrink-0" size={16} />
               <p className="text-sm text-gray-700">
                 <strong className="text-[#319694]">Tip:</strong> For benchmark
-                datasets (Google cluster traces), use the{" "}
+                datasets (Google Cluster traces), use the{" "}
                 <strong>Research Benchmark Dataset</strong> dropdown in the
                 Simulation Workload Setup section above.
               </p>
