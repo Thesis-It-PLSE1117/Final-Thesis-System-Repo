@@ -31,7 +31,8 @@ export const useMetrics = (epsoResults, eacoResults) => {
   }, [epsoResults, eacoResults]);
 
   const getImbalanceValue = (data) => {
-    const imbalance = data.summary?.loadImbalance ?? data.summary?.loadBalance ?? 0;
+    // Always use raw loadImbalance value, never the normalized loadBalance
+    const imbalance = data.summary?.loadImbalance ?? 0;
     return imbalance.toFixed(4);
   };
 

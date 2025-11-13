@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Info } from "lucide-react";
 import MetricsPanel from "./MetricsPanel";
 import Controls from "./Controls";
 import { useAnimationState } from "../../hooks/useAnimationState";
 import { useMetrics } from "../../hooks/useMetrics";
 import { useVMStatus } from "../../hooks/useVMStatus";
 import { useAnimationEngine } from "../../hooks/useAnimationEngine";
+import { useVMStatusDistribution } from "../../hooks/useVMStatusDistribution";
 import { AlgorithmTabs } from "./AlgorithmTabs";
 import { IterationNotice } from "./IterationNotice";
 import { ComparisonView } from "./ComparisonView";
 import { VMCardsGrid } from "./VMCardsGrid";
+import VMStatusTooltip from "./VMStatusTooltip";
 
 const AnimationTab = ({
   dataCenterConfig,
@@ -74,7 +77,18 @@ const AnimationTabLayout = ({
   onAlgorithmChange,
   onPlayPause,
   onReset,
-}) => (
+}) => {
+  const [showStatusTooltip, setShowStatusTooltip] = useState(false);
+
+  const statusDistribution = useVMStatusDistribution(
+    animationState.activeVMs[activeAlgorithm] || [],
+    animationState.taskCounts[activeAlgorithm] || {},
+    animationState.cpuLoads[activeAlgorithm] || {},
+    vmStatus.getVmStatus,
+    activeAlgorithm
+  );
+
+  return (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -89,8 +103,37 @@ const AnimationTabLayout = ({
     >
       <HeaderSection dataCenterConfig={dataCenterConfig} cloudletConfig={cloudletConfig} />
       
-      <AlgorithmTabs activeAlgorithm={activeAlgorithm} setActiveAlgorithm={onAlgorithmChange} />
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1">
+          <AlgorithmTabs activeAlgorithm={activeAlgorithm} setActiveAlgorithm={onAlgorithmChange} />
+        </div>
+        
+        {activeAlgorithm !== "comparison" && (
+          <div className="relative pt-2">
+            <button
+              type="button"
+              className="p-2 text-gray-400 hover:text-[#319694] transition-colors cursor-help rounded-lg hover:bg-gray-50"
+              onMouseEnter={() => setShowStatusTooltip(true)}
+              onMouseLeave={() => setShowStatusTooltip(false)}
+              onClick={() => setShowStatusTooltip(!showStatusTooltip)}
+              aria-label="View VM status distribution"
+            >
+              <Info size={20} />
+            </button>
+            
+            <AnimatePresence>
+              {showStatusTooltip && (
+                <VMStatusTooltip
+                  distribution={statusDistribution}
+                  algorithm={activeAlgorithm}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
 
+      
       {activeAlgorithm === "comparison" ? (
         <ComparisonView
           activeVMs={animationState.activeVMs}
@@ -128,7 +171,8 @@ const AnimationTabLayout = ({
       </div>
     </motion.div>
   </motion.div>
-);
+  );
+};
 
 const HeaderSection = ({ dataCenterConfig, cloudletConfig }) => (
   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">

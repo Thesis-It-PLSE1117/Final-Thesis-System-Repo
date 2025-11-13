@@ -75,7 +75,7 @@ const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMul
                   <h2 id="chart-modal-title" className="text-base sm:text-lg font-semibold text-gray-800 truncate">
                     {algorithm} - {chartTitle}
                   </h2>
-                  <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Expanded View</p>
+                    <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Expanded View</p>
                 </div>
               </div>
               
@@ -121,7 +121,7 @@ const ChartModal = ({ isOpen, onClose, chartOption, chartTitle, algorithm, isMul
             {/* Footer */}
             <div className="bg-gray-50 px-4 sm:px-6 py-2 sm:py-3 border-t border-gray-200 text-center flex-shrink-0">
               <p className="text-xs text-gray-500">
-                Press <kbd className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white border border-gray-300 rounded text-gray-700 font-mono text-xs">ESC</kbd> or click outside to close
+                Press <kbd className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white border border-gray-300 rounded text-gray-700 font-mono text-xs">ESC</kbd> or click the X button to close.
               </p>
             </div>
           </motion.div>
