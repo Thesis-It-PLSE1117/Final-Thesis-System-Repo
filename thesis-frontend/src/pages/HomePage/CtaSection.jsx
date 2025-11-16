@@ -37,14 +37,15 @@ const CtaSection = ({ onStartSimulation }) => {
         >
           <motion.button
             onClick={onStartSimulation}
-            className="bg-white text-[#267b79] px-8 py-4 rounded-xl text-lg font-semibold shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all flex items-center gap-3 mx-auto"
+            className="flex items-center justify-center gap-3 bg-white text-[#267b79] border-2 border-white/80 px-8 py-3 rounded-xl text-base font-semibold shadow-lg hover:shadow-2xl hover:bg-white/95 hover:border-white transition-all mx-auto"
             whileHover={{
-              scale: 1.05,
-              boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.4)",
+              scale: 1.04,
+              boxShadow: "0 22px 45px -12px rgba(15, 23, 42, 0.45)",
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ scale: 0.97 }}
           >
-            Start Simulation Now <PlayIcon className="w-5 h-5" />
+            <span>Start Simulation Now</span>
+            <PlayIcon className="w-5 h-5" />
           </motion.button>
         </motion.div>
       </div>
