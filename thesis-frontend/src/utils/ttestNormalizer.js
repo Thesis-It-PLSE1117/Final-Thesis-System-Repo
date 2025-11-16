@@ -31,7 +31,12 @@ const normalizeMetricKey = (key) => {
     energy_consumption: 'energyConsumption',
     utilization: 'resourceUtilization',
     resource_utilization: 'resourceUtilization',
-    load_balance: 'loadBalance',
+    load_balance: 'loadImbalance',
+    loadBalance: 'loadImbalance',
+    loadImbalance: 'loadImbalance',
+    load_imbalance: 'loadImbalance',
+    degreeOfImbalance: 'loadImbalance',
+    degree_of_imbalance: 'loadImbalance',
     completionTime: 'makespan',
     completion_time: 'makespan',
   };

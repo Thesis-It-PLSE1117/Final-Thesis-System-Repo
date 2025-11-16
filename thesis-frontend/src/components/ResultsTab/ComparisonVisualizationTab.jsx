@@ -6,14 +6,15 @@ import MetricInterpretations from './MetricInterpretations';
 import ChartModal from '../ECharts/ChartModal';
 import { backupMetricData } from '../../utils/backupMetricData';
 
-const METRICS = ['makespan', 'energyConsumption', 'resourceUtilization', 'responseTime', 'loadBalance'];
+const METRICS = ['makespan', 'energyConsumption', 'resourceUtilization', 'responseTime', 'loadImbalance'];
 
 const METRIC_DISPLAY_NAMES = {
   makespan: 'Makespan',
   energyConsumption: 'Energy Consumption',
   resourceUtilization: 'Resource Utilization',
   responseTime: 'Response Time',
-  loadBalance: 'Load Balance'
+  loadImbalance: 'Degree of Imbalance',
+  loadBalance: 'Degree of Imbalance'
 };
 
 const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) => {
@@ -96,7 +97,7 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
   const getChartOptionsForModal = () => {
     return METRICS
       .map(metricKey => {
-        const metricData = metricTests[metricKey];
+        const metricData = metricTests[metricKey] || (metricKey === 'loadImbalance' ? metricTests.loadBalance : null);
         if (!metricData) return null;
         
         const enrichedData = backupMetricData(metricKey, metricData, eacoResults, epsoResults);
@@ -110,7 +111,8 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
           energyConsumption: 'Energy Consumption (Wh)',
           resourceUtilization: 'Resource Utilization (%)',
           responseTime: 'Response Time (seconds)',
-          loadBalance: 'Load Balance Index'
+          loadImbalance: 'Degree of Imbalance (DI)',
+          loadBalance: 'Degree of Imbalance (DI)'
         };
 
         const getBarColor = (algorithm, isWinner, isSignificant) => {
@@ -269,7 +271,7 @@ const ComparisonVisualizationTab = ({ tTestResults, eacoResults, epsoResults }) 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {METRICS.map((metricKey, index) => {
-          const metricData = metricTests[metricKey];
+          const metricData = metricTests[metricKey] || (metricKey === 'loadImbalance' ? metricTests.loadBalance : null);
           
           if (!metricData) {
             return null;

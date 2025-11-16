@@ -6,7 +6,8 @@ const METRIC_LABELS = {
   energyConsumption: 'Energy Consumption (Wh)',
   resourceUtilization: 'Resource Utilization (%)',
   responseTime: 'Response Time (seconds)',
-  loadBalance: 'Load Balance Index'
+  loadImbalance: 'Degree of Imbalance (DI)',
+  loadBalance: 'Degree of Imbalance (DI)'
 };
 
 const getBarColor = (algorithm, isWinner, isSignificant) => {
