@@ -32,7 +32,7 @@ export const METRICS_CONFIG = {
   'Imbalance Degree': {
     description: 'Shows if work is spread evenly across servers. Lower is better balanced.',
     icon: Scale,
-    demoKey: 'loadBalance',
+    demoKey: 'loadImbalance',
     unit: '',
     category: 'additional'
   }
@@ -61,7 +61,9 @@ export const formatMetricValue = (metricKey, value) => {
     case 'energyConsumption': return value.toFixed(3);
     case 'responseTime': return `${value.toFixed(1)}ms`;
     case 'resourceUtilization': return `${value.toFixed(1)}%`;
-    case 'loadBalance': return value.toFixed(3);
+    case 'loadImbalance':
+    case 'loadBalance':
+      return value.toFixed(3);
     default: return value;
   }
 };
@@ -72,6 +74,7 @@ export const getMetricIcon = (metricKey) => {
     energyConsumption: Zap,
     responseTime: Gauge,
     resourceUtilization: Server,
+    loadImbalance: BarChart3,
     loadBalance: BarChart3
   };
   const IconComponent = icons[metricKey] || TrendingUp;
@@ -84,7 +87,8 @@ export const getMetricDisplayName = (metricKey) => {
     energyConsumption: "Energy",
     responseTime: "Response Time",
     resourceUtilization: "Utilization",
-    loadBalance: "Load Balance"
+    loadImbalance: "Degree of Imbalance",
+    loadBalance: "Degree of Imbalance"
   };
   return names[metricKey] || metricKey;
 };

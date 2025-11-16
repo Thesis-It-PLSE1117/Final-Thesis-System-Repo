@@ -3,7 +3,8 @@ const METRIC_NAMES = {
   energyConsumption: 'Energy Consumption',
   resourceUtilization: 'Resource Utilization',
   responseTime: 'Response Time',
-  loadBalance: 'Load Balance'
+  loadImbalance: 'Degree of Imbalance',
+  loadBalance: 'Degree of Imbalance'
 };
 
 const safeNumber = (value) => {
@@ -29,8 +30,8 @@ const generateMeanInterpretation = (metricKey, data) => {
     if (betterAlgorithm && pValue !== undefined) {
       let interpretation = `${betterAlgorithm} performed better for ${metricName}`;
       
-      if (meanDifference !== undefined && meanDifference !== 0) {
-        const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime'].includes(metricKey);
+    if (meanDifference !== undefined && meanDifference !== 0) {
+        const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime', 'loadImbalance'].includes(metricKey);
         interpretation += ` with a mean difference of ${Math.abs(meanDifference).toFixed(3)}`;
       }
       
@@ -127,7 +128,7 @@ export const backupMetricData = (metricKey, metricData, eacoResults, epsoResults
 
   if ((enriched.eacoMean === undefined || enriched.epsoMean === undefined) && enriched.meanDifference !== undefined) {
     const meanDiff = enriched.meanDifference;
-    const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime'].includes(metricKey);
+    const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime', 'loadImbalance'].includes(metricKey);
     
     if (enriched.eacoMean === undefined && enriched.epsoMean === undefined) {
       const eacoIndividual = eacoResults?.individualResults;
@@ -172,7 +173,7 @@ export const backupMetricData = (metricKey, metricData, eacoResults, epsoResults
   }
 
   if (!enriched.betterAlgorithm && enriched.eacoMean !== undefined && enriched.epsoMean !== undefined) {
-    const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime'].includes(metricKey);
+    const lowerIsBetter = ['makespan', 'energyConsumption', 'responseTime', 'loadImbalance'].includes(metricKey);
     if (lowerIsBetter) {
       enriched.betterAlgorithm = enriched.eacoMean < enriched.epsoMean ? 'EACO' : 'EPSO';
     } else {
