@@ -208,57 +208,92 @@ const exportIterationsAsCSV = (history, timestamp) => {
     return;
   }
   
-  const maxIterations = Math.max(eacoIterations.length, epsoIterations.length);
-  const csvRows = [];
-  
-  const headerRow = [
-    "Iteration",
-    "EACO_Makespan",
-    "EACO_ResourceUtilization",
-    "EACO_LoadBalance",
-    "EACO_EnergyConsumption",
-    "EACO_ResponseTime",
-    "EACO_Fitness",
-    "EACO_TotalCost",
-    "EACO_CostEfficiency",
-    "EPSO_Makespan",
-    "EPSO_ResourceUtilization",
-    "EPSO_LoadBalance",
-    "EPSO_EnergyConsumption",
-    "EPSO_ResponseTime",
-    "EPSO_Fitness",
-    "EPSO_TotalCost",
-    "EPSO_CostEfficiency",
+  const metrics = [
+    { key: "makespan", label: "Makespan" },
+    { key: "energyConsumption", label: "Energy" },
+    { key: "resourceUtilization", label: "Resource Util" },
+    { key: "responseTime", label: "Response Time" },
+    { key: "loadImbalance", label: "Degree of Imbalance" },
+    { key: "fitness", label: "Fitness Score" },
   ];
-  csvRows.push(headerRow.join(","));
   
-  for (let i = 0; i < maxIterations; i++) {
-    const eacoIter = eacoIterations[i] || {};
-    const epsoIter = epsoIterations[i] || {};
+  const getMetricValue = (iteration, metricKey) => {
+    if (!iteration) return 0;
+    const summary = iteration.summary || {};
     
-    const eacoSummary = eacoIter.summary || {};
-    const epsoSummary = epsoIter.summary || {};
+    if (metricKey === "energyConsumption") {
+      const directValue = summary.energyConsumption ?? iteration.energyConsumption;
+      if (typeof directValue === "number") return directValue;
+      if (directValue && typeof directValue === "object" && typeof directValue.totalEnergyWh === "number") {
+        return directValue.totalEnergyWh;
+      }
+      return 0;
+    }
     
-    const row = [
-      i + 1,
-      eacoSummary.makespan?.toFixed(2) || "N/A",
-      eacoSummary.resourceUtilization?.toFixed(2) || "N/A",
-      eacoSummary.loadBalance?.toFixed(4) || "N/A",
-      (eacoSummary.energyConsumption || eacoIter.energyConsumption)?.toFixed(2) || "N/A",
-      eacoSummary.responseTime?.toFixed(2) || "N/A",
-      eacoSummary.fitness?.toFixed(4) || "N/A",
-      eacoSummary.totalCost?.toFixed(2) || "N/A",
-      eacoSummary.costEfficiency?.toFixed(4) || "N/A",
-      epsoSummary.makespan?.toFixed(2) || "N/A",
-      epsoSummary.resourceUtilization?.toFixed(2) || "N/A",
-      epsoSummary.loadBalance?.toFixed(4) || "N/A",
-      (epsoSummary.energyConsumption || epsoIter.energyConsumption)?.toFixed(2) || "N/A",
-      epsoSummary.responseTime?.toFixed(2) || "N/A",
-      epsoSummary.fitness?.toFixed(4) || "N/A",
-      epsoSummary.totalCost?.toFixed(2) || "N/A",
-      epsoSummary.costEfficiency?.toFixed(4) || "N/A",
+    if (metricKey === "resourceUtilization") {
+      if (typeof summary.resourceUtilization === "number") return summary.resourceUtilization;
+      if (typeof summary.utilization === "number") return summary.utilization;
+      return 0;
+    }
+    
+    if (metricKey === "responseTime") {
+      if (typeof summary.responseTime === "number") return summary.responseTime;
+      if (typeof summary.avgResponseTime === "number") return summary.avgResponseTime;
+      if (typeof summary.averageResponseTime === "number") return summary.averageResponseTime;
+      return 0;
+    }
+    
+    if (metricKey === "loadImbalance") {
+      if (typeof summary.loadImbalance === "number") return summary.loadImbalance;
+      if (typeof summary.loadBalance === "number") return summary.loadBalance;
+      if (typeof summary.degreeOfImbalance === "number") return summary.degreeOfImbalance;
+      return 0;
+    }
+    
+    const value = summary[metricKey];
+    return typeof value === "number" ? value : 0;
+  };
+  
+  const headers = [
+    "Iteration",
+    "Algorithm",
+    ...metrics.map((m) => m.label),
+  ];
+  const csvRows = [headers.join(",")];
+  
+  eacoIterations.forEach((iter, index) => {
+    const values = [
+      index + 1,
+      "EACO",
+      ...metrics.map((m) => getMetricValue(iter, m.key)),
     ];
-    csvRows.push(row.join(","));
+    csvRows.push(values.join(","));
+  });
+  
+  epsoIterations.forEach((iter, index) => {
+    const values = [
+      index + 1,
+      "EPSO",
+      ...metrics.map((m) => getMetricValue(iter, m.key)),
+    ];
+    csvRows.push(values.join(","));
+  });
+  
+  const minIterations = Math.min(eacoIterations.length, epsoIterations.length);
+  for (let i = 0; i < minIterations; i++) {
+    const eacoIter = eacoIterations[i];
+    const epsoIter = epsoIterations[i];
+    
+    const values = [
+      i + 1,
+      "Difference (EACO-EPSO)",
+      ...metrics.map((m) => {
+        const eacoValue = getMetricValue(eacoIter, m.key);
+        const epsoValue = getMetricValue(epsoIter, m.key);
+        return eacoValue - epsoValue;
+      }),
+    ];
+    csvRows.push(values.join(","));
   }
   
   const csvContent = csvRows.join("\n");
