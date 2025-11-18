@@ -56,7 +56,7 @@ const PresetSelector = ({
       "medium-scale": {
         title: windowWidth < 768 ? "MS" : "Medium Scale",
         description:
-          windowWidth < 500 ? "Compare speed" : "Compare performance | Real-world test",
+          windowWidth < 500 ? "Compare speed" : "Compare performance",
         taskCount: "5,000",
         icon: Scale,
         iconColor: "text-purple-600",
@@ -64,7 +64,7 @@ const PresetSelector = ({
       "large-scale": {
         title: windowWidth < 768 ? "RS" : "Research Setup",
         description:
-          windowWidth < 500 ? "Real scenario" : "For Production Grade",
+          windowWidth < 500 ? "Real scenario" : "The study utilized this setup",
         taskCount: "10,000",
         icon: Building2,
         iconColor: "text-orange-600",

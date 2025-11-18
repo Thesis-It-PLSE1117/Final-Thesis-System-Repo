@@ -272,7 +272,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
         Track and analyze EPSO/EACO algorithm performance over time
       </p>
             <p className="text-xs text-gray-600 mb-2">
-        For <span className="font-semibold">large simulation runs (≥5000 tasks),</span> <span className="font-semibold">import/store one at a time</span> due to not run out of memory.
+        For <span className="font-semibold">large simulation runs (≥5000 tasks),</span> <span className="font-semibold">import/store one at a time</span> to not run out of memory.
       </p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">

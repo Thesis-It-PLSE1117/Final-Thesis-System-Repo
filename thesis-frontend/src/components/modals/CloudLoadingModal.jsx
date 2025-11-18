@@ -125,7 +125,7 @@ const CloudLoadingModal = ({
   const tips = [
     "For robust statistical analysis, use 50 or more iterations to ensure reliable comparison results.",
     "EPSO and EACO are enhanced optimization algorithms designed for better cloud resource scheduling.",
-    "The simulation balances multiple objectives: execution time, cost efficiency, energy usage, and load distribution.",
+    "The simulation balances multiple objectives: execution time, resource utilization, energy usage, and load distribution.",
     "Higher iteration counts provide more accurate performance metrics and confidence in algorithm comparison.",
   ];
 
