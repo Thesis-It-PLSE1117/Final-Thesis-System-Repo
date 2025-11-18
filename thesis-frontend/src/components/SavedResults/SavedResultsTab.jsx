@@ -192,11 +192,11 @@ const HistoryTab = ({ onBack, onViewResults }) => {
         setSelectedResult(null);
         await loadHistoryStats();
       } else {
-        alert("Failed to clear history");
+        alert("Failed to clear saved results");
       }
     } catch (err) {
-      console.error("Error clearing history:", err);
-      alert("Error clearing history");
+      console.error("Error clearing saved results:", err);
+      alert("Error clearing saved results");
     } finally {
       setShowClearConfirm(false);
     }

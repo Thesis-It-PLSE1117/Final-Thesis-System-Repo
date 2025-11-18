@@ -10,10 +10,8 @@ export const RunSimulationButton = ({
   executeSimulation,
   isStorageFull,
 }) => {
-  // Check valid config
-  const hasValidConfig = 
-    config.workloadFile || 
-    config.cloudletToggleEnabled;
+  // Check valid config - UPDATED: Only check for workload file
+  const hasValidConfig = config.workloadFile;
 
   // CRITICAL: Storage full check takes absolute priority
   // If storage is full, button is ALWAYS disabled regardless of other conditions
@@ -22,7 +20,7 @@ export const RunSimulationButton = ({
     isSimulating ||
     simulationState === "loading" ||
     isCoolingDown ||
-    !hasValidConfig;
+    !hasValidConfig; // Disabled when no workload file
 
   // Determine button text and appearance
   const getButtonContent = () => {    
@@ -50,10 +48,10 @@ export const RunSimulationButton = ({
   // Get appropriate title/tooltip text
   const getButtonTitle = () => {
     if (isStorageFull) {
-      return "Storage full/Nearly full - clear history before running new simulations";
+      return "Storage full/Nearly full - clear saved results before running new simulations";
     }
     if (!hasValidConfig) {
-      return "Enable synthetic workload or upload a workload file";
+      return "Upload a workload file to run simulation"; // Updated message
     }
     if (!effectiveCloudletCount) {
       return "No tasks configured";
