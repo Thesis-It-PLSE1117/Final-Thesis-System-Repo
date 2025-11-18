@@ -152,7 +152,6 @@ const MetadataDisplay = ({ metadata, algorithm }) => {
     const systemConfigItems = [
       { label: 'Number of Cloudlets', value: configSnapshot.numCloudlets || 0 },
       { label: 'Workload Type', value: configSnapshot.workloadType || 'CSV' },
-      { label: 'Use Default Workload', value: configSnapshot.useDefaultWorkload ? 'Yes' : 'No' },
     ];
 
     // Iterations

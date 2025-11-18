@@ -978,10 +978,10 @@ const ResultsTab = ({
               </svg>
               <div>
                 <p className="text-amber-900 font-semibold text-md">
-                  Charts Not Saved in History
+                  Charts Not Saved in Saved Results
                 </p>
                 <p className="text-amber-700 text-sm mt-1">
-                  These visualizations won't be retained by the history tab. Please export any charts you want to keep before exiting this page.
+                  These visualizations won't be retained by the saved results. Please export any charts you want to keep before exiting this page.
                 </p>
               </div>
             </div>

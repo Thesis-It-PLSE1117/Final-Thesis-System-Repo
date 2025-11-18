@@ -47,10 +47,6 @@ const HistoryDropdown = ({ history, onSelect, selectedId }) => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
-              <span>Plot Analysis</span>
-            </div>
-            <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
               <span>Interpretations</span>
             </div>

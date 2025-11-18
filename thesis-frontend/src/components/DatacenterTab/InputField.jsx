@@ -24,13 +24,13 @@ const ConfigRecommendations = {
 
 // More flexible validation rules - these are just recommendations, not hard limits
 const defaultValidationRules = {
-  numHosts: { min: 1, max: 100, strict: false },
+  numHosts: { min: 2, max: 100, strict: false },
   numPesPerHost: { min: 1, max: 64, strict: false },
   peMips: { min: 100, max: 10000, strict: false },
   ramPerHost: { min: 512, max: 262144, strict: false }, // Up to 256GB
   storagePerHost: { min: 100000, max: 5000000, strict: true }, // Up to 5TB
   bwPerHost: { min: 1000, max: 50000, strict: true },
-  numVMs: { min: 1, max: 1000, strict: false },
+  numVMs: { min: 2, max: 1000, strict: false },
   vmMips: { min: 100, max: 5000, strict: false },
   vmPes: { min: 1, max: 16, strict: false },
   vmRam: { min: 256, max: 16384, strict: false }, // Up to 16GB

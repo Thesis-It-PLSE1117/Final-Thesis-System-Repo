@@ -66,7 +66,7 @@ const HistoryCard = ({ result, isSelected, onClick, compact = false }) => {
           {config.numHosts || 0} Hosts, {config.numVMs || 0} VMs
         </span>
         <span className="font-medium text-[#319694]">
-          {makespan > 0 ? `${makespan.toFixed(2)} ms` : 'N/A'}
+          {makespan > 0 ? `${makespan.toFixed(2)} s` : 'N/A'}
         </span>
       </div>
       
