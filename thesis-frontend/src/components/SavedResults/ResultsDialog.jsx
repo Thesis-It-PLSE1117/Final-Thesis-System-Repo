@@ -102,12 +102,12 @@ export const ImportConfirmationDialog = ({ isOpen, onConfirm, onCancel }) => {
             <FileUp className="text-blue-600" size={24} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Import History Data</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Import Saved Result Data</h3>
             <p className="text-sm text-gray-500 mt-1 font-semibold">Confirm import action</p>
           </div>
         </div>
         <p className="text-gray-600 mb-5 text-sm">
-          This will add the imported data to your existing history. Your current history will be preserved, and the new entries will be merged in.
+          This will add the imported data to your existing saved results. Your current saved results will be preserved, and the new entries will be merged in.
         </p>
         <div className="flex justify-end space-x-3">
           <button
