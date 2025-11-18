@@ -500,15 +500,15 @@ const PresetSelector = ({
                 <div className="flex items-start">
                   <span className="inline-block w-2 h-2 bg-amber-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                   <div>
-                    <span className="font-semibold text-amber-700">Large Scale:</span>{" "}
-                    ~10 min/iteration • 30 Iterations: 1-4 hrs • 50 Iterations: 2-8 hrs.
+                    <span className="font-semibold text-amber-700">Research Setup:</span>{" "}
+                    ~3-10 min/iteration • 30 Iterations: 1-4 hrs • 50 Iterations: 2-8 hrs.
                   </div>
                 </div>
                 <div className="flex items-start">
                   <span className="inline-block w-2 h-2 bg-amber-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                   <div>
                     <span className="font-semibold text-amber-700">Medium Scale:</span>{" "}
-                    ~1 min/iteration • 30 Iteration: ~40 min • 50 Iteration: ~1 hr.
+                    ~1-3 min/iteration • 30 Iteration: ~40 min • 50 Iteration: ~1 hr.
                   </div>
                 </div>
                 <div className="flex items-start">

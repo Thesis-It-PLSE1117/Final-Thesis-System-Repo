@@ -395,7 +395,7 @@ const fetchWithExtendedTimeout = (url, options, timeoutMs = 7200000) => {
       }
       // Check if it's a real network error or timeout
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        reject(new Error('Network connection lost. The simulation may still be running on the server. Check History tab later.'));
+        reject(new Error('Network connection lost. The simulation may still be running on the server. Check Saved Results later.'));
       } else {
         reject(error);
       }

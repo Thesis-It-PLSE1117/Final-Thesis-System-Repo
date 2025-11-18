@@ -141,7 +141,7 @@ const StatisticalMethodology = () => {
                 </div>
 
                 {/* Effect Size */}
-                <div className="border border-gray-200 rounded-lg p-6">
+                {/* <div className="border border-gray-200 rounded-lg p-6">
                   <h4 className="text-lg font-medium text-gray-900 mb-4">Effect Size: Cohen's d</h4>
                   <div className="font-mono text-lg font-medium text-gray-900 mb-6 text-center p-4 bg-gray-50 rounded border">
                     d = d̄ / Sd
@@ -159,7 +159,7 @@ const StatisticalMethodology = () => {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Stability Metrics */}
                 <div className="border border-gray-200 rounded-lg p-5">
