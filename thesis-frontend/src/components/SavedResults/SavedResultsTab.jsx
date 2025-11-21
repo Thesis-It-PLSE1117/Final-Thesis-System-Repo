@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, Search } from "lucide-react";
 import {
@@ -13,12 +13,14 @@ import { exportSimulationHistory } from "../../utils/exportUtils";
 import HistoryDropdown from "./ResultsDropdown";
 import HistoryDetails from "./ResultsDetails";
 import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './ResultsDialog';
+import { LoadingOverlay } from "./LoadingSpinner"; 
 
 const HistoryTab = ({ onBack, onViewResults }) => {
   const [history, setHistory] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [selectedResult, setSelectedResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [error, setError] = useState(null);
   const [historyStats, setHistoryStats] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,6 +31,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
   const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pendingImportData, setPendingImportData] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Check if storage is full (95% threshold)
   const isStorageFull = historyStats.usedBytes >= historyStats.maxBytes * 0.95;
@@ -127,22 +130,29 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     }
   };
 
-  const handleImportHistory = async (event) => {
+const handleImportHistory = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     try {
+      // Show loading immediately when file is selected and being processed
+      setImporting(true);
+      setShowImportDialog(false); // Close the import dialog
+      
       const text = await file.text();
       const backupData = JSON.parse(text);
       
+      // Store the data for confirmation
       setPendingImportData({ backupData, fileInput: event.target });
       setShowImportConfirm(true);
-      setShowImportDialog(false);
+      
+      // Hide loading after confirmation dialog is shown
+      setImporting(false);
     } catch (err) {
       console.error("Error importing history:", err);
       alert("Invalid backup file format");
       event.target.value = "";
-      setShowImportDialog(false);
+      setImporting(false);
     }
   };
 
@@ -150,6 +160,8 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     if (!pendingImportData) return;
 
     try {
+      // Show loading again for the actual import process
+      setImporting(true);
       const success = await importHistory(pendingImportData.backupData);
       if (success) {
         await loadHistory();
@@ -168,6 +180,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       }
       setPendingImportData(null);
       setShowImportConfirm(false);
+      setImporting(false);
     }
   };
 
@@ -177,6 +190,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
     }
     setPendingImportData(null);
     setShowImportConfirm(false);
+    setImporting(false); // Ensure loading is hidden if canceled
   };
 
   const handleClearHistory = () => {
@@ -185,6 +199,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
 
   const confirmClearHistory = async () => {
     try {
+      setLoading(true);
       const success = await clearHistory();
       if (success) {
         setHistory([]);
@@ -198,6 +213,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       console.error("Error clearing saved results:", err);
       alert("Error clearing saved results");
     } finally {
+      setLoading(false);
       setShowClearConfirm(false);
     }
   };
@@ -254,8 +270,19 @@ const HistoryTab = ({ onBack, onViewResults }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="p-6"
+      className="p-6 relative"
     >
+      {/* Import Loading Overlay - Shows when file is being processed AND during actual import */}
+      <AnimatePresence>
+        {importing && (
+          <LoadingOverlay message={
+            showImportConfirm 
+              ? "Importing saved result..." 
+              : "Reading file..."
+          } />
+        )}
+      </AnimatePresence>
+
       {/* Header with Stats and Actions */}
       <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-sm border border-[#319694]/15">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -269,11 +296,11 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </h2>
             </div>
             <p className="text-sm text-gray-600 mb-2">
-        Track and analyze EPSO/EACO algorithm performance over time
-      </p>
+              Track and analyze EPSO/EACO algorithm performance over time
+            </p>
             <p className="text-xs text-gray-600 mb-2">
-        For <span className="font-semibold">large simulation runs (≥5000 tasks),</span> <span className="font-semibold">import/store one at a time</span> to not run out of memory.
-      </p>
+              For <span className="font-semibold">large simulation runs (≥5000 tasks),</span> <span className="font-semibold">import/store one at a time</span> to not run out of memory.
+            </p>
             <div className="text-sm text-gray-600">
               <span className="font-medium text-[#319694]">
                 {historyStats.simulationRuns || 0}
@@ -439,43 +466,54 @@ const HistoryTab = ({ onBack, onViewResults }) => {
               </div>
             )}
 
-            {/* Import - disabled when storage is full */}
+            {/* Import - disabled when storage is full or importing */}
             <button
               onClick={() => setShowImportDialog(true)}
-              disabled={isStorageFull}
+              disabled={isStorageFull || importing}
               className={`px-3 py-2 rounded-lg text-sm border flex items-center transition-colors ${
-                isStorageFull
+                isStorageFull || importing
                   ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                   : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
               }`}
               title={
                 isStorageFull 
                   ? "Storage nearly full - clear saved results or delete old simulations before importing" 
+                  : importing
+                  ? "Import in progress..."
                   : "Import saved result from backup"
               }
               data-testid="import-button"
             >
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                />
-              </svg>
-              Import JSON
+              {importing ? (
+                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-1"></div>
+              ) : (
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  />
+                </svg>
+              )}
+              {importing ? "Importing..." : "Import JSON"}
             </button>
 
             {/* Clear - only show when there's history */}
             {history.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="bg-white text-red-500 px-3 py-2 rounded-lg text-sm border border-red-100 hover:bg-red-50 flex items-center transition-colors"
+                disabled={importing}
+                className={`bg-white px-3 py-2 rounded-lg text-sm border flex items-center transition-colors ${
+                  importing
+                    ? 'text-gray-400 border-gray-200 cursor-not-allowed'
+                    : 'text-red-500 border-red-100 hover:bg-red-50'
+                }`}
                 title="Clear all history"
               >
                 <svg
@@ -547,6 +585,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             setShowImportDialog={setShowImportDialog}
             handleImportHistory={handleImportHistory}
             isStorageFull={isStorageFull}
+            importing={importing}
           />
         )}
       </AnimatePresence>
@@ -557,6 +596,7 @@ const HistoryTab = ({ onBack, onViewResults }) => {
             isOpen={showImportConfirm}
             onConfirm={confirmImport}
             onCancel={cancelImport}
+            importing={importing}
           />
         )}
       </AnimatePresence>
