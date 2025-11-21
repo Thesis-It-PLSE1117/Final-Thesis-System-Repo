@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Bird, Route, Sparkles } from "lucide-react";
+
 import MetricsPanel from "./MetricsPanel";
 import { VMCardsGrid } from "./VMCardsGrid";
 
@@ -22,8 +24,8 @@ export const ComparisonView = ({
   ];
 
   const baselineAlgorithms = [
-    { id: "PSO", label: "PSO", color: "green", icon: "M12 19l9 2-9-18-9 18 9-2zm0 0v-8" },
-    { id: "ACO", label: "ACO", color: "orange", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" }
+    { id: "PSO", label: "PSO", color: "green", icon: "" },
+    { id: "ACO", label: "ACO", color: "orange", icon: "" }
   ];
 
   const algorithms = comparisonMode === "enhanced" ? enhancedAlgorithms : baselineAlgorithms;
@@ -180,13 +182,13 @@ const AlgorithmComparisonPanel = ({
       description: "Enhanced Ant Colony Optimization"
     },
     PSO: {
-      icon: "M12 19l9 2-9-18-9 18 9-2zm0 0v-8",
+      icon: "",
       label: "PSO",
       bgColor: "green",
       description: "Particle Swarm Optimization"
     },
     ACO: {
-      icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
+      icon: "",
       label: "ACO",
       bgColor: "orange",
       description: "Ant Colony Optimization"
@@ -195,29 +197,62 @@ const AlgorithmComparisonPanel = ({
 
   const config = algorithmConfig[algorithm];
 
+  const borderColorClasses = {
+    blue: "border-blue-100",
+    purple: "border-purple-100",
+    green: "border-green-100",
+    orange: "border-orange-100",
+  };
+
+  const headerTextClasses = {
+    blue: "text-blue-600",
+    purple: "text-purple-600",
+    green: "text-green-600",
+    orange: "text-orange-600",
+  };
+
+  const chipBgClasses = {
+    blue: "bg-blue-600",
+    purple: "bg-purple-600",
+    green: "bg-green-600",
+    orange: "bg-orange-600",
+  };
+
+  const borderClass = borderColorClasses[config.bgColor] || "border-gray-100";
+  const headerTextClass = headerTextClasses[config.bgColor] || "text-gray-700";
+  const chipBgClass = chipBgClasses[config.bgColor] || "bg-gray-600";
+
   return (
     <motion.div
-      className={`bg-white p-3 sm:p-6 rounded-xl shadow-sm border border-${config.bgColor}-100`}
+      className={`bg-white p-3 sm:p-6 rounded-xl shadow-sm border ${borderClass}`}
       initial={{ opacity: 0, x: algorithm === "EPSO" || algorithm === "PSO" ? -20 : 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex-1">
-          <h5 className={`font-bold text-base sm:text-lg text-${config.bgColor}-600 flex items-center mb-1`}>
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={config.icon} />
-            </svg>
+          <h5 className={`font-bold text-base sm:text-lg ${headerTextClass} flex items-center mb-1`}>
+            {algorithm === "EPSO" || algorithm === "EACO" ? (
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+            ) : algorithm === "PSO" ? (
+              <Bird className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+            ) : algorithm === "ACO" ? (
+              <Route className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+            ) : (
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={config.icon} />
+              </svg>
+            )}
             <span>{config.label}</span>
           </h5>
           <p className="text-xs text-gray-500 mb-2">{config.description}</p>
         </div>
-        <span className={`text-xs sm:text-sm bg-${config.bgColor}-600 text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 ml-2`}>
+        <span className={`text-xs sm:text-sm ${chipBgClass} text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 ml-2`}>
           {activeVMs[algorithm]?.length || 0} Active VMs
         </span>
       </div>

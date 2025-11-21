@@ -16,18 +16,19 @@ export const useVMStatus = (activeVMs, taskCounts, cpuLoads) => {
       ? totalTasksForAlgorithm / activeVMsForAlgorithm.length 
       : 0;
     
-    const taskOverloadThreshold = avgTasksPerVm > 0 ? avgTasksPerVm * 2 : 10;
+    const taskOverloadThreshold = avgTasksPerVm > 0 ? avgTasksPerVm * 1.5 : 8;
 
-    const isCpuOverloaded = cpuPercentage > 85;
-    const isTaskOverloaded = vmTaskCount > taskOverloadThreshold && avgTasksPerVm > 5;
+    const isCpuOverloaded = cpuPercentage > 80;
+    const isTaskOverloaded = vmTaskCount > taskOverloadThreshold;
 
     if (isCpuOverloaded && isTaskOverloaded) return "Overloaded";
-    if (cpuPercentage > 75) return "High Load";
-    if (cpuPercentage > 50) return "Medium Load";
-    if (cpuPercentage > 20) return "Normal";
+    if (cpuPercentage > 65) return "High Load";
+    if (cpuPercentage > 30) return "Medium Load";
+    if (cpuPercentage > 10) return "Normal";
     if (cpuPercentage > 0) return "Low Load";
     return "Idle";
   };
+
 
   const getStatusColor = (status) => {
     const statusColors = {

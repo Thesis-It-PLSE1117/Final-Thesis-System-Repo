@@ -41,6 +41,8 @@ const ResultsTab = ({
   onNavigateToHelp,
   eacoResults,
   epsoResults,
+  acoResults,
+  psoResults,
   plotData,
   plotsGenerating,
 }) => {
@@ -612,6 +614,10 @@ const ResultsTab = ({
                 epsoAnalysis={epsoResults?.analysis}
                 eacoResults={eacoResults}
                 epsoResults={epsoResults}
+                acoAnalysis={acoResults?.analysis}
+                psoAnalysis={psoResults?.analysis}
+                acoResults={acoResults}
+                psoResults={psoResults}
               />
             ) : (
               <>

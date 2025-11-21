@@ -99,31 +99,17 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
         Performance Metrics
       </h4>
       
-      {/* Horizontal scrollable container */}
-      <div className="overflow-x-auto pb-3 -mx-1 px-1">
-        <div className="flex space-x-3 min-w-max">
-          {metricConfigs.map((metric, index) => (
-            <MetricCard
-              key={metric.key}
-              metric={metric}
-              value={metrics[metric.key]}
-              color={currentColor}
-              index={index}
-            />
-          ))}
-        </div>
-      </div>
-      
-      {/* Scroll indicator for mobile */}
-      <div className="flex justify-center mt-2 sm:hidden">
-        <div className="flex space-x-1">
-          {metricConfigs.map((_, index) => (
-            <div
-              key={index}
-              className="w-1.5 h-1.5 bg-gray-300 rounded-full"
-            />
-          ))}
-        </div>
+      {/* Responsive grid that fits the available container width */}
+      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {metricConfigs.map((metric, index) => (
+          <MetricCard
+            key={metric.key}
+            metric={metric}
+            value={metrics[metric.key]}
+            color={currentColor}
+            index={index}
+          />
+        ))}
       </div>
     </motion.div>
   );
@@ -134,7 +120,7 @@ const MetricCard = ({ metric, value, color, index }) => (
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ delay: index * 0.1 }}
-    className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 min-w-[140px] flex-shrink-0"
+    className="bg-white rounded-lg p-4 shadow-sm border border-gray-100"
   >
     <div className="flex items-start justify-between mb-2">
       <div className="flex items-center">

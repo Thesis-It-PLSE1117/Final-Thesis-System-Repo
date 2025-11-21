@@ -127,7 +127,14 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
           {log.cloudletId !== null && log.cloudletId !== undefined ? log.cloudletId : '-'}
         </div>
         <div className="flex-1 text-sm text-gray-600">
-          {log.description || `${log.type} event`}
+          <div>
+            {log.description || `${log.type} event`}
+          </div>
+          {log.algoDescription && (
+            <div className="text-xs text-gray-500 mt-0.5">
+              {log.algoDescription}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -269,7 +276,7 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Time (s)</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">VM ID</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Task ID</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Description / Algorithm</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -300,7 +307,14 @@ const SchedulingLogTable = ({ logs, algorithm }) => {
                       {log.cloudletId !== null && log.cloudletId !== undefined ? log.cloudletId : '-'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {log.description || `${log.type} event`}
+                      <div>
+                        {log.description || `${log.type} event`}
+                      </div>
+                      {log.algoDescription && (
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {log.algoDescription}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );

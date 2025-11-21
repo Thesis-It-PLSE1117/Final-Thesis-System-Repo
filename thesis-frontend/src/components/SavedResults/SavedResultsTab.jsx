@@ -14,6 +14,7 @@ import HistoryDropdown from "./ResultsDropdown";
 import HistoryDetails from "./ResultsDetails";
 import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './ResultsDialog';
 import { LoadingOverlay } from "./LoadingSpinner"; 
+import { showNotification } from "../common/ErrorNotification";
 
 const HistoryTab = ({ onBack, onViewResults }) => {
   const [history, setHistory] = useState([]);
@@ -167,13 +168,13 @@ const handleImportHistory = async (event) => {
         await loadHistory();
         await loadHistoryStats();
         setSelectedResult(null);
-        alert("Saved Result imported successfully");
+        showNotification("Saved result imported successfully", "success");
       } else {
-        alert("Failed to import saved result");
+        showNotification("Failed to import saved result", "error");
       }
     } catch (err) {
       console.error("Error during import:", err);
-      alert("Error importing saved result");
+      showNotification("Error importing saved result", "error");
     } finally {
       if (pendingImportData.fileInput) {
         pendingImportData.fileInput.value = "";
@@ -206,12 +207,13 @@ const handleImportHistory = async (event) => {
         setFilteredHistory([]);
         setSelectedResult(null);
         await loadHistoryStats();
+        showNotification("All saved results cleared", "success");
       } else {
-        alert("Failed to clear saved results");
+        showNotification("Failed to clear saved results", "error");
       }
     } catch (err) {
       console.error("Error clearing saved results:", err);
-      alert("Error clearing saved results");
+      showNotification("Error clearing saved results", "error");
     } finally {
       setLoading(false);
       setShowClearConfirm(false);
