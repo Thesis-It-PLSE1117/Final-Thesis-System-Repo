@@ -120,6 +120,82 @@ export const coreAlgoData = {
       icon: "FileText",
       label: (
         <a
+          href="https://doi.org/10.3390/s23136155"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          View
+        </a>
+      ),
+      explanation: "Prioritized Task-Scheduling Algorithm in Cloud Computing Using Cat Swarm Optimization; DOI: 10.3390/s23136155. Published in Sensors, Vol. 23, Issue 13, Article 6155, July 2023. Proposes a Cat Swarm Optimization–based scheduler in CloudSim and compares it against baseline ACO and PSO for cloud task scheduling performance.",
+      tip: (
+        <>
+          2023 <span className="font-semibold">Sensors paper</span> with CSO algorithm comparisons.
+        </>
+      ),
+    },
+    {
+      icon: "FileText",
+      label: (
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          View
+        </a>
+      ),
+      explanation: "A Comparative Analysis Of Task Scheduling Algorithms Through CloudSim. Published in IJCRT (International Journal of Creative Research Thoughts), Vol. 10, Issue 7, 2022 by Bhuyan, S. S., & Mishra, A. K. Compares multiple task scheduling algorithms in CloudSim, using standard PSO with typical parameter settings as one of the baselines.",
+      tip: (
+        <>
+          2022 IJCRT study on <span className="font-semibold">cloud scheduling algorithms</span>.
+        </>
+      ),
+    },
+    {
+      icon: "FileText",
+      label: (
+        <a
+          href="https://doi.org/10.4108/eetsis.4042"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          View
+        </a>
+      ),
+      explanation: "Enhanced Task Scheduling Using Optimized Particle Swarm Optimization Algorithm in Cloud Computing Environment; DOI: 10.4108/eetsis.4042. Published in EAI Endorsed Transactions on Scalable Information Systems, Vol. 4, Issue 11, 2023, by Potluri et al. Enhances standard SPSO-based task scheduling, using the classic SPSO 2011 configuration as its baseline for evaluation.",
+      tip: (
+        <>
+          2023 EAI paper on <span className="font-semibold">SPSO enhancements</span>.
+        </>
+      ),
+    },
+    {
+      icon: "FileText",
+      label: (
+        <a
+          href="https://arxiv.org/pdf/2405.15397.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          View
+        </a>
+      ),
+      explanation: "Comparative Analysis of Four Prominent Ant Colony Optimization Variants: Ant System, Rank-Based Ant System, Max-Min Ant System, and Ant Colony System. Published as arXiv preprint 2405.15397, May 2024, by Ahmed et al. Systematically compares major ACO variants, justifying MMAS as standard baseline in cloud task scheduling.",
+      tip: (
+        <>
+          2024 arXiv on <span className="font-semibold">ACO variants comparison</span>.
+        </>
+      ),
+    },
+    {
+      icon: "FileText",
+      label: (
+        <a
           href="https://doi.org/10.1155/2013/860289"
           target="_blank"
           rel="noopener noreferrer"

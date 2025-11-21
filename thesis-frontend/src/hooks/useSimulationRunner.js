@@ -592,9 +592,21 @@ export const useSimulationRunner = () => {
             await historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
           } else {
             // use synchronous plot generation
-            const eacoResponse = await runAlgorithm("EACO", configData, enableMatlabPlots, workloadFile, false);
-            setProgress(70);
-            const epsoResponse = await runAlgorithm("EPSO", configData, enableMatlabPlots, workloadFile, false);
+            const algorithms = workloadFile ? ["EACO", "EPSO", "BPSO", "BACO"] : ["EACO", "EPSO"];
+            const resultsByAlgorithm = {};
+
+            for (const algo of algorithms) {
+              const response = await runAlgorithm(algo, configData, enableMatlabPlots, workloadFile, false);
+              if (algo === "EACO") {
+                setProgress(70);
+              }
+              resultsByAlgorithm[algo] = response;
+            }
+
+            const eacoResponse = resultsByAlgorithm["EACO"];
+            const epsoResponse = resultsByAlgorithm["EPSO"];
+            const bpsoResponse = resultsByAlgorithm["BPSO"];
+            const bacoResponse = resultsByAlgorithm["BACO"];
             
             /**
              * I extract analysis field from backend response to get interpretations
@@ -634,6 +646,44 @@ export const useSimulationRunner = () => {
                 datasetId: epsoResponse.datasetId || epsoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
               }
             };
+
+            if (bpsoResponse) {
+              combinedResults.bpso = {
+                rawResults: bpsoResponse.simulationResults || bpsoResponse.rawResults || bpsoResponse,
+                summary: bpsoResponse.simulationResults?.summary || bpsoResponse.summary || bpsoResponse.rawResults?.summary,
+                plotData: bpsoResponse.plotData,
+                analysis: bpsoResponse.analysis,
+                plotMetadata: bpsoResponse.plotMetadata,
+                executionTimeMs: bpsoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'BPSO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: bpsoResponse.runId || bpsoResponse.simulationResults?.runId,
+                seed: bpsoResponse.seed || bpsoResponse.simulationResults?.seed,
+                datasetId: bpsoResponse.datasetId || bpsoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
+              };
+            }
+
+            if (bacoResponse) {
+              combinedResults.baco = {
+                rawResults: bacoResponse.simulationResults || bacoResponse.rawResults || bacoResponse,
+                summary: bacoResponse.simulationResults?.summary || bacoResponse.summary || bacoResponse.rawResults?.summary,
+                plotData: bacoResponse.plotData,
+                analysis: bacoResponse.analysis,
+                plotMetadata: bacoResponse.plotMetadata,
+                executionTimeMs: bacoResponse.executionTimeMs,
+                configSnapshot: {
+                  ...configData,
+                  algorithm: 'BACO',
+                  iterations: iterationConfig.iterations || 1
+                },
+                runId: bacoResponse.runId || bacoResponse.simulationResults?.runId,
+                seed: bacoResponse.seed || bacoResponse.simulationResults?.seed,
+                datasetId: bacoResponse.datasetId || bacoResponse.simulationResults?.datasetId || (workloadFile ? 'custom-csv' : 'synthetic-random')
+              };
+            }
             setSimulationResults(combinedResults);
             await historyService.saveToHistory(combinedResults, dataCenterConfig, cloudletConfig, workloadFile);
             
