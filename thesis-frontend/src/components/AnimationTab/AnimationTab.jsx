@@ -22,15 +22,17 @@ const AnimationTab = ({
   onViewResults,
   eacoResults,
   epsoResults,
+  acoResults, // Add ACO results prop
+  psoResults, // Add PSO results prop
 }) => {
   const [activeAlgorithm, setActiveAlgorithm] = useState("EPSO");
   const [showResultsButton, setShowResultsButton] = useState(true);
 
   const animationState = useAnimationState(dataCenterConfig);
-  const metricsState = useMetrics(epsoResults, eacoResults);
+  const metricsState = useMetrics(epsoResults, eacoResults, acoResults, psoResults); // Update metrics hook
   const vmStatus = useVMStatus(animationState.activeVMs, animationState.taskCounts, animationState.cpuLoads);
 
-  const isIterationResult = checkIfIterationResult(epsoResults, eacoResults);
+  const isIterationResult = checkIfIterationResult(epsoResults, eacoResults, acoResults, psoResults);
 
   useWorkloadFile(workloadFile, metricsState.setTotalTasks);
 
@@ -38,6 +40,8 @@ const AnimationTab = ({
     dataCenterConfig,
     epsoResults,
     eacoResults,
+    acoResults, // Add to animation engine
+    psoResults, // Add to animation engine
     animationState,
     metricsState,
     setShowResultsButton,
@@ -205,27 +209,37 @@ const SingleAlgorithmView = ({
   dataCenterConfig,
   getVmStatus,
   getStatusColor,
-}) => (
-  <>
-    <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll mb-4 sm:mb-6 pr-1 sm:pr-2">
-      <VMCardsGrid
-        algorithm={algorithm}
-        dataCenterConfig={dataCenterConfig}
-        activeVMs={activeVMs}
-        taskCounts={taskCounts}
-        cpuLoads={cpuLoads}
-        getVmStatus={getVmStatus}
-        getStatusColor={getStatusColor}
-      />
-    </div>
-    <div className="mb-4 sm:mb-6">
-      <MetricsPanel
-        metrics={metrics[algorithm]}
-        color={algorithm === "EPSO" ? "blue" : "purple"}
-      />
-    </div>
-  </>
-);
+}) => {
+  // Color mapping for different algorithms
+  const colorMap = {
+    EPSO: "blue",
+    EACO: "purple",
+    PSO: "green", 
+    ACO: "orange"
+  };
+
+  return (
+    <>
+      <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll mb-4 sm:mb-6 pr-1 sm:pr-2">
+        <VMCardsGrid
+          algorithm={algorithm}
+          dataCenterConfig={dataCenterConfig}
+          activeVMs={activeVMs}
+          taskCounts={taskCounts}
+          cpuLoads={cpuLoads}
+          getVmStatus={getVmStatus}
+          getStatusColor={getStatusColor}
+        />
+      </div>
+      <div className="mb-4 sm:mb-6">
+        <MetricsPanel
+          metrics={metrics[algorithm]}
+          color={colorMap[algorithm] || "blue"}
+        />
+      </div>
+    </>
+  );
+};
 
 const ResultsButton = ({ onViewResults }) => (
   <div className="flex justify-end">
@@ -247,12 +261,16 @@ const ResultsButton = ({ onViewResults }) => (
 );
 
 // Helper functions
-const checkIfIterationResult = (epsoResults, eacoResults) => {
+const checkIfIterationResult = (epsoResults, eacoResults, acoResults, psoResults) => {
   return (
     (epsoResults && epsoResults.isIterationResult) ||
     (eacoResults && eacoResults.isIterationResult) ||
+    (acoResults && acoResults.isIterationResult) ||
+    (psoResults && psoResults.isIterationResult) ||
     epsoResults?.rawResults?.totalIterations > 1 ||
-    eacoResults?.rawResults?.totalIterations > 1
+    eacoResults?.rawResults?.totalIterations > 1 ||
+    acoResults?.rawResults?.totalIterations > 1 ||
+    psoResults?.rawResults?.totalIterations > 1
   );
 };
 

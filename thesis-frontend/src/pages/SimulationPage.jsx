@@ -32,6 +32,10 @@ const AnimationTab = lazy(
 const ResultsTab = lazy(() => import("../components/ResultsTab/ResultsTab"));
 const HelpTab = lazy(() => import("../components/HelpTab/HelpTab"));
 
+//remove this once fixed pso and aco dummy
+import { psoResults, acoResults } from './dummyData';
+
+
 import CloudLoadingModal from "../components/modals/CloudLoadingModal";
 
 // Animation variants
@@ -419,6 +423,8 @@ const SimulationPage = ({ onBack, initialTab = "dataCenter" }) => {
               workloadFile={config.workloadFile}
               eacoResults={simulationResults?.eaco}
               epsoResults={simulationResults?.epso}
+              acoResults={acoResults}
+              psoResults={psoResults}
               onBack={() => setSimulationState("config")}
               onViewResults={() => setSimulationState("results")}
             />

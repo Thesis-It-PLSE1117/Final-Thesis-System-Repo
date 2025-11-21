@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
 
-export const useMetrics = (epsoResults, eacoResults) => {
+export const useMetrics = (epsoResults, eacoResults, acoResults, psoResults) => {
   const [metrics, setMetrics] = useState({
     EPSO: { imbalance: 0, makespan: 0, utilization: 0 },
     EACO: { imbalance: 0, makespan: 0, utilization: 0 },
+    PSO: { imbalance: 0, makespan: 0, utilization: 0 },
+    ACO: { imbalance: 0, makespan: 0, utilization: 0 },
   });
 
   const [totalTasks, setTotalTasks] = useState(0);
 
   useEffect(() => {
-    if (epsoResults && eacoResults) {
-      const epsoData = epsoResults.rawResults || epsoResults;
-      const eacoData = eacoResults.rawResults || eacoResults;
+    if (epsoResults || eacoResults || acoResults || psoResults) {
+      const epsoData = epsoResults?.rawResults || epsoResults || {};
+      const eacoData = eacoResults?.rawResults || eacoResults || {};
+      const acoData = acoResults?.rawResults || acoResults || {};
+      const psoData = psoResults?.rawResults || psoResults || {};
 
       setMetrics({
         EPSO: {
@@ -24,11 +28,23 @@ export const useMetrics = (epsoResults, eacoResults) => {
           makespan: (eacoData.summary?.makespan || 0).toFixed(2),
           utilization: getUtilizationValue(eacoData),
         },
+        PSO: {
+          imbalance: getImbalanceValue(psoData),
+          makespan: (psoData.summary?.makespan || 0).toFixed(2),
+          utilization: getUtilizationValue(psoData),
+        },
+        ACO: {
+          imbalance: getImbalanceValue(acoData),
+          makespan: (acoData.summary?.makespan || 0).toFixed(2),
+          utilization: getUtilizationValue(acoData),
+        },
       });
 
-      setTotalTasks(epsoData.summary?.totalCloudlets || 100);
+      // Use the first available result to set total tasks
+      const firstResult = epsoData || eacoData || acoData || psoData;
+      setTotalTasks(firstResult.summary?.totalCloudlets || 100);
     }
-  }, [epsoResults, eacoResults]);
+  }, [epsoResults, eacoResults, acoResults, psoResults]);
 
   const getImbalanceValue = (data) => {
     // Always use raw loadImbalance value, never the normalized loadBalance
