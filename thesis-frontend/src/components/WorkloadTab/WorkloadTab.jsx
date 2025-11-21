@@ -151,8 +151,8 @@ const WorkloadTab = ({
             defaultCloudletCount={defaultCloudletCount} // Make sure this is passed
           />
 
-          {/* Show CSV Format Guide when no workload is selected */}
-          {!workloadFile && !selectedPreset && <CSVFormatGuide />}
+          {/* CSV Format Guide is always visible for reference */}
+          <CSVFormatGuide />
 
           <WorkloadUploadCard
             isDragging={isDragging}

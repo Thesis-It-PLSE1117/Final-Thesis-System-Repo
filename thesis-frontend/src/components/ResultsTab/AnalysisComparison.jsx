@@ -19,10 +19,20 @@ import {
 import PlotInterpretationCard from './PlotInterpretationCard';
 import ExecutionTimeDisplay from './ExecutionTimeDisplay';
 
-const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResults }) => {
+const AnalysisComparison = ({ 
+  eacoAnalysis, 
+  epsoAnalysis, 
+  eacoResults, 
+  epsoResults,
+  acoAnalysis,
+  psoAnalysis,
+  acoResults,
+  psoResults,
+}) => {
   const [expandedSections, setExpandedSections] = useState({
     overall: true,
     metrics: false,
+    baselineMetrics: false,
     efficiency: false,
     recommendations: false,
     plots: true
@@ -295,6 +305,39 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
         </AnimatePresence>
       </div>
 
+      {(acoAnalysis?.metricInterpretations || psoAnalysis?.metricInterpretations) && (
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+          <button
+            onClick={() => toggleSection('baselineMetrics')}
+          className="w-full px-6 py-4 bg-gradient-to-r from-[#319694]/90 to-[#319694]/70 text-white flex items-center justify-between hover:from-[#267b79]/90 hover:to-[#267b79]/70 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <BarChart3 size={24} />
+              <h3 className="text-xl font-bold">Baseline Metrics Analysis</h3>
+            </div>
+            {expandedSections.baselineMetrics ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.baselineMetrics && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="p-6">
+                  <BaselineMetricComparison 
+                    acoMetrics={acoAnalysis?.metricInterpretations}
+                    psoMetrics={psoAnalysis?.metricInterpretations}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* Efficiency Analysis Comparison */}
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
         <button
@@ -318,31 +361,68 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
             >
               <div className="p-6">
                 {comparisonMode === 'side-by-side' ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-[#319694]">EACO Efficiency</h4>
-                      {eacoAnalysis?.efficiencyAnalysis && Object.entries(eacoAnalysis.efficiencyAnalysis).map(([key, value]) => (
-                        <div key={key} className="bg-teal-50 border border-teal-200 rounded-lg p-3">
-                          <p className="text-base font-medium text-gray-800 capitalize mb-1">
-                            {key.replace(/([A-Z])/g, ' $1').trim()}
-                          </p>
-                          <p className="text-sm text-gray-600">{value}</p>
-                        </div>
-                      ))}
+                  <>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-[#319694]">EACO Efficiency</h4>
+                        {eacoAnalysis?.efficiencyAnalysis &&
+                          Object.entries(eacoAnalysis.efficiencyAnalysis).map(([key, value]) => (
+                            <div key={key} className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+                              <p className="text-base font-medium text-gray-800 capitalize mb-1">
+                                {key.replace(/([A-Z])/g, ' $1').trim()}
+                              </p>
+                              <p className="text-sm text-gray-600">{value}</p>
+                            </div>
+                          ))}
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-purple-600">EPSO Efficiency</h4>
+                        {epsoAnalysis?.efficiencyAnalysis &&
+                          Object.entries(epsoAnalysis.efficiencyAnalysis).map(([key, value]) => (
+                            <div key={key} className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                              <p className="text-base font-medium text-gray-800 capitalize mb-1">
+                                {key.replace(/([A-Z])/g, ' $1').trim()}
+                              </p>
+                              <p className="text-sm text-gray-600">{value}</p>
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-purple-600">EPSO Efficiency</h4>
-                      {epsoAnalysis?.efficiencyAnalysis && Object.entries(epsoAnalysis.efficiencyAnalysis).map(([key, value]) => (
-                        <div key={key} className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                          <p className="text-base font-medium text-gray-800 capitalize mb-1">
-                            {key.replace(/([A-Z])/g, ' $1').trim()}
-                          </p>
-                          <p className="text-sm text-gray-600">{value}</p>
+
+                    {(acoAnalysis?.efficiencyAnalysis || psoAnalysis?.efficiencyAnalysis) && (
+                      <div className="mt-6 border-t border-gray-200 pt-4">
+                        <h4 className="font-semibold text-gray-800 mb-3">Baseline Efficiency (ACO vs PSO)</h4>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <h5 className="font-semibold text-sky-700">Baseline ACO Efficiency</h5>
+                            {acoAnalysis?.efficiencyAnalysis &&
+                              Object.entries(acoAnalysis.efficiencyAnalysis).map(([key, value]) => (
+                                <div key={key} className="bg-sky-50 border border-sky-200 rounded-lg p-3">
+                                  <p className="text-base font-medium text-gray-800 capitalize mb-1">
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                                  </p>
+                                  <p className="text-sm text-gray-600">{value}</p>
+                                </div>
+                              ))}
+                          </div>
+
+                          <div className="space-y-3">
+                            <h5 className="font-semibold text-indigo-700">Baseline PSO Efficiency</h5>
+                            {psoAnalysis?.efficiencyAnalysis &&
+                              Object.entries(psoAnalysis.efficiencyAnalysis).map(([key, value]) => (
+                                <div key={key} className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                                  <p className="text-base font-medium text-gray-800 capitalize mb-1">
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                                  </p>
+                                  <p className="text-sm text-gray-600">{value}</p>
+                                </div>
+                              ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <ToggleView 
                     eacoContent={eacoAnalysis?.efficiencyAnalysis}
@@ -613,6 +693,44 @@ const MetricComparison = ({ eacoMetrics, epsoMetrics }) => {
               <span className="text-sm font-semibold text-purple-700">EPSO</span>
               <p className="text-sm text-gray-600 mt-1">
                 {epsoMetrics?.[metric] || 'No interpretation available'}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Baseline metric comparison for ACO/PSO
+const BaselineMetricComparison = ({ acoMetrics, psoMetrics }) => {
+  if (!acoMetrics && !psoMetrics) return null;
+
+  const allMetrics = new Set([
+    ...Object.keys(acoMetrics || {}),
+    ...Object.keys(psoMetrics || {}),
+  ]);
+
+  return (
+    <div className="space-y-4">
+      {Array.from(allMetrics).map(metric => (
+        <div key={metric} className="border border-gray-200 rounded-lg p-4">
+          <h5 className="font-semibold text-lg text-gray-800 capitalize mb-3">
+            {metric === 'loadBalance' ? 'Degree of Imbalance' : 
+             metric === 'loadImbalance' ? 'Degree of Imbalance' :
+             metric.replace(/([A-Z])/g, ' $1').trim()}
+          </h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-sky-50 border-l-4 border-sky-400 rounded-lg p-3">
+              <span className="text-sm font-semibold text-sky-700">Baseline ACO</span>
+              <p className="text-sm text-gray-600 mt-1">
+                {acoMetrics?.[metric] || 'No interpretation available'}
+              </p>
+            </div>
+            <div className="bg-indigo-50 border-l-4 border-indigo-400 rounded-lg p-3">
+              <span className="text-sm font-semibold text-indigo-700">Baseline PSO</span>
+              <p className="text-sm text-gray-600 mt-1">
+                {psoMetrics?.[metric] || 'No interpretation available'}
               </p>
             </div>
           </div>

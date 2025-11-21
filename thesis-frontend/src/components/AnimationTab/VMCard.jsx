@@ -19,6 +19,7 @@ const VMCard = ({
         isActive={isActive}
         taskCount={taskCount}
         cpuPercentage={cpuPercentage}
+        cpuLoad={cpuLoad}
         status={status}
         getStatusColor={getStatusColor}
       />
@@ -31,6 +32,7 @@ const VMCard = ({
       isActive={isActive}
       taskCount={taskCount}
       cpuPercentage={cpuPercentage}
+      cpuLoad={cpuLoad}
       dataCenterConfig={dataCenterConfig}
       status={status}
       getStatusColor={getStatusColor}
@@ -43,6 +45,7 @@ const CompactVMCard = ({
   isActive,
   taskCount,
   cpuPercentage,
+  cpuLoad,
   status,
   getStatusColor,
 }) => (
@@ -76,7 +79,7 @@ const CompactVMCard = ({
           "bg-emerald-400"
         }`} />
         <span className={isActive ? "text-gray-700" : "text-gray-500"}>
-          {cpuPercentage.toFixed(0)}% CPU
+          {cpuPercentage.toFixed(0)}% CPU ({cpuLoad.toFixed(2)})
         </span>
       </div>
       <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -93,6 +96,7 @@ const DetailedVMCard = ({
   isActive,
   taskCount,
   cpuPercentage,
+  cpuLoad,
   dataCenterConfig,
   status,
   getStatusColor,
@@ -140,7 +144,9 @@ const DetailedVMCard = ({
         <div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-600">CPU Load</span>
-            <span className="font-medium text-gray-800">{cpuPercentage.toFixed(0)}%</span>
+            <span className="font-medium text-gray-800">
+              {cpuPercentage.toFixed(0)}% ({cpuLoad.toFixed(2)})
+            </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-1.5">
             <motion.div
