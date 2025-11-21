@@ -22,14 +22,14 @@ const AnimationTab = ({
   onViewResults,
   eacoResults,
   epsoResults,
-  acoResults, // Add ACO results prop
-  psoResults, // Add PSO results prop
+  acoResults,
+  psoResults,
 }) => {
   const [activeAlgorithm, setActiveAlgorithm] = useState("EPSO");
   const [showResultsButton, setShowResultsButton] = useState(true);
 
   const animationState = useAnimationState(dataCenterConfig);
-  const metricsState = useMetrics(epsoResults, eacoResults, acoResults, psoResults); // Update metrics hook
+  const metricsState = useMetrics(epsoResults, eacoResults, acoResults, psoResults);
   const vmStatus = useVMStatus(animationState.activeVMs, animationState.taskCounts, animationState.cpuLoads);
 
   const isIterationResult = checkIfIterationResult(epsoResults, eacoResults, acoResults, psoResults);
@@ -40,8 +40,8 @@ const AnimationTab = ({
     dataCenterConfig,
     epsoResults,
     eacoResults,
-    acoResults, // Add to animation engine
-    psoResults, // Add to animation engine
+    acoResults,
+    psoResults,
     animationState,
     metricsState,
     setShowResultsButton,
@@ -93,88 +93,87 @@ const AnimationTabLayout = ({
   );
 
   return (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="flex-grow p-3 sm:p-6 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
-  >
     <motion.div
-      className="bg-white p-4 sm:p-8 rounded-xl shadow-lg mb-4 sm:mb-6 border border-gray-200"
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="flex-grow p-3 sm:p-6 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
     >
-      <HeaderSection dataCenterConfig={dataCenterConfig} cloudletConfig={cloudletConfig} />
-      
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <AlgorithmTabs activeAlgorithm={activeAlgorithm} setActiveAlgorithm={onAlgorithmChange} />
-        </div>
+      <motion.div
+        className="bg-white p-4 sm:p-8 rounded-xl shadow-lg mb-4 sm:mb-6 border border-gray-200"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <HeaderSection dataCenterConfig={dataCenterConfig} cloudletConfig={cloudletConfig} />
         
-        {activeAlgorithm !== "comparison" && (
-          <div className="relative pt-2">
-            <button
-              type="button"
-              className="p-2 text-gray-400 hover:text-[#319694] transition-colors cursor-help rounded-lg hover:bg-gray-50"
-              onMouseEnter={() => setShowStatusTooltip(true)}
-              onMouseLeave={() => setShowStatusTooltip(false)}
-              onClick={() => setShowStatusTooltip(!showStatusTooltip)}
-              aria-label="View VM status distribution"
-            >
-              <Info size={20} />
-            </button>
-            
-            <AnimatePresence>
-              {showStatusTooltip && (
-                <VMStatusTooltip
-                  distribution={statusDistribution}
-                  algorithm={activeAlgorithm}
-                />
-              )}
-            </AnimatePresence>
+        <div className="flex items-start justify-between gap-2 mb-4 sm:mb-6">
+          <div className="flex-1">
+            <AlgorithmTabs activeAlgorithm={activeAlgorithm} setActiveAlgorithm={onAlgorithmChange} />
           </div>
+          
+          {activeAlgorithm !== "comparison" && (
+            <div className="relative pt-2">
+              <button
+                type="button"
+                className="p-2 text-gray-400 hover:text-[#319694] transition-colors cursor-help rounded-lg hover:bg-gray-50"
+                onMouseEnter={() => setShowStatusTooltip(true)}
+                onMouseLeave={() => setShowStatusTooltip(false)}
+                onClick={() => setShowStatusTooltip(!showStatusTooltip)}
+                aria-label="View VM status distribution"
+              >
+                <Info size={20} />
+              </button>
+              
+              <AnimatePresence>
+                {showStatusTooltip && (
+                  <VMStatusTooltip
+                    distribution={statusDistribution}
+                    algorithm={activeAlgorithm}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {activeAlgorithm === "comparison" ? (
+          <ComparisonView
+            activeVMs={animationState.activeVMs}
+            taskCounts={animationState.taskCounts}
+            cpuLoads={animationState.cpuLoads}
+            metrics={metricsState.metrics}
+            dataCenterConfig={dataCenterConfig}
+            getVmStatus={vmStatus.getVmStatus}
+            getStatusColor={vmStatus.getStatusColor}
+          />
+        ) : (
+          <SingleAlgorithmView
+            algorithm={activeAlgorithm}
+            activeVMs={animationState.activeVMs}
+            taskCounts={animationState.taskCounts}
+            cpuLoads={animationState.cpuLoads}
+            metrics={metricsState.metrics}
+            dataCenterConfig={dataCenterConfig}
+            getVmStatus={vmStatus.getVmStatus}
+            getStatusColor={vmStatus.getStatusColor}
+          />
         )}
-      </div>
 
-      
-      {activeAlgorithm === "comparison" ? (
-        <ComparisonView
-          activeVMs={animationState.activeVMs}
-          taskCounts={animationState.taskCounts}
-          cpuLoads={animationState.cpuLoads}
-          metrics={metricsState.metrics}
-          dataCenterConfig={dataCenterConfig}
-          getVmStatus={vmStatus.getVmStatus}
-          getStatusColor={vmStatus.getStatusColor}
-        />
-      ) : (
-        <SingleAlgorithmView
-          algorithm={activeAlgorithm}
-          activeVMs={animationState.activeVMs}
-          taskCounts={animationState.taskCounts}
-          cpuLoads={animationState.cpuLoads}
-          metrics={metricsState.metrics}
-          dataCenterConfig={dataCenterConfig}
-          getVmStatus={vmStatus.getVmStatus}
-          getStatusColor={vmStatus.getStatusColor}
-        />
-      )}
+        <div className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <Controls
+            isPlaying={animationState.isPlaying}
+            handlePlayPause={onPlayPause}
+            handleReset={onReset}
+            progress={animationState.progress}
+            total={metricsState.totalTasks}
+            cloudlets={cloudletConfig.numCloudlets}
+          />
 
-      <div className="space-y-4 sm:space-y-6"> {/* Added spacing wrapper */}
-        <Controls
-          isPlaying={animationState.isPlaying}
-          handlePlayPause={onPlayPause}
-          handleReset={onReset}
-          progress={animationState.progress}
-          total={metricsState.totalTasks}
-          cloudlets={cloudletConfig.numCloudlets}
-        />
-
-        <ResultsButton onViewResults={onViewResults} />
-      </div>
+          {showResultsButton && <ResultsButton onViewResults={onViewResults} />}
+        </div>
+      </motion.div>
     </motion.div>
-  </motion.div>
   );
 };
 
@@ -219,8 +218,8 @@ const SingleAlgorithmView = ({
   };
 
   return (
-    <>
-      <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll mb-4 sm:mb-6 pr-1 sm:pr-2">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="h-[400px] sm:h-[500px] overflow-y-auto smooth-scroll pr-1 sm:pr-2">
         <VMCardsGrid
           algorithm={algorithm}
           dataCenterConfig={dataCenterConfig}
@@ -231,13 +230,14 @@ const SingleAlgorithmView = ({
           getStatusColor={getStatusColor}
         />
       </div>
-      <div className="mb-4 sm:mb-6">
+      
+      <div>
         <MetricsPanel
-          metrics={metrics[algorithm]}
+          metrics={metrics[algorithm] || getDefaultMetrics()}
           color={colorMap[algorithm] || "blue"}
         />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -287,5 +287,13 @@ const useWorkloadFile = (workloadFile, setTotalTasks) => {
     }
   }, [workloadFile, setTotalTasks]);
 };
+
+const getDefaultMetrics = () => ({
+  imbalance: "0.0000",
+  makespan: "0.00",
+  utilization: "0.00",
+  energyConsumption: "0.00",
+  responseTime: "0.00"
+});
 
 export default AnimationTab;

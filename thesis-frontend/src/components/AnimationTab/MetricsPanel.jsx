@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
 const MetricsPanel = ({ metrics, color = "blue" }) => {
+  // Log the available metrics
+  console.log("Available metrics:", metrics);
+  console.log("Metrics keys:", metrics ? Object.keys(metrics) : "No metrics provided");
+
   const colorClasses = {
     blue: {
       bg: "bg-blue-50",
@@ -13,6 +17,18 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
       border: "border-purple-200",
       text: "text-purple-700",
       accent: "text-purple-600",
+    },
+    green: {
+      bg: "bg-green-50",
+      border: "border-green-200",
+      text: "text-green-700",
+      accent: "text-green-600",
+    },
+    orange: {
+      bg: "bg-orange-50",
+      border: "border-orange-200",
+      text: "text-orange-700",
+      accent: "text-orange-600",
     },
   };
 
@@ -39,7 +55,26 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
       tooltip: "Percentage of available resources being used",
       unit: "%",
     },
+    {
+      key: "energyConsumption",
+      label: "Energy Consumption",
+      icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+      tooltip: "Total energy consumed by all VMs",
+      unit: "kWh",
+    },
+    {
+      key: "responseTime",
+      label: "Response Time",
+      icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+      tooltip: "Average response time for task execution",
+      unit: "ms",
+    },
   ];
+
+  // Log each metric value individually
+  metricConfigs.forEach(config => {
+    console.log(`${config.label}:`, metrics[config.key]);
+  });
 
   return (
     <motion.div
@@ -64,16 +99,31 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
         Performance Metrics
       </h4>
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        {metricConfigs.map((metric, index) => (
-          <MetricCard
-            key={metric.key}
-            metric={metric}
-            value={metrics[metric.key]}
-            color={currentColor}
-            index={index}
-          />
-        ))}
+      {/* Horizontal scrollable container */}
+      <div className="overflow-x-auto pb-3 -mx-1 px-1">
+        <div className="flex space-x-3 min-w-max">
+          {metricConfigs.map((metric, index) => (
+            <MetricCard
+              key={metric.key}
+              metric={metric}
+              value={metrics[metric.key]}
+              color={currentColor}
+              index={index}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Scroll indicator for mobile */}
+      <div className="flex justify-center mt-2 sm:hidden">
+        <div className="flex space-x-1">
+          {metricConfigs.map((_, index) => (
+            <div
+              key={index}
+              className="w-1.5 h-1.5 bg-gray-300 rounded-full"
+            />
+          ))}
+        </div>
       </div>
     </motion.div>
   );
@@ -84,7 +134,7 @@ const MetricCard = ({ metric, value, color, index }) => (
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ delay: index * 0.1 }}
-    className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100"
+    className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 min-w-[140px] flex-shrink-0"
   >
     <div className="flex items-start justify-between mb-2">
       <div className="flex items-center">
@@ -101,12 +151,14 @@ const MetricCard = ({ metric, value, color, index }) => (
             d={metric.icon}
           />
         </svg>
-        <span className="text-sm font-medium text-gray-700">{metric.label}</span>
+        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          {metric.label}
+        </span>
       </div>
     </div>
     <div className="flex items-baseline">
       <span className={`text-xl font-bold ${color.accent}`}>
-        {value}
+        {value || "0.00"}
       </span>
       {metric.unit && (
         <span className="text-sm text-gray-500 ml-1">{metric.unit}</span>

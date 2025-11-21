@@ -260,6 +260,8 @@ const CrossComparisonMetrics = ({ enhancedMetrics, baselineMetrics, enhancedLabe
     imbalance: calculateImprovement(enhancedMetrics.imbalance, baselineMetrics.imbalance, true),
     makespan: calculateImprovement(enhancedMetrics.makespan, baselineMetrics.makespan, true),
     utilization: calculateImprovement(enhancedMetrics.utilization, baselineMetrics.utilization, false),
+    energyConsumption: calculateImprovement(enhancedMetrics.energyConsumption, baselineMetrics.energyConsumption, true),
+    responseTime: calculateImprovement(enhancedMetrics.responseTime, baselineMetrics.responseTime, true),
   };
 
   const getColorClass = (improvement, isLowerBetter = true) => {
@@ -270,7 +272,7 @@ const CrossComparisonMetrics = ({ enhancedMetrics, baselineMetrics, enhancedLabe
 
   return (
     <div className={`p-4 bg-gradient-to-r from-${enhancedColor}-50 to-gray-50 rounded-xl border border-${enhancedColor}-200`}>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <MetricImprovement
           label="Load Imbalance"
           improvement={improvements.imbalance}
@@ -291,6 +293,20 @@ const CrossComparisonMetrics = ({ enhancedMetrics, baselineMetrics, enhancedLabe
           isPositive={improvements.utilization > 0}
           description="Higher is better"
           colorClass={getColorClass(improvements.utilization, false)}
+        />
+        <MetricImprovement
+          label="Energy Consumption"
+          improvement={improvements.energyConsumption}
+          isPositive={improvements.energyConsumption > 0}
+          description="Lower is better"
+          colorClass={getColorClass(improvements.energyConsumption, true)}
+        />
+        <MetricImprovement
+          label="Response Time"
+          improvement={improvements.responseTime}
+          isPositive={improvements.responseTime > 0}
+          description="Lower is better"
+          colorClass={getColorClass(improvements.responseTime, true)}
         />
       </div>
     </div>

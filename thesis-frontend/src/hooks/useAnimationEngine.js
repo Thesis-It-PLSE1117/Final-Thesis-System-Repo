@@ -228,11 +228,21 @@ export const useAnimationEngine = ({
     return data.summary?.loadImbalance ?? 0;
   };
 
+  const getEnergyConsumption = (data) => {
+    return data.summary?.energyConsumption ?? 0;
+  };
+
+  const getResponseTime = (data) => {
+    return data.summary?.responseTime ?? 0;
+  };
+
   const getFinalMetrics = (data) => {
     const metrics = {
       imbalance: getImbalanceValue(data).toFixed(4),
       makespan: (data.summary?.makespan || 0).toFixed(2),
-      utilization: (data.summary?.resourceUtilization || data.summary?.utilization || 0).toFixed(2),
+      utilization: (data.summary?.resourceUtilization || 0).toFixed(2),
+      energyConsumption: getEnergyConsumption(data).toFixed(2),
+      responseTime: getResponseTime(data).toFixed(2),
     };
     console.log('Final metrics for:', data, metrics);
     return metrics;
@@ -241,7 +251,9 @@ export const useAnimationEngine = ({
   const getInterpolatedMetrics = (data, progress) => ({
     imbalance: (getImbalanceValue(data) * (progress / 100)).toFixed(4),
     makespan: ((data.summary?.makespan || 0) * (progress / 100)).toFixed(2),
-    utilization: ((data.summary?.resourceUtilization || data.summary?.utilization || 0) * (progress / 100)).toFixed(2),
+    utilization: ((data.summary?.resourceUtilization || 0) * (progress / 100)).toFixed(2),
+    energyConsumption: (getEnergyConsumption(data) * (progress / 100)).toFixed(2),
+    responseTime: (getResponseTime(data) * (progress / 100)).toFixed(2),
   });
 
   const finishAnimation = (finalEpsoData, finalEacoData, finalAcoData, finalPsoData, epsoData, eacoData, acoData, psoData) => {

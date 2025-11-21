@@ -6,6 +6,8 @@ export const psoResults = {
       makespan: 285.67,
       loadImbalance: 0.1276,
       resourceUtilization: 72.34,
+      energyConsumption: 42.18,
+      responseTime: 68.45,
       totalCloudlets: 1000,
       totalVms: 20
     },
@@ -47,6 +49,8 @@ export const acoResults = {
       makespan: 298.92,
       loadImbalance: 0.1421,
       resourceUtilization: 69.89,
+      energyConsumption: 45.73,
+      responseTime: 72.18,
       totalCloudlets: 1000,
       totalVms: 20
     },
