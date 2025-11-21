@@ -358,7 +358,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
 
       {/* Recommendations Comparison */}
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-        <button
+        {/* <button
           onClick={() => toggleSection('recommendations')}
           className="w-full px-6 py-4 bg-gradient-to-r from-[#319694]/70 to-[#319694]/50 text-white flex items-center justify-between hover:from-[#267b79]/70 hover:to-[#267b79]/50 transition-all"
         >
@@ -368,7 +368,7 @@ const AnalysisComparison = ({ eacoAnalysis, epsoAnalysis, eacoResults, epsoResul
           </div>
           {expandedSections.recommendations ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </button>
-        
+         */}
         <AnimatePresence>
           {expandedSections.recommendations && (
             <motion.div

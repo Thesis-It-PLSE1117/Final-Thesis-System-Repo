@@ -70,8 +70,8 @@ const HomePage = () => {
       ],
       list: [
         "Number of hosts and their processing capacity.",
-        "Virtual machine settings (CPU, RAM, Bandwidth).",
-        "Host specifications (cores, RAM, storage).",
+        "Virtual machine settings",
+        "Host specifications.",
         "Preset configurations or fully custom settings.",
       ],
     },
@@ -99,7 +99,7 @@ const HomePage = () => {
       list: [
         "Choose test runs (50+ recommended for statistical accuracy).",
         "System tests both EACO and EPSO algorithms simultaneously.",
-        "Watch live task scheduling animation (single run only).",
+        "Observe task scheduling animation (single run only).",
         "Track progress across multiple test iterations.",
       ],
     },

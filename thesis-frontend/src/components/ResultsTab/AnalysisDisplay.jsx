@@ -214,7 +214,7 @@ const AnalysisDisplay = ({ analysis, algorithmName }) => {
 
       {/* Recommendations Section */}
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-        <button
+        {/* <button
           onClick={() => toggleSection('recommendations')}
           className="w-full px-6 py-4 bg-gradient-to-r from-[#319694]/70 to-[#319694]/50 text-white flex items-center justify-between hover:from-[#267b79]/70 hover:to-[#267b79]/50 transition-all">
           <div className="flex items-center gap-3">
@@ -222,7 +222,7 @@ const AnalysisDisplay = ({ analysis, algorithmName }) => {
             <h3 className="text-xl font-bold">Optimization Recommendations</h3>
           </div>
           {expandedSections.recommendations ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </button>
+        </button> */}
         
         <AnimatePresence>
           {expandedSections.recommendations && recommendations && (

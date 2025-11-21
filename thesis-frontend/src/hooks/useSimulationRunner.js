@@ -39,7 +39,7 @@ export const useSimulationRunner = () => {
   
   const calculatePollingInterval = (taskCount) => {
     if (taskCount <= 100) return 7000;
-    if (taskCount >= 5000) return 165000;
+    if (taskCount >= 5000) return 60000
     
     const minTasks = 100;
     const maxTasks = 5000;
