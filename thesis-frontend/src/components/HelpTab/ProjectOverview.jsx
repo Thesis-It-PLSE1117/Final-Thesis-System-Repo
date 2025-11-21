@@ -18,7 +18,7 @@ const ProjectOverview = () => {
       icon: <FileText className="w-5 h-5" />,
       content: (
         <>
-          This system compares two cloud algorithms: <span className="font-semibold">EPSO</span> and <span className="font-semibold">EACO</span>. 
+          This system compares two cloud algorithms: <span className="font-semibold">EPSO</span> and <span className="font-semibold">EACO</span>, also provides baseline results for guidance. 
           It uses the <span className="font-semibold">CloudSim framework</span> with real Google Cluster data to test how they balance loads.
         </>
       )
@@ -108,40 +108,8 @@ const ProjectOverview = () => {
         }
       ]
     },
-    {
-      title: "Research Approach",
-      icon: <HelpCircle className="w-5 h-5" />,
-      content: (
-        <>
-          <span className="font-semibold">Quantitative, simulation-based</span> research design with expert evaluation. 
-          <span className="font-semibold">30 participants:</span> 15 IT experts and 15 end users 
-          (11 cloud specialists + 4 academic professionals). <span className="font-semibold">Purposive sampling</span> method ensures relevant expertise.
-        </>
-      ),
-      subsections: [
-        {
-          title: "System Evaluation Methodology",
-          content: (
-            <>
-              <span className="font-semibold">Likert scale</span> with four response options: <span className="font-semibold">4</span> (Strongly Agree, 3.26–4.00), 
-              <span className="font-semibold">3</span> (Agree, 2.51–3.25), <span className="font-semibold">2</span> (Disagree, 1.76–2.50), 
-              <span className="font-semibold">1</span> (Strongly Disagree, 1.00–1.75). <span className="font-semibold">Median scores</span> used for stability with small groups.
-            </>
-          )
-        }
-      ]
-    },
-    {
-      title: "Ethics & Data Handling",
-      icon: <BookOpen className="w-5 h-5" />,
-      content: (
-        <>
-          <span className="font-semibold">Voluntary participation</span> with <span className="font-semibold">informed consent</span>. 
-          <span className="font-semibold">Confidentiality</span> maintained throughout evaluation. Survey responses administered via <span className="font-semibold">Google Forms</span>—this app does not store user data. 
-          Results validated through expert feedback from <span className="font-semibold">cloud specialists and IT professionals</span>.
-        </>
-      )
-    }
+
+
   ];
 
   return (

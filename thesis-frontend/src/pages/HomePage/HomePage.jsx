@@ -98,7 +98,7 @@ const HomePage = () => {
       ],
       list: [
         "Choose test runs (50+ recommended for statistical accuracy).",
-        "System tests both EACO and EPSO algorithms simultaneously.",
+        "System tests both EACO and EPSO algorithms simultaneously, baseline algorithms as well.",
         "Watch live task scheduling animation (single run only).",
         "Track progress across multiple test iterations.",
       ],
