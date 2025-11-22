@@ -338,7 +338,6 @@ const AnalysisComparison = ({
         </div>
       )}
 
-      {/* Efficiency Analysis Comparison */}
       <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
         <button
           onClick={() => toggleSection('efficiency')}

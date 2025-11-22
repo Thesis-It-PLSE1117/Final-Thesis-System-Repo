@@ -6,7 +6,8 @@ const STATUS_KEY_MAP = {
   'Medium Load': 'mediumLoad',
   'Normal': 'normal',
   'Low Load': 'lowLoad',
-  'Idle': 'idle'
+  'Idle': 'idle',
+  'Critical Overload': 'criticalOverload'
 };
 
 export const useVMStatusDistribution = (
@@ -24,6 +25,7 @@ export const useVMStatusDistribution = (
       mediumLoad: 0,
       highLoad: 0,
       overloaded: 0,
+      criticalOverload: 0,
       total: 0
     };
 

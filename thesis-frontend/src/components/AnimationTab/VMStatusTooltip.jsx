@@ -3,6 +3,12 @@ import { AlertCircle, Zap, Activity, CheckCircle, Moon, Circle } from "lucide-re
 
 const STATUS_CONFIG = [
   {
+    key: 'criticalOverload',
+    label: 'Critical Overload',
+    icon: AlertCircle,
+    color: '#a855f7'
+  },
+  {
     key: 'overloaded',
     label: 'Overloaded',
     icon: AlertCircle,

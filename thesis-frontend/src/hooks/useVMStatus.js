@@ -2,8 +2,9 @@ import { useMemo } from "react";
 
 export const useVMStatus = (activeVMs, taskCounts, cpuLoads) => {
   const getVmStatus = (vmId, algorithm) => {
-    const cpuLoad = cpuLoads[algorithm][vmId] || 0;
-    const cpuPercentage = Math.min(100, cpuLoad * 100);
+    const cpuLoad = (cpuLoads[algorithm] && cpuLoads[algorithm][vmId]) || 0;
+    const cpuPercentage = cpuLoad * 100;
+
     const vmTaskCount = taskCounts[algorithm][vmId] || 0;
 
     const activeVMsForAlgorithm = activeVMs[algorithm];
@@ -21,6 +22,7 @@ export const useVMStatus = (activeVMs, taskCounts, cpuLoads) => {
     const isCpuOverloaded = cpuPercentage > 80;
     const isTaskOverloaded = vmTaskCount > taskOverloadThreshold;
 
+    if (cpuPercentage > 100) return "Critical Overload";
     if (isCpuOverloaded && isTaskOverloaded) return "Overloaded";
     if (cpuPercentage > 65) return "High Load";
     if (cpuPercentage > 30) return "Medium Load";
@@ -32,6 +34,7 @@ export const useVMStatus = (activeVMs, taskCounts, cpuLoads) => {
 
   const getStatusColor = (status) => {
     const statusColors = {
+      "Critical Overload": "bg-purple-100 text-purple-800 border-purple-300",
       "Overloaded": "bg-red-100 text-red-800 border-red-300",
       "High Load": "bg-orange-100 text-orange-800 border-orange-300",
       "Medium Load": "bg-yellow-100 text-yellow-800 border-yellow-300",
