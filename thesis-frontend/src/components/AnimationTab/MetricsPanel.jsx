@@ -67,7 +67,7 @@ const MetricsPanel = ({ metrics, color = "blue" }) => {
       label: "Response Time",
       icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
       tooltip: "Average response time for task execution",
-      unit: "ms",
+      unit: "s",
     },
   ];
 

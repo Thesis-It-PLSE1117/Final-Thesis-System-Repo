@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Bird, Route, Sparkles } from "lucide-react";
+import { Bird, Route, Sparkles, ChevronDown } from "lucide-react";
 
 import MetricsPanel from "./MetricsPanel";
 import { VMCardsGrid } from "./VMCardsGrid";
@@ -15,20 +15,67 @@ export const ComparisonView = ({
   getVmStatus,
   getStatusColor,
 }) => {
-  const [comparisonMode, setComparisonMode] = useState("enhanced"); // "enhanced" or "baseline"
-  const [activeComparison, setActiveComparison] = useState("EPSOvsPSO"); // "EPSOvsPSO" or "EACOvsACO"
+  const [leftAlgorithm, setLeftAlgorithm] = useState("EPSO");
+  const [rightAlgorithm, setRightAlgorithm] = useState("PSO");
+  const [dropdownOpen, setDropdownOpen] = useState({ left: false, right: false });
 
-  const enhancedAlgorithms = [
-    { id: "EPSO", label: "EPSO", color: "blue", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
-    { id: "EACO", label: "EACO", color: "purple", icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" }
+  const algorithms = [
+    { 
+      id: "EPSO", 
+      label: "EPSO", 
+      color: "blue", 
+      icon: "M13 10V3L4 14h7v7l9-11h-7z",
+      description: "Enhanced Particle Swarm Optimization",
+      enhanced: true
+    },
+    { 
+      id: "EACO", 
+      label: "EACO", 
+      color: "purple", 
+      icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4",
+      description: "Enhanced Ant Colony Optimization",
+      enhanced: true
+    },
+    { 
+      id: "PSO", 
+      label: "PSO", 
+      color: "green", 
+      icon: "",
+      description: "Particle Swarm Optimization",
+      enhanced: false
+    },
+    { 
+      id: "ACO", 
+      label: "ACO", 
+      color: "orange", 
+      icon: "",
+      description: "Ant Colony Optimization",
+      enhanced: false
+    }
   ];
 
-  const baselineAlgorithms = [
-    { id: "PSO", label: "PSO", color: "green", icon: "" },
-    { id: "ACO", label: "ACO", color: "orange", icon: "" }
-  ];
+  const leftAlgoConfig = algorithms.find(algo => algo.id === leftAlgorithm);
+  const rightAlgoConfig = algorithms.find(algo => algo.id === rightAlgorithm);
 
-  const algorithms = comparisonMode === "enhanced" ? enhancedAlgorithms : baselineAlgorithms;
+  const availableLeftAlgorithms = algorithms.filter(algo => algo.id !== rightAlgorithm);
+  const availableRightAlgorithms = algorithms.filter(algo => algo.id !== leftAlgorithm);
+
+  const toggleDropdown = (side) => {
+    setDropdownOpen(prev => ({
+      ...prev,
+      [side]: !prev[side]
+    }));
+  };
+
+  const selectAlgorithm = (side, algorithmId) => {
+    if (side === 'left') {
+      setLeftAlgorithm(algorithmId);
+      setDropdownOpen({ left: false, right: false });
+    } else {
+      setRightAlgorithm(algorithmId);
+      setDropdownOpen({ left: false, right: false });
+    }
+  };
 
   return (
     <div className="mb-4 sm:mb-6">
@@ -42,114 +89,149 @@ export const ComparisonView = ({
           Algorithm Comparison
         </h4>
         
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 font-medium">Compare:</span>
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setComparisonMode("enhanced")}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
-                comparisonMode === "enhanced"
-                  ? "bg-[#319694] text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              Enhanced
-            </button>
-            <button
-              onClick={() => setComparisonMode("baseline")}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
-                comparisonMode === "baseline"
-                  ? "bg-[#319694] text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              Baseline
-            </button>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600 font-medium">Compare:</span>
+            
+            {/* Left Algorithm Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('left')}
+                className="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors min-w-[120px] justify-between"
+              >
+                <span className="flex items-center space-x-2">
+                  {leftAlgoConfig.enhanced ? (
+                    <Sparkles className="w-4 h-4" />
+                  ) : leftAlgoConfig.id === "PSO" ? (
+                    <Bird className="w-4 h-4" />
+                  ) : (
+                    <Route className="w-4 h-4" />
+                  )}
+                  <span>{leftAlgoConfig.label}</span>
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              
+              {dropdownOpen.left && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10"
+                >
+                  {availableLeftAlgorithms.map((algo) => (
+                    <button
+                      key={algo.id}
+                      onClick={() => selectAlgorithm('left', algo.id)}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                    >
+                      {algo.enhanced ? (
+                        <Sparkles className="w-4 h-4" />
+                      ) : algo.id === "PSO" ? (
+                        <Bird className="w-4 h-4" />
+                      ) : (
+                        <Route className="w-4 h-4" />
+                      )}
+                      <span>{algo.label}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+
+            <span className="text-gray-400">vs</span>
+
+            {/* Right Algorithm Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('right')}
+                className="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors min-w-[120px] justify-between"
+              >
+                <span className="flex items-center space-x-2">
+                  {rightAlgoConfig.enhanced ? (
+                    <Sparkles className="w-4 h-4" />
+                  ) : rightAlgoConfig.id === "PSO" ? (
+                    <Bird className="w-4 h-4" />
+                  ) : (
+                    <Route className="w-4 h-4" />
+                  )}
+                  <span>{rightAlgoConfig.label}</span>
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              
+              {dropdownOpen.right && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10"
+                >
+                  {availableRightAlgorithms.map((algo) => (
+                    <button
+                      key={algo.id}
+                      onClick={() => selectAlgorithm('right', algo.id)}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                    >
+                      {algo.enhanced ? (
+                        <Sparkles className="w-4 h-4" />
+                      ) : algo.id === "PSO" ? (
+                        <Bird className="w-4 h-4" />
+                      ) : (
+                        <Route className="w-4 h-4" />
+                      )}
+                      <span>{algo.label}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
           </div>
         </div>
       </motion.div>
 
       <div className="flex flex-col lg:grid lg:grid-cols-2 gap-3 sm:gap-6">
-        {algorithms.map((algorithm) => (
-          <AlgorithmComparisonPanel
-            key={algorithm.id}
-            algorithm={algorithm.id}
-            color={algorithm.color}
-            activeVMs={activeVMs}
-            taskCounts={taskCounts}
-            cpuLoads={cpuLoads}
-            highlightedVM={highlightedVM}
-            metrics={metrics[algorithm.id]}
-            dataCenterConfig={dataCenterConfig}
-            getVmStatus={getVmStatus}
-            getStatusColor={getStatusColor}
-          />
-        ))}
+        <AlgorithmComparisonPanel
+          algorithm={leftAlgorithm}
+          color={leftAlgoConfig.color}
+          activeVMs={activeVMs}
+          taskCounts={taskCounts}
+          cpuLoads={cpuLoads}
+          highlightedVM={highlightedVM}
+          metrics={metrics[leftAlgorithm]}
+          dataCenterConfig={dataCenterConfig}
+          getVmStatus={getVmStatus}
+          getStatusColor={getStatusColor}
+        />
+        
+        <AlgorithmComparisonPanel
+          algorithm={rightAlgorithm}
+          color={rightAlgoConfig.color}
+          activeVMs={activeVMs}
+          taskCounts={taskCounts}
+          cpuLoads={cpuLoads}
+          highlightedVM={highlightedVM}
+          metrics={metrics[rightAlgorithm]}
+          dataCenterConfig={dataCenterConfig}
+          getVmStatus={getVmStatus}
+          getStatusColor={getStatusColor}
+        />
       </div>
 
-      {/* Toggleable Comparison Sections */}
-      {(metrics.EPSO && metrics.PSO && metrics.EACO && metrics.ACO) && (
+      {/* Cross Comparison Metrics */}
+      {(metrics[leftAlgorithm] && metrics[rightAlgorithm]) && (
         <div className="mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h5 className="text-lg font-bold text-gray-800">Performance Comparison</h5>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600 font-medium">View:</span>
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setActiveComparison("EPSOvsPSO")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
-                    activeComparison === "EPSOvsPSO"
-                      ? "bg-blue-500 text-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  EPSO vs PSO
-                </button>
-                <button
-                  onClick={() => setActiveComparison("EACOvsACO")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
-                    activeComparison === "EACOvsACO"
-                      ? "bg-purple-500 text-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  EACO vs ACO
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {activeComparison === "EPSOvsPSO" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <CrossComparisonMetrics 
-                enhancedMetrics={metrics.EPSO} 
-                baselineMetrics={metrics.PSO}
-                enhancedLabel="EPSO"
-                baselineLabel="PSO"
-                enhancedColor="blue"
-              />
-            </motion.div>
-          )}
-          
-          {activeComparison === "EACOvsACO" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <CrossComparisonMetrics 
-                enhancedMetrics={metrics.EACO} 
-                baselineMetrics={metrics.ACO}
-                enhancedLabel="EACO"
-                baselineLabel="ACO"
-                enhancedColor="purple"
-              />
-            </motion.div>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <CrossComparisonMetrics 
+              enhancedMetrics={metrics[leftAlgorithm]} 
+              baselineMetrics={metrics[rightAlgorithm]}
+              enhancedLabel={leftAlgoConfig.label}
+              baselineLabel={rightAlgoConfig.label}
+              enhancedColor={leftAlgoConfig.color}
+            />
+          </motion.div>
         </div>
       )}
     </div>
@@ -225,7 +307,7 @@ const AlgorithmComparisonPanel = ({
   return (
     <motion.div
       className={`bg-white p-3 sm:p-6 rounded-xl shadow-sm border ${borderClass}`}
-      initial={{ opacity: 0, x: algorithm === "EPSO" || algorithm === "PSO" ? -20 : 20 }}
+      initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
@@ -307,6 +389,14 @@ const CrossComparisonMetrics = ({ enhancedMetrics, baselineMetrics, enhancedLabe
 
   return (
     <div className={`p-4 bg-gradient-to-r from-${enhancedColor}-50 to-gray-50 rounded-xl border border-${enhancedColor}-200`}>
+      <div className="text-center mb-4">
+        <h6 className="text-lg font-bold text-gray-800">
+          {enhancedLabel} vs {baselineLabel} Comparison
+        </h6>
+        <p className="text-sm text-gray-600">
+          Percentage improvement of {enhancedLabel} over {baselineLabel}
+        </p>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <MetricImprovement
           label="Load Imbalance"
