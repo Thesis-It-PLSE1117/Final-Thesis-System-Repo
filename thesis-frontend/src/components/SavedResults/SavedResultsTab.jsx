@@ -385,7 +385,14 @@ const handleImportHistory = async (event) => {
                         item.id.startsWith(baseId),
                       );
 
-                      if (pairedRuns.length === 2) {
+                      const hasEaco = pairedRuns.some(
+                        (item) => item.algorithm === "EACO",
+                      );
+                      const hasEpso = pairedRuns.some(
+                        (item) => item.algorithm === "EPSO",
+                      );
+
+                      if (hasEaco && hasEpso) {
                         const runId =
                           selectedResult.simulationId?.split("#")[1] || baseId;
                         exportSimulationHistory(
@@ -428,7 +435,14 @@ const handleImportHistory = async (event) => {
                         item.id.startsWith(baseId),
                       );
 
-                      if (pairedRuns.length === 2) {
+                      const hasEaco = pairedRuns.some(
+                        (item) => item.algorithm === "EACO",
+                      );
+                      const hasEpso = pairedRuns.some(
+                        (item) => item.algorithm === "EPSO",
+                      );
+
+                      if (hasEaco && hasEpso) {
                         const runId =
                           selectedResult.simulationId?.split("#")[1] || baseId;
                         exportSimulationHistory(

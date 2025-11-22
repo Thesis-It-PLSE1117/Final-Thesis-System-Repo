@@ -763,6 +763,8 @@ export const exportSimulationHistory = (
     const runId = history[0]?.id?.split("-")[0];
     const eacoData = history.find((sim) => sim.algorithm === "EACO");
     const epsoData = history.find((sim) => sim.algorithm === "EPSO");
+    const bpsoData = history.find((sim) => sim.algorithm === "BPSO");
+    const bacoData = history.find((sim) => sim.algorithm === "BACO");
     
     const hasIterations = eacoData?.rawResults?.individualResults?.length > 0 || 
                           epsoData?.rawResults?.individualResults?.length > 0;
@@ -770,6 +772,8 @@ export const exportSimulationHistory = (
     const pairedData = {
       eacoResults: eacoData?.rawResults || eacoData?.summary || null,
       epsoResults: epsoData?.rawResults || epsoData?.summary || null,
+      bpsoResults: bpsoData ? (bpsoData.rawResults || bpsoData.summary || null) : null,
+      bacoResults: bacoData ? (bacoData.rawResults || bacoData.summary || null) : null,
       workloadName: eacoData?.config?.workloadType || epsoData?.config?.workloadType || null,
       iterations: eacoData?.iterations || epsoData?.iterations || (hasIterations ? eacoData?.rawResults?.totalIterations : 1),
       totalExecutionTime: eacoData?.totalExecutionTime || epsoData?.totalExecutionTime || null,
@@ -809,6 +813,26 @@ export const exportSimulationHistory = (
             analysis: epsoData?.analysis || null,
             plotAnalysis: epsoData?.plotAnalysis || null,
           },
+          ...(bpsoData && {
+            BPSO: {
+              summary: bpsoData.summary || null,
+              energyConsumption: bpsoData.energyConsumption || null,
+              vmUtilization: bpsoData.vmUtilization || null,
+              schedulingLog: bpsoData.schedulingLog || null,
+              analysis: bpsoData.analysis || null,
+              plotAnalysis: bpsoData.plotAnalysis || null,
+            },
+          }),
+          ...(bacoData && {
+            BACO: {
+              summary: bacoData.summary || null,
+              energyConsumption: bacoData.energyConsumption || null,
+              vmUtilization: bacoData.vmUtilization || null,
+              schedulingLog: bacoData.schedulingLog || null,
+              analysis: bacoData.analysis || null,
+              plotAnalysis: bacoData.plotAnalysis || null,
+            },
+          }),
         },
       },
     };

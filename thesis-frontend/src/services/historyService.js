@@ -294,18 +294,162 @@ export const saveToHistory = async (
       return result;
     };
 
-    const historyEntries = [
-      {
-        id: `${id}-eaco`,
+    const historyEntries = [];
+
+    historyEntries.push({
+      id: `${id}-eaco`,
+      baseId,
+      timestamp,
+      algorithm: "EACO",
+      config: fullConfig,
+      rawResults: {
+        ...results.eaco.rawResults,
+        individualResults: (
+          results.eaco.rawResults?.individualResults ||
+          results.eaco.individualResults ||
+          []
+        ).map((result) => ({
+          ...result,
+          summary: result.summary || {},
+          vmUtilization: result.vmUtilization || [],
+          schedulingLog: result.schedulingLog || [],
+          energyConsumption: result.energyConsumption || 0,
+          configSnapshot: result.configSnapshot || {},
+        })),
+        totalIterations:
+          results.eaco.rawResults?.totalIterations ||
+          results.eaco.totalIterations ||
+          results.eaco.rawResults?.individualResults?.length ||
+          results.eaco.individualResults?.length ||
+          0,
+        averageMetrics:
+          results.eaco.rawResults?.averageMetrics ||
+          results.eaco.averageMetrics ||
+          {},
+        minMetrics:
+          results.eaco.rawResults?.minMetrics ||
+          results.eaco.minMetrics ||
+          {},
+        maxMetrics:
+          results.eaco.rawResults?.maxMetrics ||
+          results.eaco.maxMetrics ||
+          {},
+        stdDevMetrics:
+          results.eaco.rawResults?.stdDevMetrics ||
+          results.eaco.stdDevMetrics ||
+          {},
+        bestResult:
+          results.eaco.rawResults?.bestResult ||
+          results.eaco.bestResult ||
+          null,
+      },
+      summary: results.eaco.rawResults?.summary || results.eaco.summary,
+      energyConsumption:
+        results.eaco.rawResults?.energyConsumption ||
+        results.eaco.energyConsumption,
+      vmUtilization:
+        results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
+      schedulingLog:
+        results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
+      analysis: results.eaco.analysis || null,
+      plotAnalysis: extractPlotAnalysis(results.eaco),
+      tTestResults: results.eaco.tTestResults || null,
+      wilcoxonTestResults: results.eaco.wilcoxonTestResults || null,
+      simulationId: results.eaco.simulationId,
+      runId: results.eaco.runId || null,
+      seed: results.eaco.seed || null,
+      configSnapshot: {
+        ...(results.eaco.configSnapshot || fullConfig),
+        algorithm: 'EACO'
+      },
+      datasetId:
+        results.eaco.datasetId ||
+        (workloadFile ? "custom-csv" : "synthetic-random"),
+    });
+
+    historyEntries.push({
+      id: `${id}-epso`,
+      baseId,
+      timestamp,
+      algorithm: "EPSO",
+      config: fullConfig,
+      rawResults: {
+        ...results.epso.rawResults,
+        individualResults: (
+          results.epso.rawResults?.individualResults ||
+          results.epso.individualResults ||
+          []
+        ).map((result) => ({
+          ...result,
+          summary: result.summary || {},
+          vmUtilization: result.vmUtilization || [],
+          schedulingLog: result.schedulingLog || [],
+          energyConsumption: result.energyConsumption || 0,
+          configSnapshot: result.configSnapshot || {},
+        })),
+        totalIterations:
+          results.epso.rawResults?.totalIterations ||
+          results.epso.totalIterations ||
+          results.epso.rawResults?.individualResults?.length ||
+          results.epso.individualResults?.length ||
+          0,
+        averageMetrics:
+          results.epso.rawResults?.averageMetrics ||
+          results.epso.averageMetrics ||
+          {},
+        minMetrics:
+          results.epso.rawResults?.minMetrics ||
+          results.epso.minMetrics ||
+          {},
+        maxMetrics:
+          results.epso.rawResults?.maxMetrics ||
+          results.epso.maxMetrics ||
+          {},
+        stdDevMetrics:
+          results.epso.rawResults?.stdDevMetrics ||
+          results.epso.stdDevMetrics ||
+          {},
+        bestResult:
+          results.epso.rawResults?.bestResult ||
+          results.epso.bestResult ||
+          null,
+      },
+      summary: results.epso.rawResults?.summary || results.epso.summary,
+      energyConsumption:
+        results.epso.rawResults?.energyConsumption ||
+        results.epso.energyConsumption,
+      vmUtilization:
+        results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
+      schedulingLog:
+        results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
+      analysis: results.epso.analysis || null,
+      plotAnalysis: extractPlotAnalysis(results.epso),
+      tTestResults: results.epso.tTestResults || null,
+      wilcoxonTestResults: results.epso.wilcoxonTestResults || null,
+      simulationId: results.epso.simulationId,
+      runId: results.epso.runId || null,
+      seed: results.epso.seed || null,
+      configSnapshot: {
+        ...(results.epso.configSnapshot || fullConfig),
+        algorithm: 'EPSO'
+      },
+      datasetId:
+        results.epso.datasetId ||
+        (workloadFile ? "custom-csv" : "synthetic-random"),
+    });
+
+    if (results.bpso) {
+      historyEntries.push({
+        id: `${id}-bpso`,
         baseId,
         timestamp,
-        algorithm: "EACO",
+        algorithm: "BPSO",
         config: fullConfig,
         rawResults: {
-          ...results.eaco.rawResults,
+          ...results.bpso.rawResults,
           individualResults: (
-            results.eaco.rawResults?.individualResults ||
-            results.eaco.individualResults ||
+            results.bpso.rawResults?.individualResults ||
+            results.bpso.individualResults ||
             []
           ).map((result) => ({
             ...result,
@@ -316,66 +460,69 @@ export const saveToHistory = async (
             configSnapshot: result.configSnapshot || {},
           })),
           totalIterations:
-            results.eaco.rawResults?.totalIterations ||
-            results.eaco.totalIterations ||
-            results.eaco.rawResults?.individualResults?.length ||
-            results.eaco.individualResults?.length ||
+            results.bpso.rawResults?.totalIterations ||
+            results.bpso.totalIterations ||
+            results.bpso.rawResults?.individualResults?.length ||
+            results.bpso.individualResults?.length ||
             0,
           averageMetrics:
-            results.eaco.rawResults?.averageMetrics ||
-            results.eaco.averageMetrics ||
+            results.bpso.rawResults?.averageMetrics ||
+            results.bpso.averageMetrics ||
             {},
           minMetrics:
-            results.eaco.rawResults?.minMetrics ||
-            results.eaco.minMetrics ||
+            results.bpso.rawResults?.minMetrics ||
+            results.bpso.minMetrics ||
             {},
           maxMetrics:
-            results.eaco.rawResults?.maxMetrics ||
-            results.eaco.maxMetrics ||
+            results.bpso.rawResults?.maxMetrics ||
+            results.bpso.maxMetrics ||
             {},
           stdDevMetrics:
-            results.eaco.rawResults?.stdDevMetrics ||
-            results.eaco.stdDevMetrics ||
+            results.bpso.rawResults?.stdDevMetrics ||
+            results.bpso.stdDevMetrics ||
             {},
           bestResult:
-            results.eaco.rawResults?.bestResult ||
-            results.eaco.bestResult ||
+            results.bpso.rawResults?.bestResult ||
+            results.bpso.bestResult ||
             null,
         },
-        summary: results.eaco.rawResults?.summary || results.eaco.summary,
+        summary: results.bpso.rawResults?.summary || results.bpso.summary,
         energyConsumption:
-          results.eaco.rawResults?.energyConsumption ||
-          results.eaco.energyConsumption,
+          results.bpso.rawResults?.energyConsumption ||
+          results.bpso.energyConsumption,
         vmUtilization:
-          results.eaco.rawResults?.vmUtilization || results.eaco.vmUtilization,
+          results.bpso.rawResults?.vmUtilization || results.bpso.vmUtilization,
         schedulingLog:
-          results.eaco.rawResults?.schedulingLog || results.eaco.schedulingLog,
-        analysis: results.eaco.analysis || null,
-        plotAnalysis: extractPlotAnalysis(results.eaco),
-        tTestResults: results.eaco.tTestResults || null,
-        wilcoxonTestResults: results.eaco.wilcoxonTestResults || null,
-        simulationId: results.eaco.simulationId,
-        runId: results.eaco.runId || null,
-        seed: results.eaco.seed || null,
+          results.bpso.rawResults?.schedulingLog || results.bpso.schedulingLog,
+        analysis: results.bpso.analysis || null,
+        plotAnalysis: extractPlotAnalysis(results.bpso),
+        tTestResults: results.bpso.tTestResults || null,
+        wilcoxonTestResults: results.bpso.wilcoxonTestResults || null,
+        simulationId: results.bpso.simulationId,
+        runId: results.bpso.runId || null,
+        seed: results.bpso.seed || null,
         configSnapshot: {
-          ...(results.eaco.configSnapshot || fullConfig),
-          algorithm: 'EACO'
+          ...(results.bpso.configSnapshot || fullConfig),
+          algorithm: 'BPSO'
         },
         datasetId:
-          results.eaco.datasetId ||
+          results.bpso.datasetId ||
           (workloadFile ? "custom-csv" : "synthetic-random"),
-      },
-      {
-        id: `${id}-epso`,
+      });
+    }
+
+    if (results.baco) {
+      historyEntries.push({
+        id: `${id}-baco`,
         baseId,
         timestamp,
-        algorithm: "EPSO",
+        algorithm: "BACO",
         config: fullConfig,
         rawResults: {
-          ...results.epso.rawResults,
+          ...results.baco.rawResults,
           individualResults: (
-            results.epso.rawResults?.individualResults ||
-            results.epso.individualResults ||
+            results.baco.rawResults?.individualResults ||
+            results.baco.individualResults ||
             []
           ).map((result) => ({
             ...result,
@@ -386,63 +533,61 @@ export const saveToHistory = async (
             configSnapshot: result.configSnapshot || {},
           })),
           totalIterations:
-            results.epso.rawResults?.totalIterations ||
-            results.epso.totalIterations ||
-            results.epso.rawResults?.individualResults?.length ||
-            results.epso.individualResults?.length ||
+            results.baco.rawResults?.totalIterations ||
+            results.baco.totalIterations ||
+            results.baco.rawResults?.individualResults?.length ||
+            results.baco.individualResults?.length ||
             0,
           averageMetrics:
-            results.epso.rawResults?.averageMetrics ||
-            results.epso.averageMetrics ||
+            results.baco.rawResults?.averageMetrics ||
+            results.baco.averageMetrics ||
             {},
           minMetrics:
-            results.epso.rawResults?.minMetrics ||
-            results.epso.minMetrics ||
+            results.baco.rawResults?.minMetrics ||
+            results.baco.minMetrics ||
             {},
           maxMetrics:
-            results.epso.rawResults?.maxMetrics ||
-            results.epso.maxMetrics ||
+            results.baco.rawResults?.maxMetrics ||
+            results.baco.maxMetrics ||
             {},
           stdDevMetrics:
-            results.epso.rawResults?.stdDevMetrics ||
-            results.epso.stdDevMetrics ||
+            results.baco.rawResults?.stdDevMetrics ||
+            results.baco.stdDevMetrics ||
             {},
           bestResult:
-            results.epso.rawResults?.bestResult ||
-            results.epso.bestResult ||
+            results.baco.rawResults?.bestResult ||
+            results.baco.bestResult ||
             null,
         },
-        summary: results.epso.rawResults?.summary || results.epso.summary,
+        summary: results.baco.rawResults?.summary || results.baco.summary,
         energyConsumption:
-          results.epso.rawResults?.energyConsumption ||
-          results.epso.energyConsumption,
+          results.baco.rawResults?.energyConsumption ||
+          results.baco.energyConsumption,
         vmUtilization:
-          results.epso.rawResults?.vmUtilization || results.epso.vmUtilization,
+          results.baco.rawResults?.vmUtilization || results.baco.vmUtilization,
         schedulingLog:
-          results.epso.rawResults?.schedulingLog || results.epso.schedulingLog,
-        analysis: results.epso.analysis || null,
-        plotAnalysis: extractPlotAnalysis(results.epso),
-        tTestResults: results.epso.tTestResults || null,
-        wilcoxonTestResults: results.epso.wilcoxonTestResults || null,
-        simulationId: results.epso.simulationId,
-        runId: results.epso.runId || null,
-        seed: results.epso.seed || null,
+          results.baco.rawResults?.schedulingLog || results.baco.schedulingLog,
+        analysis: results.baco.analysis || null,
+        plotAnalysis: extractPlotAnalysis(results.baco),
+        tTestResults: results.baco.tTestResults || null,
+        wilcoxonTestResults: results.baco.wilcoxonTestResults || null,
+        simulationId: results.baco.simulationId,
+        runId: results.baco.runId || null,
+        seed: results.baco.seed || null,
         configSnapshot: {
-          ...(results.epso.configSnapshot || fullConfig),
-          algorithm: 'EPSO'
+          ...(results.baco.configSnapshot || fullConfig),
+          algorithm: 'BACO'
         },
         datasetId:
-          results.epso.datasetId ||
+          results.baco.datasetId ||
           (workloadFile ? "custom-csv" : "synthetic-random"),
-      },
-    ];
+      });
+    }
 
-    // Calculate sizes of new entries
-    const eacoSize = calculateObjectSize(historyEntries[0]);
-    const epsoSize = calculateObjectSize(historyEntries[1]);
-    const totalNewSize = eacoSize + epsoSize;
+    const sizes = historyEntries.map((entry) => calculateObjectSize(entry));
+    const totalNewSize = sizes.reduce((sum, size) => sum + size, 0);
 
-    console.log(`New entries size: EACO ${formatMB(eacoSize)} MB + EPSO ${formatMB(epsoSize)} MB = ${formatMB(totalNewSize)} MB`);
+    console.log(`New entries size: ${historyEntries.length} entries, total ${formatMB(totalNewSize)} MB`);
 
     const db = await getDB();
     const currentUsage = await getStorageUsage(db);
@@ -463,10 +608,7 @@ export const saveToHistory = async (
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
-    await Promise.all([
-      store.add(historyEntries[0]),
-      store.add(historyEntries[1]),
-    ]);
+    await Promise.all(historyEntries.map((entry) => store.add(entry)));
 
     await tx.done;
 
@@ -599,6 +741,12 @@ export const getPairedHistoryResults = async (resultId) => {
     const epsoResult = pairedEntries.find(
       (entry) => entry.algorithm === "EPSO",
     );
+    const bpsoResult = pairedEntries.find(
+      (entry) => entry.algorithm === "BPSO",
+    );
+    const bacoResult = pairedEntries.find(
+      (entry) => entry.algorithm === "BACO",
+    );
 
     if (!eacoResult && !epsoResult) {
       console.error("No EACO or EPSO results found in paired entries");
@@ -616,13 +764,14 @@ export const getPairedHistoryResults = async (resultId) => {
     return {
       eaco: eacoResult || null,
       epso: epsoResult || null,
+      bpso: bpsoResult || null,
+      baco: bacoResult || null,
     };
   } catch (error) {
     console.error("Failed to get paired history results:", error);
     return null;
   }
 };
-
 /**
  * Delete a specific history entry and its pair
  */
@@ -771,6 +920,8 @@ export const importHistory = async (backupData) => {
 
       const eacoMetadata = backupData.metadata.algorithms.EACO;
       const epsoMetadata = backupData.metadata.algorithms.EPSO;
+      const bpsoMetadata = backupData.metadata.algorithms.BPSO;
+      const bacoMetadata = backupData.metadata.algorithms.BACO;
 
       if (eacoMetadata) {
         const eacoRawResults = backupData.eacoResults || {};
@@ -793,6 +944,66 @@ export const importHistory = async (backupData) => {
           analysis: eacoMetadata.analysis || null,
           plotAnalysis: eacoMetadata.plotAnalysis || null,
           tTestResults: backupData.ttestResults || null,
+          wilcoxonTestResults: null,
+          simulationId: backupData.runId ? `sim#${backupData.runId}` : `sim#${baseId}`,
+          runId: backupData.runId || baseId,
+          seed: backupData.seed || null,
+          configSnapshot: backupData.configSnapshot || {},
+          datasetId: backupData.datasetId || "imported-data",
+        });
+      }
+
+      if (bpsoMetadata) {
+        const bpsoRawResults = backupData.bpsoResults || {};
+        const bpsoSchedulingLog = bpsoMetadata.schedulingLog || 
+          (bpsoRawResults.individualResults && bpsoRawResults.individualResults.length > 0
+            ? bpsoRawResults.individualResults[bpsoRawResults.individualResults.length - 1]?.schedulingLog || []
+            : []);
+
+        entriesToImport.push({
+          id: `${baseId}-bpso`,
+          baseId,
+          timestamp,
+          algorithm: "BPSO",
+          config: backupData.configSnapshot || {},
+          rawResults: bpsoRawResults,
+          summary: bpsoMetadata.summary || {},
+          energyConsumption: bpsoMetadata.energyConsumption || 0,
+          vmUtilization: bpsoMetadata.vmUtilization || [],
+          schedulingLog: bpsoSchedulingLog,
+          analysis: bpsoMetadata.analysis || null,
+          plotAnalysis: bpsoMetadata.plotAnalysis || null,
+          tTestResults: null,
+          wilcoxonTestResults: null,
+          simulationId: backupData.runId ? `sim#${backupData.runId}` : `sim#${baseId}`,
+          runId: backupData.runId || baseId,
+          seed: backupData.seed || null,
+          configSnapshot: backupData.configSnapshot || {},
+          datasetId: backupData.datasetId || "imported-data",
+        });
+      }
+
+      if (bacoMetadata) {
+        const bacoRawResults = backupData.bacoResults || {};
+        const bacoSchedulingLog = bacoMetadata.schedulingLog || 
+          (bacoRawResults.individualResults && bacoRawResults.individualResults.length > 0
+            ? bacoRawResults.individualResults[bacoRawResults.individualResults.length - 1]?.schedulingLog || []
+            : []);
+
+        entriesToImport.push({
+          id: `${baseId}-baco`,
+          baseId,
+          timestamp,
+          algorithm: "BACO",
+          config: backupData.configSnapshot || {},
+          rawResults: bacoRawResults,
+          summary: bacoMetadata.summary || {},
+          energyConsumption: bacoMetadata.energyConsumption || 0,
+          vmUtilization: bacoMetadata.vmUtilization || [],
+          schedulingLog: bacoSchedulingLog,
+          analysis: bacoMetadata.analysis || null,
+          plotAnalysis: bacoMetadata.plotAnalysis || null,
+          tTestResults: null,
           wilcoxonTestResults: null,
           simulationId: backupData.runId ? `sim#${backupData.runId}` : `sim#${baseId}`,
           runId: backupData.runId || baseId,

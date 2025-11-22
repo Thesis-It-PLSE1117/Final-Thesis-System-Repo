@@ -136,11 +136,53 @@ export const TabContent = ({
 
       const convertedResults = {
         eaco: reconstructResult(pairedResults.eaco),
-        epso: reconstructResult(pairedResults.epso)
+        epso: reconstructResult(pairedResults.epso),
+        bpso: reconstructResult(pairedResults.bpso),
+        baco: reconstructResult(pairedResults.baco)
       };
 
       if (!convertedResults.eaco && !convertedResults.epso) {
         throw new Error('Failed to reconstruct results from history data');
+      }
+
+      const snapshot =
+        convertedResults.eaco?.configSnapshot ||
+        convertedResults.epso?.configSnapshot ||
+        null;
+
+      if (snapshot && config && typeof config.restoreConfig === 'function') {
+        const restoredDataCenterConfig = {
+          ...config.dataCenterConfig,
+          numHosts: snapshot.numHosts ?? config.dataCenterConfig.numHosts,
+          numPesPerHost: snapshot.numPesPerHost ?? config.dataCenterConfig.numPesPerHost,
+          peMips: snapshot.peMips ?? config.dataCenterConfig.peMips,
+          ramPerHost: snapshot.ramPerHost ?? config.dataCenterConfig.ramPerHost,
+          bwPerHost: snapshot.bwPerHost ?? config.dataCenterConfig.bwPerHost,
+          storagePerHost: snapshot.storagePerHost ?? config.dataCenterConfig.storagePerHost,
+          numVMs: snapshot.numVMs ?? config.dataCenterConfig.numVMs,
+          vmMips: snapshot.vmMips ?? config.dataCenterConfig.vmMips,
+          vmPes: snapshot.vmPes ?? config.dataCenterConfig.vmPes,
+          vmRam: snapshot.vmRam ?? config.dataCenterConfig.vmRam,
+          vmBw: snapshot.vmBw ?? config.dataCenterConfig.vmBw,
+          vmSize: snapshot.vmSize ?? config.dataCenterConfig.vmSize,
+          vmScheduler: snapshot.vmScheduler ?? config.dataCenterConfig.vmScheduler,
+          optimizationAlgorithm:
+            snapshot.optimizationAlgorithm ?? config.dataCenterConfig.optimizationAlgorithm,
+        };
+
+        const restoredCloudletConfig = {
+          ...config.cloudletConfig,
+          numCloudlets: snapshot.numCloudlets ?? config.cloudletConfig.numCloudlets,
+        };
+
+        config.restoreConfig({
+          dataCenterConfig: restoredDataCenterConfig,
+          cloudletConfig: restoredCloudletConfig,
+          iterationConfig: config.iterationConfig,
+          enableMatlabPlots: config.enableMatlabPlots,
+          selectedPreset: config.selectedPreset,
+          cloudletToggleEnabled: config.cloudletToggleEnabled,
+        });
       }
 
       setSimulationResults(convertedResults);
