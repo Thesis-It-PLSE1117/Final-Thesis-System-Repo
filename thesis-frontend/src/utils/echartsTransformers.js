@@ -377,6 +377,8 @@ export const transformVMUtilization = (vmUtilization, algorithmName) => {
 
   const avgCpu = cpuUtil.reduce((a, b) => a + b, 0) / cpuUtil.length;
   const avgRam = ramUtil.reduce((a, b) => a + b, 0) / ramUtil.length;
+  const maxCpuValue = cpuUtil.length > 0 ? Math.max(...cpuUtil) : 0;
+  const dynamicCpuMax = Math.max(100, Math.ceil(maxCpuValue / 10) * 10);
 
   return {
     title: {
@@ -417,7 +419,7 @@ export const transformVMUtilization = (vmUtilization, algorithmName) => {
     },
     yAxis: {
       type: 'value',
-      max: 100,
+      max: dynamicCpuMax,
       axisLabel: { formatter: '{value}%' }
     },
     series: [
@@ -694,7 +696,7 @@ export const transformRadarChart = (summary, algorithmName) => {
 
   const makespan = Math.max(0, summary.makespan || 0);
   const avgResponseTime = Math.max(0, summary.responseTime || summary.avgResponseTime || 0);
-  const resourceUtilization = Math.max(0, Math.min(100, summary.resourceUtilization || 0));
+  const resourceUtilization = Math.max(0, summary.resourceUtilization || 0);
   const energyConsumption = Math.max(0, summary.energyConsumption || 0);
   const degreeOfImbalance = Math.max(0, summary.loadImbalance || 0);
 
@@ -711,6 +713,7 @@ export const transformRadarChart = (summary, algorithmName) => {
   const maxResponseTime = Math.max(avgResponseTime * 1.2, 100);
   const maxEnergy = Math.max(energyConsumption * 1.2, 10);
   const maxImbalance = Math.max(degreeOfImbalance * 1.2, 5);
+  const maxResourceUtilization = Math.max(resourceUtilization * 1.2, 100);
 
   return {
     title: {
@@ -765,7 +768,7 @@ export const transformRadarChart = (summary, algorithmName) => {
       indicator: [
         { name: 'Makespan (s)', max: maxMakespan },
         { name: 'Response Time (s)', max: maxResponseTime },
-        { name: 'Resource Util. (%)', max: 100 },
+        { name: 'Resource Util. (%)', max: maxResourceUtilization },
         { name: 'Energy Cons. (Wh)', max: maxEnergy },
         { name: 'Degree of Imbalance', max: maxImbalance }
       ],

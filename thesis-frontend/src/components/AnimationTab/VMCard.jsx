@@ -10,7 +10,7 @@ const VMCard = ({
   getStatusColor,
   isCompactView = false,
 }) => {
-  const cpuPercentage = Math.min(100, Math.max(0, cpuLoad * 100));
+  const cpuPercentage = Math.max(0, cpuLoad * 100);
   
   if (isCompactView) {
     return (
@@ -79,7 +79,7 @@ const CompactVMCard = ({
           "bg-emerald-400"
         }`} />
         <span className={isActive ? "text-gray-700" : "text-gray-500"}>
-          {cpuPercentage.toFixed(0)}% CPU ({cpuLoad.toFixed(2)})
+          {cpuPercentage.toFixed(0)}% ({cpuLoad.toFixed(2)})
         </span>
       </div>
       <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -156,7 +156,7 @@ const DetailedVMCard = ({
                 "bg-emerald-400"
               }`}
               initial={{ width: 0 }}
-              animate={{ width: `${cpuPercentage}%` }}
+              animate={{ width: `${Math.min(cpuPercentage, 100)}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
