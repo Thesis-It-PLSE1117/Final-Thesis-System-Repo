@@ -37,142 +37,160 @@ const WorkloadUploadCard = ({
   const shouldShowUploadSection =
     (!workloadFile && !selectedPreset) || csvRowCount === 0;
 
-// CSV Validation Utility Function
-const validateCSVFields = (csvData) => {
-  const requiredColumns = [
-    { name: "pes_number", desc: "Processing cores required (1-8)." },
-    { name: "file_size", desc: "Input data size (0-1 normalized or bytes)." },
-    { name: "output_size", desc: "Output data size (0-1 normalized or bytes)." },
-  ];
+  // File size limit constant (20 MB in bytes)
+  const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-  const optionalColumns = [
-    "arrival_time",
-    "cpu_request",
-    "pes_number",
-    "arrival_ts",
-    "time_window",
-    "task_id",
-  ];
+  // CSV Validation Utility Function
+  const validateCSVFields = (csvData) => {
+    const requiredColumns = [
+      { name: "pes_number", desc: "Processing cores required (1-8)." },
+      { name: "file_size", desc: "Input data size (0-1 normalized or bytes)." },
+      { name: "output_size", desc: "Output data size (0-1 normalized or bytes)." },
+    ];
 
-  const validationResult = {
-    isValid: true,
-    errors: [],
-    warnings: [],
-    missingColumns: [],
-    foundColumns: [],
-    columnDetails: {}
-  };
+    const optionalColumns = [
+      "arrival_time",
+      "cpu_request",
+      "pes_number",
+      "arrival_ts",
+      "time_window",
+      "task_id",
+    ];
 
-  // Check if we have headers and data
-  if (!csvData.meta?.fields || csvData.meta.fields.length === 0) {
-    validationResult.isValid = false;
-    validationResult.errors.push("CSV file has no column headers.");
-    return validationResult;
-  }
+    const validationResult = {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      missingColumns: [],
+      foundColumns: [],
+      columnDetails: {}
+    };
 
-  if (!csvData.data || csvData.data.length === 0) {
-    validationResult.isValid = false;
-    validationResult.errors.push("CSV file has no data rows.");
-    return validationResult;
-  }
-
-  const headers = csvData.meta.fields;
-  validationResult.foundColumns = headers;
-
-  // Check for required columns
-  requiredColumns.forEach(requiredCol => {
-    const foundHeader = headers.find(header => 
-      header.toLowerCase() === requiredCol.name.toLowerCase()
-    );
-
-    if (!foundHeader) {
+    // Check if we have headers and data
+    if (!csvData.meta?.fields || csvData.meta.fields.length === 0) {
       validationResult.isValid = false;
-      validationResult.missingColumns.push(requiredCol.name);
-      validationResult.errors.push(`Missing required column: "${requiredCol.name}" - ${requiredCol.desc}`);
-    } else {
-      validationResult.columnDetails[requiredCol.name] = {
-        foundAs: foundHeader,
-        description: requiredCol.desc,
-        isRequired: true
-      };
+      validationResult.errors.push("CSV file has no column headers.");
+      return validationResult;
     }
-  });
 
-  // Check for optional columns and note any unexpected columns
-  headers.forEach(header => {
-    const isRequired = requiredColumns.some(col => 
-      col.name.toLowerCase() === header.toLowerCase()
-    );
-    
-    const isOptional = optionalColumns.some(optCol => 
-      optCol.toLowerCase() === header.toLowerCase()
-    );
-
-    if (!isRequired && !isOptional) {
-      validationResult.warnings.push(`Unexpected column: "${header}" - This column will be ignored during simulation.`);
-    } else if (isOptional) {
-      validationResult.columnDetails[header] = {
-        foundAs: header,
-        description: "Optional column",
-        isRequired: false
-      };
+    if (!csvData.data || csvData.data.length === 0) {
+      validationResult.isValid = false;
+      validationResult.errors.push("CSV file has no data rows.");
+      return validationResult;
     }
-  });
 
-  // Validate data types and ranges for required columns if we have data
-  if (validationResult.isValid && csvData.data.length > 0) {
-    const firstRow = csvData.data[0];
+    const headers = csvData.meta.fields;
+    validationResult.foundColumns = headers;
 
-    // Validate 'file_size' and 'output_size' columns
-    ['file_size', 'output_size'].forEach(colName => {
-      const colHeader = headers.find(h => h.toLowerCase() === colName.toLowerCase());
-      if (colHeader && firstRow[colHeader]) {
-        const sizeValue = parseFloat(firstRow[colHeader]);
-        if (isNaN(sizeValue) || sizeValue < 0) {
-          validationResult.warnings.push(`Column "${colName}" should be a non-negative number. Found: ${firstRow[colHeader]}`);
-        }
+    // Check for required columns
+    requiredColumns.forEach(requiredCol => {
+      const foundHeader = headers.find(header => 
+        header.toLowerCase() === requiredCol.name.toLowerCase()
+      );
+
+      if (!foundHeader) {
+        validationResult.isValid = false;
+        validationResult.missingColumns.push(requiredCol.name);
+        validationResult.errors.push(`Missing required column: "${requiredCol.name}" - ${requiredCol.desc}`);
+      } else {
+        validationResult.columnDetails[requiredCol.name] = {
+          foundAs: foundHeader,
+          description: requiredCol.desc,
+          isRequired: true
+        };
       }
     });
-  }
 
-  return validationResult;
-};
-
-const validateCSV = (file, callback) => {
-  Papa.parse(file, {
-    header: true,
-    preview: 10,
-    skipEmptyLines: true,
-    complete: (results) => {
-      // First check basic CSV structure
-      if (!results.meta.fields || results.meta.fields.length === 0) {
-        callback("Your CSV file needs column headers.");
-        return;
-      }
-      if (results.data.length === 0) {
-        callback("Your CSV file has no data rows.");
-        return;
-      }
-
-      const fieldValidation = validateCSVFields(results);
+    // Check for optional columns and note any unexpected columns
+    headers.forEach(header => {
+      const isRequired = requiredColumns.some(col => 
+        col.name.toLowerCase() === header.toLowerCase()
+      );
       
-      if (!fieldValidation.isValid) {
-        const errorMessage = fieldValidation.errors.join(' ');
-        callback(errorMessage);
-        return;
-      }
+      const isOptional = optionalColumns.some(optCol => 
+        optCol.toLowerCase() === header.toLowerCase()
+      );
 
-      // Return both the results and validation info
-      callback(null, {
-        ...results,
-        validation: fieldValidation
+      if (!isRequired && !isOptional) {
+        validationResult.warnings.push(`Unexpected column: "${header}" - This column will be ignored during simulation.`);
+      } else if (isOptional) {
+        validationResult.columnDetails[header] = {
+          foundAs: header,
+          description: "Optional column",
+          isRequired: false
+        };
+      }
+    });
+
+    // Validate data types and ranges for required columns if we have data
+    if (validationResult.isValid && csvData.data.length > 0) {
+      const firstRow = csvData.data[0];
+
+      // Validate 'file_size' and 'output_size' columns
+      ['file_size', 'output_size'].forEach(colName => {
+        const colHeader = headers.find(h => h.toLowerCase() === colName.toLowerCase());
+        if (colHeader && firstRow[colHeader]) {
+          const sizeValue = parseFloat(firstRow[colHeader]);
+          if (isNaN(sizeValue) || sizeValue < 0) {
+            validationResult.warnings.push(`Column "${colName}" should be a non-negative number. Found: ${firstRow[colHeader]}`);
+          }
+        }
       });
-    },
-    error: (error) => {
-      callback("Cannot read your CSV file. Check the format.");
-    },
-  });
-};
+    }
+
+    return validationResult;
+  };
+
+  const validateCSV = (file, callback) => {
+    Papa.parse(file, {
+      header: true,
+      preview: 10,
+      skipEmptyLines: true,
+      complete: (results) => {
+        // First check basic CSV structure
+        if (!results.meta.fields || results.meta.fields.length === 0) {
+          callback("Your CSV file needs column headers.");
+          return;
+        }
+        if (results.data.length === 0) {
+          callback("Your CSV file has no data rows.");
+          return;
+        }
+
+        const fieldValidation = validateCSVFields(results);
+        
+        if (!fieldValidation.isValid) {
+          const errorMessage = fieldValidation.errors.join(' ');
+          callback(errorMessage);
+          return;
+        }
+
+        // Return both the results and validation info
+        callback(null, {
+          ...results,
+          validation: fieldValidation
+        });
+      },
+      error: (error) => {
+        callback("Cannot read your CSV file. Check the format.");
+      },
+    });
+  };
+
+  // File validation function
+  const validateFile = (file) => {
+    // Check file type
+    if (!file.type.includes('csv') && !file.name.toLowerCase().endsWith('.csv')) {
+      return "Please upload a CSV file only.";
+    }
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size exceeds the 20 MB limit. Your file is ${(file.size / (1024 * 1024)).toFixed(2)} MB.`;
+    }
+
+    return null;
+  };
 
   // Load preview when file or preset changes
   useEffect(() => {
@@ -256,16 +274,37 @@ const validateCSV = (file, callback) => {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
+    
     if (e.dataTransfer.files?.[0]) {
-      onFileUpload({ target: { files: [e.dataTransfer.files[0]] } });
+      const file = e.dataTransfer.files[0];
+      
+      // Validate file before processing
+      const fileError = validateFile(file);
+      if (fileError) {
+        setValidationError(fileError);
+        return;
+      }
+      
+      onFileUpload({ target: { files: [file] } });
       onPresetSelect("");
+      setValidationError(null);
     }
   };
 
   const handleFileInputChange = (e) => {
     if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+      
+      // Validate file before processing
+      const fileError = validateFile(file);
+      if (fileError) {
+        setValidationError(fileError);
+        return;
+      }
+      
       onFileUpload(e);
       onPresetSelect("");
+      setValidationError(null);
     }
   };
 
@@ -323,7 +362,7 @@ const validateCSV = (file, callback) => {
                 />
                 <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-1 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-lg left-0">
                   Check the Help tab for detailed preprocessing steps and file
-                  format requirements
+                  format requirements. Maximum file size: 20 MB.
                 </div>
               </div>
             </div>
@@ -357,7 +396,7 @@ const validateCSV = (file, callback) => {
                   <p className="text-sm text-gray-600 mb-1">
                     or drag and drop your file here
                   </p>
-                  <p className="text-sm text-gray-500">CSV files only</p>
+                  <p className="text-sm text-gray-500">CSV files only (max 20 MB)</p>
                 </div>
                 <input
                   id="file-input"
@@ -367,6 +406,14 @@ const validateCSV = (file, callback) => {
                   onChange={handleFileInputChange}
                 />
               </motion.label>
+            </div>
+
+            {/* File size limit info */}
+            <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg mt-3">
+              <Info className="text-blue-500 flex-shrink-0" size={16} />
+              <p className="text-sm text-blue-700">
+                <strong>File size limit:</strong> 20 MB maximum
+              </p>
             </div>
 
             {/* Info about benchmark datasets */}
@@ -381,8 +428,27 @@ const validateCSV = (file, callback) => {
             </div>
           </div>
 
+          {/* Show file validation errors */}
+          {validationError && (
+            <motion.div
+              className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <AlertCircle className="text-red-500 mt-0.5" size={16} />
+              <div>
+                <p className="text-sm font-medium text-red-800">
+                  Upload Error
+                </p>
+                <p className="text-sm text-red-600">
+                  {validationError}
+                </p>
+              </div>
+            </motion.div>
+          )}
+
           {/* Show error message if CSV has 0 rows */}
-          {csvRowCount === 0 && workloadFile && (
+          {csvRowCount === 0 && workloadFile && !validationError && (
             <motion.div
               className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
               initial={{ opacity: 0, y: -10 }}

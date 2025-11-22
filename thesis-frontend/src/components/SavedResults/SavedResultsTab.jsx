@@ -13,7 +13,7 @@ import { exportSimulationHistory } from "../../utils/exportUtils";
 import HistoryDropdown from "./ResultsDropdown";
 import HistoryDetails from "./ResultsDetails";
 import { DeleteConfirmationDialog, ImportDialog, ImportConfirmationDialog, ClearHistoryConfirmationDialog } from './ResultsDialog';
-import { LoadingOverlay } from "./LoadingSpinner"; 
+import { LoadingOverlay } from "../common/LoadingSpinner"; 
 import { showNotification } from "../common/ErrorNotification";
 
 const HistoryTab = ({ onBack, onViewResults }) => {
