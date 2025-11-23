@@ -194,6 +194,10 @@ const HeaderSection = ({ dataCenterConfig, cloudletConfig }) => (
           </svg>
           <span className="break-words">VM: {dataCenterConfig.vmPes} PEs @ {dataCenterConfig.vmMips} MIPS</span>
         </div>
+        <div className="flex items-center text-xs text-gray-500">
+          <Info className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="break-words">Load factor = total assigned work / VM capacity; values &gt; 100% indicate oversubscription.</span>
+        </div>
       </div>
     </div>
   </div>
