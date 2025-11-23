@@ -18,8 +18,8 @@ const VMCard = ({
         vmId={vmId + 1}
         isActive={isActive}
         taskCount={taskCount}
-        cpuPercentage={cpuPercentage}
         cpuLoad={cpuLoad}
+        cpuPercentage={cpuPercentage}
         status={status}
         getStatusColor={getStatusColor}
       />
@@ -31,8 +31,8 @@ const VMCard = ({
       vmId={vmId + 1}
       isActive={isActive}
       taskCount={taskCount}
-      cpuPercentage={cpuPercentage}
       cpuLoad={cpuLoad}
+      cpuPercentage={cpuPercentage}
       dataCenterConfig={dataCenterConfig}
       status={status}
       getStatusColor={getStatusColor}
@@ -44,8 +44,8 @@ const CompactVMCard = ({
   vmId,
   isActive,
   taskCount,
-  cpuPercentage,
   cpuLoad,
+  cpuPercentage,
   status,
   getStatusColor,
 }) => (
@@ -78,8 +78,11 @@ const CompactVMCard = ({
           cpuPercentage > 60 ? "bg-amber-400" : 
           "bg-emerald-400"
         }`} />
-        <span className={isActive ? "text-gray-700" : "text-gray-500"}>
-          {cpuPercentage.toFixed(0)}% ({cpuLoad.toFixed(2)})
+        <span
+          className={isActive ? "text-gray-700" : "text-gray-500"}
+          title="Load factor = total assigned work / VM capacity; values > 100% indicate oversubscription."
+        >
+          {cpuLoad.toFixed(2)}× ({cpuPercentage.toFixed(0)}%)
         </span>
       </div>
       <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -95,8 +98,8 @@ const DetailedVMCard = ({
   vmId,
   isActive,
   taskCount,
-  cpuPercentage,
   cpuLoad,
+  cpuPercentage,
   dataCenterConfig,
   status,
   getStatusColor,
@@ -143,9 +146,14 @@ const DetailedVMCard = ({
         {/* CPU Utilization */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-600">CPU Load</span>
+            <span
+              className="text-gray-600"
+              title="Load factor = total assigned work / VM capacity; values > 100% indicate oversubscription."
+            >
+              Load Factor
+            </span>
             <span className="font-medium text-gray-800">
-              {cpuPercentage.toFixed(0)}% ({cpuLoad.toFixed(2)})
+              {cpuLoad.toFixed(2)}× ({cpuPercentage.toFixed(0)}%)
             </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-1.5">
