@@ -43,7 +43,7 @@ export const coreAlgoData = {
         {
           icon: "TrendingUp",
           label: "Adaptive Learning",
-          explanation: "The algorithm learns by adjusting pheromone evaporation rates (0.1-0.9) based on solution diversity and reinforcing assignments to less-loaded VMs.",
+          explanation: "The algorithm learns by adjusting pheromone evaporation rates using the entropy-based formula: ρ(t) = ρ_min + (ρ_max - ρ_min) × (H - H_min)/(H_max - H_min).",
           example: "Stronger pheromone trails emerge on efficient task-VM mappings while poor solutions fade faster.",
           tip: (
             <>
@@ -113,372 +113,372 @@ export const coreAlgoData = {
 
 
     methodsReferences: {
-  title: "Methods",
-  icon: "BookOpen",
-  items: [
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.3390/s23136155"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "Prioritized Task-Scheduling Algorithm in Cloud Computing Using Cat Swarm Optimization; DOI: 10.3390/s23136155. Published in Sensors, Vol. 23, Issue 13, Article 6155, July 2023. Proposes a Cat Swarm Optimization–based scheduler in CloudSim and compares it against baseline ACO and PSO for cloud task scheduling performance.",
-      tip: (
-        <>
-          2023 <span className="font-semibold">Sensors paper</span> with CSO algorithm comparisons.
-        </>
-      ),
+      title: "Methods",
+      icon: "BookOpen",
+      items: [
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.3390/s23136155"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "Prioritized Task-Scheduling Algorithm in Cloud Computing Using Cat Swarm Optimization; DOI: 10.3390/s23136155. Published in Sensors, Vol. 23, Issue 13, Article 6155, July 2023. Proposes a Cat Swarm Optimization–based scheduler in CloudSim and compares it against baseline ACO and PSO for cloud task scheduling performance.",
+          tip: (
+            <>
+              2023 <span className="font-semibold">Sensors paper</span> with CSO algorithm comparisons.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "A Comparative Analysis Of Task Scheduling Algorithms Through CloudSim. Published in IJCRT (International Journal of Creative Research Thoughts), Vol. 10, Issue 7, 2022 by Bhuyan, S. S., & Mishra, A. K. Compares multiple task scheduling algorithms in CloudSim, using standard PSO with typical parameter settings as one of the baselines.",
+          tip: (
+            <>
+              2022 IJCRT study on <span className="font-semibold">cloud scheduling algorithms</span>.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.4108/eetsis.4042"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "Enhanced Task Scheduling Using Optimized Particle Swarm Optimization Algorithm in Cloud Computing Environment; DOI: 10.4108/eetsis.4042. Published in EAI Endorsed Transactions on Scalable Information Systems, Vol. 4, Issue 11, 2023, by Potluri et al. Enhances standard SPSO-based task scheduling, using the classic SPSO 2011 configuration as its baseline for evaluation.",
+          tip: (
+            <>
+              2023 EAI paper on <span className="font-semibold">SPSO enhancements</span>.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://arxiv.org/pdf/2405.15397.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "Comparative Analysis of Four Prominent Ant Colony Optimization Variants: Ant System, Rank-Based Ant System, Max-Min Ant System, and Ant Colony System. Published as arXiv preprint 2405.15397, May 2024, by Ahmed et al. Systematically compares major ACO variants, justifying MMAS as standard baseline in cloud task scheduling.",
+          tip: (
+            <>
+              2024 arXiv on <span className="font-semibold">ACO variants comparison</span>.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1155/2013/860289"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[44] Martins Akugbe Arasomwan and A. O. Adewumi, \"On the Performance of Linear Decreasing Inertia Weight Particle Swarm Optimization for Global Optimization,\" The Scientific World JOURNAL, vol. 2013, pp. 1–12, Jan. 2013, doi: 10.1155/2013/860289.",
+          tip: (
+            <>
+              Validates our <span className="font-semibold">0.9 → 0.4 inertia decay</span> range.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1016/j.neucom.2021.03.077"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[6] X. Li, K. Mao, F. Lin, and X. Zhang, \"Particle swarm optimization with state-based adaptive velocity limit strategy,\" Neurocomputing, vol. 447, pp. 64–79, Mar. 2021, doi: 10.1016/j.neucom.2021.03.077.",
+          tip: (
+            <>
+              Supports <span className="font-semibold">dynamic velocity limits</span> (6.0 → 1.0).
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1155/2016/6469721"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[45] P. Li and H. Zhu, \"Parameter Selection for Ant Colony Algorithm Based on Bacterial Foraging Algorithm,\" Mathematical Problems in Engineering, vol. 2016, pp. 1–12, 2016, doi: 10.1155/2016/6469721.",
+          tip: (
+            <>
+              Justifies <span className="font-semibold">α=1.0, β=2.0</span> parameter choices.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://link.springer.com/chapter/10.1007/978-3-030-81462-5_6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[4] A. Daniel, N. Partheeban, and S. Sriramulu, \"Enhanced Ant Colony Optimization Algorithm for Optimizing Load Balancing in Cloud Computing Platform,\" in Computational Intelligence in Data Science, Springer, 2021, pp. 64–70.",
+          tip: (
+            <>
+              Demonstrates <span className="font-semibold">load-based pheromone</span> reinforcement.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.3390/sym16060661"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[40] J. Tang, G. Liu, Q. Qi, and Q. Pan, \"Enhanced Particle Swarm Optimization for Task Scheduling in Cloud Computing Environments,\" Symmetry, vol. 16, no. 6, p. 661, 2024.",
+          tip: (
+            <>
+              Recent validation of <span className="font-semibold">EPSO effectiveness</span> in cloud scheduling.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://arxiv.org/abs/2408.13386"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[5] Andreoli, R., Zhao, J., Cucinotta, T., & Buyya, R. (2025, January 20). CloudSim 7G: An integrated toolkit for modeling and simulation of Future Generation Cloud Computing Environments. arXiv.org. https://arxiv.org/abs/2408.13386.",
+          tip: (
+            <>
+              Our <span className="font-semibold">simulation platform</span> for algorithm evaluation.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://www.researchgate.net/publication/341123014_Borg_the_next_generation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[14] Borg: The next generation - researchgate. 2020. https://www.researchgate.net/publication/341123014_Borg_the_next_generation",
+          tip: (
+            <>
+              Real-world <span className="font-semibold">workload data</span> for testing.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1186/s13677-023-00453-3"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[3] J. Zhou et al., \"Comparative analysis of metaheuristic load balancing algorithms for efficient load balancing in cloud computing,\" Journal of Cloud Computing: Advances, Systems and Applications, vol. 12, no. 85, pp. 1–21, Jun. 2023, doi: 10.1186/s13677-023-00453-3.",
+          tip: (
+            <>
+              Comprehensive <span className="font-semibold">algorithm comparison</span> framework.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.3390/s22030920"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[2] A. Khan et al., \"AdPSO: Adaptive PSO-Based Task Scheduling Approach for Cloud Computing,\" Sensors, vol. 22, no. 3, p. 920, 2022.",
+          tip: (
+            <>
+              Validates <span className="font-semibold">adaptive parameter strategies</span>.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.3390/a14020029"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[39] A. A. Al-Moalmi, J. Luo, A. Salah, and K. Li, \"Task scheduling in cloud computing using hybrid meta-heuristic: a two-way approach,\" Algorithms, vol. 14, no. 2, p. 29, 2021.",
+          tip: (
+            <>
+              Explores <span className="font-semibold">hybrid algorithm</span> approaches.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1016/j.jpdc.2020.04.008"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[21] A. Devaraj, M. Elhoseny, S. Dhanasekaran, E. Lydia, and K. Shankar, \"Hybridization of firefly and Improved Multi-Objective Particle Swarm Optimization algorithm for energy efficient load balancing in Cloud Computing environments,\" J. Parallel Distrib. Comput., vol. 142, pp. 36-45, Aug. 2020.",
+          tip: (
+            <>
+              Multi-objective <span className="font-semibold">energy optimization</span> strategies.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1007/s10462-024-10925-w"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[16] N. Devi et al., \"A systematic literature review for load balancing and task scheduling techniques in cloud computing,\" Artificial Intelligence Review, vol. 57, no. 10, Sep. 2024, doi: 10.1007/s10462-024-10925-w.",
+          tip: (
+            <>
+              Comprehensive <span className="font-semibold">state-of-the-art</span> review.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="http://www.softcomputing.net/nabic11_7.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[50] Inertia weight strategies in particle swarm optimization, http://www.softcomputing.net/nabic11_7.pdf (accessed Nov. 8, 2025).",
+          tip: (
+            <>
+              Educational resource on <span className="font-semibold">PSO fundamentals</span>.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://algorithmafternoon.com/books/particle_swarm/chapter04/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[51] \"Chapter 4 - parameter tuning and its effects,\" Chapter 4 - Parameter Tuning and Its Effects | Algorithm Afternoon, https://algorithmafternoon.com/books/particle_swarm/chapter04/ (accessed Nov. 8, 2025).",
+          tip: (
+            <>
+              Practical <span className="font-semibold">parameter selection</span> guidance.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
+              href="https://doi.org/10.1016/j.swevo.2022.101056"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[53] P. Stodola, P. Otřísal, and K. Hasilová, “Adaptive Ant Colony Optimization with node clustering applied to the Travelling Salesman Problem,” Swarm and Evolutionary Computation, vol. 70, p. 101056, Mar. 2022, doi: 10.1016/j.swevo.2022.101056.",
+          tip: (
+            <>
+              Source for <span className="font-semibold">adaptive evaporation</span> formula.
+            </>
+          ),
+        },
+      ],
     },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "A Comparative Analysis Of Task Scheduling Algorithms Through CloudSim. Published in IJCRT (International Journal of Creative Research Thoughts), Vol. 10, Issue 7, 2022 by Bhuyan, S. S., & Mishra, A. K. Compares multiple task scheduling algorithms in CloudSim, using standard PSO with typical parameter settings as one of the baselines.",
-      tip: (
-        <>
-          2022 IJCRT study on <span className="font-semibold">cloud scheduling algorithms</span>.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.4108/eetsis.4042"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "Enhanced Task Scheduling Using Optimized Particle Swarm Optimization Algorithm in Cloud Computing Environment; DOI: 10.4108/eetsis.4042. Published in EAI Endorsed Transactions on Scalable Information Systems, Vol. 4, Issue 11, 2023, by Potluri et al. Enhances standard SPSO-based task scheduling, using the classic SPSO 2011 configuration as its baseline for evaluation.",
-      tip: (
-        <>
-          2023 EAI paper on <span className="font-semibold">SPSO enhancements</span>.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://arxiv.org/pdf/2405.15397.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "Comparative Analysis of Four Prominent Ant Colony Optimization Variants: Ant System, Rank-Based Ant System, Max-Min Ant System, and Ant Colony System. Published as arXiv preprint 2405.15397, May 2024, by Ahmed et al. Systematically compares major ACO variants, justifying MMAS as standard baseline in cloud task scheduling.",
-      tip: (
-        <>
-          2024 arXiv on <span className="font-semibold">ACO variants comparison</span>.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1155/2013/860289"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[44] Martins Akugbe Arasomwan and A. O. Adewumi, \"On the Performance of Linear Decreasing Inertia Weight Particle Swarm Optimization for Global Optimization,\" The Scientific World JOURNAL, vol. 2013, pp. 1–12, Jan. 2013, doi: 10.1155/2013/860289.",
-      tip: (
-        <>
-          Validates our <span className="font-semibold">0.9 → 0.4 inertia decay</span> range.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1016/j.neucom.2021.03.077"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[6] X. Li, K. Mao, F. Lin, and X. Zhang, \"Particle swarm optimization with state-based adaptive velocity limit strategy,\" Neurocomputing, vol. 447, pp. 64–79, Mar. 2021, doi: 10.1016/j.neucom.2021.03.077.",
-      tip: (
-        <>
-          Supports <span className="font-semibold">dynamic velocity limits</span> (6.0 → 1.0).
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1155/2016/6469721"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[45] P. Li and H. Zhu, \"Parameter Selection for Ant Colony Algorithm Based on Bacterial Foraging Algorithm,\" Mathematical Problems in Engineering, vol. 2016, pp. 1–12, 2016, doi: 10.1155/2016/6469721.",
-      tip: (
-        <>
-          Justifies <span className="font-semibold">α=1.0, β=2.0</span> parameter choices.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://link.springer.com/chapter/10.1007/978-3-030-81462-5_6"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[4] A. Daniel, N. Partheeban, and S. Sriramulu, \"Enhanced Ant Colony Optimization Algorithm for Optimizing Load Balancing in Cloud Computing Platform,\" in Computational Intelligence in Data Science, Springer, 2021, pp. 64–70.",
-      tip: (
-        <>
-          Demonstrates <span className="font-semibold">load-based pheromone</span> reinforcement.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.3390/sym16060661"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[40] J. Tang, G. Liu, Q. Qi, and Q. Pan, \"Enhanced Particle Swarm Optimization for Task Scheduling in Cloud Computing Environments,\" Symmetry, vol. 16, no. 6, p. 661, 2024.",
-      tip: (
-        <>
-          Recent validation of <span className="font-semibold">EPSO effectiveness</span> in cloud scheduling.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://arxiv.org/abs/2408.13386"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[5] Andreoli, R., Zhao, J., Cucinotta, T., & Buyya, R. (2025, January 20). CloudSim 7G: An integrated toolkit for modeling and simulation of Future Generation Cloud Computing Environments. arXiv.org. https://arxiv.org/abs/2408.13386.",
-      tip: (
-        <>
-          Our <span className="font-semibold">simulation platform</span> for algorithm evaluation.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://www.researchgate.net/publication/341123014_Borg_the_next_generation"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[14] Borg: The next generation - researchgate. 2020. https://www.researchgate.net/publication/341123014_Borg_the_next_generation",
-      tip: (
-        <>
-          Real-world <span className="font-semibold">workload data</span> for testing.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1186/s13677-023-00453-3"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[3] J. Zhou et al., \"Comparative analysis of metaheuristic load balancing algorithms for efficient load balancing in cloud computing,\" Journal of Cloud Computing: Advances, Systems and Applications, vol. 12, no. 85, pp. 1–21, Jun. 2023, doi: 10.1186/s13677-023-00453-3.",
-      tip: (
-        <>
-          Comprehensive <span className="font-semibold">algorithm comparison</span> framework.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.3390/s22030920"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[2] A. Khan et al., \"AdPSO: Adaptive PSO-Based Task Scheduling Approach for Cloud Computing,\" Sensors, vol. 22, no. 3, p. 920, 2022.",
-      tip: (
-        <>
-          Validates <span className="font-semibold">adaptive parameter strategies</span>.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.3390/a14020029"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[39] A. A. Al-Moalmi, J. Luo, A. Salah, and K. Li, \"Task scheduling in cloud computing using hybrid meta-heuristic: a two-way approach,\" Algorithms, vol. 14, no. 2, p. 29, 2021.",
-      tip: (
-        <>
-          Explores <span className="font-semibold">hybrid algorithm</span> approaches.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1016/j.jpdc.2020.04.008"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[21] A. Devaraj, M. Elhoseny, S. Dhanasekaran, E. Lydia, and K. Shankar, \"Hybridization of firefly and Improved Multi-Objective Particle Swarm Optimization algorithm for energy efficient load balancing in Cloud Computing environments,\" J. Parallel Distrib. Comput., vol. 142, pp. 36-45, Aug. 2020.",
-      tip: (
-        <>
-          Multi-objective <span className="font-semibold">energy optimization</span> strategies.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://doi.org/10.1007/s10462-024-10925-w"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[16] N. Devi et al., \"A systematic literature review for load balancing and task scheduling techniques in cloud computing,\" Artificial Intelligence Review, vol. 57, no. 10, Sep. 2024, doi: 10.1007/s10462-024-10925-w.",
-      tip: (
-        <>
-          Comprehensive <span className="font-semibold">state-of-the-art</span> review.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="http://www.softcomputing.net/nabic11_7.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[50] Inertia weight strategies in particle swarm optimization, http://www.softcomputing.net/nabic11_7.pdf (accessed Nov. 8, 2025).",
-      tip: (
-        <>
-          Educational resource on <span className="font-semibold">PSO fundamentals</span>.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://algorithmafternoon.com/books/particle_swarm/chapter04/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-         View
-        </a>
-      ),
-      explanation: "[51] \"Chapter 4 - parameter tuning and its effects,\" Chapter 4 - Parameter Tuning and Its Effects | Algorithm Afternoon, https://algorithmafternoon.com/books/particle_swarm/chapter04/ (accessed Nov. 8, 2025).",
-      tip: (
-        <>
-          Practical <span className="font-semibold">parameter selection</span> guidance.
-        </>
-      ),
-    },
-    {
-      icon: "FileText",
-      label: (
-        <a
-          href="https://algorithmafternoon.com/ants/ant_system/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          View
-        </a>
-      ),
-      explanation: "[53] \"Ant System,\" Ant System | Algorithm Afternoon, https://algorithmafternoon.com/ants/ant_system/ (accessed Nov. 8, 2025).",
-      tip: (
-        <>
-          Core <span className="font-semibold">ACO algorithm</span> principles and implementation.
-        </>
-      ),
-    },
-  ],
-},
 
 
     references: {
