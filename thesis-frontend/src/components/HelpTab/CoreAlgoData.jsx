@@ -234,6 +234,25 @@ export const coreAlgoData = {
           icon: "FileText",
           label: (
             <a
+              href="https://peerj.com/articles/cs-2253/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View
+            </a>
+          ),
+          explanation: "[58] Y. Han et al., \"DCWPSO: Particle swarm optimization with dynamic inertia weight updating and enhanced learning strategies,\" PeerJ Computer Science, https://peerj.com/articles/cs-2253/ (accessed Nov. 25, 2025).",
+          tip: (
+            <>
+              Reference study for <span className="font-semibold">non-linear inertia weight</span> strategies.
+            </>
+          ),
+        },
+        {
+          icon: "FileText",
+          label: (
+            <a
               href="https://doi.org/10.1155/2016/6469721"
               target="_blank"
               rel="noopener noreferrer"
